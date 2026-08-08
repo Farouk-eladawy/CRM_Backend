@@ -1,0 +1,76 @@
+Table Name,Field Name,Data Type,Sample Value
+Trips,TripID,str,7031
+Trips,Title,str,Marsa Alam: Luxor Tour to the Valley of the Kings &amp; Karnak Temples
+Trips,Slug,str,luxor-day-tour-marsa-alam-valley-kings-karnak
+Trips,StatusWorkflow,str,publish
+Trips,Permalink,str,https://ftstravels.com/tours/marsa-alam-luxor-tour-to-the-valley-of-the-kings-karnak-temples/
+Trips,TripCode,str,FTS-7031
+Trips,Duration_Hours,int,22
+Trips,Duration_Unit,str,hours
+Trips,Price_From,str,0
+Trips,Currency,str,EUR
+Trips,FeaturedImage,list/array,"[{'id': 'attyaJKhkYpMf3HO5', 'width': 1200, 'height': 800, 'url': 'https://v5.airtableusercontent.co"
+Trips,Gallery,list/array,"[{'id': 'attv4agiYrx9sWqBP', 'width': 1200, 'height': 800, 'url': 'https://v5.airtableusercontent.co"
+Trips,SEO_Title,str,Guided Luxor Tours from Marsa Alam - Valley of Kings & Karnak
+Trips,LastSynced,str,2026-01-04
+Trips,Images,list/array,"['recHJFSzG5zS5rU7p', 'recAZERe6BVDrpHaZ', 'recOhheJgN28st4M7', 'recjzNElB4HRJDx2p', 'recGgUNf1348st"
+Trips,TripHighlights,list/array,"['recASP4z6DxFWZpjk', 'recoe2Febju450YYo', 'rec4XFEbzAmfD7P1p', 'recSSMj9fB7Mh0moP', 'recZuzPTnCeaAd"
+Trips,ItinerarySteps,list/array,"['rec8BuKiRXEuUFTBJ', 'recqOP59nwvqF96b9', 'recgutTNcOBaE5mva', 'recpeXAmPIjJPrPDA', 'recvk9TZeZI9Pl"
+Trips,TripFAQs,list/array,"['reclNhL2B1e4qRNKR', 'rec7U4lfpNXBc2r9G']"
+Trips,TripIncludes,list/array,"['rec5Ohg1fiQOVyKKn', 'reccOg4kuHgq2YTn9', 'recaSAtolbLnWxTz7', 'rec4PBvrLQhHz1lDA', 'recbOTouV7xEYk"
+Trips,TripDetails,list/array,['recDMnZizStkjwgeb']
+Trips,Overview_Section_Title,str,About this tour
+Trips,Trip_Description,str,<!-- wp:paragraph --> <p>Embark on a day trip to Luxor from Marsa Alam and explore the wonders of an
+Trips,Itinerary_Section_Title,str,Itinerary
+Trips,FAQ_Section_Title,str,Frequently asked questions
+Trips,Cost_Section_Title,str,Included
+Trips,Cost_Includes_Title,str,Cost Includes
+Trips,AI_Highlights_Status,str,Waiting
+Trips,AI_IncExc_Status,str,Waiting
+Trips,AI_Itinerary_Status,str,Waiting
+Trips,Trip_Highlights_Section_Title,str,Highlights
+Trips,AI_Status,str,Waiting
+Trips,AI_TripFacts_Status,str,Waiting
+Trips,AI_Images_Status,str,Waiting
+Trips,AI_FAQs_Status,str,Waiting
+Trips,AI_AddOns_Status,str,Waiting
+Trips,Publish_Status,str,Not Started
+Trips,SEO_Description,str,Fly from Hurghada to Cairo for a full-day tour of the Grand Egyptian Museum & Pyramids. Experience a
+Trips,RankMathScore,int,1
+Trips,SEO_FocusKeywords,str,Cairo day trip from Hurghada
+Trips,SEO_FocusKeywords_List,list/array,['Cairo day trip from Hurghada']
+Trips,Tab_Content,str,This Hurghada to Cairo day trip by plane maximizes your time efficiently. You'll experience Egypt's 
+Trips,Cost_Excludes_Title,str,What's Not Included
+Trips,Highlights Improvement With AI,list/array,"['recILtm55J11q0CUi', 'recTabBViCO5Tmskq', 'recePVGcju0c0Kc9M', 'recDDVyDOuyNUdqP3', 'reccoOTnI3RZfY"
+Trips,Itinerary Improvement With AI,list/array,"['rec9lj3AI6E8SC5Rn', 'recCW6OwqU0277Mot', 'recL6gUJByj2sLkrK', 'rec6IXL0iXnhob538', 'recWHSXLD2tviu"
+Trips,TripExcludes Improvement With AI,list/array,"['recVmQwoRuG0nvgTu', 'recJZNzPZ4or0hczU', 'recJ95xRtQWOOunke', 'recqT6vaQ1LoWZpz6']"
+Trips,TripIncludes Improvement With AI,list/array,"['rec7Lfa4hE4CJtIYp', 'recACYAVtcqy84KL1', 'rechgMMK5QMr3EQMe', 'rec6p6GfxXUItN5vU', 'reczwsk9iSDvd5"
+Trips,TripFacts Improvement With AI,list/array,"['recPGlxUiHMyxcWBD', 'rec3bCIgYoRrZn5ii', 'recvfaSH4Xp65iy3P', 'recDlbkad0sevyrKf', 'reco3xSpcUwGYA"
+Trips,Images Improvement With AI,list/array,['recLDVJsyLpDP37AE']
+Trips,FAQs Improvement With AI,list/array,"['recdKkLAVuNTySmkC', 'recW0MIxv4vQoaDRy', 'recL4anQ6pwXY0Yqj', 'recVHkQqP1si1S8kS', 'recH6BlsaDd5Fl"
+Trips,AddOns Improvement With AI,list/array,"['recQrY0l5JdyuOc9h', 'recRSKtBqRblpi4ID', 'recOsfUBwJ826dfqD']"
+Trips,Pipeline_Status,str,Completed
+Trips,Improvement With AI,list/array,['recpSxA0kwyu3XDLS']
+Trips,Packages,list/array,['recSI5LwT8vMIsxau']
+Trips,Prices,list/array,"['recBACSY7BlgEeiNt', 'reccoxtWWHkbZDGf1', 'recxTbQnOqPhkQVFK', 'recBGRgDUM5vudiEE', 'recYO6AV3Q9QKS"
+Trips,TripExcludes,list/array,"['recAz4pYBemEN9AKO', 'recl7YxQy8Wkr51bU', 'rectkQXdR1oTukrxB']"
+Trips,Itinerary_Description,str,<!-- wp:paragraph --> <p>Leave the city behind and set out on a magical desert escape in Sahl Hashee
+Prices,PackageID,str,22088
+Prices,CategoryID,int,87
+Prices,Label,str,Infant
+Prices,RegularPrice,int,0
+Prices,Currency,str,EUR
+Prices,MinPax,int,0
+Prices,PricingType,str,per-person
+Prices,GroupPricing,str,"[{""from"":1,""to"":"""",""price"":0}]"
+Prices,Trip,list/array,['rec4EulOkfdFoDJUh']
+Prices,SalePrice,int,35
+Prices,MaxPax,int,1000
+Images,ImageID,int,7154
+Images,URL,str,https://ftstravels.com/wp-content/uploads/2025/05/poiuytrewdfg_7-9.jpg
+Images,Width,int,1200
+Images,Height,int,800
+Images,Title,str,poiuytrewdfg_7
+Images,MimeType,str,image/jpeg
+Images,SourceTrip,list/array,['recAsv7aryNTEnk06']
+Images,Images Improvement With AI,list/array,['recCKsmERp185M4EU']

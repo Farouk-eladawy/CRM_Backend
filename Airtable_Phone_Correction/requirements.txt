@@ -1,0 +1,5 @@
+# Phone Correction Tool Dependencies
+python-dotenv
+pyairtable
+phonenumbers
+requests

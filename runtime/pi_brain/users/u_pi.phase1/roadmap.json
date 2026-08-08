@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "version": "v1",
+  "phases": [
+    {
+      "phase": 1,
+      "name": "external_brain_layer",
+      "status": "active",
+      "goal": "Create workspace, schema files, and safe file bridge."
+    },
+    {
+      "phase": 2,
+      "name": "personal_memory_layer",
+      "status": "planned",
+      "goal": "Add behavior model, goals, and reusable memory types."
+    },
+    {
+      "phase": 3,
+      "name": "operational_manifest_layer",
+      "status": "planned",
+      "goal": "Produce action manifest and connect it to execution bridge."
+    },
+    {
+      "phase": 4,
+      "name": "personal_assistant_layer",
+      "status": "planned",
+      "goal": "Track long-term goals, verify outcomes, and evolve PI into an assistant."
+    }
+  ],
+  "updated_at": "2026-07-10T12:54:48.618202+00:00"
+}

@@ -1,0 +1,48 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "حلل الحجز التالي TIQ-TEST-999",
+  "assistant_reply": "**Booking Summary – TIQ-TEST-999**\n\n- **Customer:** Test User  \n- **Phone:** 201004655246  \n- **Trip:** Grand Egypt Ticket  \n- **Date:** 26 June 2026 (21:00)  \n- **Hotel:** Sunrise Resort  \n- **Department:** غير محدد  \n- **CRM Chat History:** موجودة (محادثة واحدة، رسالتان)  \n\n**ملخص المحادثة السابقة مع العميل:**  \nالعميل أرسل \"Hello\"، وتم الرد عليه بترحيب وتأكيد بيانات الحجز، مع عرض المساعدة أو تحويله إلى فريق الجودة أو وكيل بشري. لم يرد العميل بعد.\n\n**الخطوة التالية الموصى بها:**  \nبما أن العميل لم يرد بعد على الرد الأولي، يُفضل إرسال متابعة بسيطة بعد 24 ساعة لسؤاله إن كان بحاجة لأي مساعدة إضافية، أو يمكنك التواصل معه مباشرة عبر الهاتف لتأكيد الحجز والاستفسار عن احتياجاته.",
+  "intent": "booking_summary",
+  "case_context": {
+    "record_id": "recxRGwaeuq5GinM6",
+    "booking_number": "TIQ-TEST-999",
+    "customer_name": "Test User",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "",
+    "trip_name": "Grand Egypt Ticket",
+    "trip_date": "2026-06-26T21:00:00.000Z",
+    "hotel": "sunrise resort"
+  },
+  "workflow_state": {
+    "intent": "booking_summary",
+    "phase": "case_active",
+    "awaiting": "followup",
+    "case_context": {
+      "record_id": "recxRGwaeuq5GinM6",
+      "booking_number": "TIQ-TEST-999",
+      "customer_name": "Test User",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "",
+      "trip_name": "Grand Egypt Ticket",
+      "trip_date": "2026-06-26T21:00:00.000Z",
+      "hotel": "sunrise resort"
+    },
+    "note": "**Booking Summary – TIQ-TEST-999**\n\n- **Customer:** Test User  \n- **Phone:** 201004655246  \n- **Trip:** Grand Egypt Ticket  \n- **Date:** 26 June 2026 (21:00)  \n- **Hotel:** Sunrise Resort  \n- **Department:** غير محدد  \n- **CRM Chat History:** موجودة (محادثة واحدة، رسالتان)  \n\n**ملخص المحادثة السابقة مع العميل:**  \nالعميل أرسل \"Hello\"، وتم الرد عليه بترحيب وتأكيد بيانات الحجز، مع عرض المساعدة أو تحويله إلى فريق الجودة أو وكيل بشري. لم يرد العميل بعد.\n\n**الخطوة التالية الموصى بها:**  \nبما أن العميل لم يرد بعد على الرد الأولي، يُفضل إرسال متابعة بسيطة بعد 24 ساعة لسؤاله إن كان بحاجة لأي مساعدة إضافية، أو يمكنك التواصل معه مباشرة عبر الهاتف لتأكيد الحجز والاستفسار عن احتياجاته.",
+    "updated_at": "2026-07-11T01:06:32.492057+00:00"
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "حلل الحجز التالي TIQ-TEST-999"
+    },
+    {
+      "role": "assistant",
+      "text": "**Booking Summary – TIQ-TEST-999**\n\n- **Customer:** Test User  \n- **Phone:** 201004655246  \n- **Trip:** Grand Egypt Ticket  \n- **Date:** 26 June 2026 (21:00)  \n- **Hotel:** Sunrise Resort  \n- **Department:** غير محدد  \n- **CRM Chat History:** موجودة (محادثة واحدة، رسالتان)  \n\n**ملخص المحادثة السابقة مع العميل:**  \nالعميل أرسل \"Hello\"، وتم الرد عليه بترحيب وتأكيد بيانات الحجز، مع عرض المساعدة أو تحويله إلى فريق الجودة أو وكيل بشري. لم يرد العميل بعد.\n\n**الخطوة التالية الموصى بها:**  \nبما أن العميل لم يرد بعد على الرد الأولي، يُفضل إرسال متابعة بسيطة بعد 24 ساعة لسؤاله إن كان بحاجة لأي مساعدة إضافية، أو يمكنك التواصل معه مباشرة عبر الهاتف لتأكيد الحجز والاستفسار عن احتياجاته."
+    }
+  ],
+  "pending_action": {},
+  "captured_at": "2026-07-11T01:06:32.492057+00:00"
+}

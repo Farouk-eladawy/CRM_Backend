@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-phase4-test",
+  "status": "completed",
+  "updated_at": "2026-07-10T12:58:24.679867+00:00",
+  "intent": "next_step",
+  "current_stage": "memory",
+  "stage_status": "completed",
+  "next_stage": "completed"
+}

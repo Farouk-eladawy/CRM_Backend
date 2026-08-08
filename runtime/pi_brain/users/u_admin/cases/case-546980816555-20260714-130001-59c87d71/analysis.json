@@ -1,0 +1,28 @@
+{
+  "understood_intent": "update_airtable",
+  "confidence": 0.49,
+  "is_clean": false,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "update_airtable",
+  "case_reference": "546980816555",
+  "hard_case_reason": [
+    "short_followup_context_dependency",
+    "implicit_update_request"
+  ],
+  "ambiguities": [],
+  "misclassification_flags": [
+    "implicit_update_request"
+  ],
+  "risk_flags": [
+    "write_operation",
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "نعم",
+    "reply_preview": "تم تحديث Airtable بنجاح.\nالعميل: Ahmed Elkhatib\nالحجز: 546980816555",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-14T13:00:04.067455+00:00"
+}

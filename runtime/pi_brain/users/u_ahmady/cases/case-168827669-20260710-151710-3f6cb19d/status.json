@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-168827669-20260710-151710-3f6cb19d",
+  "status": "active",
+  "updated_at": "2026-07-10T15:17:10.813918+00:00",
+  "intent": "booking_summary",
+  "current_stage": "intake",
+  "stage_status": "completed",
+  "next_stage": "analysis"
+}

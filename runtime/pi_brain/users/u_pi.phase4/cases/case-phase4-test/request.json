@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-phase4-test",
+  "intent": "next_step",
+  "request_source": "internal_whatsapp_assistant",
+  "captured_at": "2026-07-10T12:58:24.678584+00:00"
+}

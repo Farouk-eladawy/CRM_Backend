@@ -1,0 +1,67 @@
+{
+  "status": "success",
+  "message": "Booking summary prepared successfully.",
+  "data": {
+    "summary": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "trip_name": "The Grand Egyptian Museum",
+      "booking_status": "Canceled",
+      "date_trip": "2026-06-23T01:00:00.000Z",
+      "populated_field_count": 79,
+      "empty_field_count": 73,
+      "linked_fields": [
+        {
+          "field_name": "Tour Guide Name & Phone",
+          "count": 1
+        },
+        {
+          "field_name": "Driver Name & Phone",
+          "count": 1
+        }
+      ],
+      "attachment_fields": [
+        {
+          "field_name": "Attachments",
+          "count": 1
+        }
+      ],
+      "high_signal_fields": {
+        "Agency": "Tiqets",
+        "Booking Nr.": "123456test",
+        "Date Trip": "2026-06-23T01:00:00.000Z",
+        "trip Name": "The Grand Egyptian Museum",
+        "Customer Name": "Ahmady",
+        "Hotel Name": "الي Ajira Bay",
+        "Customer personal email": "Amrmahraga@gmail.com",
+        "Customer Phone": "201004655246",
+        "Booking Status": "Canceled",
+        "No show & refund": [
+          "No show"
+        ],
+        "Attachments": [
+          {
+            "id": "attyF4LMZWHr1SKtk",
+            "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/FvwNiGy3TYexyhZblWog7Q/f4xvb1hS_NLYZ7TVPw5Fh-17zCxKUgETPDwpdNrYME3KunKia-gp8RrUP1vI-KwYGF9XfSy5fc_gBIRTIDPvlr915pkG9Z3G_fOJshb6YFHR5WzoPJpiNnuyuoeHHC0VKTkHkRQYWbMGedMjjblxCV0dWXZw7tGdwt4_1WNWfWw/Fxlbs5iDA9HIWreLp_itcVdlNeXnGTK-KsrAAzFQZx4",
+            "filename": "Bel Air Azur Resort.pdf",
+            "size": 4187009,
+            "type": "application/pdf",
+            "thumbnails": {
+              "small": {
+                "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/BTY16K91S_NQx8aoRrLXbw/6sLpow1YgMiqszMolIeOtOH6fmFtXywocF6xC_ANkprPymZrh4jF8d8Er4b6I-hLKjnxJuuKZy57SQjBS1L4emY7_5x69rjPkvSDOnH6pyRMduDI3i2tLYCnYAnu2sNs6xTbVTZ2lINc4-8sVqQQ8w/KVcZv3L0BAD_YRbOmVP26pt-yC4Yy-SLk9EKd7sqvGE",
+                "width": 28,
+                "height": 36
+              },
+              "large": {
+                "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/gmByeTFxuXyg-Ocv4Zu8vA/WG7AMo26VRLdtmkbAVwr_65FpCtiqjtGfUYVm16bAwiEnDmC4NB6Kv09hCAo9j8mDC83NnRIxLVEFZ25ouMqpod_T7dTn3u9ej2jD4xHC5gP2toMOrfuUryy9vxfnpWufkDZceMULRIaanGnZjHPPg/8CwOZAyRPKuguagSCu465b7V-8JxWQ3jLrCbQtzcSMQ",
+                "width": 512,
+                "height": 663
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

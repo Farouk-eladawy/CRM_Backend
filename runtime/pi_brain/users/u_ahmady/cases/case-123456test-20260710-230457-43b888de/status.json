@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-123456test-20260710-230457-43b888de",
+  "status": "active",
+  "updated_at": "2026-07-10T23:05:15.481909+00:00",
+  "intent": "create_invoice",
+  "current_stage": "analysis",
+  "stage_status": "completed",
+  "next_stage": "plan"
+}

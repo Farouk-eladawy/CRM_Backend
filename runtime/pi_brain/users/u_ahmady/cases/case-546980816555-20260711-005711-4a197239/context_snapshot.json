@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-546980816555-20260711-005711-4a197239",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "+201013498777",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-06-05T05:00:00.000Z",
+    "hotel": "Sunrise Arabian Beach Resort"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "قم بتعديل رقم الهاتف الي 201013498777"
+      },
+      {
+        "role": "assistant",
+        "text": "تمام، تم تعديل رقم الهاتف للعميل أحمد الخطيب إلى +201013498777 في نظام Airtable.\n\n**ملخص الحجز:**\n- **العميل:** أحمد الخطيب\n- **رقم الحجز:** 546980816555\n- **الرحلة:** المتحف المصري الكبير (تذكرة تخطي الطابور)\n- **التاريخ:** 5 يونيو 2026\n- **الفندق:** Sunrise Arabian Beach Resort\n- **البريد الإلكتروني:** Ahmedyeladawy@gmail.com\n- **عدد الأشخاص:** 2 بالغين\n\n**ملخص المحادثة السابقة (CRM):**\nتم إرسال رابط الدليل الصوتي للعميل، ورد بكلمة \"Hello\" و\"Confirm\". قام الوكيل بالترحيب وتأكيد الحجز، ثم تم إغلاق المحادثة بواسطة عبدالرحمن سيد بسبب \"Spam / Out of scope\".\n\n**الخطوة التالية المقترحة:**\nبما أن المحادثة السابقة تم إغلاقها كـ Spam، يُنصح بإعادة فتح محادثة جديدة مع العميل لتأكيد التعديل على رقم الهاتف، وإعادة إرسال رابط الدليل الصوتي إذا لزم الأمر، مع طلب تأكيد الاستلام."
+      }
+    ],
+    "last_case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "+201013498777",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-06-05T05:00:00.000Z",
+      "hotel": "Sunrise Arabian Beach Resort"
+    },
+    "last_intent": "booking_summary",
+    "updated_at": "2026-07-11T00:55:57.234363+00:00",
+    "pending_action": {},
+    "workflow_state": {
+      "intent": "booking_summary",
+      "phase": "case_active",
+      "awaiting": "followup",
+      "case_context": {
+        "record_id": "rec4mCX8CaQoQrXjI",
+        "booking_number": "546980816555",
+        "customer_name": "Ahmed Elkhatib",
+        "location": "Unknown",
+        "phone": "+201013498777",
+        "email": "Ahmedyeladawy@gmail.com",
+        "trip_name": "Grand Egyptian Museum",
+        "trip_date": "2026-06-05T05:00:00.000Z",
+        "hotel": "Sunrise Arabian Beach Resort"
+      },
+      "note": "تمام، تم تعديل رقم الهاتف للعميل أحمد الخطيب إلى +201013498777 في نظام Airtable.\n\n**ملخص الحجز:**\n- **العميل:** أحمد الخطيب\n- **رقم الحجز:** 546980816555\n- **الرحلة:** المتحف المصري الكبير (تذكرة تخطي الطابور)\n- **التاريخ:** 5 يونيو 2026\n- **الفندق:** Sunrise Arabian Beach Resort\n- **البريد الإلكتروني:** Ahmedyeladawy@gmail.com\n- **عدد الأشخاص:** 2 بالغين\n\n**ملخص المحادثة السابقة (CRM):**\nتم إرسال رابط الدليل الصوتي للعميل، ورد بكلمة \"Hello\" و\"Confirm\". قام الوكيل بالترحيب وتأكيد الحجز، ثم تم إغلاق المحادثة بواسطة عبدالرحمن سيد بسبب \"Spam / Out of scope\".\n\n**الخطوة التالية المقترحة:**\nبما أن المحادثة السابقة تم إغلاقها كـ Spam، يُنصح بإعادة فتح محادثة جديدة مع العميل لتأكيد التعديل على رقم الهاتف، وإعادة إرسال رابط الدليل الصوتي إذا لزم الأمر، مع طلب تأكيد الاستلام.",
+      "updated_at": "2026-07-11T00:57:11.532728+00:00"
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-11T00:57:11.533726+00:00",
+      "case_id": "case-546980816555-20260711-005711-4a197239",
+      "current_stage": "intake",
+      "stage_status": "started",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "546980816555",
+      "intent": "booking_summary",
+      "updated_at": "2026-07-11T00:57:11.533726+00:00"
+    },
+    "topic_reset_meta": {
+      "reason": "reference_changed",
+      "reset_at": "2026-07-11T00:57:05.744991+00:00"
+    }
+  },
+  "captured_at": "2026-07-11T00:57:11.549429+00:00"
+}

@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-546980816555-20260714-121629-c58a95b7",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "+201013498777",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-09-25T05:00:00.000Z",
+    "hotel": "Sunrise Arabian Beach Resort"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "هاتلي تذكرة الطيران اللي علي الحجز ده 546980816555",
+        "reference": "546980816555",
+        "intent": "booking_summary",
+        "timestamp": "2026-07-14T12:16:29.002248+00:00"
+      },
+      {
+        "role": "assistant",
+        "text": "تم العثور على 1 ملف/مرفق للحجز 546980816555.\nهذه هي الملفات/المرفقات المرتبطة بالحجز مباشرة من Airtable:\n- الحقول المفحوصة: Attachments\n1. Pickalbatros Jungle Aqua Park Resort Neverland Hurghada.GYGMX4KLHN98.pdf | Attachments | application/pdf\n   URL: `https://v5.airtableusercontent.com/v3/u/55/55/1784044800000/e4aE1oCKP4p3hXJASyp00A/h9QS2l81hCGWwtm13fT2-WzCbKas4LaWBzHbcCtnQzx-bNro5aL07-3l9XGZ_CW6wLya_AXtmhHlnBbxNiGXb1aX-YJjs3xKD2muxmiTh6gF79Npykqv7CEAWVVK9FNPGMwwAfhw0YQZiJtchBXnpQfBmGlcer5kcq8ENp-0KzfK2jnkj0plpi2_DjXUU8g9DS4LTRNxLPBhoYAYnZRPLaIpdijMFmKVOM8GHXRYLUg/mnO90KRnVuOoz-7ftGmyCIr3BTBlfCTNFsarldki0vo`",
+        "reference": "546980816555",
+        "intent": "booking_summary",
+        "timestamp": "2026-07-14T12:16:29.003689+00:00"
+      },
+      {
+        "role": "user",
+        "text": "هاتلي تذكرة الطيران اللي علي الحجز ده 546980816555",
+        "timestamp": "2026-07-14T12:23:48.440530+00:00",
+        "reference": "546980816555",
+        "intent": "booking_summary"
+      },
+      {
+        "role": "assistant",
+        "text": "تم العثور على 1 ملف/مرفق للحجز 546980816555.\nهذه هي الملفات/المرفقات المرتبطة بالحجز مباشرة من Airtable:\n- الحقول المفحوصة: Attachments\n1. Pickalbatros Jungle Aqua Park Resort Neverland Hurghada.GYGMX4KLHN98.pdf | Attachments | application/pdf\n   URL: `https://v5.airtableusercontent.com/v3/u/55/55/1784044800000/e4aE1oCKP4p3hXJASyp00A/h9QS2l81hCGWwtm13fT2-WzCbKas4LaWBzHbcCtnQzx-bNro5aL07-3l9XGZ_CW6wLya_AXtmhHlnBbxNiGXb1aX-YJjs3xKD2muxmiTh6gF79Npykqv7CEAWVVK9FNPGMwwAfhw0YQZiJtchBXnpQfBmGlcer5kcq8ENp-0KzfK2jnkj0plpi2_DjXUU8g9DS4LTRNxLPBhoYAYnZRPLaIpdijMFmKVOM8GHXRYLUg/mnO90KRnVuOoz-7ftGmyCIr3BTBlfCTNFsarldki0vo`",
+        "timestamp": "2026-07-14T12:23:48.441656+00:00",
+        "reference": "546980816555",
+        "intent": "booking_summary"
+      }
+    ],
+    "last_case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "+201013498777",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-09-25T05:00:00.000Z",
+      "hotel": "Sunrise Arabian Beach Resort"
+    },
+    "pending_action": {},
+    "workflow_state": {
+      "intent": "booking_summary",
+      "phase": "case_active",
+      "awaiting": "followup",
+      "case_context": {
+        "record_id": "rec4mCX8CaQoQrXjI",
+        "booking_number": "546980816555",
+        "customer_name": "Ahmed Elkhatib",
+        "location": "Unknown",
+        "phone": "+201013498777",
+        "email": "Ahmedyeladawy@gmail.com",
+        "trip_name": "Grand Egyptian Museum",
+        "trip_date": "2026-09-25T05:00:00.000Z",
+        "hotel": "Sunrise Arabian Beach Resort"
+      },
+      "note": "تم العثور على 1 ملف/مرفق للحجز 546980816555.\nهذه هي الملفات/المرفقات المرتبطة بالحجز مباشرة من Airtable:\n- الحقول المفحوصة: Attachments\n1. Pickalbatros Jungle Aqua Park Resort Neverland Hurghada.GYGMX4KLHN98.pdf | Attachments | application/pdf\n   URL: `https://v5.airtableusercontent.com/v3/u/55/55/1784044800000/e4aE1oCKP4p3hXJASyp00A/h9QS2l81hCGWwtm13fT2-WzCbKas4LaWBzHbcCtnQzx-bNro5aL07-3l9XGZ_CW6wLya_AXtmhHlnBbxNiGXb1aX-YJjs3xKD2muxmiTh6gF79Npykqv7CEAWVVK9FNPGMwwAfhw0YQZiJtchBXnpQfBmGlcer5kcq8ENp-0KzfK2jnkj0plpi2_DjXUU8g9DS4LTRNxLPBhoYAYnZRPLaIpdijMFmKVOM8GHXRYLUg/mnO90KRnVuOoz-7ftGmyCIr3BTBlfCTNFsarldki0vo`",
+      "updated_at": "2026-07-14T12:23:48.442685+00:00"
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-14T12:16:29.004454+00:00",
+      "case_id": "case-546980816555-20260714-121629-c58a95b7",
+      "current_stage": "intake",
+      "stage_status": "completed",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "546980816555",
+      "intent": "booking_summary",
+      "updated_at": "2026-07-14T12:16:29.021144+00:00"
+    },
+    "lookup_memory": {
+      "reference": "546980816555",
+      "intent": "booking_summary",
+      "message_text": "هاتلي تذكرة الطيران اللي علي الحجز ده 546980816555",
+      "updated_at": "2026-07-14T12:23:48.440530+00:00"
+    },
+    "updated_at": "2026-07-14T12:16:29.027651+00:00",
+    "last_intent": "booking_summary"
+  },
+  "captured_at": "2026-07-14T12:23:48.456512+00:00"
+}

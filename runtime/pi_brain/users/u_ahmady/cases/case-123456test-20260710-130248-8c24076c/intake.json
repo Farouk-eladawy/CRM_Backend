@@ -1,0 +1,90 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "هات ملخص الحجز 123456test",
+  "assistant_reply": "أهلاً بك يا Ahmady،\n\nتمام، طلبت ملخص الحجز **123456test** للعميل **Ahmady**. إليك التفاصيل:\n\n---\n\n### 📋 ملخص الحجز\n\n| العنصر | التفاصيل |\n|---|---|\n| **رقم الحجز** | 123456test |\n| **العميل** | Ahmady (Ahmed Elkhatib) |\n| **رقم الهاتف** | 201004655246 |\n| **البريد الإلكتروني** | Amrmahraga@gmail.com |\n| **الرحلة** | The Grand Egyptian Museum |\n| **التاريخ** | 23 يونيو 2026 |\n| **الفندق** | الي Ajira Bay |\n| **حالة Airtable** | موجود ✅ |\n\n---\n\n### 📞 ملخص المحادثات السابقة مع العميل (21 رسالة عبر 3 محادثات)\n\n- **تم إرسال رابط الدليل الصوتي** للعميل وطلب تأكيد الاستلام.\n- **العميل رد بـ \"Hello\" و \"Confirm\"** عدة مرات.\n- **تم إرسال رابط صور الفوتوغرافر** بعد الرحلة.\n- **تم إرسال طلب تقييم (Feedback)**.\n- **العميل استفسر عن تأكيد الدفع** وكانت الحالة \"Pending\" سابقاً.\n- **آخر تفاعل:** العميل رد بـ \"Hello\" وتم الرد عليه بمعلومات عن الحجز.\n\n---\n\n### 🔄 حالة سير العمل (Workflow)\n\n- **النية:** general_qa\n- **المرحلة:** ملغاة (Cancelled)\n- **ملاحظة:** تم إلغاء الإجراء المعلق بواسطة مستخدم داخلي.\n\n---\n\n### ✅ الخطوة التالية الموصى بها\n\nبناءً على التحليل، أقترح:\n1. **تأكيد حالة الدفع** للعميل Ahmady — هل تمت معالجة الدفع أم لا يزال Pending؟\n2. **إذا كان الدفع مؤكداً**، أرسل للعميل تأكيد الحجز النهائي وتذكير بموعد الرحلة (23 يونيو 2026).\n3. **إذا كان الدفع معلقاً**، تواصل مع العميل لتأكيد طريقة الدفع أو إرسال رابط الدفع.\n\nهل تريد متابعة أي من هذه الخطوات؟",
+  "intent": "booking_summary",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "workflow_state": {
+    "intent": "booking_summary",
+    "phase": "case_active",
+    "awaiting": "followup",
+    "case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "note": "أهلاً بك يا Ahmady،\n\nتمام، طلبت ملخص الحجز **123456test** للعميل **Ahmady**. إليك التفاصيل:\n\n---\n\n### 📋 ملخص الحجز\n\n| العنصر | التفاصيل |\n|---|---|\n| **رقم الحجز** | 123456test |\n| **العميل** | Ahmady (Ahmed Elkhatib) |\n| **رقم الهاتف** | 201004655246 |\n| **البريد الإلكتروني** | Amrmahraga@gmail.com |\n| **الرحلة** | The Grand Egyptian Museum |\n| **التاريخ** | 23 يونيو 2026 |\n| **الفندق** | الي Ajira Bay |\n| **حالة Airtable** | موجود ✅ |\n\n---\n\n### 📞 ملخص المحادثات السابقة مع العميل (21 رسالة عبر 3 محادثات)\n\n- **تم إرسال رابط الدليل الصوتي** للعميل وطلب تأكيد الاستلام.\n- **العميل رد بـ \"Hello\" و \"Confirm\"** عدة مرات.\n- **تم إرسال رابط صور الفوتوغرافر** بعد الرحلة.\n- **تم إرسال طلب تقييم (Feedback)**.\n- **العميل استفسر عن تأكيد الدفع** وكانت الحالة \"Pending\" سابقاً.\n- **آخر تفاعل:** العميل رد بـ \"Hello\" وتم الرد عليه بمعلومات عن الحجز.\n\n---\n\n### 🔄 حالة سير العمل (Workflow)\n\n- **النية:** general_qa\n- **المرحلة:** ملغاة (Cancelled)\n- **ملاحظة:** تم إلغاء الإجراء المعلق بواسطة مستخدم داخلي.\n\n---\n\n### ✅ الخطوة التالية الموصى بها\n\nبناءً على التحليل، أقترح:\n1. **تأكيد حالة الدفع** للعميل Ahmady — هل تمت معالجة الدفع أم لا يزال Pending؟\n2. **إذا كان الدفع مؤكداً**، أرسل للعميل تأكيد الحجز ال",
+    "updated_at": "2026-07-10T13:02:48.782288+00:00",
+    "action_type": "trip_booking_alert",
+    "action_mode": ""
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "الجدول الاساسي main base"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك يا Ahmady،\n\nتمام، فهمت إنك عاوز تعرف جدول الرحلات المتاحة **اليوم وغداً** بشكل عام، مش بس للحجز 123456test.\n\nللأسف، أنا مش متصلة مباشرة بقاعدة بيانات Airtable عشان أجيبلك قائمة الرحلات الكاملة. لكن أقدر أساعدك بطريقتين:\n\n1. **إذا كان عندك اسم قاعدة بيانات معينة** (مثلاً \"قاعدة الرحلات\" أو \"Religious Base\") أو رابط، قوللي إسمها عشان أبحث فيها.\n2. **أو ممكن تفتح Airtable بنفسك** وتتصفح جدول الرحلات، وتصفيه حسب التاريخ (Today و Tomorrow).\n\nهل عندك اسم قاعدة معينة أو رابط عشان أدورلك فيها؟"
+    },
+    {
+      "role": "user",
+      "text": "- عاوز تحليل PI للحالة دي قبل التنفيذ"
+    },
+    {
+      "role": "assistant",
+      "text": "---\n\n## ✅ FTS Travels CRM — System Overview (OpenClaw Version)\n\nI have fully analyzed the project. Here is a comprehensive architectural summary:\n\n---\n\n### 🏗️ **System Architecture**\n\n| Layer | Technology | Purpose |\n|---|---|---|\n| **Backend Server** | Flask (Python) | `OpenClaw_Core.py` — Main API gateway (port `18789`) |\n| **AI Agent (Teacher)** | Python | `ai_agent.py` (~1.5MB) — Live customer handling system |\n| **OpenClaw Core (Student)** | Flask | Learning system that shadows the Teacher |\n| **Observer** | Python | `OpenClaw_Observer.py` — Airtable audit & change analyzer |\n| **Dashboard** | Flask + HTML | `dashboard.py` — Real-time log viewer |\n| **Frontend** | React/TypeScript (Vite) | Full CRM dashboard in `frontend_dashboard/` |\n| **WhatsApp** | Evolution API (port `8080`) + Meta Cloud API | Dual-channel WhatsApp messaging |\n| **Database** | Airtable (Primary) + SQLite (Local Mirror) | `airtable_mirror.db`, `chat_history.db`, `knowledge.db` |\n\n---\n\n### 🔄 **Core Data Flow**\n\n```\nWhatsApp/Web → OpenClaw Core → AI Processing → Airtable + Response\n                      ↓\n              Observer (Monitors Airtable changes, analyzes via DeepSeek)\n                      ↓\n              Dashboard (Real-time logs & insights)\n```\n\n---\n\n### 🧠 **AI Providers**\n- **DeepSeek** (primary) — `deepseek-coder` model\n- **OpenAI** — `gpt-4o` (configured but not primary)\n- Both configured in `config.json`\n\n---\n\n### 📁 **Key Files**\n\n| File | Function |\n|---|---|\n| `OpenClaw_Core.py` | Main Flask server with webhooks, Airtable proxy, message processing |\n| `OpenClaw_Observer.py` | Audits Airtable changes, categorizes them with AI |\n| `ai_agent.py` | Full AI agent (~1.5MB) — Teacher system with conversation handling |\n| `ai_helper.py` | DeepSeek API wrapper + summarization/analysis helpers |\n| `config.json` | Central config (API keys, WhatsApp, Airtable, Stripe, etc.) |\n| `SOUL.md` | AI assistant identity, tone, and behavioral rules |\n| `chat_db.py` | Chat history database layer |"
+    },
+    {
+      "role": "user",
+      "text": "محتاج اعرف الرحلات تاريخ الرحله اليوم ؟"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك يا Ahmady،\n\nتمام، فهمت طلبك. عاوز تعمل تحليل PI (Performance Improvement / Process Improvement) للحالة دي قبل التنفيذ. خلينا نراجع الموقف كله ونحلله:\n\n---\n\n### 📋 **ملخص الحالة الحالية (Case: 123456test)**\n\n| العنصر | التفاصيل |\n|---|---|\n| **العميل** | Ahmady (رقم: 201004655246) |\n| **الرحلة** | The Grand Egyptian Museum |\n| **التاريخ** | 23 يونيو 2026 |\n| **الفندق** | الي Ajira Bay |\n| **آخر حالة** | Pending action cancelled بواسطتك |\n| **الطلب الحالي** | عاوز جدول الرحلات المتاحة اليوم وغداً |\n\n---\n\n### 🔍 **تحليل PI (Process Improvement)**\n\n**1. نقاط القوة في العملية الحالية:**\n- ✅ تم إلغاء الإشعار المكرر بسرعة\n- ✅ الحجز مسجل بنظام Airtable مع بيانات واضحة\n- ✅ العميل معروف ورقمه متاح\n\n**2. نقاط الضعف / الفجوات:**\n- ❌ **عدم وجود وصول مباشر لقاعدة بيانات Airtable** — أنا مش متصلة عشان أجيب جدول الرحلات الكامل\n- ❌ **الطلب غير واضح** — هل عاوز جدول الرحلات المتاحة للعميل Ahmady ولا جدول عام لكل الرحلات؟\n- ❌ **التاريخ** — \"اليوم وغداً\" محتاج توضيح: هل تقصد 23-24 يونيو 2026 ولا تاريخ اليوم الفعلي؟\n\n**3. المخاطر المحتملة:**\n- ⚠️ إذا كان العميل ينتظر رد، التأخير في تجهيز الجدول قد يسبب إحباط\n- ⚠️ إذا تم إرسال جدول غير دقيق، قد يسبب التباس في الحجز\n\n---\n\n### 🎯 **الخطوات المقترحة للتحسين (قبل التنفيذ)**\n\n1. **تحديد نطاق الطلب بدقة:**\n   - هل الجدول المطلوب خاص بالعميل Ahmady (رحلاته فقط)؟\n   - أم جدول عام لكل الرحلات المتاحة اليوم وغداً في Main Base؟\n\n2. **تأكيد التاريخ:**\n   - هل تقصد تاريخ الرحلة المسجل (23-24 يونيو 2026)؟\n   - أم تاريخ اليوم الفعلي (حسب توقيتك المحلي)؟\n\n3. **تجهيز البدائل:**\n   - إذا كان الجدول عام، هل عندك رابط Airtable أو اسم جدول محدد عشان أبحث فيه؟\n   - أو ممكن تفتح Airtable بنفسك وتصفيه حسب التاريخ؟\n\n---\n\n### ✅ **توصيتي النهائية**\n\nأقترح نبدأ بـ:\n1. **تأكيد نطاق الطلب** — هل هو خاص بالعميل Ahmady ولا عام؟\n2. **تأكيد التاريخ** — 23-24 يونيو ولا تاريخ اليوم الفعلي؟\n3. **تحديد مصدر البيانات** — هل عندك رابط Airtable للجدول الأساسي؟\n\nبعدها أقدر أجهزلك تحليل كامل وجدول منظم.\n\n**هل تفضل نبدأ بالتوضيح الأول؟**"
+    },
+    {
+      "role": "user",
+      "text": "قم بتحليل وفحص قاعدة الرحلات داخل Airtable"
+    },
+    {
+      "role": "assistant",
+      "text": "لم أجد نتائج مطابقة في Airtable / I couldn't find matching Airtable results for: trip='Airtable'."
+    },
+    {
+      "role": "user",
+      "text": "تقرير الرحلات"
+    },
+    {
+      "role": "assistant",
+      "text": "The command line is too long."
+    },
+    {
+      "role": "user",
+      "text": "هات ملخص الحجز 123456test"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك يا Ahmady،\n\nتمام، طلبت ملخص الحجز **123456test** للعميل **Ahmady**. إليك التفاصيل:\n\n---\n\n### 📋 ملخص الحجز\n\n| العنصر | التفاصيل |\n|---|---|\n| **رقم الحجز** | 123456test |\n| **العميل** | Ahmady (Ahmed Elkhatib) |\n| **رقم الهاتف** | 201004655246 |\n| **البريد الإلكتروني** | Amrmahraga@gmail.com |\n| **الرحلة** | The Grand Egyptian Museum |\n| **التاريخ** | 23 يونيو 2026 |\n| **الفندق** | الي Ajira Bay |\n| **حالة Airtable** | موجود ✅ |\n\n---\n\n### 📞 ملخص المحادثات السابقة مع العميل (21 رسالة عبر 3 محادثات)\n\n- **تم إرسال رابط الدليل الصوتي** للعميل وطلب تأكيد الاستلام.\n- **العميل رد بـ \"Hello\" و \"Confirm\"** عدة مرات.\n- **تم إرسال رابط صور الفوتوغرافر** بعد الرحلة.\n- **تم إرسال طلب تقييم (Feedback)**.\n- **العميل استفسر عن تأكيد الدفع** وكانت الحالة \"Pending\" سابقاً.\n- **آخر تفاعل:** العميل رد بـ \"Hello\" وتم الرد عليه بمعلومات عن الحجز.\n\n---\n\n### 🔄 حالة سير العمل (Workflow)\n\n- **النية:** general_qa\n- **المرحلة:** ملغاة (Cancelled)\n- **ملاحظة:** تم إلغاء الإجراء المعلق بواسطة مستخدم داخلي.\n\n---\n\n### ✅ الخطوة التالية الموصى بها\n\nبناءً على التحليل، أقترح:\n1. **تأكيد حالة الدفع** للعميل Ahmady — هل تمت معالجة الدفع أم لا يزال Pending؟\n2. **إذا كان الدفع مؤكداً**، أرسل للعميل تأكيد الحجز النهائي وتذكير بموعد الرحلة (23 يونيو 2026).\n3. **إذا كان الدفع معلقاً**، تواصل مع العميل لتأكيد طريقة الدفع أو إرسال رابط الدفع.\n\nهل تريد متابعة أي من هذه الخطوات؟"
+    }
+  ],
+  "pending_action": {},
+  "captured_at": "2026-07-10T13:02:48.782288+00:00"
+}

@@ -1,0 +1,11 @@
+('2026-07-20T13:55:21.364249', '{"chat_id": "8cd61d3f-95ed-4ff4-8a33-92dbd8a30c97", "reason": "Duplicate message"}')
+('2026-05-27T01:56:38.049972', '{"chat_id": "8c10100a-7ece-4a31-b72d-4354657868e4", "reason": "Customer saying thanks / confirmation"}')
+('2026-05-25T02:25:44.125403', '{"chat_id": "95044b3a-a336-4a42-ab67-178e59dab8aa", "reason": "Customer saying thanks / confirmation"}')
+('2026-05-23T23:16:26.166614', '{"chat_id": "94fc3f41-4b13-491a-89f1-0242cf675a15", "reason": "Spam / Out of scope"}')
+('2026-05-23T23:16:21.574747', '{"chat_id": "9ca2b3b6-dc1b-40ff-b69e-9afb5515a842", "reason": "Customer saying thanks / confirmation"}')
+('2026-05-23T23:16:15.951090', '{"chat_id": "38a2608c-bbef-49cf-ab44-2d47139589a4", "reason": "Customer saying thanks / confirmation"}')
+('2026-05-22T12:10:32.515805', '{"chat_id": "2fab60c7-66ef-4d2c-9249-d33f8ac7e87c", "reason": "Customer saying thanks / confirmation"}')
+('2026-05-22T11:58:51.472619', '{"chat_id": "8c10100a-7ece-4a31-b72d-4354657868e4", "reason": "Spam / Out of scope"}')
+('2026-05-22T08:38:29.294028', '{"chat_id": "d747cd68-e17b-44c4-94e8-437b31802b92", "reason": "Customer saying thanks / confirmation"}')
+('2026-05-21T05:53:51.568326', '{"chat_id": "f49ca6ef-96c6-4470-91d3-2fa0775a6ca6", "reason": "Spam / Out of scope"}')
+total_rows_fetched=10

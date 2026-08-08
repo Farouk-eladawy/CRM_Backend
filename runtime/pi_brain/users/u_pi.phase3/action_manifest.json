@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "workspace_actor": "u:pi.phase3",
+  "case_id": "case-phase3-test",
+  "intent": "update_airtable",
+  "stage": "execution_bridge",
+  "actions": [
+    {
+      "action_id": "case-phase3-test-pending-01",
+      "type": "update_airtable",
+      "target": "rec123",
+      "requires_approval": true,
+      "status": "awaiting_user_approval",
+      "source_stage": "execution_bridge",
+      "payload": {
+        "type": "update_airtable",
+        "record_id": "rec123",
+        "text": "Customer requested callback tomorrow"
+      },
+      "reason": "Preview update then request approval",
+      "confidence": 0.88
+    }
+  ],
+  "updated_at": "2026-07-10T12:57:06.366592+00:00"
+}

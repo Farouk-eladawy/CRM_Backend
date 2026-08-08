@@ -1,0 +1,3 @@
+knowledge.db strict_qa_rules matches: 0
+chat_history.db workflows using 15day script: 1
+  WF: id=religious_15day_autoreply_v1 | name=15 Days Exact Keyword Auto-Reply Religious - عمرة ١٥ يوم (لحظي)

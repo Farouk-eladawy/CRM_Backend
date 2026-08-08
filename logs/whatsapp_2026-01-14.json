@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2026-01-14T15:21:38.236467",
+    "phone": "1234567890",
+    "direction": "inbound",
+    "message": "Hello, I want to book a Safari trip.",
+    "channel_id": "Simulator"
+  }
+]

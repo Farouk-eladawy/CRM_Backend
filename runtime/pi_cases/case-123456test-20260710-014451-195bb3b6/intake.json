@@ -1,0 +1,90 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "رقم الحجز 123456test",
+  "assistant_reply": "أهلاً بك، Ahmady. إليك ملخص الحجز وسجل المحادثة:\n\n**ملخص الحجز (Booking Summary)**\n- **العميل:** Ahmady\n- **رقم الحجز:** 123456test\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **رقم الهاتف:** 201013498777\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n\n**سجل المحادثة من CRM (15 رسالة، محادثتان):**\n- تم إرسال قالب افتتاحي ورد العميل بـ \"Hello\".\n- تم إرسال رابط الصور الفوتوغرافية (3 مرات).\n- تم إرسال رابط التقييم (Feedback).\n- تم إرسال قالب افتتاحي آخر ورد العميل بـ \"Confirm\" ثم \"Hello\".\n- آخر رد من الوكيل: سؤال عن تأكيد الدفع (Pending).\n\n**الخطوة التالية المقترحة:**\n- يبدو أن الدفع لا يزال **Pending** حسب آخر محادثة. يُوصى بالتحقق من حالة الدفع في Airtable/CRM أولاً، ثم إرسال رسالة للعميل لتأكيد الدفع أو طلب إثبات الدفع إذا لزم الأمر.\n\nهل تريد متابعة أي إجراء محدد لهذا الحجز؟",
+  "intent": "booking_summary",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201013498777",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "workflow_state": {
+    "intent": "booking_summary",
+    "phase": "case_active",
+    "awaiting": "followup",
+    "case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201013498777",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "note": "أهلاً بك، Ahmady. إليك ملخص الحجز وسجل المحادثة:\n\n**ملخص الحجز (Booking Summary)**\n- **العميل:** Ahmady\n- **رقم الحجز:** 123456test\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **رقم الهاتف:** 201013498777\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n\n**سجل المحادثة من CRM (15 رسالة، محادثتان):**\n- تم إرسال قالب افتتاحي ورد العميل بـ \"Hello\".\n- تم إرسال رابط الصور الفوتوغرافية (3 مرات).\n- تم إرسال رابط التقييم (Feedback).\n- تم إرسال قالب افتتاحي آخر ورد العميل بـ \"Confirm\" ثم \"Hello\".\n- آخر رد من الوكيل: سؤال عن تأكيد الدفع (Pending).\n\n**الخطوة التالية المقترحة:**\n- يبدو أن الدفع لا يزال **Pending** حسب آخر محادثة. يُوصى بالتحقق من حالة الدفع في Airtable/CRM أولاً، ثم إرسال رسالة للعميل لتأكيد الدفع أو طلب إثبات الدفع إذا لزم الأمر.\n\nهل تريد متابعة أي إجراء محدد لهذا الحجز؟",
+    "updated_at": "2026-07-10T01:44:51.005383+00:00",
+    "action_type": "update_airtable",
+    "action_mode": ""
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "ارسل قالب الافتتاحيه"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك، Ahmady.\n\nتم تحديث Airtable بنجاح للحجز **TIQ-TEST-999**:\n- رقم الهاتف: **201004655246**\n\nالعميل: Test User  \nالرحلة: Grand Egypt Ticket  \nالتاريخ: 11 يوليو 2026  \nالفندق: sunrise resort\n\nهل تريد متابعة أي شيء آخر لهذا الحجز؟ مثلاً إرسال رسالة تأكيد للعميل أو تعديل أي بيانات أخرى؟"
+    },
+    {
+      "role": "user",
+      "text": "ارسل قالب Opening"
+    },
+    {
+      "role": "assistant",
+      "text": "لا أستطيع إرسال واتساب لأن رقم الهاتف غير متوفر / I can't send WhatsApp because the phone number is missing."
+    },
+    {
+      "role": "user",
+      "text": "لقد قمنا بتحدث الرقم بالفعل"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تجهيز تعديل Airtable للحالة التالية:\n- العميل: Test User\n- رقم الحجز: TIQ-TEST-999\n- Note: - -> لقد قمنا بتحدث الرقم بالفعل\n\nأرسل `نعم` أو `موافق` لتنفيذ التعديل داخل Airtable الآن، أو `إلغاء` لإلغاء الطلب."
+    },
+    {
+      "role": "user",
+      "text": "نعم"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تحديث Airtable بنجاح.\nالعميل: Test User\nالحجز: TIQ-TEST-999"
+    },
+    {
+      "role": "user",
+      "text": "ارسل قالب Opening"
+    },
+    {
+      "role": "assistant",
+      "text": "لا أستطيع إرسال واتساب لأن رقم الهاتف غير متوفر / I can't send WhatsApp because the phone number is missing."
+    },
+    {
+      "role": "user",
+      "text": "رقم الحجز 123456test"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك، Ahmady. إليك ملخص الحجز وسجل المحادثة:\n\n**ملخص الحجز (Booking Summary)**\n- **العميل:** Ahmady\n- **رقم الحجز:** 123456test\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **رقم الهاتف:** 201013498777\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n\n**سجل المحادثة من CRM (15 رسالة، محادثتان):**\n- تم إرسال قالب افتتاحي ورد العميل بـ \"Hello\".\n- تم إرسال رابط الصور الفوتوغرافية (3 مرات).\n- تم إرسال رابط التقييم (Feedback).\n- تم إرسال قالب افتتاحي آخر ورد العميل بـ \"Confirm\" ثم \"Hello\".\n- آخر رد من الوكيل: سؤال عن تأكيد الدفع (Pending).\n\n**الخطوة التالية المقترحة:**\n- يبدو أن الدفع لا يزال **Pending** حسب آخر محادثة. يُوصى بالتحقق من حالة الدفع في Airtable/CRM أولاً، ثم إرسال رسالة للعميل لتأكيد الدفع أو طلب إثبات الدفع إذا لزم الأمر.\n\nهل تريد متابعة أي إجراء محدد لهذا الحجز؟"
+    }
+  ],
+  "pending_action": {},
+  "captured_at": "2026-07-10T01:44:51.005383+00:00"
+}

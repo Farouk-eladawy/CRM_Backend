@@ -1,0 +1,48 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "وريني ملخص الحجز 168827669",
+  "assistant_reply": "أهلاً بك! أنا فرح. 😊\n\nإليك ملخص الحجز 168827669:\n\n**العميل:** عبدالعزيز المدني  \n**رقم الهاتف:** +971508768000  \n**البريد الإلكتروني:** a.almdani1@hotmail.com  \n**الرحلة:** المتحف المصري الكبير (Grand Egyptian Museum)  \n**تاريخ الرحلة:** 9 يوليو 2026  \n**حالة السجل في Airtable:** موجود ✅  \n**سجل محادثات CRM:** غير متوفر ❌\n\n**الخطوة التالية المقترحة:**  \nبما أن سجل المحادثات غير موجود في CRM، أنصح بالتواصل مع العميل مباشرة لتأكيد الحجز وتقديم التفاصيل النهائية للرحلة.",
+  "intent": "booking_summary",
+  "case_context": {
+    "record_id": "reclrQNb9dNvfM0KT",
+    "booking_number": "168827669",
+    "customer_name": "Abdulaziz Almadani",
+    "location": "Unknown",
+    "phone": "+971508768000",
+    "email": "a.almdani1@hotmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-07-09T22:00:00.000Z",
+    "hotel": ""
+  },
+  "workflow_state": {
+    "intent": "booking_summary",
+    "phase": "case_active",
+    "awaiting": "followup",
+    "case_context": {
+      "record_id": "reclrQNb9dNvfM0KT",
+      "booking_number": "168827669",
+      "customer_name": "Abdulaziz Almadani",
+      "location": "Unknown",
+      "phone": "+971508768000",
+      "email": "a.almdani1@hotmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-07-09T22:00:00.000Z",
+      "hotel": ""
+    },
+    "note": "أهلاً بك! أنا فرح. 😊\n\nإليك ملخص الحجز 168827669:\n\n**العميل:** عبدالعزيز المدني  \n**رقم الهاتف:** +971508768000  \n**البريد الإلكتروني:** a.almdani1@hotmail.com  \n**الرحلة:** المتحف المصري الكبير (Grand Egyptian Museum)  \n**تاريخ الرحلة:** 9 يوليو 2026  \n**حالة السجل في Airtable:** موجود ✅  \n**سجل محادثات CRM:** غير متوفر ❌\n\n**الخطوة التالية المقترحة:**  \nبما أن سجل المحادثات غير موجود في CRM، أنصح بالتواصل مع العميل مباشرة لتأكيد الحجز وتقديم التفاصيل النهائية للرحلة.",
+    "updated_at": "2026-07-10T15:17:10.802240+00:00"
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "وريني ملخص الحجز 168827669"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك! أنا فرح. 😊\n\nإليك ملخص الحجز 168827669:\n\n**العميل:** عبدالعزيز المدني  \n**رقم الهاتف:** +971508768000  \n**البريد الإلكتروني:** a.almdani1@hotmail.com  \n**الرحلة:** المتحف المصري الكبير (Grand Egyptian Museum)  \n**تاريخ الرحلة:** 9 يوليو 2026  \n**حالة السجل في Airtable:** موجود ✅  \n**سجل محادثات CRM:** غير متوفر ❌\n\n**الخطوة التالية المقترحة:**  \nبما أن سجل المحادثات غير موجود في CRM، أنصح بالتواصل مع العميل مباشرة لتأكيد الحجز وتقديم التفاصيل النهائية للرحلة."
+    }
+  ],
+  "pending_action": {},
+  "captured_at": "2026-07-10T15:17:10.802240+00:00"
+}

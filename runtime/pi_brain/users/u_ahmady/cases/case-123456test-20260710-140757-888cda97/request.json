@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-123456test-20260710-140757-888cda97",
+  "intent": "create_invoice",
+  "request_source": "internal_whatsapp_assistant",
+  "captured_at": "2026-07-10T14:12:10.180246+00:00"
+}

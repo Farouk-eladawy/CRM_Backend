@@ -1,0 +1,9 @@
+{
+  "type": "update_record",
+  "description": "Update specific fields of an existing Airtable record (e.g. changing phone number, status, date, hotel)",
+  "target_record": "string (The Airtable record ID to update, e.g. recXYZ)",
+  "requires_approval": false,
+  "payload": {
+    "[Field Name]": "string/number/boolean (The actual field name exactly as it appears in Airtable and the new value)"
+  }
+}

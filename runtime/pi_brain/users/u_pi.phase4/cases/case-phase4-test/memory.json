@@ -1,0 +1,16 @@
+{
+  "memory_eligible": true,
+  "pattern": "ambiguous_lookup_case",
+  "execution_outcome": "awaiting_identifier",
+  "resolved_action": "next_step",
+  "lesson_learned": "Preserve staged workflow state and ask for clarification before action.",
+  "root_cause": [
+    "identifier_not_fully_resolved",
+    "context_dependent_followup"
+  ],
+  "pi_used": true,
+  "pi_summary": {
+    "recommended_next_step": "Ask for booking number",
+    "approval_required": false
+  }
+}

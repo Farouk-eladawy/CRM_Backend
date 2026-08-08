@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Operations Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        /* Custom Scrollbar for chat */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-gray-800">
+
+    <!-- 1. LEFT SIDEBAR (Navigation) -->
+    <div class="w-16 md:w-64 bg-[#333333] text-white flex flex-col flex-shrink-0 transition-all duration-300">
+        <!-- Header -->
+        <div class="h-14 flex items-center justify-center md:justify-start md:px-4 border-b border-gray-700">
+            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-0 md:ml-2">
+                <i class="fas fa-paw text-white"></i>
+            </div>
+            <span class="hidden md:block font-bold text-lg mr-2">OpenClaw</span>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="flex-1 overflow-y-auto py-4">
+            <div class="px-4 mb-2 text-xs text-gray-400 hidden md:block">المساحات (Workspaces)</div>
+            
+            <a href="#" class="flex items-center px-4 py-2 bg-gray-700 text-white border-r-4 border-blue-500">
+                <i class="fas fa-table w-6 text-center"></i>
+                <span class="hidden md:block mr-3">Leads CRM</span>
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                <i class="fas fa-plane w-6 text-center"></i>
+                <span class="hidden md:block mr-3">Trips Catalog</span>
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                <i class="fas fa-users w-6 text-center"></i>
+                <span class="hidden md:block mr-3">Customers</span>
+            </a>
+
+            <div class="mt-6 px-4 mb-2 text-xs text-gray-400 hidden md:block">الأدوات (Tools)</div>
+            <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                <i class="fas fa-chart-line w-6 text-center"></i>
+                <span class="hidden md:block mr-3">التقارير</span>
+            </a>
+        </div>
+
+        <!-- User Profile -->
+        <div class="p-4 border-t border-gray-700 flex items-center">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=random" class="w-8 h-8 rounded-full">
+            <div class="hidden md:block mr-3">
+                <div class="text-sm font-medium">مسؤول العمليات</div>
+                <div class="text-xs text-gray-400">متصل</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MAIN CONTENT (Grid View) -->
+    <div class="flex-1 flex flex-col bg-white overflow-hidden relative">
+        <!-- Toolbar -->
+        <div class="h-14 border-b flex items-center justify-between px-4 bg-white shadow-sm z-10">
+            <div class="flex items-center">
+                <h2 class="text-lg font-bold ml-4">Leads CRM <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full mr-2">Grid View</span></h2>
+                <div class="hidden md:flex space-x-2 space-x-reverse mr-6">
+                    <button class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded text-gray-600 flex items-center gap-2">
+                        <i class="fas fa-filter text-xs"></i> تصفية
+                    </button>
+                    <button class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded text-gray-600 flex items-center gap-2">
+                        <i class="fas fa-sort text-xs"></i> ترتيب
+                    </button>
+                    <button class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded text-gray-600 flex items-center gap-2">
+                        <i class="fas fa-palette text-xs"></i> تلوين
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <input type="text" placeholder="بحث..." class="pl-8 pr-3 py-1.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48">
+                    <i class="fas fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
+                </div>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm">
+                    <i class="fas fa-plus ml-1"></i> إضافة سجل
+                </button>
+            </div>
+        </div>
+
+        <!-- Table / Grid -->
+        <div class="flex-1 overflow-auto bg-gray-50">
+            <table class="w-full border-collapse text-sm text-right">
+                <thead class="bg-gray-100 sticky top-0 z-0 text-gray-500 font-medium">
+                    <tr>
+                        <th class="p-0 sticky right-0 bg-gray-100 z-10 w-10 border-b border-l border-gray-200 text-center"><input type="checkbox"></th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[150px]"><i class="fas fa-font text-gray-400 ml-1 text-xs"></i> اسم العميل</th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[120px]"><i class="fas fa-hashtag text-gray-400 ml-1 text-xs"></i> رقم الحجز</th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[100px]"><i class="fas fa-check-circle text-gray-400 ml-1 text-xs"></i> الحالة</th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[150px]"><i class="fas fa-plane text-gray-400 ml-1 text-xs"></i> الرحلة</th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[120px]"><i class="fas fa-phone text-gray-400 ml-1 text-xs"></i> الهاتف</th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[100px]"><i class="fas fa-dollar-sign text-gray-400 ml-1 text-xs"></i> السعر</th>
+                        <th class="p-3 border-b border-l border-gray-200 min-w-[150px]"><i class="fas fa-calendar text-gray-400 ml-1 text-xs"></i> تاريخ الرحلة</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    <!-- Row 1 -->
+                    <tr class="hover:bg-blue-50 group cursor-pointer transition-colors">
+                        <td class="p-2 sticky right-0 bg-white group-hover:bg-blue-50 border-l border-gray-200 text-center"><span class="text-xs text-gray-300">1</span></td>
+                        <td class="p-2 border-l border-gray-200 font-medium text-gray-900">أحمد محمد</td>
+                        <td class="p-2 border-l border-gray-200 font-mono text-xs bg-gray-50 rounded w-fit">2026-02-23</td>
+                        <td class="p-2 border-l border-gray-200"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">مؤكد</span></td>
+                        <td class="p-2 border-l border-gray-200">سفاري صحراء</td>
+                        <td class="p-2 border-l border-gray-200 font-mono text-gray-500">01090005205</td>
+                        <td class="p-2 border-l border-gray-200 font-medium">$150.00</td>
+                        <td class="p-2 border-l border-gray-200">24 Feb 2026</td>
+                    </tr>
+                    <!-- Row 2 -->
+                    <tr class="hover:bg-blue-50 group cursor-pointer transition-colors">
+                        <td class="p-2 sticky right-0 bg-white group-hover:bg-blue-50 border-l border-gray-200 text-center"><span class="text-xs text-gray-300">2</span></td>
+                        <td class="p-2 border-l border-gray-200 font-medium text-gray-900">سارة علي</td>
+                        <td class="p-2 border-l border-gray-200 font-mono text-xs bg-gray-50 rounded w-fit">2026-02-24</td>
+                        <td class="p-2 border-l border-gray-200"><span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold">قيد الانتظار</span></td>
+                        <td class="p-2 border-l border-gray-200">غوص شرم الشيخ</td>
+                        <td class="p-2 border-l border-gray-200 font-mono text-gray-500">01234567890</td>
+                        <td class="p-2 border-l border-gray-200 font-medium">$200.00</td>
+                        <td class="p-2 border-l border-gray-200">25 Feb 2026</td>
+                    </tr>
+                     <!-- Row 3 -->
+                     <tr class="hover:bg-blue-50 group cursor-pointer transition-colors">
+                        <td class="p-2 sticky right-0 bg-white group-hover:bg-blue-50 border-l border-gray-200 text-center"><span class="text-xs text-gray-300">3</span></td>
+                        <td class="p-2 border-l border-gray-200 font-medium text-gray-900">John Doe</td>
+                        <td class="p-2 border-l border-gray-200 font-mono text-xs bg-gray-50 rounded w-fit">2026-02-25</td>
+                        <td class="p-2 border-l border-gray-200"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-bold">ملغي</span></td>
+                        <td class="p-2 border-l border-gray-200">رحلة القاهرة</td>
+                        <td class="p-2 border-l border-gray-200 font-mono text-gray-500">+14155552671</td>
+                        <td class="p-2 border-l border-gray-200 font-medium">$350.00</td>
+                        <td class="p-2 border-l border-gray-200">26 Feb 2026</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="h-8 bg-gray-50 border-t flex items-center px-4 text-xs text-gray-500 justify-between">
+            <div>3 سجلات • تم التحديث قبل دقيقة</div>
+            <div>
+                <span class="mr-3"><i class="fas fa-wifi text-green-500"></i> متصل</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. RIGHT SIDEBAR (AI Assistant) -->
+    <div class="w-80 bg-white border-r shadow-xl flex flex-col z-20">
+        <!-- AI Header -->
+        <div class="h-14 border-b flex items-center justify-between px-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <h3 class="font-bold text-sm">مساعد العمليات الذكي</h3>
+            </div>
+            <button class="text-white opacity-70 hover:opacity-100"><i class="fas fa-ellipsis-v"></i></button>
+        </div>
+
+        <!-- Observer Logs / Insights (Mini Dashboard) -->
+        <div class="bg-gray-50 p-3 border-b">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-gray-500 uppercase">نشاط المراقب (Live)</span>
+                <span class="text-[10px] bg-red-100 text-red-600 px-1.5 rounded">Active</span>
+            </div>
+            <div class="space-y-2 max-h-32 overflow-y-auto custom-scroll pr-1">
+                <!-- Log Item 1 -->
+                <div class="text-xs bg-white p-2 rounded border border-l-2 border-l-yellow-500 shadow-sm">
+                    <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                        <span>11:45:44</span>
+                        <span>تصحيح يدوي</span>
+                    </div>
+                    <p class="text-gray-700 leading-tight">تم تحديث وقت النقل (Pickup Time) يدويًا لرحلة أحمد محمد.</p>
+                </div>
+                 <!-- Log Item 2 -->
+                 <div class="text-xs bg-white p-2 rounded border border-l-2 border-l-blue-500 shadow-sm">
+                    <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                        <span>11:46:00</span>
+                        <span>تقدم في سير العمل</span>
+                    </div>
+                    <p class="text-gray-700 leading-tight">إرسال الفاتورة تلقائيًا للعميل سارة علي.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll bg-gray-50" id="chat-container">
+            <!-- AI Welcome Message -->
+            <div class="flex items-start gap-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 text-indigo-600">
+                    <i class="fas fa-robot text-sm"></i>
+                </div>
+                <div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-gray-700 border border-gray-100">
+                    مرحباً بك! 👋
+                    <br>أنا OpenClaw، مساعدك الذكي.
+                    <br>يمكنك سؤالي عن الحجوزات، أو طلب تعديل بيانات، أو تحليل المشاكل.
+                </div>
+            </div>
+
+            <!-- User Message -->
+            <div class="flex items-start gap-2 flex-row-reverse">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 text-gray-600">
+                    <i class="fas fa-user text-sm"></i>
+                </div>
+                <div class="bg-blue-600 p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-white">
+                    هل فيه أي مشاكل في حجز أحمد محمد؟
+                </div>
+            </div>
+
+            <!-- AI Response -->
+            <div class="flex items-start gap-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 text-indigo-600">
+                    <i class="fas fa-robot text-sm"></i>
+                </div>
+                <div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-gray-700 border border-gray-100">
+                    نعم، لاحظت أن <b>وقت النقل (Pickup Time)</b> كان مفقوداً وتمت إضافته يدوياً منذ قليل (11:45).
+                    <br>
+                    <br>
+                    <button class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-200 hover:bg-indigo-100 w-full text-right mb-1">
+                        <i class="fas fa-eye ml-1"></i> عرض التفاصيل
+                    </button>
+                    <button class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-200 hover:bg-indigo-100 w-full text-right">
+                        <i class="fas fa-envelope ml-1"></i> إرسال تأكيد للعميل
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="p-3 bg-white border-t">
+            <div class="relative">
+                <textarea 
+                    class="w-full bg-gray-100 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none scrollbar-hide" 
+                    rows="1" 
+                    placeholder="اكتب طلبك هنا... (مثال: عدل وقت الرحلة)"
+                    id="chat-input"
+                ></textarea>
+                <button class="absolute left-2 bottom-2 text-indigo-600 hover:text-indigo-800 p-1">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button class="absolute right-2 bottom-2 text-gray-400 hover:text-gray-600 p-1">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <div class="text-[10px] text-center text-gray-400 mt-2">
+                AI Agent is connected to OpenClaw Core
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Script to Simulate Chat Interaction
+        const input = document.getElementById('chat-input');
+        const chatContainer = document.getElementById('chat-container');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const text = this.value.trim();
+                if (text) {
+                    addMessage(text, 'user');
+                    this.value = '';
+                    
+                    // Simulate AI Thinking
+                    setTimeout(() => {
+                        addMessage('جاري تحليل طلبك...', 'ai');
+                    }, 1000);
+                }
+            }
+        });
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = sender === 'user' ? 'flex items-start gap-2 flex-row-reverse' : 'flex items-start gap-2';
+            
+            const icon = sender === 'user' 
+                ? '<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 text-gray-600"><i class="fas fa-user text-sm"></i></div>'
+                : '<div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 text-indigo-600"><i class="fas fa-robot text-sm"></i></div>';
+            
+            const bubble = sender === 'user'
+                ? `<div class="bg-blue-600 p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-white">${text}</div>`
+                : `<div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-gray-700 border border-gray-100">${text}</div>`;
+
+            div.innerHTML = icon + bubble;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

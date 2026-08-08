@@ -1,0 +1,14 @@
+{
+  "bridge_status": "awaiting_user_approval",
+  "pending_action_type": "update_airtable",
+  "requires_approval": true,
+  "payload_preview": {
+    "type": "update_airtable",
+    "record_id": "rec123",
+    "text": "Customer requested callback tomorrow"
+  },
+  "pi_guidance": {
+    "confidence": 0.88,
+    "recommended_next_step": "Preview update then request approval"
+  }
+}

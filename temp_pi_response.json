@@ -1,0 +1,41 @@
+{
+  "case_understanding": "The user (Ahmady) previously checked booking 546980816555 (Ahmed Elkhatib, GEM Skip The Line, €20 pending). He asked to send a polite payment reminder to the customer. The assistant proposed a message (in Arabic presumably) and asked for approval. Now the user confirms: translate the message to English and send it directly without further approval gate.",
+  "confirmed_facts": [
+    "Booking: 546980816555 - Ahmed Elkhatib",
+    "Trip: Grand Egyptian Museum: Skip The Line Ticket on 2026-06-05",
+    "Amount: 20 EUR - Invoice status: pending",
+    "Customer phone: +201013498777 (from customer link)",
+    "Payment URL: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-4808592227",
+    "User confirmed sending by saying 'ارسالها مباشرة' (send directly)"
+  ],
+  "missing_information": [
+    "Airtable Record ID is not explicitly shown but available from case_context",
+    "CRM Chat ID for the customer conversation is available from case_context"
+  ],
+  "risk_flags": [
+    "Invoice has been pending for over a month since trip date (2026-06-05)",
+    "Net Rate Price field has an #ERROR! that should be fixed separately",
+    "Sending payment reminder requires 24-hour window check before text mode"
+  ],
+  "recommended_internal_reply": "✅ تم تجهيز رسالة باللغة الإنجليزية وإرسالها مباشرة إلى العميل أحمد يطلب فيها دفع الفاتورة.\n\nالرسالة المرسلة:\n\nDear Ahmed Elkhatib,\n\nI hope this message finds you well. This is a friendly reminder regarding your booking (#546980816555) for the Grand Egyptian Museum: Skip The Line Ticket on June 5, 2026.\n\nYour invoice of €20 is still pending payment. Could you please complete the payment at your earliest convenience?\n\nYou can pay securely here:\nhttps://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-4808592227\n\nIf you have any questions or need assistance, feel free to reach out.\n\nBest regards,\nFTS Travels Team",
+  "recommended_next_step": "Monitor if customer responds or pays within 48 hours; if no response, follow up with a WhatsApp template. Also fix Net Rate Price #ERROR! in the booking record separately.",
+  "should_ask_clarifying_question": false,
+  "clarifying_question": "",
+  "approval_required": false,
+  "execution_guidance": "local_executor_only",
+  "confidence": 0.95,
+  "action_manifest": [
+    {
+      "type": "send_customer_message",
+      "channel": "whatsapp",
+      "mode": "text",
+      "requires_approval": false,
+      "text": "Dear Ahmed Elkhatib,\n\nI hope this message finds you well. This is a friendly reminder regarding your booking (#546980816555) for the Grand Egyptian Museum: Skip The Line Ticket on June 5, 2026.\n\nYour invoice of €20 is still pending payment. Could you please complete the payment at your earliest convenience?\n\nYou can pay securely here:\nhttps://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-4808592227\n\nIf you have any questions or need assistance, feel free to reach out.\n\nBest regards,\nFTS Travels Team",
+      "phone": "+201013498777",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "template_language": "en",
+      "execution_instruction": "send_now_skip_approval"
+    }
+  ]
+}

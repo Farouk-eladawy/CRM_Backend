@@ -1,0 +1,1 @@
+import sqlite3; conn=sqlite3.connect('chat_history.db'); c=conn.cursor(); c.execute('SELECT chat_id, location, unread_count FROM conversations WHERE sender_identifier LIKE \'%27730973183236119%\' OR chat_id LIKE \'%27730973183236119%\''); print(c.fetchall())

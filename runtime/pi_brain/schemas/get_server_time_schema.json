@@ -1,0 +1,9 @@
+{
+  "name": "get_server_time",
+  "description": "Returns the current server time",
+  "parameters": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

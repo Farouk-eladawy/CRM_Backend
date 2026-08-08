@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "cases": [
+    {
+      "case_id": "case-phase4-test",
+      "pattern": "ambiguous_lookup_case",
+      "root_cause": [
+        "identifier_not_fully_resolved",
+        "context_dependent_followup"
+      ],
+      "lesson_learned": "Preserve staged workflow state and ask for clarification before action.",
+      "captured_at": "2026-07-10T12:58:24.680882+00:00"
+    }
+  ],
+  "updated_at": "2026-07-10T12:58:24.680882+00:00"
+}

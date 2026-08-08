@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Operations Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* Airtable-like Scrollbars */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 5px;
+            border: 2px solid #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Table Styling */
+        .airtable-grid {
+            display: block;
+            white-space: nowrap;
+            overflow: auto;
+            height: calc(100vh - 100px); /* Adjust based on header height */
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        .airtable-header-cell {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            border-bottom: 1px solid #d1d5db;
+            border-right: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: 500;
+            z-index: 10;
+            display: inline-block;
+            height: 32px;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+
+        .airtable-row {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .airtable-row:hover {
+            background-color: #f8fafc;
+        }
+
+        .airtable-cell {
+            display: inline-block;
+            padding: 6px 12px;
+            border-right: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #1f2937;
+            height: 32px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+
+        /* Column Widths (Simulated) */
+        .col-w-xs { width: 80px; }
+        .col-w-sm { width: 120px; }
+        .col-w-md { width: 180px; }
+        .col-w-lg { width: 250px; }
+        .col-w-xl { width: 350px; }
+
+        /* Field Type Icons */
+        .field-icon {
+            color: #9ca3af;
+            margin-right: 6px;
+            font-size: 11px;
+        }
+
+        /* Tags/Badges */
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-yellow { background: #fef9c3; color: #854d0e; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f3f4f6; color: #374151; }
+
+    </style>
+</head>
+<body class="flex h-screen w-screen">
+
+    <!-- 1. LEFT SIDEBAR (Compact Navigation) -->
+    <div class="w-16 bg-[#333333] flex flex-col items-center py-4 text-white z-20 flex-shrink-0">
+        <div class="mb-6 w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shadow-lg cursor-pointer hover:bg-blue-600 transition">
+            <i class="fas fa-paw text-xl"></i>
+        </div>
+        
+        <!-- Workspace Icons -->
+        <div class="space-y-4 flex flex-col items-center w-full">
+            <div class="p-2 bg-gray-700 rounded-lg cursor-pointer relative group">
+                <i class="fas fa-table text-lg text-white"></i>
+                <div class="absolute left-14 top-2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50 pointer-events-none">
+                    Leads CRM
+                </div>
+            </div>
+            <div class="p-2 text-gray-400 hover:text-white cursor-pointer relative group">
+                <i class="fas fa-plane text-lg"></i>
+                 <div class="absolute left-14 top-2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50 pointer-events-none">
+                    Trips Catalog
+                </div>
+            </div>
+            <div class="p-2 text-gray-400 hover:text-white cursor-pointer relative group">
+                <i class="fas fa-users text-lg"></i>
+                 <div class="absolute left-14 top-2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50 pointer-events-none">
+                    Customers
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto mb-4">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=random" class="w-8 h-8 rounded-full border-2 border-gray-600 cursor-pointer">
+        </div>
+    </div>
+
+    <!-- 2. MAIN CONTENT (Airtable Grid Replica) -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden bg-white relative">
+        
+        <!-- Toolbar (Top Bar) -->
+        <div class="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white shadow-sm z-10">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
+                    <h2 class="font-bold text-lg text-gray-800">Leads CRM</h2>
+                    <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                </div>
+                
+                <div class="h-6 w-px bg-gray-300 mx-2"></div>
+
+                <!-- View Tabs -->
+                <div class="flex bg-gray-100 rounded p-0.5">
+                    <div class="px-3 py-1 bg-white shadow-sm rounded text-xs font-medium text-blue-600 flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-th"></i> Grid View
+                    </div>
+                    <div class="px-3 py-1 text-xs font-medium text-gray-500 flex items-center gap-2 cursor-pointer hover:bg-gray-200 rounded">
+                        <i class="fas fa-columns"></i> Kanban
+                    </div>
+                     <div class="px-3 py-1 text-xs font-medium text-gray-500 flex items-center gap-2 cursor-pointer hover:bg-gray-200 rounded">
+                        <i class="fas fa-calendar"></i> Calendar
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3">
+                 <div class="flex items-center gap-1 text-gray-600 text-sm">
+                    <button class="hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-1"><i class="fas fa-filter text-gray-400"></i> Filter</button>
+                    <button class="hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-1"><i class="fas fa-sort text-gray-400"></i> Sort</button>
+                    <button class="hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-1"><i class="fas fa-palette text-gray-400"></i> Color</button>
+                </div>
+                <div class="relative">
+                    <i class="fas fa-search absolute left-2 top-2 text-gray-400 text-xs"></i>
+                    <input type="text" placeholder="Find..." class="pl-7 pr-3 py-1 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-blue-500 w-40 transition-all focus:w-60">
+                </div>
+            </div>
+        </div>
+
+        <!-- THE GRID (Horizontal Scroll Container) -->
+        <div class="airtable-grid flex-1 overflow-auto bg-white" id="grid-container">
+            <!-- HEADERS -->
+            <div class="whitespace-nowrap bg-gray-50 border-b border-gray-300 sticky top-0 z-10 flex w-max">
+                <div class="airtable-header-cell col-w-xs text-center border-l-4 border-l-transparent"><input type="checkbox"></div>
+                <!-- Dynamic Headers based on CSV -->
+                <div class="airtable-header-cell col-w-md"><i class="fas fa-font field-icon"></i> Agency</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-align-left field-icon"></i> Booking Nr.</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-calendar field-icon"></i> Date Trip</div>
+                <div class="airtable-header-cell col-w-lg"><i class="fas fa-align-left field-icon"></i> trip Name</div>
+                <div class="airtable-header-cell col-w-md"><i class="fas fa-user field-icon"></i> Customer Name</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-list field-icon"></i> Option</div>
+                <div class="airtable-header-cell col-w-lg"><i class="fas fa-align-left field-icon"></i> des</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-user-tie field-icon"></i> Guide</div>
+                <div class="airtable-header-cell col-w-xs"><i class="fas fa-hashtag field-icon"></i> ADT</div>
+                <div class="airtable-header-cell col-w-xs"><i class="fas fa-hashtag field-icon"></i> STD</div>
+                <div class="airtable-header-cell col-w-xs"><i class="fas fa-hashtag field-icon"></i> CHD</div>
+                <div class="airtable-header-cell col-w-xs"><i class="fas fa-hashtag field-icon"></i> Inf</div>
+                <div class="airtable-header-cell col-w-md"><i class="fas fa-align-left field-icon"></i> Add - Ons</div>
+                <div class="airtable-header-cell col-w-md"><i class="fas fa-hotel field-icon"></i> Hotel Name</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-door-open field-icon"></i> Room number</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-clock field-icon"></i> pickup time</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-check-square field-icon"></i> Issue Tickets</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-map-marker-alt field-icon"></i> From</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-map-marker-alt field-icon"></i> to</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-dollar-sign field-icon"></i> Total price USD</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-phone field-icon"></i> Customer Phone</div>
+                <div class="airtable-header-cell col-w-sm"><i class="fas fa-check-circle field-icon"></i> Status</div>
+                <!-- Add more columns as needed -->
+            </div>
+
+            <!-- ROWS (Mock Data) -->
+            <div class="w-max">
+                <!-- Row 1 -->
+                <div class="airtable-row flex hover:bg-gray-50">
+                    <div class="airtable-cell col-w-xs text-center border-l-4 border-l-blue-500 bg-gray-50 font-bold text-gray-400">1</div>
+                    <div class="airtable-cell col-w-md">Viator</div>
+                    <div class="airtable-cell col-w-sm"><span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">BR-2024-001</span></div>
+                    <div class="airtable-cell col-w-sm text-gray-600">2026-02-25 08:00</div>
+                    <div class="airtable-cell col-w-lg font-medium">Safari Desert Adventure VIP</div>
+                    <div class="airtable-cell col-w-md">John Smith</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-blue">VIP</span></div>
+                    <div class="airtable-cell col-w-lg text-gray-400 text-xs">Pickup from lobby</div>
+                    <div class="airtable-cell col-w-sm">Ahmed (Guide)</div>
+                    <div class="airtable-cell col-w-xs text-right">2</div>
+                    <div class="airtable-cell col-w-xs text-right">0</div>
+                    <div class="airtable-cell col-w-xs text-right">1</div>
+                    <div class="airtable-cell col-w-xs text-right">0</div>
+                    <div class="airtable-cell col-w-md">Quad Bike x1</div>
+                    <div class="airtable-cell col-w-md">Hilton Plaza</div>
+                    <div class="airtable-cell col-w-sm">1024</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-yellow">07:50 AM</span></div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-green">Done</span></div>
+                    <div class="airtable-cell col-w-sm">Hurghada</div>
+                    <div class="airtable-cell col-w-sm">Desert</div>
+                    <div class="airtable-cell col-w-sm font-mono text-green-700">$150.00</div>
+                    <div class="airtable-cell col-w-sm font-mono">+1 555 0123</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-green">Confirmed</span></div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="airtable-row flex hover:bg-gray-50">
+                    <div class="airtable-cell col-w-xs text-center border-l-4 border-l-transparent bg-gray-50 font-bold text-gray-400">2</div>
+                    <div class="airtable-cell col-w-md">GetYourGuide</div>
+                    <div class="airtable-cell col-w-sm"><span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">BR-2024-002</span></div>
+                    <div class="airtable-cell col-w-sm text-gray-600">2026-02-26 09:00</div>
+                    <div class="airtable-cell col-w-lg font-medium">Scuba Diving Intro</div>
+                    <div class="airtable-cell col-w-md">Maria Garcia</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-gray">Standard</span></div>
+                    <div class="airtable-cell col-w-lg text-gray-400 text-xs">Allergies: Nuts</div>
+                    <div class="airtable-cell col-w-sm">Sayed (Guide)</div>
+                    <div class="airtable-cell col-w-xs text-right">1</div>
+                    <div class="airtable-cell col-w-xs text-right">0</div>
+                    <div class="airtable-cell col-w-xs text-right">0</div>
+                    <div class="airtable-cell col-w-xs text-right">0</div>
+                    <div class="airtable-cell col-w-md">-</div>
+                    <div class="airtable-cell col-w-md">Rixos Premium</div>
+                    <div class="airtable-cell col-w-sm">505</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-gray">Pending</span></div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-yellow">Pending</span></div>
+                    <div class="airtable-cell col-w-sm">Sharm</div>
+                    <div class="airtable-cell col-w-sm">Sea</div>
+                    <div class="airtable-cell col-w-sm font-mono text-green-700">$85.00</div>
+                    <div class="airtable-cell col-w-sm font-mono">+34 600 000</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-yellow">Pending Payment</span></div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="airtable-row flex hover:bg-gray-50">
+                    <div class="airtable-cell col-w-xs text-center border-l-4 border-l-transparent bg-gray-50 font-bold text-gray-400">3</div>
+                    <div class="airtable-cell col-w-md">Direct</div>
+                    <div class="airtable-cell col-w-sm"><span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">BR-2024-003</span></div>
+                    <div class="airtable-cell col-w-sm text-gray-600">2026-02-27 05:00</div>
+                    <div class="airtable-cell col-w-lg font-medium">Cairo Day Trip</div>
+                    <div class="airtable-cell col-w-md">Mohamed Ali</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-blue">Private</span></div>
+                    <div class="airtable-cell col-w-lg text-gray-400 text-xs">Needs baby seat</div>
+                    <div class="airtable-cell col-w-sm">Hassan (Driver)</div>
+                    <div class="airtable-cell col-w-xs text-right">3</div>
+                    <div class="airtable-cell col-w-xs text-right">0</div>
+                    <div class="airtable-cell col-w-xs text-right">2</div>
+                    <div class="airtable-cell col-w-xs text-right">1</div>
+                    <div class="airtable-cell col-w-md">Lunch Upgrade</div>
+                    <div class="airtable-cell col-w-md">Albatros White Beach</div>
+                    <div class="airtable-cell col-w-sm">2201</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-yellow">04:45 AM</span></div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-green">Done</span></div>
+                    <div class="airtable-cell col-w-sm">Hurghada</div>
+                    <div class="airtable-cell col-w-sm">Cairo</div>
+                    <div class="airtable-cell col-w-sm font-mono text-green-700">$450.00</div>
+                    <div class="airtable-cell col-w-sm font-mono">+20 100 000</div>
+                    <div class="airtable-cell col-w-sm"><span class="badge badge-green">Confirmed</span></div>
+                </div>
+            </div>
+            
+            <!-- Add Button Row -->
+            <div class="border-b border-gray-200 p-2 text-gray-500 text-sm hover:bg-gray-50 cursor-pointer pl-10">
+                <i class="fas fa-plus"></i>
+            </div>
+        </div>
+
+        <!-- Footer / Status Bar -->
+        <div class="h-8 border-t bg-white flex items-center justify-between px-4 text-xs text-gray-500 z-10">
+            <div>3 records</div>
+            <div class="flex items-center gap-4">
+                <span><i class="fas fa-history"></i> Autosaved 2m ago</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. RIGHT SIDEBAR (AI Assistant - OpenClaw) -->
+    <div class="w-[350px] bg-white border-l shadow-xl flex flex-col z-20 flex-shrink-0">
+        <!-- AI Header -->
+        <div class="h-14 border-b flex items-center justify-between px-4 bg-gray-50">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+                    <i class="fas fa-robot text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-gray-800">OpenClaw Copilot</h3>
+                    <div class="flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">Online</span>
+                    </div>
+                </div>
+            </div>
+            <button class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- Observer Insights (Live Feed) -->
+        <div class="bg-indigo-50 p-3 border-b border-indigo-100">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-indigo-900 flex items-center gap-1">
+                    <i class="fas fa-eye text-indigo-500"></i> Live Insights
+                </span>
+                <span class="text-[10px] bg-white text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100 shadow-sm">Real-time</span>
+            </div>
+            <div class="space-y-2">
+                <!-- Log Item -->
+                <div class="bg-white p-2 rounded border border-indigo-100 shadow-sm flex gap-2">
+                    <div class="mt-0.5"><i class="fas fa-pen text-xs text-yellow-500"></i></div>
+                    <div>
+                        <div class="text-[10px] text-gray-400 mb-0.5">Just now • Manual Correction</div>
+                        <p class="text-xs text-gray-700 leading-tight">User updated <b>pickup time</b> for <i>Safari Desert</i> to 07:50.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-white" id="chat-container">
+            <!-- AI Welcome -->
+            <div class="flex gap-3">
+                <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-1 text-indigo-600">
+                    <i class="fas fa-robot text-xs"></i>
+                </div>
+                <div class="space-y-1">
+                    <div class="text-xs text-gray-400 ml-1">OpenClaw • Now</div>
+                    <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700">
+                        Hello! I'm ready to help you manage bookings.
+                        <ul class="mt-2 space-y-1 list-disc list-inside text-gray-600">
+                            <li>Check booking status</li>
+                            <li>Send WhatsApp messages</li>
+                            <li>Generate invoices</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 border-t bg-white">
+            <div class="relative shadow-sm">
+                <textarea 
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-3 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white resize-none transition-all" 
+                    rows="1" 
+                    placeholder="Ask OpenClaw..."
+                    id="chat-input"
+                ></textarea>
+                <button class="absolute right-2 bottom-2 text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-full transition-colors">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple Interaction Script
+        const input = document.getElementById('chat-input');
+        const chatContainer = document.getElementById('chat-container');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const text = this.value.trim();
+                if (text) {
+                    // User Message
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'flex gap-3 flex-row-reverse';
+                    userDiv.innerHTML = `
+                        <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 mt-1 text-gray-600">
+                            <i class="fas fa-user text-xs"></i>
+                        </div>
+                        <div class="space-y-1 text-right">
+                             <div class="text-xs text-gray-400 mr-1">You • Now</div>
+                            <div class="bg-indigo-600 p-3 rounded-2xl rounded-tr-none text-sm text-white text-left">
+                                ${text}
+                            </div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(userDiv);
+                    this.value = '';
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    // Fake AI Reply
+                    setTimeout(() => {
+                        const aiDiv = document.createElement('div');
+                        aiDiv.className = 'flex gap-3';
+                        aiDiv.innerHTML = `
+                            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-1 text-indigo-600">
+                                <i class="fas fa-robot text-xs"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-xs text-gray-400 ml-1">OpenClaw • Now</div>
+                                <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700">
+                                    I'm processing your request: "<b>${text}</b>"...
+                                </div>
+                            </div>
+                        `;
+                        chatContainer.appendChild(aiDiv);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 800);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "case_id": "case-123456test-20260710-184048-74f34ba6",
+  "status": "active",
+  "current_stage": "plan",
+  "stage_status": "completed",
+  "next_stage": "validation",
+  "case_reference": "123456test",
+  "intent": "booking_summary",
+  "requires_approval": false,
+  "execution_allowed": false,
+  "created_at": "2026-07-10T18:40:48.736847+00:00",
+  "updated_at": "2026-07-10T19:04:09.026023+00:00"
+}

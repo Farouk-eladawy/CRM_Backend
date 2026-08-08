@@ -1,0 +1,2033 @@
+{
+  "generated_at": "2026-07-13T11:42:46.764948+00:00",
+  "actor_name": "internal",
+  "table_name": "List",
+  "base_id": "appTp5YgSp9DV2HYc",
+  "record_summary": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "trip_name": "The Grand Egyptian Museum",
+    "booking_status": "Canceled",
+    "date_trip": "2026-06-23T01:00:00.000Z",
+    "populated_field_count": 79,
+    "empty_field_count": 73,
+    "linked_fields": [
+      {
+        "field_name": "Tour Guide Name & Phone",
+        "count": 1
+      },
+      {
+        "field_name": "Driver Name & Phone",
+        "count": 1
+      }
+    ],
+    "attachment_fields": [
+      {
+        "field_name": "Attachments",
+        "count": 1
+      }
+    ],
+    "high_signal_fields": {
+      "Agency": "Tiqets",
+      "Booking Nr.": "123456test",
+      "Date Trip": "2026-06-23T01:00:00.000Z",
+      "trip Name": "The Grand Egyptian Museum",
+      "Customer Name": "Ahmady",
+      "Hotel Name": "الي Ajira Bay",
+      "Customer personal email": "Amrmahraga@gmail.com",
+      "Customer Phone": "201004655246",
+      "Booking Status": "Canceled",
+      "No show & refund": [
+        "No show"
+      ],
+      "Attachments": [
+        {
+          "id": "attyF4LMZWHr1SKtk",
+          "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/FvwNiGy3TYexyhZblWog7Q/f4xvb1hS_NLYZ7TVPw5Fh-17zCxKUgETPDwpdNrYME3KunKia-gp8RrUP1vI-KwYGF9XfSy5fc_gBIRTIDPvlr915pkG9Z3G_fOJshb6YFHR5WzoPJpiNnuyuoeHHC0VKTkHkRQYWbMGedMjjblxCV0dWXZw7tGdwt4_1WNWfWw/Fxlbs5iDA9HIWreLp_itcVdlNeXnGTK-KsrAAzFQZx4",
+          "filename": "Bel Air Azur Resort.pdf",
+          "size": 4187009,
+          "type": "application/pdf",
+          "thumbnails": {
+            "small": {
+              "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/BTY16K91S_NQx8aoRrLXbw/6sLpow1YgMiqszMolIeOtOH6fmFtXywocF6xC_ANkprPymZrh4jF8d8Er4b6I-hLKjnxJuuKZy57SQjBS1L4emY7_5x69rjPkvSDOnH6pyRMduDI3i2tLYCnYAnu2sNs6xTbVTZ2lINc4-8sVqQQ8w/KVcZv3L0BAD_YRbOmVP26pt-yC4Yy-SLk9EKd7sqvGE",
+              "width": 28,
+              "height": 36
+            },
+            "large": {
+              "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/gmByeTFxuXyg-Ocv4Zu8vA/WG7AMo26VRLdtmkbAVwr_65FpCtiqjtGfUYVm16bAwiEnDmC4NB6Kv09hCAo9j8mDC83NnRIxLVEFZ25ouMqpod_T7dTn3u9ej2jD4xHC5gP2toMOrfuUryy9vxfnpWufkDZceMULRIaanGnZjHPPg/8CwOZAyRPKuguagSCu465b7V-8JxWQ3jLrCbQtzcSMQ",
+              "width": 512,
+              "height": 663
+            }
+          }
+        }
+      ]
+    }
+  },
+  "source_audit": {
+    "csv_report": {
+      "matched": [],
+      "canonical_only": [],
+      "missing": []
+    },
+    "python_mapping_report": {
+      "matched": [
+        "Agency",
+        "Booking Nr.",
+        "Date Trip",
+        "trip Name",
+        "Customer Name",
+        "des",
+        "ADT",
+        "STD",
+        "CHD",
+        "Inf",
+        "Hotel Name",
+        "Room number",
+        "Issue Tickets",
+        "Product ID",
+        "Collecting on date Trip",
+        "Review WhatsApp & Email Sent",
+        "Credit Card",
+        "Create Date",
+        "Remarks",
+        "Attachments",
+        "Last Modified",
+        "Whatsapp Room & Hotel Sent",
+        "Whatsapp Pickup Time2",
+        "Non-billable addons",
+        "GYG Rating",
+        "Customer Review",
+        "Customer Email",
+        "Customer Phone",
+        "Total price EUR",
+        "Total price USD",
+        "Total price GBP",
+        "Welcome email sent?",
+        "Created By",
+        "No show & refund",
+        "Reason",
+        "Last Modified By",
+        "Teka Send V2",
+        "Stripe invoice",
+        "Teka Send V3",
+        "Youth",
+        "CHD Age",
+        "Send Review",
+        "Attachments Boarding",
+        "SendAuto",
+        "Pickup Scheduled",
+        "Status",
+        "On Our Way",
+        "Ticket Flight Price EGP",
+        "Net Rate",
+        "Traffic Hurghada",
+        "Tour Guide Name & Phone",
+        "Car Type",
+        "Driver Name & Phone",
+        "Last Sent",
+        "Customer Country",
+        "Amount",
+        "Booking Status",
+        "Google Maps",
+        "Currency",
+        "Traveler name",
+        "Send Status Driver & Guide",
+        "Review Date",
+        "Send Sharm Pickup",
+        "Cost EGP",
+        "Representative Name & Phone",
+        "FTS Travels Important Notice",
+        "Generate Invoice",
+        "Real Product Name",
+        "Refund Amount",
+        "Total Travelers",
+        "Photo invoice",
+        "Customer personal email",
+        "Cancelled Send Status",
+        "Supplier Name & Phone",
+        "Conversations",
+        "Issue Tickets Date",
+        "Summary (Booking Nr.)",
+        "Chat Driver log",
+        "Link First Opened",
+        "Link Used",
+        "message",
+        "Driver Location link",
+        "Customer Location link",
+        "Attachments Chat",
+        "Customer Link Opened",
+        "Customer Last Message",
+        "End trip",
+        "Chat Customer log",
+        "Driver Star",
+        "Trip Status",
+        "Trip Start Time",
+        "Invoice Requested",
+        "Invoice Request Date",
+        "Invoice Requested By",
+        "AI Chat Log",
+        "Local Driver",
+        "Coupon",
+        "Conversations 2",
+        "Photographer Link",
+        "Status Photographer WhatsApp",
+        "Payment Method",
+        "Last Processed",
+        "Invoice Status",
+        "Local Send Status Driver & Guide",
+        "Trip UUID",
+        "Hotel Changed",
+        "Local Car Type",
+        "Follow sales",
+        "Hotel Cost",
+        "Synced to mailchamp",
+        "Checksum",
+        "Send Personal Email Status",
+        "Tickets",
+        "Tickets Created?",
+        "Date Trip Changed",
+        "Send Guide Tickets",
+        "AI Chat Status",
+        "Inquiry Type"
+      ],
+      "canonical_only": [
+        {
+          "field_id": "fldiOioY51CxhDvFM",
+          "mapped_name": "Pickup Time",
+          "canonical_live_name": "pickup time"
+        }
+      ],
+      "missing": [
+        {
+          "field_id": "fldycSvjVrtHeApBU",
+          "mapped_name": "Selected Option"
+        },
+        {
+          "field_id": "fldkiK6tdHq7O5WEA",
+          "mapped_name": "Tour Language"
+        },
+        {
+          "field_id": "fldsDHetRtwrR2Yo2",
+          "mapped_name": "Add-Ons Details"
+        },
+        {
+          "field_id": "fldzItiGxw8W4Z6D6",
+          "mapped_name": "Flight Departure (From)"
+        },
+        {
+          "field_id": "fldwxsi9yVHwwtQSE",
+          "mapped_name": "Flight Return (To)"
+        },
+        {
+          "field_id": "fldDeFCFR74boCvJe",
+          "mapped_name": "CXL Date"
+        },
+        {
+          "field_id": "fld86EpJz89M4LvcQ",
+          "mapped_name": "Add-Ons (Operational)"
+        },
+        {
+          "field_id": "fldpYGxzy8dYaCBbn",
+          "mapped_name": "fldpYGxzy8dYaCBbn"
+        },
+        {
+          "field_id": "fldStOtT8aDZ3rYm0",
+          "mapped_name": "Kommo Conversation Backup"
+        },
+        {
+          "field_id": "fldU2tOjTxrnxIRty",
+          "mapped_name": "Contacts"
+        },
+        {
+          "field_id": "Escalation Dept",
+          "mapped_name": "Escalation Dept"
+        }
+      ],
+      "suspicious_ids": [
+        {
+          "field_id": "fldpYGxzy8dYaCBbn",
+          "mapped_name": "fldpYGxzy8dYaCBbn"
+        }
+      ]
+    },
+    "live_field_audit": [
+      {
+        "field_id": "fldNkXuR3rytcsswQ",
+        "field_name": "Agency",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Tiqets",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "flduE2TbOmhEv7ebR",
+        "field_name": "Customer Phone",
+        "field_type": "phoneNumber",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "201004655246",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldZGLB1NXyaM530F",
+        "field_name": "Booking Nr.",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "123456test",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldxeRvCQakzWaRTw",
+        "field_name": "Customer Name",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Ahmady",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldf5EuwGjs3L75Yw",
+        "field_name": "Hotel Name",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "الي Ajira Bay",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld1AwHLTD5KYyUeQ",
+        "field_name": "Room number",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "404",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldiOioY51CxhDvFM",
+        "field_name": "pickup time",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "00:00",
+          "00:05",
+          "00:10",
+          "00:15",
+          "00:20",
+          "00:25",
+          "00:30",
+          "00:35",
+          "00:40",
+          "00:45",
+          "00:50",
+          "00:55",
+          "01:00",
+          "01:05",
+          "01:10"
+        ]
+      },
+      {
+        "field_id": "fld4AsPdRUQJqHVia",
+        "field_name": "Whatsapp Pickup Time2",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try again"
+        ]
+      },
+      {
+        "field_id": "fldTi5WQWiggTyYLF",
+        "field_name": "trip Name",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "The Grand Egyptian Museum",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldycSvjVrtHeApBU",
+        "field_name": "Option",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Skip The Line + Audio Guide",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldjzxYjMjPu8RAz6",
+        "field_name": "Non-billable addons",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "*= Notes:* Women should please wear appropriate clothing in the old town.....to preserve our tradition, because the Egyptians are not used to it (only City Tour)",
+          "*= Notes:* 1 $€£ will be collected from each person for the intelligence services >> Safari Tour",
+          "*= The Entrance fees are not included:* If you need to visit them, you will *pay 1850 EGP  per person* there",
+          "*= The Entrance fees are not included:* If you need to visit them, you will *pay 1500 EGP  per person* there",
+          "at the main street before the security check",
+          "at the main street before the security check, beside Prima Life",
+          "in front of the CIB Bank, which is opposite the hotel",
+          "Orange Bay >>> Entry National park isn't included, please note that you will pay it 5$ per person cash on the trip",
+          "Dolphin >>> Entry National park isn't included, please note that you will pay it 5$ per person cash on the trip",
+          "Non-billable addons",
+          "*• Boarding Pass:* Kindly find the boarding pass attached. Please review it carefully before heading to the airport.",
+          "*• Boarding Pass:* Please find the Air Cairo flight ticket attached. Note that boarding passes for Air Cairo are issued at the airport, not online. Review carefully before heading to the airport.",
+          "\"Orange Bay >>>  A tourist tax isn't included. Please note that you will pay €5 per adult or child in cash on the trip",
+          "\"Dolphin >>>  A tourist tax isn't included. Please note that you will pay €5 per adult or child in cash on the trip",
+          "\"Orange By >>>  The National Park fee isn't included. Please note that you will pay €5 per adult or child in cash on the trip\""
+        ]
+      },
+      {
+        "field_id": "fld86EpJz89M4LvcQ",
+        "field_name": "Add-Ons ((MultiSelect))",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Transfer Extra: You will pay 10 euros per person for an extra transfer",
+          "Paid",
+          "Transfer Extra:  TUI MAGIC LIFE Kalawy, You will pay 25 euros per person for an extra transfer",
+          "\"Transfer Extra: TUI MAGIC LIFE Kalawy, You will pay 30 euros per person for an extra transfer.\"",
+          "\"Transfer Extra: Vivia blue , You will pay 15 euros per person for an extra transfer.\"",
+          "Participants Photography Session for a Trip",
+          "An additional amount of €5 will be collected during the trip.",
+          "Extra fees to change the day",
+          "Cairo entrance fees",
+          "Extra transfer from Hurghada",
+          "Entry Fees to Tutankhamun Tomb",
+          "Transfer Extra: You will pay 15 euros per person for an extra transfer Safaga or Soma Bay",
+          "Nile Boat",
+          "extra transfer from Marsa Alam",
+          "extra transfer from EL-Gouna EUR 15.00 per person"
+        ]
+      },
+      {
+        "field_id": "fldYaTY94QklaDUoI",
+        "field_name": "Stripe invoice",
+        "field_type": "url",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldROrdKaJ4LMBCv0",
+        "field_name": "Collecting on date Trip",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld1Hru77i6BbON3X",
+        "field_name": "Credit Card",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldTo8xOfiuYXAJf3",
+        "field_name": "Currency",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "USD",
+        "linked_table_id": "",
+        "choices": [
+          "USD",
+          "EUR",
+          "GBP",
+          "EGP"
+        ]
+      },
+      {
+        "field_id": "fldUSc37tXMuNKQa1",
+        "field_name": "Amount",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "1740",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldGOpXkSgFSLSTQA",
+        "field_name": "Remarks",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "€ 40.00",
+          "Transfer Makadi",
+          "80 EUR extra for change",
+          "Paid cash in office",
+          "105 EUR cash on 05/10",
+          "21600 EGP cash",
+          "New",
+          "https://buy.stripe.com/eVabIN7np8Ti32U28a",
+          "Ramy",
+          "Ramadan",
+          "250 GBP",
+          "تم",
+          "cash",
+          "strip",
+          "pay one back to hotel tpday"
+        ]
+      },
+      {
+        "field_id": "fldsDHetRtwrR2Yo2",
+        "field_name": "Add - Ons",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld0VpYP86zx6e7wM",
+        "field_name": "des",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Hurghada",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldpbHDv83p4tXgKR",
+        "field_name": "Car Type",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "HIS 3 (HRG)",
+        "linked_table_id": "",
+        "choices": [
+          "Limousine",
+          "Hiace",
+          "Costar",
+          "Bus",
+          "HIS 1",
+          "HIS 2",
+          "HIS 3",
+          "HIS 4",
+          "H1",
+          "HIS 5",
+          "HIS 6",
+          "H1 ( 2 )",
+          "H1 ( 1 )",
+          "H1 ( 3 )",
+          "LIMOUSINE 1"
+        ]
+      },
+      {
+        "field_id": "fld4603hqMTTLNhUx",
+        "field_name": "Teka Send V3",
+        "field_type": "button",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'label': 'Teka Send V3', 'url': 'https://hook.us2.make.com/16g0msqzkkdgrhvcjq5vtlplb2p5xbqf?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=202",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldkiK6tdHq7O5WEA",
+        "field_name": "Guide",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "English",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldmacIbiGeZPTgJF",
+        "field_name": "Tour Guide Name & Phone",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "recOSqKvrJP3rY4H4",
+        "linked_table_id": "tblNs1p6J23nhSBm6",
+        "choices": []
+      },
+      {
+        "field_id": "fldxYcZ9eUhIywv10",
+        "field_name": "Driver Name & Phone",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "recbSN2beDLkfp7Rf",
+        "linked_table_id": "tblUJidvg0lqTZ3Ev",
+        "choices": []
+      },
+      {
+        "field_id": "fldTU4QOjSU8eGwcG",
+        "field_name": "ADT",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "2",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld464qO0Er9lZqTy",
+        "field_name": "STD",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldZxfA1KPxW4f0U1",
+        "field_name": "Inf",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldGaaJPPBzWWatqn",
+        "field_name": "Youth",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "flddUFVXlX2tM2aFa",
+        "field_name": "CHD",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "1",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldLarr8JRaok4E1r",
+        "field_name": "Generate Invoice",
+        "field_type": "button",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'label': 'Generate Invoice', 'url': 'https://hook.us2.make.com/35vgcw6t3t8iv2f87p9jgfor34766nly?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&Agency=Tiqets&pickup_time=&customer_name=Ah",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldlnGdLQW6lgZdhP",
+        "field_name": "Attachments",
+        "field_type": "multipleAttachments",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "{'id': 'attyF4LMZWHr1SKtk', 'url': 'https://v5.airtableusercontent.com/v3/u/55/55/1783951200000/FvwNiGy3TYexyhZblWog7Q/f4xvb1hS_NLYZ7TVPw5Fh-17zCxKUgETPDwpdNrYME3KunKia-gp8RrUP1vI-KwYGF9XfSy5fc_gBIRTI",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld0vi9Gg4Q4FrQqN",
+        "field_name": "Date Trip",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "2026-06-23T01:00:00.000Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldj4fVrrG1AXawe6",
+        "field_name": "No show & refund",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "No show",
+        "linked_table_id": "",
+        "choices": [
+          "No show",
+          "Refund",
+          "Complaint",
+          "No show & refund",
+          "now show 1 pax",
+          "تعديل سعر التذكره كان 11100 بعد بعد تعديل العميل زاد علي الفرد 2600",
+          "تم تبليغ وائل",
+          "حسب الطفل زي الكبير",
+          "منتظر سعر الكنسله",
+          "Delphenia Vincent",
+          "الاسم ده كنسل الحجز ب 17 فقط والاسم كان تذكرته متصدره",
+          "no show 3 pax",
+          "no show 2 pax",
+          "تنفيذ م وائل",
+          "تم اصدار وكنسلت التذكره القديمه"
+        ]
+      },
+      {
+        "field_id": "fldTThKkbsLQbOqlx",
+        "field_name": "Reason",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldzItiGxw8W4Z6D6",
+        "field_name": "From",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "SM 07:05",
+        "linked_table_id": "",
+        "choices": [
+          "SM 07:05",
+          "MS 06:30",
+          "MS 07:00",
+          "SM 08:20",
+          "PAS 08:30",
+          "PAS 06:15",
+          "GB 02:00",
+          "MS 06:45",
+          "NE 06:00",
+          "SM 08:30",
+          "SM 06:00",
+          "GB 2:00",
+          "MS 06:30",
+          "MS 09:10",
+          "PAS 05:30"
+        ]
+      },
+      {
+        "field_id": "fldwxsi9yVHwwtQSE",
+        "field_name": "to",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "MS 20:50",
+        "linked_table_id": "",
+        "choices": [
+          "MS 20:50",
+          "SM 21:05",
+          "PAS 20:30",
+          "MS 18:35",
+          "MS 21:10",
+          "MS 21:25",
+          "SM 21:25",
+          "SM 20:30",
+          "SM 23:00",
+          "MS 20:55",
+          "PAS 20:35",
+          "PAS 20:00",
+          "SM 15:55",
+          "PAS 19:30",
+          "SM 19:30"
+        ]
+      },
+      {
+        "field_id": "fldz2Q8Pdtk4JI582",
+        "field_name": "Issue Tickets",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Hany Flight",
+          "Royal Flight",
+          "Waiting",
+          "Royal Travel",
+          "Egyland",
+          "Wiating",
+          "Sharter",
+          "Charter",
+          "waiting",
+          "Egyland",
+          "New",
+          "royel travel",
+          "FTS",
+          "fts",
+          "Hamy Flight"
+        ]
+      },
+      {
+        "field_id": "fldJ8Cr935rIsv0qP",
+        "field_name": "Customer Email",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Amrmahraga@gmail.com",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldipGqkuotnrZNzl",
+        "field_name": "Product ID",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldxojZr9QM07M5Bb",
+        "field_name": "Net Rate",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "1740",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldybgXWJ9tcpIDWo",
+        "field_name": "Customer Review",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldaJ5gPFpfMoMkRI",
+        "field_name": "Google Maps",
+        "field_type": "url",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "https://www.google.com/maps/place/Pickalbatros+Blu+Spa+Resort+-+Hurghada/@27.1825934,33.8223907,775m/data=!3m1!1e3!4m10!3m9!1s0x144d7d2fa6963acf:0x9db37298868172aa!5m3!1s2026-05-01!4m1!1i2!8m2!3d27.18",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldOOCUaCGdRpjWsi",
+        "field_name": "Review WhatsApp & Email Sent",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again",
+          "Issue Tickets",
+          "Wael Ibrahim"
+        ]
+      },
+      {
+        "field_id": "fld9XKDr7skie8aj3",
+        "field_name": "Last Modified By",
+        "field_type": "lastModifiedBy",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'id': 'usr3u5inRqvXzhRui', 'email': 'booking@ftstravels.com', 'name': 'Booking Ftstravel'}",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldlYBCgxRYbPPmzk",
+        "field_name": "Traveler name",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldsYBmk0iN3sSUHK",
+        "field_name": "Real Product Name",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldjbRrkW8jOtYqHP",
+        "field_name": "Create Date",
+        "field_type": "createdTime",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldQJqMeoNiCY9gZa",
+        "field_name": "Created By",
+        "field_type": "createdBy",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'id': 'usr3u5inRqvXzhRui', 'email': 'booking@ftstravels.com', 'name': 'Booking Ftstravel'}",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldQvitXogi6eTjBJ",
+        "field_name": "Created By Username",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "ahmedtaha",
+          "ahmedsaad",
+          "bassant",
+          "nadeen",
+          "abanoub",
+          "heba",
+          "abeer",
+          "mariem",
+          "emad",
+          "zain"
+        ]
+      },
+      {
+        "field_id": "fldqYNM9cO0gP0j0y",
+        "field_name": "Booking Status",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Canceled",
+        "linked_table_id": "",
+        "choices": [
+          "Active",
+          "Canceled",
+          "Changed",
+          "Confirmed",
+          "PENDING",
+          "Updated",
+          "Cancelled",
+          "Pending"
+        ]
+      },
+      {
+        "field_id": "fldmSuO5mHBpNg4ot",
+        "field_name": "Photo invoice",
+        "field_type": "url",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldFZp5jfFSOxLC1Z",
+        "field_name": "Supplier Name & Phone",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "tblPQ3QCo9nNTXC2O",
+        "choices": []
+      },
+      {
+        "field_id": "fldtCWmlaWWlq7SDd",
+        "field_name": "Local Driver",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "tblUJidvg0lqTZ3Ev",
+        "choices": []
+      },
+      {
+        "field_id": "fldMgP7tlXi2fV406",
+        "field_name": "CHD Age",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Years",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldUvqUlROJ8bMxjo",
+        "field_name": "Pickup Scheduled",
+        "field_type": "button",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'label': 'Send Schadewald', 'url': 'https://hook.us2.make.com/6dbwnjp0ox4uv9zrp6rlerjr5cyr2iab?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld5pX4AlVUCSsLyl",
+        "field_name": "Whatsapp Room & Hotel Sent",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try again",
+          "mbnmb"
+        ]
+      },
+      {
+        "field_id": "fldbQ0TODViVqfrDX",
+        "field_name": "Total price EUR",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "flddJDtMPvFxZRjpW",
+        "field_name": "Total price USD",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldF680MyZ3TZhE5q",
+        "field_name": "Total price GBP",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldNPy7zfFxERlp5z",
+        "field_name": "Welcome email sent?",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "True",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldvTmeTAiZvv8S4e",
+        "field_name": "Teka Send V2",
+        "field_type": "button",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'label': 'Teka Send', 'url': 'https://hook.us2.make.com/pqywaq4qn6vamdhk3sso446lfcflni6s?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-0",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "flddIZ0saICNyK3Oo",
+        "field_name": "Send Review",
+        "field_type": "button",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'label': 'Send Review', 'url': 'https://hook.us2.make.com/muioyztmt6hfguaci12uxxpo9k3v27rn?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldb5nYiQ1IySwMz7",
+        "field_name": "CancelBookingUpdateCXLDate",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "2026-06-07T12:29:43.000Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldR8egO7k0QyirPZ",
+        "field_name": "Last Modified",
+        "field_type": "lastModifiedTime",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "2026-07-13T11:33:36.000Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldn7tX2vmKx8YDPg",
+        "field_name": "SendAuto",
+        "field_type": "lastModifiedTime",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld6qf33d3uKSUk7i",
+        "field_name": "Attachments Boarding",
+        "field_type": "multipleAttachments",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldkfIJOHizwtG6Sp",
+        "field_name": "GYG Rating",
+        "field_type": "rating",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldqywL6UFtu9vpSD",
+        "field_name": "Status",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldUYs3AVojqdTSdq",
+        "field_name": "On Our Way",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Try again",
+          "Done",
+          "30.00",
+          "180.00"
+        ]
+      },
+      {
+        "field_id": "fldRrSkZn40wvzI4f",
+        "field_name": "Ticket Flight Price EGP",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldSPTTHIB6Tqu9fm",
+        "field_name": "Traffic Hurghada",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldmUrQIo2cAnSmOR",
+        "field_name": "Last Sent",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "2026-04-23T04:30:00.076Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldtoDLlCLdrHa7bD",
+        "field_name": "Customer Country",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldv8AHtWzxvhRczG",
+        "field_name": "Send Status Driver & Guide",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again"
+        ]
+      },
+      {
+        "field_id": "fldwt7CHgweBP9In7",
+        "field_name": "Review Date",
+        "field_type": "date",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "2026-06-07",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldBOlPbmAT3HOgPE",
+        "field_name": "Send Sharm Pickup",
+        "field_type": "button",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "{'label': 'Send Sharm', 'url': 'https://hook.us2.make.com/dxbjvsbob2ur94g67gg6rmvqvso8n8bj?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldZr5Uy7dmKQCDSY",
+        "field_name": "Cost EGP",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldeFPwzOqWreOrXy",
+        "field_name": "Representative Name & Phone",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "tblPczNyohkeovdqp",
+        "choices": []
+      },
+      {
+        "field_id": "fld0x8Utw31NzTe3I",
+        "field_name": "FTS Travels Important Notice",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldzXd4R8TzMPKonk",
+        "field_name": "Refund Amount",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldWgPfS8X35JxZzI",
+        "field_name": "Total Travelers",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldyn4LGMcYOPACtH",
+        "field_name": "Customer personal email",
+        "field_type": "email",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Amrmahraga@gmail.com",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldpuypjj4RbGmxYp",
+        "field_name": "Cancelled Send Status",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again"
+        ]
+      },
+      {
+        "field_id": "fldpYGxzy8dYaCBbn",
+        "field_name": "Note",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "عدل الفندق الي Ajira Bay",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldStOtT8aDZ3rYm0",
+        "field_name": "Sent Bad Review Status",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldCXruY59UFiIkUd",
+        "field_name": "Conversations",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldVn6KXd2zALVh32",
+        "field_name": "Issue Tickets Date",
+        "field_type": "date",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldYRjbui0LDzNTRG",
+        "field_name": "Summary (Booking Nr.)",
+        "field_type": "aiText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "{'state': 'empty', 'value': None, 'isStale': True}",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld9fAZm1VH7RwIkY",
+        "field_name": "Chat Driver log",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "\n[2026-02-10T23:53:39.405Z] DRIVER: مرحباً، أنا السائق الخاص بك. أنا في الطريق إليك\n[2026-02-10T23:59:23.369Z] DRIVER: أعتذر عن التأخير ساصل قريبا\n[2026-02-11T00:06:06.450Z] DRIVER: No Show Proof: htt",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldLxKq3OlhWTwMGF",
+        "field_name": "Link First Opened",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldkViGQFDDXeCFav",
+        "field_name": "Link Used",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldY05nkv49VYEavE",
+        "field_name": "message",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "أعتذر عن التأخير ساصل قريبا",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldFDlwedfBDGCo2S",
+        "field_name": "Driver Location link",
+        "field_type": "url",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "https://www.google.com/maps?q=30.2984757,31.3585844",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldb63YgLNZpGkCRZ",
+        "field_name": "Driver Link",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "https://tracker.ftstravels.net/?booking=123456test",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldrSpzhtYTtnF7o3",
+        "field_name": "Customer Location link",
+        "field_type": "url",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldUFRYj8a7Rvqn1a",
+        "field_name": "Attachments Chat",
+        "field_type": "multipleAttachments",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldxQUvFZ4ksr1B5b",
+        "field_name": "Customer Link",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "https://tracker.ftstravels.net/?booking=123456test&phone=201004655246",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldyqKqRJDGKHIsLP",
+        "field_name": "Customer Link Opened",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldyURpYcVPIdrHPD",
+        "field_name": "Customer Last Message",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldIuq1WEI81jF30u",
+        "field_name": "End trip",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldvDzTZoYd3jwonU",
+        "field_name": "Chat Customer log",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldo03tVxYOkKYR59",
+        "field_name": "Driver Star",
+        "field_type": "rating",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldGuv25HViefumk5",
+        "field_name": "Trip Status",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "no_show",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldxkIrsk66Ya4ojL",
+        "field_name": "Trip Start Time",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld2drH7Hm9Lm5iUs",
+        "field_name": "Control Portal",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "https://supplier.ftstravels.net/control.html",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld0mOLIgfwoFpXMU",
+        "field_name": "Created By Email",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldEfaIZioTEAhPF0",
+        "field_name": "Invoice Requested",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "True",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldx4H3HZ1loBt7ZC",
+        "field_name": "Invoice Request Date",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldDaUv0t4kDPOA4u",
+        "field_name": "Invoice Requested By",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "flduuuMSIrGromYIj",
+        "field_name": "AI Chat Log",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "\n\n[2026-06-03 09:46:10] [WhatsApp - User]: hola\ntest\n\n[2026-06-03 09:46:15] [WhatsApp_Auto - System]: Thank you for reaching out! How can I assist you today? Do you have any questions about your booki",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld5Hswu0bnLmgPJt",
+        "field_name": "Guide Link Portal",
+        "field_type": "rollup",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "https://guide.ftstravels.net/index.html?id=recOSqKvrJP3rY4H4",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld8NzVTdwFCn7ILf",
+        "field_name": "Driver Link Portal",
+        "field_type": "rollup",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "http://driver.ftstravels.net/driver-control.html?id=recbSN2beDLkfp7Rf",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldIXg0wCQ2KqFmnG",
+        "field_name": "Coupon",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld3SZidxdPnEIdQW",
+        "field_name": "Supp Link Portal",
+        "field_type": "rollup",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldU2tOjTxrnxIRty",
+        "field_name": "Offer Send Status",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld0WkstjBxxcOxaq",
+        "field_name": "Conversations 2",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "tbl6pMRC6rSxCsHWD",
+        "choices": []
+      },
+      {
+        "field_id": "fldohy6zV4BfC436S",
+        "field_name": "Photographer Link",
+        "field_type": "url",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "https://drive.google.com/drive/folders/1X9cOMkea8KPaSh6NRJFp3XeqnFMwg8G1?usp=drive_link",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld3LDk2Afq9LptZA",
+        "field_name": "Status Photographer WhatsApp",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again"
+        ]
+      },
+      {
+        "field_id": "fldN9TkRiGVgPUB0t",
+        "field_name": "Payment Method",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Cash",
+          "Visa",
+          "Credit Card",
+          "Bank Transfer",
+          "PayPal",
+          "Other"
+        ]
+      },
+      {
+        "field_id": "fld8PcVhsKPBYCz8E",
+        "field_name": "voucher",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "dynamic_voucher.html?bookingNumber=123456test&customerName=Ahmady&email=Amrmahraga%40gmail.com&phone=201004655246&tripDate=2026-06-23T01%3A00%3A00.000Z&tripName=The%20Grand%20Egyptian%20Museum&destina",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldL6SxTprxkCRoZ0",
+        "field_name": "Last Processed",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldi0Utcnul8za2gg",
+        "field_name": "Invoice Status",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "pending",
+        "linked_table_id": "",
+        "choices": [
+          "succeeded",
+          "pending",
+          "failed",
+          "Paid"
+        ]
+      },
+      {
+        "field_id": "fldo4iSY1R6afdRjq",
+        "field_name": "Local Send Status Driver & Guide",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again"
+        ]
+      },
+      {
+        "field_id": "fldVI88SxWBWf2KDC",
+        "field_name": "Trip UUID",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "6356889672",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldwi7tQNzN6ILOXW",
+        "field_name": "Hotel Changed",
+        "field_type": "lastModifiedTime",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "2026-07-09T22:07:54.000Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldmNO7fO7Aa2QbBN",
+        "field_name": "Local Car Type",
+        "field_type": "multipleSelects",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Limousine",
+          "Hiace",
+          "Costar",
+          "Bus",
+          "HIS 1",
+          "HIS 2",
+          "HIS 3",
+          "HIS 4",
+          "H1",
+          "HIS 5",
+          "HIS 6",
+          "H1 ( 2 )",
+          "H1 ( 1 )",
+          "H1 ( 3 )",
+          "LIMOUSINE 1"
+        ]
+      },
+      {
+        "field_id": "fldm7PCAqS50GENkc",
+        "field_name": "Follow sales",
+        "field_type": "singleCollaborator",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldSAEgLiHT651CfX",
+        "field_name": "Hotel Cost",
+        "field_type": "number",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldaX6jc5XUD7F1n2",
+        "field_name": "Country from Phone",
+        "field_type": "aiText",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "{'state': 'generated', 'value': 'Egypt', 'isStale': False}",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "flddoMrzBCoX0cxII",
+        "field_name": "Synced to mailchamp",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "True",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldprPowa5HfDO3lA",
+        "field_name": "Checksum",
+        "field_type": "multilineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldpxGExN6gvgdWVE",
+        "field_name": "Send Personal Email Status",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldAQ043jxHuIu7Ic",
+        "field_name": "Tickets",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "tblD0FduWq7fCTHBM",
+        "choices": []
+      },
+      {
+        "field_id": "fld1UmSKfwns2U1Bl",
+        "field_name": "Tickets Created?",
+        "field_type": "checkbox",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldDvxy6ki5E1hRLE",
+        "field_name": "Date Trip Changed",
+        "field_type": "lastModifiedTime",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "2026-06-23T14:10:08.000Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld9AN7eXdTlkbbsF",
+        "field_name": "Send Guide Tickets",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again"
+        ]
+      },
+      {
+        "field_id": "fldlTmUsJViiXoJDv",
+        "field_name": "AI Chat Status",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "ESCALATED",
+          "RESOLVED",
+          "ACTIVE",
+          "Sharakwy"
+        ]
+      },
+      {
+        "field_id": "fldSjZvgwqZgSFHqj",
+        "field_name": "Last Modified AI Chat log",
+        "field_type": "lastModifiedTime",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "2026-07-09T22:43:23.000Z",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldZ14ejBngcCdgzg",
+        "field_name": "Tour Type",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": [
+          "Museum",
+          "Citadel",
+          "Both"
+        ]
+      },
+      {
+        "field_id": "fld2lVVQweQXYDhVE",
+        "field_name": "Commission Breakdown",
+        "field_type": "percent",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld2ksW4kv3tBMdEe",
+        "field_name": "Retail Price",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldJbMsRiqjPf4GPJ",
+        "field_name": "Revenue",
+        "field_type": "singleLineText",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldPPveib2cdrrCUb",
+        "field_name": "Inquiry Type",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "FOLLOW_UP",
+        "linked_table_id": "",
+        "choices": [
+          "CANCELLATION",
+          "PICKUP_QUERY",
+          "COMPLAINT",
+          "TRIP_INFO_QUERY",
+          "FOLLOW_UP",
+          "OTHER",
+          "INFO_UPDATE",
+          "TEST_SCENARIO",
+          "GENERAL",
+          "LOST_ITEM",
+          "URGENT_ISSUE",
+          "LOST_ITEM",
+          "CLARIFICATION_REQUEST",
+          "QUALITY_REQUEST"
+        ]
+      },
+      {
+        "field_id": "fldgr24ttMvEtYxOJ",
+        "field_name": "Last_Modified_Customer_Location",
+        "field_type": "lastModifiedTime",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldIrNBWjplensx7m",
+        "field_name": "Real Date Trip",
+        "field_type": "dateTime",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fld7MwcdGpnmsGc8B",
+        "field_name": "Tracking Operation Link",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "https://tracker.ftstravels.net/?booking=123456test&operation",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldSBUxaHIAkuoqhh",
+        "field_name": "Audio Guide Link",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "http://tiqets.ftstravels.com/?GM/ticketId=123456test",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldYKQGG0z8bi7rsw",
+        "field_name": "Send Reminder Pickup",
+        "field_type": "singleSelect",
+        "is_updatable": true,
+        "has_value_in_record": true,
+        "value_preview": "Done",
+        "linked_table_id": "",
+        "choices": [
+          "Done",
+          "Try Again"
+        ]
+      },
+      {
+        "field_id": "fld6recfbPRMqHCyO",
+        "field_name": "Net Rate Price (Number Only)",
+        "field_type": "formula",
+        "is_updatable": false,
+        "has_value_in_record": true,
+        "value_preview": "1740",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldjOt6mFrtZMJSIe",
+        "field_name": "Attachments Operations",
+        "field_type": "multipleAttachments",
+        "is_updatable": true,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "",
+        "choices": []
+      },
+      {
+        "field_id": "fldnVYcsBZ9DTpD3m",
+        "field_name": "Products_Catalog",
+        "field_type": "multipleRecordLinks",
+        "is_updatable": false,
+        "has_value_in_record": false,
+        "value_preview": "",
+        "linked_table_id": "tblTr0v9wGmN9Bwdg",
+        "choices": []
+      }
+    ]
+  }
+}

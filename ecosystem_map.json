@@ -1,0 +1,1244 @@
+{
+  "Agency": {
+    "id": "fldNkXuR3rytcsswQ",
+    "name": "Agency",
+    "type": "singleLineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Booking Nr.": {
+    "id": "fldZGLB1NXyaM530F",
+    "name": "Booking Nr.",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Date Trip": {
+    "id": "fld0vi9Gg4Q4FrQqN",
+    "name": "Date Trip",
+    "type": "dateTime",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "trip Name": {
+    "id": "fldTi5WQWiggTyYLF",
+    "name": "trip Name",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Customer Name": {
+    "id": "fldxeRvCQakzWaRTw",
+    "name": "Customer Name",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Option": {
+    "id": "fldycSvjVrtHeApBU",
+    "name": "Option",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "des": {
+    "id": "fld0VpYP86zx6e7wM",
+    "name": "des",
+    "type": "singleLineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Guide": {
+    "id": "fldkiK6tdHq7O5WEA",
+    "name": "Guide",
+    "type": "multilineText",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "ADT": {
+    "id": "fldTU4QOjSU8eGwcG",
+    "name": "ADT",
+    "type": "number",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "STD": {
+    "id": "fld464qO0Er9lZqTy",
+    "name": "STD",
+    "type": "number",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "CHD": {
+    "id": "flddUFVXlX2tM2aFa",
+    "name": "CHD",
+    "type": "number",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Inf": {
+    "id": "fldZxfA1KPxW4f0U1",
+    "name": "Inf",
+    "type": "number",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Add - Ons": {
+    "id": "fldsDHetRtwrR2Yo2",
+    "name": "Add - Ons",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Hotel Name": {
+    "id": "fldf5EuwGjs3L75Yw",
+    "name": "Hotel Name",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Room number": {
+    "id": "fld1AwHLTD5KYyUeQ",
+    "name": "Room number",
+    "type": "multilineText",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "pickup time": {
+    "id": "fldiOioY51CxhDvFM",
+    "name": "pickup time",
+    "type": "singleSelect",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Issue Tickets ": {
+    "id": "fldz2Q8Pdtk4JI582",
+    "name": "Issue Tickets ",
+    "type": "singleSelect",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "From": {
+    "id": "fldzItiGxw8W4Z6D6",
+    "name": "From",
+    "type": "singleSelect",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "to": {
+    "id": "fldwxsi9yVHwwtQSE",
+    "name": "to",
+    "type": "singleSelect",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Product ID": {
+    "id": "fldipGqkuotnrZNzl",
+    "name": "Product ID",
+    "type": "multilineText",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Collecting on date Trip": {
+    "id": "fldROrdKaJ4LMBCv0",
+    "name": "Collecting on date Trip",
+    "type": "number",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Review WhatsApp & Email Sent": {
+    "id": "fldOOCUaCGdRpjWsi",
+    "name": "Review WhatsApp & Email Sent",
+    "type": "singleSelect",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Credit Card": {
+    "id": "fld1Hru77i6BbON3X",
+    "name": "Credit Card",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Create Date  ": {
+    "id": "fldjbRrkW8jOtYqHP",
+    "name": "Create Date  ",
+    "type": "createdTime",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "CXL Date": {
+    "id": "fldDeFCFR74boCvJe",
+    "name": "CXL Date",
+    "type": "dateTime",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Remarks": {
+    "id": "fldGOpXkSgFSLSTQA",
+    "name": "Remarks",
+    "type": "singleSelect",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Attachments": {
+    "id": "fldlnGdLQW6lgZdhP",
+    "name": "Attachments",
+    "type": "multipleAttachments",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Last Modified": {
+    "id": "fldR8egO7k0QyirPZ",
+    "name": "Last Modified",
+    "type": "lastModifiedTime",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Whatsapp Room & Hotel Sent": {
+    "id": "fld5pX4AlVUCSsLyl",
+    "name": "Whatsapp Room & Hotel Sent",
+    "type": "singleSelect",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Whatsapp Pickup Time2": {
+    "id": "fld4AsPdRUQJqHVia",
+    "name": "Whatsapp Pickup Time2",
+    "type": "singleSelect",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Non-billable addons": {
+    "id": "fldjzxYjMjPu8RAz6",
+    "name": "Non-billable addons",
+    "type": "multipleSelects",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "GYG Rating": {
+    "id": "fldkfIJOHizwtG6Sp",
+    "name": "GYG Rating",
+    "type": "rating",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Customer Review": {
+    "id": "fldybgXWJ9tcpIDWo",
+    "name": "Customer Review",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Customer Email": {
+    "id": "fldJ8Cr935rIsv0qP",
+    "name": "Customer Email",
+    "type": "singleLineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Customer Phone": {
+    "id": "flduE2TbOmhEv7ebR",
+    "name": "Customer Phone",
+    "type": "phoneNumber",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Total price EUR": {
+    "id": "fldbQ0TODViVqfrDX",
+    "name": "Total price EUR",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Total price USD ": {
+    "id": "flddJDtMPvFxZRjpW",
+    "name": "Total price USD ",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Total price GBP ": {
+    "id": "fldF680MyZ3TZhE5q",
+    "name": "Total price GBP ",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Welcome email sent?": {
+    "id": "fldNPy7zfFxERlp5z",
+    "name": "Welcome email sent?",
+    "type": "checkbox",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Created By": {
+    "id": "fldQJqMeoNiCY9gZa",
+    "name": "Created By",
+    "type": "createdBy",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Add-Ons ((MultiSelect))": {
+    "id": "fld86EpJz89M4LvcQ",
+    "name": "Add-Ons ((MultiSelect))",
+    "type": "multipleSelects",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "No show & refund": {
+    "id": "fldj4fVrrG1AXawe6",
+    "name": "No show & refund",
+    "type": "multipleSelects",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Reason ": {
+    "id": "fldTThKkbsLQbOqlx",
+    "name": "Reason ",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Last Modified By": {
+    "id": "fld9XKDr7skie8aj3",
+    "name": "Last Modified By",
+    "type": "lastModifiedBy",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Teka Send V2": {
+    "id": "fldvTmeTAiZvv8S4e",
+    "name": "Teka Send V2",
+    "type": "button",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Stripe invoice": {
+    "id": "fldYaTY94QklaDUoI",
+    "name": "Stripe invoice",
+    "type": "url",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Teka Send V3": {
+    "id": "fld4603hqMTTLNhUx",
+    "name": "Teka Send V3",
+    "type": "button",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Youth": {
+    "id": "fldGaaJPPBzWWatqn",
+    "name": "Youth",
+    "type": "number",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "CHD Age": {
+    "id": "fldMgP7tlXi2fV406",
+    "name": "CHD Age",
+    "type": "singleLineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Send Review": {
+    "id": "flddIZ0saICNyK3Oo",
+    "name": "Send Review",
+    "type": "button",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Attachments Boarding": {
+    "id": "fld6qf33d3uKSUk7i",
+    "name": "Attachments Boarding",
+    "type": "multipleAttachments",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "SendAuto": {
+    "id": "fldn7tX2vmKx8YDPg",
+    "name": "SendAuto",
+    "type": "lastModifiedTime",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Pickup Scheduled": {
+    "id": "fldUvqUlROJ8bMxjo",
+    "name": "Pickup Scheduled",
+    "type": "button",
+    "category": "Logistics",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "Logistics field likely managed by System Automation."
+  },
+  "Status": {
+    "id": "fldqywL6UFtu9vpSD",
+    "name": "Status",
+    "type": "checkbox",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "On Our Way ": {
+    "id": "fldUYs3AVojqdTSdq",
+    "name": "On Our Way ",
+    "type": "singleSelect",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Ticket Flight Price EGP": {
+    "id": "fldRrSkZn40wvzI4f",
+    "name": "Ticket Flight Price EGP",
+    "type": "singleLineText",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Net Rate": {
+    "id": "fldxojZr9QM07M5Bb",
+    "name": "Net Rate",
+    "type": "multilineText",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Traffic Hurghada ": {
+    "id": "fldSPTTHIB6Tqu9fm",
+    "name": "Traffic Hurghada ",
+    "type": "multipleSelects",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Tour Guide Name & Phone": {
+    "id": "fldmacIbiGeZPTgJF",
+    "name": "Tour Guide Name & Phone",
+    "type": "multipleRecordLinks",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Car Type": {
+    "id": "fldpbHDv83p4tXgKR",
+    "name": "Car Type",
+    "type": "multipleSelects",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Driver Name & Phone": {
+    "id": "fldxYcZ9eUhIywv10",
+    "name": "Driver Name & Phone",
+    "type": "multipleRecordLinks",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Last Sent": {
+    "id": "fldmUrQIo2cAnSmOR",
+    "name": "Last Sent",
+    "type": "dateTime",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Customer Country": {
+    "id": "fldtoDLlCLdrHa7bD",
+    "name": "Customer Country",
+    "type": "singleLineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Amount": {
+    "id": "fldUSc37tXMuNKQa1",
+    "name": "Amount",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Booking Status": {
+    "id": "fldqYNM9cO0gP0j0y",
+    "name": "Booking Status",
+    "type": "singleLineText",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Google Maps": {
+    "id": "fldaJ5gPFpfMoMkRI",
+    "name": "Google Maps",
+    "type": "url",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Currency": {
+    "id": "fldTo8xOfiuYXAJf3",
+    "name": "Currency",
+    "type": "multipleSelects",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Traveler name": {
+    "id": "fldlYBCgxRYbPPmzk",
+    "name": "Traveler name",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Send Status Driver & Guide": {
+    "id": "fldv8AHtWzxvhRczG",
+    "name": "Send Status Driver & Guide",
+    "type": "singleSelect",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Review Date": {
+    "id": "fldwt7CHgweBP9In7",
+    "name": "Review Date",
+    "type": "date",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Send Sharm Pickup": {
+    "id": "fldBOlPbmAT3HOgPE",
+    "name": "Send Sharm Pickup",
+    "type": "button",
+    "category": "Logistics",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "Logistics field likely managed by System Automation."
+  },
+  "Cost EGP": {
+    "id": "fldZr5Uy7dmKQCDSY",
+    "name": "Cost EGP",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Representative Name & Phone": {
+    "id": "fldeFPwzOqWreOrXy",
+    "name": "Representative Name & Phone",
+    "type": "multipleRecordLinks",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "FTS Travels Important Notice": {
+    "id": "fld0x8Utw31NzTe3I",
+    "name": "FTS Travels Important Notice",
+    "type": "checkbox",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "CancelBookingUpdateCXLDate": {
+    "id": "fldb5nYiQ1IySwMz7",
+    "name": "CancelBookingUpdateCXLDate",
+    "type": "formula",
+    "category": "Status",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "Status field likely managed by System Automation."
+  },
+  "Generate Invoice": {
+    "id": "fldLarr8JRaok4E1r",
+    "name": "Generate Invoice",
+    "type": "button",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Real Product Name": {
+    "id": "fldsYBmk0iN3sSUHK",
+    "name": "Real Product Name",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Refund Amount": {
+    "id": "fldzXd4R8TzMPKonk",
+    "name": "Refund Amount",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Total Travelers": {
+    "id": "fldWgPfS8X35JxZzI",
+    "name": "Total Travelers",
+    "type": "number",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Photo invoice": {
+    "id": "fldmSuO5mHBpNg4ot",
+    "name": "Photo invoice",
+    "type": "url",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Customer personal email": {
+    "id": "fldyn4LGMcYOPACtH",
+    "name": "Customer personal email",
+    "type": "email",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Cancelled Send Status": {
+    "id": "fldpuypjj4RbGmxYp",
+    "name": "Cancelled Send Status",
+    "type": "singleSelect",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Supplier Name & Phone": {
+    "id": "fldFZp5jfFSOxLC1Z",
+    "name": "Supplier Name & Phone",
+    "type": "multipleRecordLinks",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Note": {
+    "id": "fldpYGxzy8dYaCBbn",
+    "name": "Note",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Kommo Conversation Backup": {
+    "id": "fldStOtT8aDZ3rYm0",
+    "name": "Kommo Conversation Backup",
+    "type": "singleLineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Conversations": {
+    "id": "fldCXruY59UFiIkUd",
+    "name": "Conversations",
+    "type": "singleLineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Issue Tickets Date": {
+    "id": "fldVn6KXd2zALVh32",
+    "name": "Issue Tickets Date",
+    "type": "date",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Summary (Booking Nr.)": {
+    "id": "fldYRjbui0LDzNTRG",
+    "name": "Summary (Booking Nr.)",
+    "type": "aiText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Chat Driver log": {
+    "id": "fld9fAZm1VH7RwIkY",
+    "name": "Chat Driver log",
+    "type": "multilineText",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Link First Opened": {
+    "id": "fldLxKq3OlhWTwMGF",
+    "name": "Link First Opened",
+    "type": "dateTime",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Link Used": {
+    "id": "fldkViGQFDDXeCFav",
+    "name": "Link Used",
+    "type": "checkbox",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "message": {
+    "id": "fldY05nkv49VYEavE",
+    "name": "message",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Driver Location link": {
+    "id": "fldFDlwedfBDGCo2S",
+    "name": "Driver Location link",
+    "type": "url",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Driver Link": {
+    "id": "fldb63YgLNZpGkCRZ",
+    "name": "Driver Link",
+    "type": "formula",
+    "category": "Logistics",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "Logistics field likely managed by System Automation."
+  },
+  "Customer Location link": {
+    "id": "fldrSpzhtYTtnF7o3",
+    "name": "Customer Location link",
+    "type": "url",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Attachments Chat": {
+    "id": "fldUFRYj8a7Rvqn1a",
+    "name": "Attachments Chat",
+    "type": "multipleAttachments",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Customer Link": {
+    "id": "fldxQUvFZ4ksr1B5b",
+    "name": "Customer Link",
+    "type": "formula",
+    "category": "Contact",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by System Automation."
+  },
+  "Customer Link Opened": {
+    "id": "fldyqKqRJDGKHIsLP",
+    "name": "Customer Link Opened",
+    "type": "dateTime",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Customer Last Message": {
+    "id": "fldyURpYcVPIdrHPD",
+    "name": "Customer Last Message",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "End trip": {
+    "id": "fldIuq1WEI81jF30u",
+    "name": "End trip",
+    "type": "checkbox",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Chat Customer log": {
+    "id": "fldvDzTZoYd3jwonU",
+    "name": "Chat Customer log",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Driver Star": {
+    "id": "fldo03tVxYOkKYR59",
+    "name": "Driver Star",
+    "type": "rating",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Trip Status": {
+    "id": "fldGuv25HViefumk5",
+    "name": "Trip Status",
+    "type": "singleLineText",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Trip Start Time": {
+    "id": "fldxkIrsk66Ya4ojL",
+    "name": "Trip Start Time",
+    "type": "dateTime",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Control Portal": {
+    "id": "fld2drH7Hm9Lm5iUs",
+    "name": "Control Portal",
+    "type": "formula",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Created By Username": {
+    "id": "fldQvitXogi6eTjBJ",
+    "name": "Created By Username",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Created By Email": {
+    "id": "fld0mOLIgfwoFpXMU",
+    "name": "Created By Email",
+    "type": "multilineText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Invoice Requested": {
+    "id": "fldEfaIZioTEAhPF0",
+    "name": "Invoice Requested",
+    "type": "checkbox",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Invoice Request Date": {
+    "id": "fldx4H3HZ1loBt7ZC",
+    "name": "Invoice Request Date",
+    "type": "dateTime",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Invoice Requested By": {
+    "id": "fldDaUv0t4kDPOA4u",
+    "name": "Invoice Requested By",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "AI Chat Log": {
+    "id": "flduuuMSIrGromYIj",
+    "name": "AI Chat Log",
+    "type": "multilineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Local Driver": {
+    "id": "fldtCWmlaWWlq7SDd",
+    "name": "Local Driver",
+    "type": "multipleRecordLinks",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Guide Link Portal": {
+    "id": "fld5Hswu0bnLmgPJt",
+    "name": "Guide Link Portal",
+    "type": "rollup",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Driver Link Portal": {
+    "id": "fld8NzVTdwFCn7ILf",
+    "name": "Driver Link Portal",
+    "type": "rollup",
+    "category": "Logistics",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "Logistics field likely managed by System Automation."
+  },
+  "Coupon": {
+    "id": "fldIXg0wCQ2KqFmnG",
+    "name": "Coupon",
+    "type": "singleLineText",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Supp Link Portal": {
+    "id": "fld3SZidxdPnEIdQW",
+    "name": "Supp Link Portal",
+    "type": "rollup",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Contacts": {
+    "id": "fldU2tOjTxrnxIRty",
+    "name": "Contacts",
+    "type": "multipleRecordLinks",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Conversations 2": {
+    "id": "fld0WkstjBxxcOxaq",
+    "name": "Conversations 2",
+    "type": "multipleRecordLinks",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Photographer Link": {
+    "id": "fldohy6zV4BfC436S",
+    "name": "Photographer Link",
+    "type": "url",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Status Photographer WhatsApp": {
+    "id": "fld3LDk2Afq9LptZA",
+    "name": "Status Photographer WhatsApp",
+    "type": "singleSelect",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Payment Method": {
+    "id": "fldN9TkRiGVgPUB0t",
+    "name": "Payment Method",
+    "type": "singleSelect",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "voucher": {
+    "id": "fld8PcVhsKPBYCz8E",
+    "name": "voucher",
+    "type": "formula",
+    "category": "General",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "General field likely managed by System Automation."
+  },
+  "Last Processed": {
+    "id": "fldL6SxTprxkCRoZ0",
+    "name": "Last Processed",
+    "type": "dateTime",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Invoice Status": {
+    "id": "fldi0Utcnul8za2gg",
+    "name": "Invoice Status",
+    "type": "singleSelect",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Local Send Status Driver & Guide": {
+    "id": "fldo4iSY1R6afdRjq",
+    "name": "Local Send Status Driver & Guide",
+    "type": "singleSelect",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Trip UUID": {
+    "id": "fldVI88SxWBWf2KDC",
+    "name": "Trip UUID",
+    "type": "singleLineText",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Hotel Changed": {
+    "id": "fldwi7tQNzN6ILOXW",
+    "name": "Hotel Changed",
+    "type": "lastModifiedTime",
+    "category": "Logistics",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Logistics field likely managed by Human/System."
+  },
+  "Local Car Type": {
+    "id": "fldmNO7fO7Aa2QbBN",
+    "name": "Local Car Type",
+    "type": "multipleSelects",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Follow sales": {
+    "id": "fldm7PCAqS50GENkc",
+    "name": "Follow sales",
+    "type": "singleCollaborator",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Hotel Cost": {
+    "id": "fldSAEgLiHT651CfX",
+    "name": "Hotel Cost",
+    "type": "number",
+    "category": "Financial",
+    "owner": "Finance Team",
+    "criticality": "High",
+    "description": "Financial field likely managed by Finance Team."
+  },
+  "Country from Phone": {
+    "id": "fldaX6jc5XUD7F1n2",
+    "name": "Country from Phone",
+    "type": "aiText",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Synced to mailchamp": {
+    "id": "flddoMrzBCoX0cxII",
+    "name": "Synced to mailchamp",
+    "type": "checkbox",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Checksum": {
+    "id": "fldprPowa5HfDO3lA",
+    "name": "Checksum",
+    "type": "multilineText",
+    "category": "Status",
+    "owner": "Operations",
+    "criticality": "High",
+    "description": "Status field likely managed by Operations."
+  },
+  "Send Personal Email Status": {
+    "id": "fldpxGExN6gvgdWVE",
+    "name": "Send Personal Email Status",
+    "type": "checkbox",
+    "category": "Contact",
+    "owner": "Sales/Customer",
+    "criticality": "Medium",
+    "description": "Contact field likely managed by Sales/Customer."
+  },
+  "Tickets": {
+    "id": "fldAQ043jxHuIu7Ic",
+    "name": "Tickets",
+    "type": "multipleRecordLinks",
+    "category": "General",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "General field likely managed by Human/System."
+  },
+  "Tickets Created?": {
+    "id": "fld1UmSKfwns2U1Bl",
+    "name": "Tickets Created?",
+    "type": "checkbox",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  },
+  "Date Trip Changed": {
+    "id": "fldDvxy6ki5E1hRLE",
+    "name": "Date Trip Changed",
+    "type": "lastModifiedTime",
+    "category": "Trip",
+    "owner": "Human/System",
+    "criticality": "Low",
+    "description": "Trip field likely managed by Human/System."
+  },
+  "Send Guide Tickets": {
+    "id": "fld9AN7eXdTlkbbsF",
+    "name": "Send Guide Tickets",
+    "type": "singleSelect",
+    "category": "System",
+    "owner": "System Automation",
+    "criticality": "Medium",
+    "description": "System field likely managed by System Automation."
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "case_understanding": "المستخدم (أحمدي) يطلب إرسال التذكرة الخاصة بالحجز 546980816555 (Ahmed Elkhatib - Grand Egyptian Museum عبر wetravel). تم سابقًا إنشاء فاتورة wetravel جديدة وإرسال رابط القالب (ftstravels_confirm_payment) للعميل عبر واتساب. الآن المستخدم يريد التذكرة نفسها (PDF/voucher الدخول للمتحف) ليتم إرسالها له أو للعميل.",
+  "confirmed_facts": [
+    "رقم الحجز: 546980816555",
+    "العميل: Ahmed Elkhatib",
+    "الرحلة: Grand Egyptian Museum (عبر wetravel)",
+    "تم إنشاء فاتورة wetravel جديدة: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9412105116",
+    "تم إرسال قالب ftstravels_confirm_payment للعميل عبر واتساب (Phone ID: 1077199985483939)",
+    "المستخدم يريد التذكرة/الفoucher الآن: 'ابعتلي التذكره'"
+  ],
+  "missing_information": [
+    "هل التذكرة المطلوبة هي PDF/Voucher الدخول للمتحف أم رابط الفاتورة نفسه؟",
+    "هل يريد المستخدم التذكرة له شخصيًا (عرض) أم لإرسالها للعميل؟",
+    "ما هي المرفقات (Tickets/Attachments) الموجودة في سجل Airtable للحجز؟"
+  ],
+  "risk_flags": [
+    "لا يوجد إجراء مباشر 'send_ticket' أو 'fetch_ticket' في الـ schemas المتاحة حاليًا",
+    "إذا كانت التذكرة غير مرفوعة في Airtable، سيحتاج الأمر إلى تصعيد (escalation) لفريق العمليات"
+  ],
+  "recommended_internal_reply": "أهلاً أحمدي، تفضل هذه هي التذكرة الخاصة بحجز Grand Egyptian Museum للعميل Ahmed Elkhatib (رقم الحجز 546980816555)\n\nرابط التذكرة/الفاتورة: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9412105116\n\nإذا كنت تقصد التذكرة نفسها (QR code/voucher الدخول للمتحف)، أحتاج أن أتفقد ملفات التذكرة المرفوعة في Airtable أولاً. هل تريد مني جلب ملف التذكرة من نظام الحجز؟",
+  "recommended_next_step": "استخدام manage_main_bookings_schema_aware مع operation=audit_record لجلب بيانات الحجز والتحقق من وجود ملفات التذاكر (Tickets/Attachments) في Airtable",
+  "should_ask_clarifying_question": true,
+  "clarifying_question": "هل تقصد بالتذكرة:\n1️⃣ رابط الفاتورة (الذي تم إرساله للعميل) - wetravel link\n2️⃣ تذكرة الدخول الفعلية (PDF/Voucher) للمتحف - إن وجدت\n3️⃣ كلاهما\n\nأيضًا، هل تريدها لك شخصيًا (عرض) أم تريد إرسالها للعميل؟",
+  "approval_required": false,
+  "execution_guidance": "ask_user",
+  "confidence": 0.7,
+  "action_manifest": [
+    {
+      "type": "manage_main_bookings_schema_aware",
+      "target_record": "booking_or_table",
+      "requires_approval": false,
+      "payload": {
+        "operation": "audit_record",
+        "booking_number": "546980816555",
+        "field_names": ["Attachments", "Tickets", "Attachments Chat", "Booking Status", "trip Name", "Agency", "Customer Name", "Customer personal email"]
+      }
+    }
+  ]
+}

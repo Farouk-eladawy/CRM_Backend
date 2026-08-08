@@ -1,0 +1,18 @@
+=== Religious Prompt Section (L3350-3450) ===
+L3376:         if location and str(location).lower() == "religious" and chat_id:
+
+=== Searching for religious prompt building ===
+L2371:                     FieldIds.RELIGIOUS_NOTES: f"[SYSTEM]: New Lead Created. Initial Message: {initial_message}",
+  L2369:                     FieldIds.RELIGIOUS_NAME: name,
+  L2370:                     FieldIds.RELIGIOUS_EMAIL: email,
+  L2371:                     FieldIds.RELIGIOUS_NOTES: f"[SYSTEM]: New Lead Created. Initial Message: {initial_message}",
+  L2372:                     FieldIds.RELIGIOUS_TYPE: "جديد",
+  L2373:                     FieldIds.RELIGIOUS_DATE: datetime.now().strftime("%Y-%m-%d")
+  L2374:                 }
+  L2375:                 if clean_phone:
+  L2376:                     fields[FieldIds.RELIGIOUS_PHONE] = clean_phone
+  L2377:                     
+  L2378:                 record = self.religious_leads_table.create(fields, typecast=True)
+  L2379:                 record['table_name'] = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
+  L2380:                 logging.info(f"Created new Religious Lead record: {email} / {clean_phone}")
+---

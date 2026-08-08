@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-phase4-test",
+  "status": "recorded",
+  "memory_eligible": true,
+  "checks": [
+    "episodic_memory_appended",
+    "decisions_memory_appended",
+    "patterns_updated",
+    "goals_updated"
+  ],
+  "checked_at": "2026-07-10T12:58:24.683794+00:00"
+}

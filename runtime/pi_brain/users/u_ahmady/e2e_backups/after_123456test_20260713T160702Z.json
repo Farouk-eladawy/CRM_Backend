@@ -1,0 +1,198 @@
+{
+  "id": "recPRC2TeFZTc8gOE",
+  "createdTime": "2026-06-07T09:29:43.000Z",
+  "fields": {
+    "des": "E2E des 20260713T160702Z",
+    "Date Trip": "2026-07-20T10:30:00.000Z",
+    "FTS Travels Important Notice": true,
+    "Room number": "E2E Room number 20260713T160702Z",
+    "Credit Card": "E2E Credit Card 20260713T160702Z",
+    "Control Portal": "https://supplier.ftstravels.net/control.html",
+    "Retail Price": "E2E Retail Price 20260713T160702Z",
+    "Commission Breakdown": 0.15,
+    "Status Photographer WhatsApp": "Done",
+    "Supp Link Portal": [],
+    "Teka Send V3": {
+      "label": "Teka Send V3",
+      "url": "https://hook.us2.make.com/16g0msqzkkdgrhvcjq5vtlplb2p5xbqf?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=00%3A00&customer_name=E2E%20Customer%20Name%2020260713T160702Z&date_trip=2026-07-20&hotel_name=E2E%20Hotel%20Name%2020260713T160702Z&des=E2E%20des%2020260713T160702Z&trip_name=E2E%20trip%20Name%2020260713T160702Z&add_ons=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer&total_price_eur=37&total_price_usd=38&total_price_gbp=39&adt=20&std=21&chd=24&customer_phone=201004655246&Option=E2E%20Option%2020260713T160702Z&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=%22%2a%3D%20Notes%3A%2a%20Women%20should%20please%20wear%20appropriate%20clothing%20in%20the%20old%20town.....to%20preserve%20our%20tradition%2C%20because%20the%20Egyptians%20are%20not%20used%20to%20it%20%28only%20City%20Tour%29%22&record_id=recPRC2TeFZTc8gOE"
+    },
+    "STD": 21,
+    "Whatsapp Pickup Time2": "Done",
+    "Guide Link Portal": [
+      "https://guide.ftstravels.net/index.html?id=recOSqKvrJP3rY4H4"
+    ],
+    "Net Rate Price (Number Only)": 2,
+    "Tracking Operation Link": "https://tracker.ftstravels.net/?booking=123456test&operation",
+    "Add-Ons ((MultiSelect))": [
+      "Transfer Extra: You will pay 10 euros per person for an extra transfer"
+    ],
+    "Driver Link Portal": [
+      "http://driver.ftstravels.net/driver-control.html?id=recbSN2beDLkfp7Rf"
+    ],
+    "voucher": "dynamic_voucher.html?bookingNumber=123456test&customerName=E2E%20Customer%20Name%2020260713T160702Z&email=Amrmahraga%40gmail.com&phone=201004655246&tripDate=2026-07-20T10%3A30%3A00.000Z&tripTime=00%3A00&tripName=E2E%20trip%20Name%2020260713T160702Z&destination=E2E%20des%2020260713T160702Z&hotelName=E2E%20Hotel%20Name%2020260713T160702Z&roomNumber=E2E Room number 20260713T160702Z&pickupTime=00%3A00&pickupPoint=E2E%20Hotel%20Name%2020260713T160702Z&adults=20&children=24&students=21&infants=22&youth=23&amount=E2E Net Rate 20260713T160702Z&currency=USD&paymentMethod=Cash&guideLanguage=E2E%20Guide%2020260713T160702Z&language=E2E%20Guide%2020260713T160702Z&extras=E2E%20Add%20-%20Ons%2020260713T160702Z&travelerName=E2E%20Traveler%20name%2020260713T160702Z&agency=E2E%20Agency%2020260713T160702Z",
+    "Send Guide Tickets": "Done",
+    "Last Modified By": {
+      "id": "usr3u5inRqvXzhRui",
+      "email": "booking@ftstravels.com",
+      "name": "Booking Ftstravel"
+    },
+    "Chat Driver log": "\n[2026-02-10T23:53:39.405Z] DRIVER: مرحباً، أنا السائق الخاص بك. أنا في الطريق إليك\n[2026-02-10T23:59:23.369Z] DRIVER: أعتذر عن التأخير ساصل قريبا\n[2026-02-11T00:06:06.450Z] DRIVER: No Show Proof: https://i.ibb.co/yF6whq21/17707683413264029840034336623155.jpg\n[2026-02-11T00:16:38.581Z] DRIVER: أعتذر عن التأخير ساصل قريبا",
+    "Send Sharm Pickup": {
+      "label": "Send Sharm",
+      "url": "https://hook.us2.make.com/dxbjvsbob2ur94g67gg6rmvqvso8n8bj?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=00%3A00&customer_name=E2E%20Customer%20Name%2020260713T160702Z&date_trip=2026-07-20&hotel_name=E2E%20Hotel%20Name%2020260713T160702Z&des=E2E%20des%2020260713T160702Z&trip_name=E2E%20trip%20Name%2020260713T160702Z&add_ons=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer&total_price_eur=37&total_price_usd=38&total_price_gbp=39&adt=20&std=21&chd=24&customer_phone=201004655246&Option=E2E%20Option%2020260713T160702Z&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=%22%2a%3D%20Notes%3A%2a%20Women%20should%20please%20wear%20appropriate%20clothing%20in%20the%20old%20town.....to%20preserve%20our%20tradition%2C%20because%20the%20Egyptians%20are%20not%20used%20to%20it%20%28only%20City%20Tour%29%22&record_id=recPRC2TeFZTc8gOE"
+    },
+    "Date Trip Changed": "2026-07-13T16:07:50.000Z",
+    "Invoice Requested": true,
+    "Total price GBP ": 39,
+    "Driver Location link": "https://www.google.com/maps?q=30.2984757,31.3585844",
+    "Remarks": "€ 40.00",
+    "Youth": 23,
+    "Trip Status": "E2E Trip Status 20260713T160702Z",
+    "Coupon": "E2E Coupon 20260713T160702Z",
+    "Real Date Trip": "2026-07-20T10:30:00.000Z",
+    "End trip": true,
+    "Customer Email": "Amrmahraga@gmail.com",
+    "Revenue": "E2E Revenue 20260713T160702Z",
+    "Generate Invoice": {
+      "label": "Generate Invoice",
+      "url": "https://hook.us2.make.com/35vgcw6t3t8iv2f87p9jgfor34766nly?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&Agency=E2E%20Agency%2020260713T160702Z&pickup_time=00%3A00&customer_name=E2E%20Customer%20Name%2020260713T160702Z&date_trip=2026-07-20&hotel_name=E2E%20Hotel%20Name%2020260713T160702Z&des=E2E%20des%2020260713T160702Z&trip_name=E2E%20trip%20Name%2020260713T160702Z&add_ons=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer&customer_phone=201004655246&Option=E2E%20Option%2020260713T160702Z&total_travelers=51&non_billable_addons=%22%2a%3D%20Notes%3A%2a%20Women%20should%20please%20wear%20appropriate%20clothing%20in%20the%20old%20town.....to%20preserve%20our%20tradition%2C%20because%20the%20Egyptians%20are%20not%20used%20to%20it%20%28only%20City%20Tour%29%22&record_id=recPRC2TeFZTc8gOE&youth=23&chd_age=E2E%20CHD%20Age%2020260713T160702Z&gyg_rating=4&customer_review=E2E%20Customer%20Review%2020260713T160702Z&net_rate=E2E%20Net%20Rate%2020260713T160702Z14&booking_status=Active&google_maps=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FPickalbatros%2BBlu%2BSpa%2BResort%2B-%2BHurghada%2F%4027.1825934%2C33.8223907%2C775m%2Fdata%3D%213m1%211e3%214m10%213m9%211s0x144d7d2fa6963acf%3A0x9db37298868172aa%215m3%211s2026-05-01%214m1%211i2%218m2%213d27.1825934%214d33.8249656%2116s%252Fg%252F11qbkrxyjq%215m1%211e2%3Fentry%3Dtts%26g_ep%3DEgoyMDI2MDIwOC4wIPu8ASoASAFQAw%253D%253D%26skid%3Ddc2a34d5-4e4d-4367-85d0-49a6e8944ef7&currency=USD&traveler_name=E2E%20Traveler%20name%2020260713T160702Z&Amount=14&Add_Ons Multiselect=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer"
+    },
+    "CHD Age": "E2E CHD Age 20260713T160702Z",
+    "Payment Method": "Cash",
+    "Welcome email sent?": true,
+    "Agency": "E2E Agency 20260713T160702Z",
+    "Review WhatsApp & Email Sent": "Done",
+    "Inquiry Type": "CANCELLATION",
+    "Created By": {
+      "id": "usr3u5inRqvXzhRui",
+      "email": "booking@ftstravels.com",
+      "name": "Booking Ftstravel"
+    },
+    "Last Modified": "2026-07-13T16:09:33.000Z",
+    "Collecting on date Trip": 11,
+    "Ticket Flight Price EGP": "E2E Ticket Flight Price EGP 20260713T160702Z",
+    "Hotel Cost": 61,
+    "Audio Guide Link": "http://tiqets.ftstravels.com/?GM/ticketId=123456test",
+    "Last Modified AI Chat log": "2026-07-09T22:43:23.000Z",
+    "Sent Bad Review Status": true,
+    "Reason ": "E2E Reason 20260713T160702Z",
+    "ADT": 20,
+    "trip Name": "E2E trip Name 20260713T160702Z",
+    "Currency": [
+      "USD"
+    ],
+    "Amount": 14,
+    "On Our Way ": "Try again",
+    "Pickup Scheduled": {
+      "label": "Send Schadewald",
+      "url": "https://hook.us2.make.com/6dbwnjp0ox4uv9zrp6rlerjr5cyr2iab?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=00%3A00&customer_name=E2E%20Customer%20Name%2020260713T160702Z&date_trip=2026-07-20&hotel_name=E2E%20Hotel%20Name%2020260713T160702Z&des=E2E%20des%2020260713T160702Z&trip_name=E2E%20trip%20Name%2020260713T160702Z&add_ons=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer&total_price_eur=37&total_price_usd=38&total_price_gbp=39&adt=20&std=21&chd=24&customer_phone=201004655246&Option=E2E%20Option%2020260713T160702Z&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=%22%2a%3D%20Notes%3A%2a%20Women%20should%20please%20wear%20appropriate%20clothing%20in%20the%20old%20town.....to%20preserve%20our%20tradition%2C%20because%20the%20Egyptians%20are%20not%20used%20to%20it%20%28only%20City%20Tour%29%22&record_id=recPRC2TeFZTc8gOE"
+    },
+    "Trip UUID": "in_1TslRKLp8xDOkodwSRrXY0vw",
+    "Total Travelers": 51,
+    "message": "أعتذر عن التأخير ساصل قريبا",
+    "Send Reminder Pickup": "Done",
+    "Summary (Booking Nr.)": {
+      "state": "empty",
+      "value": null,
+      "isStale": true
+    },
+    "Stripe invoice": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc1dVNktOUkRxMzhSdm1HS0Z2RTB6NHdyNzZGbVRsLDE3NDQ5NjAwMg0200WZWZB25x?s=ap",
+    "Tour Type": "Museum",
+    "Booking Nr.": "123456test",
+    "Cost EGP": 48,
+    "Inf": 22,
+    "Google Maps": "https://www.google.com/maps/place/Pickalbatros+Blu+Spa+Resort+-+Hurghada/@27.1825934,33.8223907,775m/data=!3m1!1e3!4m10!3m9!1s0x144d7d2fa6963acf:0x9db37298868172aa!5m3!1s2026-05-01!4m1!1i2!8m2!3d27.1825934!4d33.8249656!16s%2Fg%2F11qbkrxyjq!5m1!1e2?entry=tts&g_ep=EgoyMDI2MDIwOC4wIPu8ASoASAFQAw%3D%3D&skid=dc2a34d5-4e4d-4367-85d0-49a6e8944ef7",
+    "Country from Phone": {
+      "state": "generated",
+      "value": "Egypt",
+      "isStale": false
+    },
+    "Driver Link": "https://tracker.ftstravels.net/?booking=123456test",
+    "Total price EUR": 37,
+    "Send Review": {
+      "label": "Send Review",
+      "url": "https://hook.us2.make.com/muioyztmt6hfguaci12uxxpo9k3v27rn?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=00%3A00&customer_name=E2E%20Customer%20Name%2020260713T160702Z&date_trip=2026-07-20&hotel_name=E2E%20Hotel%20Name%2020260713T160702Z&des=E2E%20des%2020260713T160702Z&trip_name=E2E%20trip%20Name%2020260713T160702Z&add_ons=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer&total_price_eur=37&total_price_usd=38&total_price_gbp=39&adt=20&std=21&chd=24&customer_phone=201004655246&Option=E2E%20Option%2020260713T160702Z&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=%22%2a%3D%20Notes%3A%2a%20Women%20should%20please%20wear%20appropriate%20clothing%20in%20the%20old%20town.....to%20preserve%20our%20tradition%2C%20because%20the%20Egyptians%20are%20not%20used%20to%20it%20%28only%20City%20Tour%29%22&record_id=recPRC2TeFZTc8gOE&Guide=E2E%20Guide%2020260713T160702Z"
+    },
+    "Total price USD ": 38,
+    "CHD": 24,
+    "Synced to mailchamp": true,
+    "Hotel Name": "E2E Hotel Name 20260713T160702Z",
+    "Invoice Status": "succeeded",
+    "pickup time": "00:00",
+    "Product ID": "E2E Product ID 20260713T160702Z",
+    "No show & refund": [
+      "No show"
+    ],
+    "Create Date  ": "2026-06-07T09:29:43.000Z",
+    "Non-billable addons": [
+      "*= Notes:* Women should please wear appropriate clothing in the old town.....to preserve our tradition, because the Egyptians are not used to it (only City Tour)"
+    ],
+    "GYG Rating": 4,
+    "Guide": "E2E Guide 20260713T160702Z",
+    "AI Chat Status": "ESCALATED",
+    "Traveler name": "E2E Traveler name 20260713T160702Z",
+    "Attachments": [
+      {
+        "id": "attyF4LMZWHr1SKtk",
+        "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783972800000/vqnyvrJGkWY6hC-41UqTeQ/xpdO4K6dvb_5IkSZzpw95f9Eb37w0M-rKQ9MGkpoi06MVwRLs9WRaDICFZTvb8RyFtC3sOsbKEY_VXQgyF8M4Exj_xDjXjtyT1Hwov1na_IU8QtV0_lVx6s5n7FV0Fum70GSiX_or6TFmPIA8vWip1oLY-PqyqY7-ZRcdp16Jl0/U9Segnupn5CDZs3krXIAZWBrv-J_69cURgFl3UJsSuM",
+        "filename": "Bel Air Azur Resort.pdf",
+        "size": 4187009,
+        "type": "application/pdf",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783972800000/88Ekeu3k00GIJ1vh0bTTpw/KtXR6PM96FvR6HXpz135QKWySCFEfy_b543jKAqf1uAZHOoHtxS_MBqUXNJLDCGQPMUeu4NjBE5y6b7TI1fcTTEEbfpnxhCfh-quD3H0K35HkqpFa_C0Xl1DYGSHZmRzaTQAXbK70JSMTz8ylge_SA/09pvz8FMOW0HNxDuXLHowqcC-evHd1q556hK0Qgje9o",
+            "width": 28,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783972800000/EMMHw8NCQwlo9NOKu36ygw/nl7t9KiXHGmLoUYMA0i-yqH5EfwjbGZ7848gXT1baoNFej-uBa5Qfwaajr_a7iAZ48BKBwmwFChci2GVgTNo1OGaXTD-bkHUsq6Lsobkulw1-_zp__-B99unIK5R62U4QY_AU9kS4v6TEg7GSKcTLw/x5eXBcYKD3OFidaAovOliqs79Nd0WLcT0YOpzoHoeK4",
+            "width": 512,
+            "height": 663
+          }
+        }
+      }
+    ],
+    "Local Car Type": [
+      "Limousine"
+    ],
+    "Last Sent": "2026-04-23T04:30:00.076Z",
+    "Tour Guide Name & Phone": [
+      "recOSqKvrJP3rY4H4"
+    ],
+    "SendAuto": "2026-07-13T16:07:13.000Z",
+    "Driver Star": 4,
+    "Photographer Link": "https://drive.google.com/drive/folders/1X9cOMkea8KPaSh6NRJFp3XeqnFMwg8G1?usp=drive_link",
+    "Note": "E2E Note 20260713T160702Z",
+    "Car Type": [
+      "Limousine"
+    ],
+    "Cancelled Send Status": "Done",
+    "Booking Status": "Active",
+    "Status": true,
+    "Add - Ons": "E2E Add - Ons 20260713T160702Z",
+    "Real Product Name": "E2E Real Product Name 20260713T160702Z",
+    "Customer Country": "E2E Customer Country 20260713T160702Z",
+    "Customer Phone": "201004655246",
+    "AI Chat Log": "\n\n[2026-06-03 09:46:10] [WhatsApp - User]: hola\ntest\n\n[2026-06-03 09:46:15] [WhatsApp_Auto - System]: Thank you for reaching out! How can I assist you today? Do you have any questions about your booking or would you like information about our tours and trips?\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib\n\n[2026-06-07 04:04:57] [WhatsApp - User]: Confirm i have paid\n\n[2026-06-07 04:05:04] [WhatsApp_Auto - System]: Thank you for reaching out. I have checked our system, and your payment is currently showing as **Pending**. We are now verifying the transaction with the bank. Once it is confirmed (usually within a few minutes), we will send you the final confirmation. If you have a receipt or transaction ID, feel free to share it here so we can speed up the process.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib\n\n[2026-07-10 01:43:14] [WhatsApp - User]: Confirm\nHello\n\n[2026-07-10 01:43:22] [WhatsApp_Auto - System]: Thank you for reaching out again! I see from our records that you previously asked about confirming your payment for booking **123456test** — the **Hurghada to Cairo: Pyramids & Museum for First-Time Visitors** trip scheduled for **June 23, 2026**.\n\nI checked our system, and your payment was showing as **Pending** at that time. Has your payment now been fully processed? If you have a receipt or transaction ID, please share it here so I can verify the status for you.\n\nIf you're referring to a different booking or have a new question, feel free to let me know!\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "Send Status Driver & Guide": "Done",
+    "Teka Send V2": {
+      "label": "Teka Send",
+      "url": "https://hook.us2.make.com/pqywaq4qn6vamdhk3sso446lfcflni6s?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=00%3A00&customer_name=E2E%20Customer%20Name%2020260713T160702Z&date_trip=2026-07-20&hotel_name=E2E%20Hotel%20Name%2020260713T160702Z&des=E2E%20des%2020260713T160702Z&trip_name=E2E%20trip%20Name%2020260713T160702Z&add_ons=Transfer%20Extra%3A%20You%20will%20pay%2010%20euros%20per%20person%20for%20an%20extra%20transfer&total_price_eur=37&total_price_usd=38&total_price_gbp=39&adt=20&std=21&chd=24&customer_phone=201004655246&Option=E2E%20Option%2020260713T160702Z&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=%22%2a%3D%20Notes%3A%2a%20Women%20should%20please%20wear%20appropriate%20clothing%20in%20the%20old%20town.....to%20preserve%20our%20tradition%2C%20because%20the%20Egyptians%20are%20not%20used%20to%20it%20%28only%20City%20Tour%29%22&record_id=recPRC2TeFZTc8gOE"
+    },
+    "Hotel Changed": "2026-07-13T16:07:09.000Z",
+    "Review Date": "2026-07-20",
+    "to": "MS 20:50",
+    "Customer Link": "https://tracker.ftstravels.net/?booking=123456test&phone=201004655246",
+    "Driver Name & Phone": [
+      "recbSN2beDLkfp7Rf"
+    ],
+    "Customer Name": "E2E Customer Name 20260713T160702Z",
+    "Trip Start Time": "2026-07-20T10:30:00.000Z",
+    "Net Rate": "E2E Net Rate 20260713T160702Z",
+    "Customer Review": "E2E Customer Review 20260713T160702Z",
+    "Option": "E2E Option 20260713T160702Z",
+    "Customer personal email": "Amrmahraga@gmail.com",
+    "From": "SM 07:05",
+    "Refund Amount": 50
+  }
+}

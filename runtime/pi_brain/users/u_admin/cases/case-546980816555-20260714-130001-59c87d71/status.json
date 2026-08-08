@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-546980816555-20260714-130001-59c87d71",
+  "status": "active",
+  "updated_at": "2026-07-14T13:00:04.090271+00:00",
+  "intent": "update_airtable",
+  "current_stage": "analysis",
+  "stage_status": "blocked",
+  "next_stage": "analysis"
+}

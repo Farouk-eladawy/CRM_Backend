@@ -1,0 +1,38 @@
+2105: <h2 className="font-black text-[22px] text-[#0F172A] tracking-[-0.02em]">AI Operation</h2>
+2277: <h3 className="font-bold text-[16px] text-gray-900 mb-3">Filter</h3>
+2308: <span className="text-[13px] text-gray-600 font-medium pl-2">Where</span>
+2315: <option value="and">and</option>
+2316: <option value="or">or</option>
+2355: <span className="text-[13px] text-gray-500 font-medium pr-2">Where</span>
+2401: <option value="Confirmed">Confirmed</option>
+2402: <option value="Pending">Pending</option>
+2403: <option value="Cancelled">Cancelled</option>
+2404: <option value="No Show">No Show</option>
+2409: <option value="Hurghada">Hurghada</option>
+2410: <option value="Cairo">Cairo</option>
+2413: <option value="Yes">Yes</option>
+2481: <option value="Confirmed">Confirmed</option>
+2482: <option value="Pending">Pending</option>
+2483: <option value="Cancelled">Cancelled</option>
+2484: <option value="No Show">No Show</option>
+2489: <option value="Hurghada">Hurghada</option>
+2490: <option value="Cairo">Cairo</option>
+2493: <option value="Yes">Yes</option>
+2563: <h3 className="font-bold text-[16px] text-gray-900">Sort by</h3>
+2588: {index > 0 && <span className="text-[13px] text-gray-500 font-medium pr-2">then by</span>}
+2638: <span className="text-[13px] text-gray-700 font-medium">Automatically sort records</span>
+2660: <button onClick={() => toggleAllFields(true)} className="text-[12px] text-blue-600 hover:underline">Show all</button>
+2661: <button onClick={() => toggleAllFields(false)} className="text-[12px] text-gray-500 hover:underline">Default</button>
+2802: <span className="whitespace-nowrap">Changes</span>
+2818: <div className="text-[11px] text-gray-400 truncate">No changes yet</div>
+2900: <option value="">Time TBD</option>
+2934: <div className="text-[12px] font-bold text-gray-800">Change log</div>
+3044: const displayVal = (val === undefined || val === '') ? <span className="text-gray-400 text-[12px]">Empty</span> : renderValue(val, field, false, selectedRecord.id, fieldKey);
+3207: <div className="px-3 py-3 text-[13px] text-gray-400">No options</div>
+3462: <div className="px-3 py-3 text-[13px] text-gray-400">No options</div>
+3681: if (!a?.url) return <div className="text-gray-500 text-[13px]">No file URL</div>;
+3719: <h3 className="font-bold text-[16px] text-gray-900">Create New View</h3>
+3726: <label className="block text-[13px] font-semibold text-gray-700 mb-1.5">View Name</label>
+3737: <label className="block text-[13px] font-semibold text-gray-700 mb-2">Filter Settings</label>
+3741: <span className="text-[13px] text-gray-700">Duplicate current filters</span>
+3745: <span className="text-[13px] text-gray-700">Start with empty filters</span>

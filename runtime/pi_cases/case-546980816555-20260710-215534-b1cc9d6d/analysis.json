@@ -1,0 +1,28 @@
+{
+  "understood_intent": "send_customer_message",
+  "confidence": 0.49,
+  "is_clean": false,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "send_customer_message",
+  "case_reference": "546980816555",
+  "hard_case_reason": [
+    "short_followup_context_dependency",
+    "implicit_send_request"
+  ],
+  "ambiguities": [],
+  "misclassification_flags": [
+    "implicit_send_request"
+  ],
+  "risk_flags": [
+    "customer_send_operation",
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "نعم",
+    "reply_preview": "تم التنفيذ بنجاح.\nالعميل: Ahmed Elkhatib\nالحجز: 546980816555\nالهاتف: 201013498777\nالقالب: opening\nPhone Number ID: 1077199985483939",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T21:55:46.103791+00:00"
+}

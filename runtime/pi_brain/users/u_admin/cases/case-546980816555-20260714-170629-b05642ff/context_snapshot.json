@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-546980816555-20260714-170629-b05642ff",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "201090005205",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-09-25T05:00:00.000Z",
+    "hotel": "Sunrise Test Hotel"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "اعمل فاتورة 120 يورو للحجز 546980816555",
+        "reference": "546980816555",
+        "intent": "create_invoice",
+        "timestamp": "2026-07-14T17:06:29.031301+00:00"
+      },
+      {
+        "role": "assistant",
+        "text": "نتيجة فحص الفاتورة الحالية:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 120.0 EUR\n- المزود: wetravel\n- حالة الفاتورة الحالية: pending\n- رابط الفاتورة الحالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9706856648\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل على هذا الحجز، لذلك لن أطلب موافقتك على إنشاء واحدة جديدة تلقائيًا.\nإذا أردت، اطلب مني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`.",
+        "reference": "546980816555",
+        "intent": "create_invoice",
+        "timestamp": "2026-07-14T17:06:29.031813+00:00"
+      },
+      {
+        "role": "user",
+        "text": "`أنشئ فاتورة جديدة بدل الحالية`",
+        "timestamp": "2026-07-14T17:07:13.206703+00:00",
+        "reference": "546980816555",
+        "intent": "create_invoice"
+      },
+      {
+        "role": "assistant",
+        "text": "تم تجهيز إنشاء فاتورة بشكل آمن:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود المتوقع: wetravel\n- نوع الحجز: standard\n- حالة الفاتورة الحالية: pending\n- يوجد رابط فاتورة حالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9706856648\n- وضع التنفيذ: إنشاء فاتورة جديدة بدل الحالية\n\nنتيجة المحاكاة: الحالة جاهزة للتنفيذ الفعلي بعد موافقتك.\n\nتحذيرات:\n- existing_invoice_will_be_replaced\n\nأرسل `نعم` أو `موافق` لإنشاء الفاتورة الآن. بعد الإنشاء سأجهز لك مراجعة مستقلة قبل إرسالها للعميل.",
+        "timestamp": "2026-07-14T17:07:13.207724+00:00",
+        "reference": "546980816555",
+        "intent": "create_invoice"
+      }
+    ],
+    "last_case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "201090005205",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-09-25T05:00:00.000Z",
+      "hotel": "Sunrise Test Hotel"
+    },
+    "pending_action": {
+      "type": "create_invoice",
+      "mode": "simulate_verify_execute",
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "requested_by": "Admin Manager",
+      "force_new_invoice": true,
+      "custom_amount": null,
+      "custom_currency": null,
+      "preferred_template_name": "",
+      "preferred_template_language": "en",
+      "send_after_create": true,
+      "case_context": {
+        "record_id": "rec4mCX8CaQoQrXjI",
+        "booking_number": "546980816555",
+        "customer_name": "Ahmed Elkhatib",
+        "location": "Unknown",
+        "phone": "201090005205",
+        "email": "Ahmedyeladawy@gmail.com",
+        "trip_name": "Grand Egyptian Museum",
+        "trip_date": "2026-09-25T05:00:00.000Z",
+        "hotel": "Sunrise Test Hotel"
+      },
+      "simulate_result": {
+        "capability_key": "create_invoice",
+        "simulate_only": "True",
+        "record_id": "rec4mCX8CaQoQrXjI",
+        "booking_number": "546980816555",
+        "customer_name": "Ahmed Elkhatib",
+        "amount": "20.0",
+        "currency": "EUR",
+        "provider": "wetravel",
+        "invoice_status": "pending",
+        "existing_payment_url": "https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9706856648",
+        "existing_payment_id": "9706856648",
+        "existing_invoice_present": "True",
+        "force_new_invoice": "True",
+        "booking_type": "standard",
+        "communication_profile": "{'trip_name': 'Grand Egyptian Museum', 'option': 'Skip The Line', 'booking_type': 'standard', 'is_ticket': 'False', 'is_flight': 'False', 'is_audio_guide': 'False', 'payment_template_strategy': 'payment_template_default'}",
+        "ready_to_execute": "True",
+        "warnings": "['existing_invoice_will_be_replaced']",
+        "blocked_reasons": "[]",
+        "dry_run_supported": "True"
+      }
+    },
+    "workflow_state": {
+      "intent": "create_invoice",
+      "phase": "awaiting_approval",
+      "awaiting": "approval",
+      "case_context": {
+        "record_id": "rec4mCX8CaQoQrXjI",
+        "booking_number": "546980816555",
+        "customer_name": "Ahmed Elkhatib",
+        "location": "Unknown",
+        "phone": "201090005205",
+        "email": "Ahmedyeladawy@gmail.com",
+        "trip_name": "Grand Egyptian Museum",
+        "trip_date": "2026-09-25T05:00:00.000Z",
+        "hotel": "Sunrise Test Hotel"
+      },
+      "note": "تم تجهيز إنشاء فاتورة بشكل آمن:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود المتوقع: wetravel\n- نوع الحجز: standard\n- حالة الفاتورة الحالية: pending\n- يوجد رابط فاتورة حالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9706856648\n- وضع التنفيذ: إنشاء فاتورة جديدة بدل الحالية\n\nنتيجة المحاكاة: الحالة جاهزة للتنفيذ الفعلي بعد موافقتك.\n\nتحذيرات:\n- existing_invoice_will_be_replaced\n\nأرسل `نعم` أو `موافق` لإنشاء الفاتورة الآن. بعد الإنشاء سأجهز لك مراجعة مستقلة قبل إرسالها للعميل.",
+      "updated_at": "2026-07-14T17:07:13.207724+00:00",
+      "action_type": "create_invoice",
+      "action_mode": "simulate_verify_execute"
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-14T17:06:29.032322+00:00",
+      "case_id": "case-546980816555-20260714-170629-b05642ff",
+      "current_stage": "intake",
+      "stage_status": "completed",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "546980816555",
+      "intent": "create_invoice",
+      "updated_at": "2026-07-14T17:06:29.049702+00:00"
+    },
+    "lookup_memory": {
+      "reference": "546980816555",
+      "intent": "create_invoice",
+      "message_text": "`أنشئ فاتورة جديدة بدل الحالية`",
+      "updated_at": "2026-07-14T17:07:13.190550+00:00"
+    },
+    "updated_at": "2026-07-14T17:06:29.050223+00:00",
+    "last_intent": "create_invoice"
+  },
+  "captured_at": "2026-07-14T17:07:13.224687+00:00"
+}

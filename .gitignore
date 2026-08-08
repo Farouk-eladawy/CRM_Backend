@@ -1,0 +1,79 @@
+node_modules/
+headout_browser_data/
+__pycache__/
+.pytest_cache/
+gyg_browser_data/
+
+# Databases and Temp DB Files
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+*.sql
+chat_history_staging_copy.db
+*_railway_snapshot.db
+railway_staging_upload/
+
+# Secrets and Credentials
+token*.json
+credentials*.json
+client_secret_*.json
+railway_vars.json
+google_reviews_token.json
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# IDE and Debug Folders
+.dbg/
+.runtime/
+.vscode/
+.trae/
+.idea/
+
+# Logs and Debug Output
+*.log
+*.ndjson
+*.jsonl
+agent_log.txt
+fc_out.txt
+diff.txt
+_debug_frames/
+
+# Archives, Backups, and Zips
+*.bak
+*.bak-*
+*.backup*
+*_backup*.json
+*.zip
+_ARCHIVE_BEFORE_CLEANUP/
+OpenClaw_Version_Evaluation/
+AI Agent Setup/
+migration_backups/
+temp_debug/
+pi_sessions/
+uploads/pi_attachments/
+
+# Windows Specific and Binaries
+NSSM_v2.25/
+*.exe
+
+# System/Corrupted files
+nul
+
+# Large Data, Media, and Exports
+*.mbox
+*.mp4
+*.pdf
+
+# Repos inside Repos (Submodules / Heavy unneeded folders)
+OpenClaw_Operations_Dashboard/
+Operation_AI_System/
+WhatsAppSimulator/
+fts-travels-crm-dashboard-&-guides/
+make.com/
+Send Report For Guide/
+docker_prep/
+Bukon_Server/

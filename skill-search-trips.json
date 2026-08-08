@@ -1,0 +1,20 @@
+{
+  "name": "search_trips",
+  "description": "Search for available trips and tours. Supports filtering by provider (Viator, Headout, GetYourGuide) if the customer has a specific preference or booking.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "The search keyword (e.g., 'safari', 'Cairo', 'museum')."
+      },
+      "provider": {
+        "type": "string",
+        "description": "Optional: Filter by provider name (e.g., 'Viator', 'Headout', 'GYG'). Use this if the user asks about a specific booking source.",
+        "enum": ["viator", "headout", "gyg"]
+      }
+    },
+    "required": ["query"]
+  },
+  "command": "python tools/search_trips.py \"{query}\" \"{provider}\""
+}

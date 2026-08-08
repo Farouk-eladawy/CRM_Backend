@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "version": "v1",
+  "capabilities": [
+    {
+      "key": "booking_summary",
+      "title": "Booking Summary",
+      "aliases": [
+        "summary",
+        "summarize",
+        "لخص",
+        "ملخص",
+        "وريني الحالة",
+        "هات ملخص"
+      ],
+      "requires_case_context": true,
+      "approval_required": false,
+      "execution_mode": "read_only"
+    },
+    {
+      "key": "draft_reply",
+      "title": "Draft Reply",
+      "aliases": [
+        "draft reply",
+        "مسودة رد",
+        "اكتب رد",
+        "جهز رد"
+      ],
+      "requires_case_context": true,
+      "approval_required": false,
+      "execution_mode": "advisory"
+    },
+    {
+      "key": "next_step",
+      "title": "Next Step",
+      "aliases": [
+        "next step",
+        "افضل خطوة",
+        "أفضل خطوة",
+        "اعمل ايه",
+        "المفروض اعمل ايه"
+      ],
+      "requires_case_context": true,
+      "approval_required": false,
+      "execution_mode": "advisory"
+    },
+    {
+      "key": "update_airtable",
+      "title": "Update Airtable",
+      "aliases": [
+        "update airtable",
+        "حدث",
+        "عدل",
+        "غير",
+        "تحديث"
+      ],
+      "requires_case_context": true,
+      "approval_required": true,
+      "execution_mode": "approval_then_execute"
+    },
+    {
+      "key": "send_customer_message",
+      "title": "Send Customer Message",
+      "aliases": [
+        "send to customer",
+        "ابعث للعميل",
+        "ارسل للعميل",
+        "template"
+      ],
+      "requires_case_context": true,
+      "approval_required": true,
+      "execution_mode": "approval_then_execute"
+    },
+    {
+      "key": "trip_booking_alert",
+      "title": "Trip Booking Alert",
+      "aliases": [
+        "alert",
+        "notify",
+        "اشعار",
+        "تنبيه",
+        "نبهني"
+      ],
+      "requires_case_context": false,
+      "approval_required": true,
+      "execution_mode": "approval_then_execute"
+    },
+    {
+      "key": "create_invoice",
+      "title": "Create Invoice",
+      "aliases": [
+        "invoice",
+        "فاتورة",
+        "payment link",
+        "رابط دفع",
+        "انشاء فاتورة",
+        "إنشاء فاتورة"
+      ],
+      "requires_case_context": true,
+      "approval_required": true,
+      "execution_mode": "simulate_verify_execute",
+      "simulate_supported": true,
+      "knowledge_refs": [
+        "/api/payments/create",
+        "/api/payments/bulk_create",
+        "make_generate_invoice_fts_aegypten_v1"
+      ]
+    }
+  ],
+  "updated_at": "2026-07-18T13:59:57.371605+00:00"
+}

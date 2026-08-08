@@ -1,0 +1,1406 @@
+openapi: 3.0.3
+info:
+  title: Tiqets Supplier API
+  version: 2.3.2
+  description: |
+    The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
+    if they aren't connected already.
+
+    The API is loosely based on `REST`. You format `GET` or `POST` requests in `JSON` and you will receive either a
+    JSON-formatted response or an `HTTP` error.
+
+    The endpoints described here are to be exposed on the Supply Partners own systems for Tiqets' systems to consume.
+    In other words: Tiqets initiates `HTTP` calls to the Supply Partners' systems and the Supply Partner's system must
+    respond.
+
+    **Important**: This specification is for the API v2.0. If you are using the deprecated API v1.x then you should read the
+    [documentation for API v1](https://tiqets.github.io/supplier-api/v1.html). If you are migrating between versions
+    please refer to the [API Migration Guide](https://tiqets.github.io/supplier-api/migration.html) for details.
+
+    # Data sharing
+    Tiqets does not share personal information of its customers (PII) with third parties, unless explicitly agreed otherwise.
+    This API Specification does however provide the structure to share (PII) but our systems will default to sending placeholder values.
+
+    Any PII received is to be treated according to the rules laid out in the European Union's "General Data Protection Regulation (GDPR)"
+
+    # Generic requirements
+
+    ### Optional endpoints
+    There are no optional endpoints.
+    All endpoints must be implemented.
+    Failing to do so will block implementers from being certified and allows to go to production.
+
+    ### Response times
+    Maximum response times of the various API endpoints:
+      * Under 5 seconds.
+      * Availability calls with a data range of just 1 day: < 200ms
+
+    ### Flexibility towards unexpected (new) fields
+    In the future Tiqets MAY add new fields to the specification.
+    Although we intend to keep implementers (you) updated about changes the implementation MUST NOT fail when new, unexpected data is received in the incoming requests.
+    Eg.: We MAY start sending the customer's language preference along in the payload to the reservation endpoint. That extra field MUST NOT cause your implementation to fail for syntax reasons or payload validation reasons.
+
+    # Concepts
+
+    ### Product
+
+    The attraction, event or tour the Supply Partner sells tickets for.
+
+    Example:
+
+    * Entrance to the Louvre
+    * Hop-on Hop-off bus ticket
+
+    Product IDs may not change and must be a stable identifier regardless of dates, prices, etc.
+
+    ### Variant
+
+    A "Variant" (in the business often called "ticket types") covers certain price points and inclusions.
+    Each Product must offer at least 1 variant.
+    Eg.:
+
+    * Adult
+    * Child
+    * Adult | Audio Guide
+    * Adult | Audio Guide French
+    * 24H Hop On Hop Off bus
+    * 48H Hop On Hop Off bus
+
+    Variant IDs must:
+
+    * Remain the same regardless of dates and timeslots.
+    (If you use fluctuating IDs in your own systems you must ensure that Tiqets receives a constant, non-varying value.)
+    * Be strings that comply with the following regular expression: `/[A-Za-z0-9_\-]{1,64}/`
+    Examples:
+      * "1"
+      * "ABC-123"
+      * "20193112"
+      * "a3_cd-E22331"
+      * "1234567890123456789012"
+      * "eyJwIjoxMjMsICJ0IjpbMyw1NiwzNDUsODc2LDM0XX0="
+
+    ### Date and Time Values
+
+    The date/time values supported by the different endpoints must always be interpreted in the product/venue's
+    timezone. For example, a request to make a reservation for a product like "The Empire State Building" in the New York,
+    that specifies a `datetime` value of `2022-12-26T15:30` means that the customer plans to visit the venue on
+    `2022-12-26` at `15:30` ET.
+
+    ### Date ranges
+
+    Endpoints that support date ranges must consider those parameters to be "inclusive".
+    This means that:
+    * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
+    * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
+
+    # Generic HTTP error status codes
+
+    These status code are the same for every endpoint.
+
+    | Status code   |                          Message                            |
+    |---------------|-------------------------------------------------------------|
+    |         `403` | Forbidden - Missing or incorrect API key                    |
+    |         `405` | Method Not Allowed - Incorrect HTTP method was used         |
+    |         `5xx` | Service Error                                               |
+
+    **5xx Errors** 
+
+    Errors in the 500 range indicate a significant issue occurred. Therefore, we do not expect you to respond with
+     a properly structured JSON response that outlines the exact cause of the problem. 
+    Instead, we will log any 5xx range errors and consider that your system was not available at that moment. Additionally,
+     we will log your response for debugging purposes later. 
+
+    For all 400 range errors we *do require* a properly structured JSON response that precisely describes what went wrong. 
+
+    # Context specific errors
+
+    Each request besides the status codes can return context specific errors.
+    The HTTP status code must be ```400 - Bad request``` and the response body must contain this JSON structure:
+
+    ```
+    {
+      "error_code": integer,
+      "error": string,
+      "message": string
+    }
+    ```
+
+    Example error response can be found below
+    ```
+    {
+      "error_code": 1000,
+      "error": "Missing argument",
+      "message": "Required argument start was not found"
+    }
+    ```
+
+    Contect specific errors are divided into these categories:
+
+    * **`1xxx`** - Missing input
+    * **`2xxx`** - Invalid input
+    * **`3xxx`** - Request processing failed
+
+
+    # Development tools
+
+    Tiqets offers the following tools to facilitate the development process.
+
+    ## Integration Testing
+
+    To ensure you have correctly implemented the Tiqets Supplier API Specification on your server we offer an integration testing tool. This tool simulates many happy and unhappy flows and checks if each of those is handled properly.
+
+    Only if ALL tests pass without any errors your integration is ready.
+
+    ### Web tool
+
+    If your development environment can be accessed from the web (directly or via a tunneling service like [ngrok](https://ngrok.com/)) then [**our online test tool**](https://supplier-api-web-tool.tiqets.com/) is the way to go.
+
+    If you haven’t received the credentials yet please request them via apisupport@tiqets.com
+
+    [![webtool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/webtool.png)](https://supplier-api-web-tool.tiqets.com/)
+
+    ### Command Line tool
+
+    For development environments that can not be accessed from the web please refer to [**our CLI tool**](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester).
+    This tool runs from the Command Line and is much less user friendly than our online tool but it performs the exact same tests.
+
+    Python must be installed on your development environment.
+
+    [![cli tool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/clitool.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester)
+
+
+    ## Mock server
+
+    Need more examples? Play with [**our mock server**](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock) to see some examples of expected behavior.
+
+    Python must be installed on your development environment.
+
+    [![mock server screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/mockserver.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock)
+  contact:
+    name: "Tiqets API Support"
+    email: apisupport@tiqets.com
+  x-logo:
+    url: "https://tiqets.github.io/supplier-api/docs/tiqets-logo.png"
+    altText: "Tiqets.com Logo"
+tags:
+  - name: Availability
+    description: |
+      The availability endpoint allows Tiqets to retrieve a product's available variants for a given date range.
+  - name: Product Catalog
+    description: |
+      The product catalog endpoints allow Tiqets to retrieve the attractions, events or tours offered by our Supply Partners.
+  - name: Reservation
+    description: |
+      The reservation endpoints allow Tiqets to reserve tickets purchased by customers.
+  - name: Booking
+    description: |
+      The booking endpoints allow Tiqets to create bookings by confirming reservations and, to cancel previous bookings.
+x-tagGroups:
+  - name: Endpoints
+    tags:
+      - Product Catalog
+      - Availability
+      - Reservation
+      - Booking
+paths:
+  "/v2/products":
+    get:
+      tags:
+        - Product Catalog
+      summary: A catalog of available products.
+      description: Returns a list of available products.
+      operationId: getProducts
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Products"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
+      security:
+        - authorization_header: []
+  "/v2/products/{product_id}/availability":
+    get:
+      tags:
+        - Availability
+      summary: Availability
+      description: |
+        The availability endpoint lists the available "variants".
+        Variants are commonly referred to by the industry as "Ticket Types" or "Discounts".
+
+        The endpoint also returns the available quantities and (optionally) their price, defined by the `amount` and the `currency`.
+        The `amount` MUST represent "Face Value": The price that a customer would pay at the venue's ticket office and MUST include all applicable local taxes.
+
+        ### Note on pricing information:
+        ```
+        Pricing information MAY be ingested by Tiqets if, and only if, the prerequisites are met which currently are:
+        - The supplier and Tiqets have signed a specific type of agreement
+        - All variants carry the same commission percentage, according to the agreement
+        ```
+
+        The returned values must be up-to-date and always in the local time of the product/venue.
+
+        Tiqets will typically query the availability for 1 particular date or for a full month and populate its
+        availability cache with the response.
+
+        **Expected behavior**:
+          - Only availability within the requested date range is returned
+          - When there is no availability for the requested and existing product an empty object (`{}`) shall be returned
+
+        **Example #1 to illustrate the above**:
+          - An availability request is made for an existing product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.
+          - The queried product only has 2 months of availability defined in the system.
+          - **Expected response:** Availability for the 2 months that can be provided, never an error.
+
+        **Example #2 to illustrate the above**:
+          - An availability request is made for an existing product and a date range that isn't defined yet in the Supplier's Booking Software system.
+          - **Expected response**: An empty object (```{}```).
+
+        The same data structure is used regardless of whether the product supports timeslots or not.
+
+        **Important**:
+        - if a product doesn't support timeslots then the date/time keys in the availability response must set the timeslot
+        component to `T00:00`; eg. `2022-12-24T00:00`. On the other hand, if a product supports timeslots then every
+        date/time key in the response must include a valid time component, eg. `2022-12-24T15:30`. For more details see
+        the examples in the specification of the endpoint's response.
+        - If a product has `provides_pricing=true`, then this endpoint should return the price for each variant.
+
+        Dates in the past must be supported without returning an error response. Instead, the endpoint should return an
+        availability response without data for the dates in the past.
+      operationId: getAvailability
+      parameters:
+        - name: product_id
+          in: path
+          description: ID of a single product
+          required: true
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Start of the date range in ISO format `YYYY-MM-DD`
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2019-06-21"
+        - name: end
+          in: query
+          description: End of the date range in ISO format `YYYY-MM-DD`
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2019-06-21"
+      responses:
+        "200":
+          description: Available variants by date and timeslots
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvailabilityResponse"
+              examples: {
+                  "Product without prices": {
+                    "description": "Checking availability for a product with `provides_pricing=false`",
+                    "value": {
+                      "2022-12-19T11:00": {
+                        "available_tickets": 0,
+                        "variants": []
+                      },
+                      "2022-12-19T16:30": {
+                        "available_tickets": 100,
+                        "variants": [
+                          {
+                            "id": "TcGz7ywywiWYURHEWD",
+                            "name": "Adult",
+                            "available_tickets": 100
+                          },
+                          {
+                            "id": "hKl5sDxP9ont4GB",
+                            "name": "Child",
+                            "available_tickets": 10
+                          }
+                        ]
+                      },
+                      "2022-12-19T17:30": {
+                        "available_tickets": 63,
+                        "variants": [
+                          {
+                            "id": "wimaiHdm",
+                            "name": "Adult",
+                            "available_tickets": 53
+                          },
+                          {
+                            "id": "erHVNJ7KlKU4Oi4F",
+                            "name": "Child",
+                            "available_tickets": 10
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "Product with prices": {
+                    "description": "Checking Availability for a product with a `provides_pricing=true`.",
+                    "value": {
+                      "2022-12-29T11:00": {
+                        "available_tickets": 14,
+                        "variants": [
+                          {
+                            "id": "hdT3Hng4vsQRSkg",
+                            "name": "Adult",
+                            "available_tickets": 14,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "pJEZw2DtlaKEWi",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "Product without availability": {
+                    "description": "A product that does not have availability for the specified dates.",
+                    "value": {}
+                  },
+                  "Product with timeslots": {
+                    "description": "Checking availability for a product that supports multiple timeslots per day (`use_timeslots=true`).",
+                    "value": {
+                      "2022-12-19T11:00": {
+                        "available_tickets": 0,
+                        "variants": []
+                      },
+                      "2022-12-19T16:30": {
+                        "available_tickets": 100,
+                        "variants": [
+                          {
+                            "id": "TcGz7ywywiWYURHEWD",
+                            "name": "Adult",
+                            "available_tickets": 100,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "hKl5sDxP9ont4GB",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      },
+                      "2022-12-19T17:30": {
+                        "available_tickets": 63,
+                        "variants": [
+                          {
+                            "id": "wimaiHdm",
+                            "name": "Adult",
+                            "available_tickets": 53,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "erHVNJ7KlKU4Oi4F",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      },
+                      "2022-12-20T11:00": {
+                        "available_tickets": 100,
+                        "variants": [
+                          {
+                            "id": "Gtcs6N50GnSLr6J9",
+                            "name": "Adult",
+                            "available_tickets": 100,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "HKBI861tu",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      },
+                      "2022-12-20T16:30": {
+                        "available_tickets": 100,
+                        "variants": [
+                          {
+                            "id": "BeT4xQB",
+                            "name": "Adult",
+                            "available_tickets": 100,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "el7Lje",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      },
+                      "2022-12-20T17:30": {
+                        "available_tickets": 63,
+                        "variants": [
+                          {
+                            "id": "0UUHZR0LlE",
+                            "name": "Adult",
+                            "available_tickets": 53,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "x5kggQPJNl",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "Product with a single timeslot": {
+                    "description": "Checking Availability for a product with a single timeslot (`use_timeslots=true`).",
+                    "value": {
+                      "2022-12-28T11:00": {
+                        "available_tickets": 0,
+                        "variants": []
+                      },
+                      "2022-12-29T11:00": {
+                        "available_tickets": 14,
+                        "variants": [
+                          {
+                            "id": "hdT3Hng4vsQRSkg",
+                            "name": "Adult",
+                            "available_tickets": 14,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "pJEZw2DtlaKEWi",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "Product without timeslots": {
+                    "description": "Checking Availability for a product that does not use timeslots (`use_timeslots=false`).",
+                    "value": {
+                      "2022-12-19T00:00": {
+                        "available_tickets": 92,
+                        "variants": [
+                          {
+                            "id": "Y0J7aP1f3",
+                            "name": "Adult",
+                            "available_tickets": 82,
+                            "price": {
+                              "amount": "4.20",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "3cSQ8i",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "2.10",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "Availability for single date in the past": {
+                    "description": "Availability for a single date in the past",
+                    "value": {}
+                  },
+                  "Availability for date range in the past": {
+                    "description": "Checking Availability on 2022-12-02 for a date range from 2022-12-01 until 2022-12-03",
+                    "value": {
+                      "2022-12-02T11:00": {
+                        "available_tickets": 0,
+                        "variants": []
+                      },
+                      "2022-12-03T11:00": {
+                        "available_tickets": 63,
+                        "variants": [
+                          {
+                            "id": "Zoe7zLmeWgu6pI",
+                            "name": "Adult",
+                            "available_tickets": 53,
+                            "price": {
+                              "amount": "10",
+                              "currency": "EUR"
+                            }
+                          },
+                          {
+                            "id": "I9yRjJ",
+                            "name": "Child",
+                            "available_tickets": 10,
+                            "price": {
+                              "amount": "5.75",
+                              "currency": "EUR"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+              }
+        "400":
+          description: |
+            Bad request
+
+            ## Context Specific Error Codes
+
+            | Error code          |           Error           |                                         Message                                        |
+            |---------------------|---------------------------|----------------------------------------------------------------------------------------|
+            |                1000 | Missing argument          | Required argument `ATTRIBUTE_NAME` was not found                                       |
+            |                1001 | Missing product           | Product with ID `ID_NUMBER` doesn't exist                                              |
+            |                2000 | Malformed datetime        | Incorrect date format, please use the `YYYY-MM-DD` format                              |
+            |                2001 | Incorrect date range      | The end date cannot be earlier than start date                                         |
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
+      security:
+        - authorization_header: []
+  /v2/products/{product_id}/reservation:
+    post:
+      tags:
+        - Reservation
+      summary: Reservation
+      description: |
+        The reservation data contains all data that Tiqets has available for the order.
+        At a bare minimum that is:
+        - The ordered items and their quantities;
+        - Personal information of the main booker (possibly anonymized);
+
+        Depending on the configuration of your product the request may also include:
+        - Additional information at the booking level;
+        - Additional information at the ticket (individual visitor) level;
+        - Pricing information - The prices that Tiqets expects to be paying for the order;
+
+        Please ensure to carefully validate all input data before confirming the reservation.
+      operationId: reservation
+      parameters:
+        - name: product_id
+          in: path
+          description: ID of a single product
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Reservation"
+            examples: {
+              "Reservation without visitor data": {
+                "description": "Create a reservation without sending visitor data.",
+                "value": {
+                  "datetime": "2022-12-26T15:30",
+                  "tickets": [
+                    {
+                      "variant_id": "njj6LScEfpp6P",
+                      "quantity": 2
+                    },
+                    {
+                      "variant_id": "24PV7c7O",
+                      "quantity": 1
+                    }
+                  ],
+                  "customer": {
+                    "first_name": "Jon",
+                    "last_name": "Snow",
+                    "email": "jon@snow.com",
+                    "phone": "+48 555 555 555",
+                    "country": "nl"
+                  }
+                }
+              },
+              "Reservation without timeslots": {
+                "description": "Create a reservation for a product that does not support timeslots (`use_timeslots=false`).",
+                "value":{
+                  "datetime": "2022-12-26T00:00",
+                  "tickets": [
+                    {
+                      "variant_id": "TkiKZwB",
+                      "quantity": 2
+                    },
+                    {
+                      "variant_id": "GnHe4Q3AjeJtMcM59QJV",
+                      "quantity": 1
+                    }
+                  ],
+                  "customer": {
+                    "first_name": "Jon",
+                    "last_name": "Snow",
+                    "email": "jon@snow.com",
+                    "phone": "+48 555 555 555",
+                    "country": "nl"
+                  }
+                }
+              },
+              "Reservation for a product with timeslots": {
+                "description": "Create a reservation for a product that supports timeslots (`use_timeslots=true`)",
+                "value":{
+                  "datetime": "2022-12-26T17:00",
+                  "tickets": [
+                    {
+                      "variant_id": "BzYBUNze",
+                      "quantity": 2
+                    },
+                    {
+                      "variant_id": "kKdTxEC",
+                      "quantity": 1
+                    }
+                  ],
+                  "customer": {
+                    "first_name": "Jon",
+                    "last_name": "Snow",
+                    "email": "jon@snow.com",
+                    "phone": "+48 555 555 555",
+                    "country": "nl"
+                  }
+                }
+              },
+              "Reservation with additional data": {
+                "description": "Create a reservation for a product with `required_visitor_data=['full_name', 'email']` and `required_order_data=['pickup_location', 'nationality']`",
+                "value":{
+                  "datetime": "2022-12-26T15:30",
+                  "tickets": [
+                    {
+                      "variant_id": "rLVezl2rFjo5Hxtb",
+                      "quantity": 2,
+                      "required_visitor_data": [
+                        {
+                          "full_name": "Jon Snow",
+                          "email": "jon@snow.com"
+                        },
+                        {
+                          "full_name": "Tyrion Lannister",
+                          "email": "tyrion@casterlyrock.com"
+                        }
+                      ]
+                    },
+                    {
+                      "variant_id": "h2xK0CeEYeN7n",
+                      "quantity": 1,
+                      "required_visitor_data": [
+                        {
+                          "full_name": "Arya Stark",
+                          "email": "arya@north.com"
+                        }
+                      ]
+                    }
+                  ],
+                  "customer": {
+                    "first_name": "Jon",
+                    "last_name": "Snow",
+                    "email": "jon@snow.com",
+                    "phone": "+48 555 555 555",
+                    "country": "nl"
+                  },
+                  "required_order_data": {
+                    "pickup_location": "Porto Azzurro Aparthotel, Malta",
+                    "nationality": "USA"
+                  }
+                }
+              },
+              "Reservation with additional order data": {
+                "description": "Create a reservation for a product with `required_order_data=['pickup_location', 'nationality']`",
+                "value":{
+                  "datetime": "2022-12-26T23:30",
+                  "tickets": [
+                    {
+                      "variant_id": "5ZSkpJSifs",
+                      "quantity": 2
+                    },
+                    {
+                      "variant_id": "223NF5",
+                      "quantity": 1
+                    }
+                  ],
+                  "customer": {
+                    "first_name": "Jon",
+                    "last_name": "Snow",
+                    "email": "jon@snow.com",
+                    "phone": "+48 555 555 555",
+                    "country": "nl"
+                  },
+                  "required_order_data": {
+                    "pickup_location": "Porto Azzurro Aparthotel, Malta",
+                    "nationality": "USA"
+                  }
+                }
+              }
+            }
+        required: true
+      responses:
+        "200":
+          description: Reservation details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+              examples: {
+                "product with pricing": {
+                  "description": "Response after creating a reservation for a product that provides pricing (`provides_pricing=true`).",
+                  "value": {
+                    "expires_at": "2019-06-30T19:45:00+00:00",
+                    "reservation_id": "78940",
+                    "unit_price": {
+                      "TcGz7ywywiWYURHEWD": {
+                        "amount": "10",
+                        "currency": "EUR"
+                      },
+                      "hKl5sDxP9ont4GB": {
+                        "amount": "5.75",
+                        "currency": "EUR"
+                      }
+                    }
+                  }
+                },
+                "product without pricing": {
+                  "description": "Response after creating a reservation for a product that does not provides pricing (`provides_pricing=false`).",
+                  "value": {
+                    "expires_at": "2019-06-30T19:45:00+00:00",
+                    "reservation_id": "78940"
+                  }
+                }
+              }
+        "400":
+          description: |
+            Bad request
+
+            ## Context Specific Error Codes
+
+            | Error code          |             Error                  |                                                    Message                                          |
+            |---------------------|------------------------------------|-----------------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument                   | Required argument `ATTRIBUTE_NAME` was not found.                                                   |
+            |                1001 | Missing product                    | Product with ID `ID_NUMBER` doesn't exist.                                                          |
+            |                1003 | Missing required fields            | Eg. Missing data for field `full_name`.                                                             |
+            |                2000 | Malformed datetime                 | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`.                                           |
+            |                2002 | Invalid datetime                   | The given date/time doesn't exist in the system.                                                    |
+            |                2003 | Wrong variant ID                   | Given variant id doesn't belong to the given date/timeslot.                                         |
+            |                2004 | Incorrect type                     | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead.                                       |
+            |                2005 | Invalid Value                      | Eg. The phone number must not contain dots.                                                         |
+            |                2009 | Incorrect date                     | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months). |
+            |                3000 | Availability error                 | The requested number of tickets is not longer available for a given variant and/or date/timeslot.   |
+            |                3006 | Insufficient funds                 | The value of the order exceeds the remaining pre-paid funds                                         |
+            |                3008 | Maximum tickets per order exceeded | A maximum of [NUMBER_OF_TICKETS] can be booked per order.                                           |
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
+            
+      security:
+        - authorization_header: []
+  "/v2/booking":
+    post:
+      tags:
+        - Booking
+      summary: Booking
+      description: |
+        After the customer has paid, Tiqets will confirm the earlier made reservation by providing your reservation ID.
+      operationId: booking
+      parameters:
+        - name: TIQETS-TEST-ORDER
+          in: header
+          description: The header that is being sent by the testing tool. Can be used to mark test bookings in your system.
+          required: false
+          example: "true"
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+        required: true
+      responses:
+        "200":
+          description: Booking response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingResponse"
+              examples: {
+                "One barcode per visitor": {
+                  "description": "An order with one barcode per visitor.",
+                  "value":{
+                    "booking_id": "657788",
+                    "barcode_format": "QRCODE",
+                    "barcode_scope": "ticket",
+                    "tickets": {
+                      "variant_1_id": [
+                          "barcode1",
+                          "barcode2"
+                      ],
+                      "variant_2_id": [
+                          "barcode3"
+                      ]
+                    }
+                  }
+                },
+                "One barcode per order": {
+                  "description": "An order with a single barcode for all the visitors.",
+                  "value": {
+                    "booking_id": "657789",
+                    "barcode_format": "QRCODE",
+                    "barcode_scope": "order",
+                    "barcode": "barcode1"
+                  }
+                },
+                "One PDF barcode per order": {
+                  "description": "An order with a single PDF barcode for all the visitors.",
+                  "value": {
+                    "booking_id": "657787",
+                    "barcode_format": "PDF",
+                    "barcode_scope": "order",
+                    "barcode": "ZXhhbXBsZS1iYXJjb2RlLXBlci1vcmRlci0x"
+                  }
+                },
+                "One PDF barcode per visitor": {
+                  "description": "An order with one PDF barcode per visitor.",
+                  "value": {
+                    "booking_id": "657787",
+                    "barcode_format": "PDF",
+                    "barcode_scope": "ticket",
+                    "tickets": {
+                      "variant_1_id": [
+                          "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMQ==",
+                          "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMg=="
+                      ],
+                      "variant_2_id": [
+                          "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMw=="
+                      ]
+                    }
+                  }
+                }
+              }
+        "400":
+          description: |
+            Bad request
+
+            ## Context Specific Error Codes
+
+            | Error code          |          Error           |                         Message                              |
+            |---------------------|--------------------------|--------------------------------------------------------------|
+            |                1000 | Missing argument         | Required argument `ATTRIBUTE_NAME` was not found             |
+            |                2004 | Incorrect type           | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead |
+            |                3001 | Reservation expired      | Your reservation has expired `MINUTES` minutes ago           |
+            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                            |
+            |                3006 | Insufficient funds       | The value of the order exceeds the remaining pre-paid funds  |
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
+      security:
+        - authorization_header: []
+  "/v2/booking/{booking_id}":
+    delete:
+      tags:
+        - Booking
+      summary: Cancellation
+      parameters:
+        - name: booking_id
+          in: path
+          description: booking ID
+          required: true
+          schema:
+            type: string
+      description: |
+        Cancel a booking base on booking ID.
+      operationId: cancellation
+      responses:
+        "204":
+          description: Booking was cancelled
+        "400":
+          description: |
+            Bad request
+
+            ## Context Specific Error Codes
+
+            | Error code           |          Error            |                         Message                                            |
+            |----------------------|---------------------------|----------------------------------------------------------------------------|
+            |                1004  | Missing booking           | Booking with ID `ID_NUMBER` doesn't exist                                  |
+            |                2009  | Incorrect date            | The booking can only be cancelled `HOURS` hours in advance                 |
+            |                3003  | Already Cancelled         | The booking with ID `BOOKING_ID` has already been cancelled                |
+            |                3004  | Cancellation not possible | The booking can't be cancelled, the product doesn't allow cancellations    |
+            |                3005  | Tickets already used      | The booking can't be cancelled because tickets have already been used      |
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
+      security:
+        - authorization_header: []
+components:
+  schemas:
+    Products:
+      type: array
+      example:
+        - id: "687345694"
+          name: "Example Tour"
+          use_timeslots: true
+          is_refundable: true
+          provides_pricing: true
+          cutoff_time: 30
+        - id: "345678900-345678"
+          name: "Example Museum"
+          description: "All day entry to Example Museum."
+          use_timeslots: false
+          is_refundable: true
+          provides_pricing: false
+          cutoff_time: 0
+          max_tickets_per_order: 20
+        - id: "PRD-564456324"
+          name: "Private Tour"
+          description: "Special individual tour"
+          use_timeslots: true
+          is_refundable: true
+          provides_pricing: false
+          cutoff_time: 120
+          required_visitor_data:
+            - full_name
+            - phone
+        - id: "UFJELUEtMTIzNDU="
+          name: "Children Tour"
+          description: "Special individual tour for children"
+          use_timeslots: true
+          is_refundable: true
+          provides_pricing: true
+          cutoff_time: 120
+          required_visitor_data:
+            - full_name
+          required_order_data:
+            - pickup_location
+            - passport_id
+        - id: "564456326"
+          name: "Adults Tour"
+          description: "Special individual tour for adults"
+          use_timeslots: true
+          is_refundable: true
+          provides_pricing: false
+          cutoff_time: 60
+          required_order_data:
+            - pickup_location
+            - passport_id
+            - flight_number
+      items:
+        $ref: "#/components/schemas/Product"
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - use_timeslots
+        - is_refundable
+        - provides_pricing
+        - cutoff_time
+      properties:
+        id:
+          type: string
+          maxLength: 64
+          description: Permanent and unique ID of a single product. Must use printable ASCII characters. If applicable, consider concatenating or `base64` encoding a set of values that are meaningful for your system.
+        name:
+          type: string
+        description:
+          type: string
+        use_timeslots:
+          type: boolean
+          description: Indicates whether the product supports timeslots or not.
+        is_refundable:
+          type: boolean
+          description: Indicates whether the product supports cancellations or not.
+        provides_pricing:
+          type: boolean
+          description: Indicates whether the product contains pricing or not.
+        cutoff_time:
+          type: integer
+          description: The minimum number of minutes before the booking date/time for the cancellation to be successful. 0 means no limit.
+        max_tickets_per_order:
+          type: integer
+          description: Specify the maximum amount of tickets that can be added to a single order. The absence of this field will mean that the product doesn't have such limits.
+        required_order_data:
+          type: array
+          description: |
+            List of _additional_, order-level details that must be included when creating a reservation.  
+            Tiqets _always_ collects the `name`, `email` and `phone number` of the main booker which is why there are no values for that in this list.  
+            ⚠️ This list is expected to be empty, except for exceptional cases.
+          items:
+            $ref: "#/components/schemas/RequiredOrderData"
+        required_visitor_data:
+          type: array
+          description: |
+            List of _additional_ details that must be included for EVERY TRAVELER in the group when creating a reservation.  
+            By default, Tiqets does not collect any details from individual travelers.  
+            Only one weight unit is allowed. Do not request both weight_kg and weight_lb but pick one and handle the input on your end.  
+            ⚠️ This list is expected to be empty, except for exceptional cases.
+          items:
+            $ref: "#/components/schemas/RequiredVisitorData"
+    VisitorData:
+        type: object
+        required:
+          - field
+          - value
+        properties:
+          field:
+            type: string
+            enum:
+              - full_name
+              - email
+              - phone
+              - address
+              - passport_id
+              - date_of_birth
+          value:
+            type: string
+    RequiredOrderData:
+        type: string
+        description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
+        enum:
+          - pickup_location
+          - dropoff_location
+          - nationality
+          - flight_number
+          - passport_id
+          - zipcode
+    RequiredVisitorData:
+        type: string
+        description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
+        enum:
+          - full_name
+          - email
+          - phone
+          - address
+          - passport_id
+          - date_of_birth
+          - weight_kg
+          - weight_lb
+    AvailabilityResponse:
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/Availability"
+    Availability:
+      type: object
+      properties:
+        available_tickets:
+          type: integer
+          example: 15
+          description: A number of available tickets for a given date/timeslot.
+        variants:
+          type: array
+          description: List of variants available on a date and timeslot combination.
+          items:
+            $ref: "#/components/schemas/Variant"
+    Variant:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "The ID of the variant. See the **Concepts** section above for details on the requirements of variant IDs."
+        name:
+          type: string
+          description: The name of the variant
+        available_tickets:
+          type: integer
+          example: 10
+          description: A number of available tickets for the variant in the given date/timeslot.
+        price:
+          type: object
+          properties:
+            amount:
+              type: string
+              example: "3.20"
+            currency:
+              type: string
+              example: EUR
+    OrderItem:
+      type: object
+      required:
+        - variant_id
+        - quantity
+      properties:
+        variant_id:
+          type: string
+          example: "1"
+        quantity:
+          type: integer
+          example: 2
+        required_visitor_data:
+          type: array
+          description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `full_name` and `email` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
+          items:
+            type: object
+            additionalProperties:
+              type: string
+              description: "Accepted fields are: `full_name`, `email`, `phone`, `address`, `passport_id`, `weight_kg`, `weight_lb` and `date_of_birth`. See the payload in the examples."
+    Reservation:
+      type: object
+      required:
+        - datetime
+        - tickets
+        - customer
+      properties:
+        datetime:
+          type: string
+          example: "2019-06-26T15:30"
+          description: "ISO format `YYYY-MM-DDTHH:MM`. If a product requires/supports timeslots then the `datetime`
+            attribute must be parsed to extract the specific timeslot for the reservation. If, on the other hand, a product
+            does not support/require timeslots then the time component of this attribute will be set to `T00:00` and can be
+            safely ignored. See the payload examples for details."
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        customer:
+          type: object
+          required:
+            - first_name
+            - last_name
+            - email
+            - phone
+            - country
+          properties:
+            first_name:
+              type: string
+              example: "Jon"
+            last_name:
+              type: string
+              example: "Snow"
+            email:
+              type: string
+              example: "jon@snow.com"
+            phone:
+              type: string
+              example: "+58 555 555 555"
+            country:
+              type: string
+              example: "nl"
+        required_order_data:
+          type: object
+          description: The additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
+          additionalProperties:
+            type: string
+            description: "Accepted fields are: `pickup_location`, `dropoff_location`, `nationality`, `flight_number`, `passport_id` and `zipcode`. See the payload in the examples."
+    ReservationResponse:
+      type: object
+      properties:
+        reservation_id:
+          type: string
+          example: "78940"
+        expires_at:
+          type: string
+          format: date-time
+          example: "2019-06-30T19:45:00+00:00"
+          description: Datetime string in format YYYY-MM-DDThh:mm:ss+00:00. Timezone is always UTC
+        unit_price:
+          type: object
+          description: |
+            If the product's `provides_pricing = true` then the response MUST specify the prices of all the
+            variants in the reservation. If `provides_pricing = false` then this attribute can be omitted from the response.
+          additionalProperties:
+            type: object
+            properties:
+              amount:
+                description: The unit price the customer will pay for a single ticket of this variant.
+                type: string
+                example: "4.20"
+              currency:
+                type: string
+                example: "EUR"
+                description: The currency to interpret the `amount` attribute.
+    Booking:
+      type: object
+      required:
+        - reservation_id
+        - order_reference
+      properties:
+        reservation_id:
+          type: string
+          example: "9887"
+        order_reference:
+          type: string
+          example: "12345678910"
+          description: |
+            Tiqets own order reference ID.  The value may consist of at most 12 digits.
+
+            You are encouraged to store this value as it allows for cross-referencing of the order administrations and facilitates locating orders in Tiqets' systems.
+    BookingResponse:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        barcode_format:
+          type: string
+          enum:
+            - AZTEC-BYTES
+            - CODE128
+            - CODE39
+            - DATAMATRIX
+            - EAN13
+            - ITF
+            - PDF
+            - QRCODE
+        barcode_scope:
+          type: string
+          description: |
+            Set this to `"order"` if your system generates a single barcode for the entire order.
+
+            Set this to `"ticket"` if your system generates 1 barcode per visitor.
+            **Important**: all the barcodes included in the order must be unique. See the example payloads for details.
+          enum:
+            - order
+            - ticket
+        barcode:
+          type: string
+          description: |
+            If `barcode_format` is set to `"PDF"` then include a base64 encoded PDF.
+            Can be omitted if `barcode_scope` is set to `"ticket"`.
+            
+            If `barcode_format` is set to `"AZTEC-BYTES"` the `barcode` field(s) must contain a Base64 encoded string.
+        tickets:
+          type: object
+          description: Can be omitted if `barcode_scope` is set to `"order"`
+          properties:
+            variant_id:
+              type: array
+              items:
+                $ref: "#/components/schemas/Barcode"
+    Barcode:
+      type: string
+    BadRequest:
+      type: object
+      properties:
+        error_code:
+          type: integer
+          example: 1000
+        error:
+          type: string
+          example: Missing argument
+        message:
+          type: string
+          example: Required argument start was not found
+  securitySchemes:
+    authorization_header:
+      type: apiKey
+      in: header
+      name: API-Key
+      description: |
+        All communication must take place over HTTPS.
+        Self-signed certificates are not accepted.
+
+        In all our calls to your API we pass an `API-Key` header containing the shared secret.
+        A response must only be returned if this key is correct.
+
+        ```
+        API-Key: "<YOUR-API-KEY>"
+        ```
+
+        If the provided value does not match the shared secret, the API will respond with an HTTP 403 status code and an empty body.

@@ -1,0 +1,106 @@
+=== RELIGIOUS REFERENCES in ai_agent.py ===
+L1918:             # Religious Tourism Base
+L1919:             if 'religious_base_id' in self.config['airtable']:
+L1920:                 self.religious_base_id = self.config['airtable']['religious_base_id']
+L1922:                     rel_leads_name = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
+L1923:                     self.religious_leads_table = self.airtable_api.table(self.religious_base_id, rel_leads_name)
+L1925:                     self.religious_tables = {
+L1926:                         t_name: self.airtable_api.table(self.religious_base_id, t_name)
+L1927:                         for t_name in self.config['airtable']['tables'].get('religious_tables', [])
+L1929:                     logging.info(f"Connected to Religious Tourism Airtable. Loaded {len(self.religious_tables)} tables.")
+L1931:                     logging.error(f"Failed to connect to Religious Base tables: {e}")
+L1932:                     self.religious_leads_table = None
+L1933:                     self.religious_tables = {}
+L1935:                 self.religious_base_id = None
+L1936:                 self.religious_leads_table = None
+L1937:                 self.religious_tables = {}
+L2366:             if department == "religious" and getattr(self, "religious_leads_table", None):
+L2369:                     FieldIds.RELIGIOUS_NAME: name,
+L2370:                     FieldIds.RELIGIOUS_EMAIL: email,
+L2371:                     FieldIds.RELIGIOUS_NOTES: f"[SYSTEM]: New Lead Created. Initial Message: {initial_message}",
+L2372:                     FieldIds.RELIGIOUS_TYPE: "جديد",
+L2373:                     FieldIds.RELIGIOUS_DATE: datetime.now().strftime("%Y-%m-%d")
+L2376:                     fields[FieldIds.RELIGIOUS_PHONE] = clean_phone
+L2378:                 record = self.religious_leads_table.create(fields, typecast=True)
+L2379:                 record['table_name'] = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
+L2380:                 logging.info(f"Created new Religious Lead record: {email} / {clean_phone}")
+L2558:             if pinned_loc in {"Sharm", "Hurghada/Cairo", "Sales", "Quality", "Religious"}:
+L2569:         if fallback in {"Sharm", "Hurghada/Cairo", "Sales", "Quality", "Unknown", "Religious"}:
+L3376:         if location and str(location).lower() == "religious" and chat_id:
+L4247:     def _find_religious_booking_by_contact(self, email, phone, booking_nr):
+L4248:         if not self.religious_base_id:
+L4269:             # Maybe there's a booking number in religious tables? Just in case:
+L4278:         # Search all religious tables
+L4281:         # 1. Search main religious tables
+L4282:         for t_name, t_obj in getattr(self, "religious_tables", {}).items():
+L4289:                 logging.warning(f"Error searching religious table {t_name}: {e}")
+L4292:         if getattr(self, "religious_leads_table", None):
+L4294:                 records = self.religious_leads_table.all(formula=formula)
+L4295:                 leads_name = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
+L4300:                 logging.warning(f"Error searching religious leads table: {e}")
+L4313:             if department == "religious":
+L4314:                 return self._find_religious_booking_by_contact(email, phone, booking_nr)
+L6601:                 # Force Religious location for messages hitting the Religious number
+L6603:                     location = "Religious"
+L7085:             dept = "religious" if location and location.lower() == "religious" else "general"
+L7563:                     if location and location.lower() != "religious":
+L7666:     def route_religious_message_to_agent(self, chat_id):
+L7688:             # Find eligible Religious agents
+L7697:                 if 'Religious' in (u.get('allowedLocations') or []) and u.get('role') == 'Agent':
+L7718:                 logging.info("No eligible agents found for Religious routing at this time.")
+L7722:             last_assigned = chat_db.get_setting("last_assigned_religious_agent") or ""
+
+=== KNOWLEDGE BASE REFERENCES in ai_agent.py ===
+L69: from knowledge_base import KnowledgeBase
+L1396:         self.kb = KnowledgeBase()
+L1985:             self.kb = KnowledgeBase()
+L1996:                 self.kb.sync_trips_from_airtable(all_trips)
+L1998:             self.kb.build_if_needed()
+L2247:             results = self.kb.search(query_text, department=department, top_k=4)
+L2975:         kb_results = self.kb.search(f"{trip_name} {message}", top_k=3)
+L16675:         @app.route('/api/knowledge_base/documents', methods=['GET', 'OPTIONS'])
+L16711:                 docs = self.kb.get_documents(dept)
+L16716:         @app.route('/api/knowledge_base/upload', methods=['POST', 'OPTIONS'])
+L16755:                             event_type="kb.document.uploaded",
+L16774:                 res = self.kb.add_document(file_path, file.filename, department)
+L16785:         @app.route('/api/knowledge_base/create', methods=['POST', 'OPTIONS'])
+L16826:                             event_type="kb.document.created",
+L16831:                 res = agent.kb.add_text_document(filename, content, department)
+L16841:         @app.route('/api/knowledge_base/documents/<doc_id>', methods=['GET', 'PUT', 'DELETE', 'OPTIONS'])
+L16847:                 doc_info = agent.kb.get_document_info(doc_id)
+L16886:                     success = agent.kb.update_document(doc_id, new_filename, new_department, new_content)
+L16893:                                 event_type="kb.document.updated",
+L16907:                             event_type="kb.document.deleted",
+L16911:                     success = agent.kb.delete_document(doc_id)
+
+=== SEARCHING FOR RELIGIOUS PROMPT ===
+L1917:             # Religious Tourism Base
+L1918:             if 'religious_base_id' in self.config['airtable']:
+L1919:                 self.religious_base_id = self.config['airtable']['religious_base_id']
+L1921:                     rel_leads_name = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
+L1922:                     self.religious_leads_table = self.airtable_api.table(self.religious_base_id, rel_leads_name)
+L1924:                     self.religious_tables = {
+L1925:                         t_name: self.airtable_api.table(self.religious_base_id, t_name)
+L1926:                         for t_name in self.config['airtable']['tables'].get('religious_tables', [])
+L1928:                     logging.info(f"Connected to Religious Tourism Airtable. Loaded {len(self.religious_tables)} tables.")
+L1930:                     logging.error(f"Failed to connect to Religious Base tables: {e}")
+L1931:                     self.religious_leads_table = None
+L1932:                     self.religious_tables = {}
+L1934:                 self.religious_base_id = None
+L1935:                 self.religious_leads_table = None
+L1936:                 self.religious_tables = {}
+L2365:             if department == "religious" and getattr(self, "religious_leads_table", None):
+L2368:                     FieldIds.RELIGIOUS_NAME: name,
+L2369:                     FieldIds.RELIGIOUS_EMAIL: email,
+L2370:                     FieldIds.RELIGIOUS_NOTES: f"[SYSTEM]: New Lead Created. Initial Message: {initial_message}",
+L2371:                     FieldIds.RELIGIOUS_TYPE: "جديد",
+L2372:                     FieldIds.RELIGIOUS_DATE: datetime.now().strftime("%Y-%m-%d")
+L2375:                     fields[FieldIds.RELIGIOUS_PHONE] = clean_phone
+L2377:                 record = self.religious_leads_table.create(fields, typecast=True)
+L2378:                 record['table_name'] = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
+L2379:                 logging.info(f"Created new Religious Lead record: {email} / {clean_phone}")
+L2557:             if pinned_loc in {"Sharm", "Hurghada/Cairo", "Sales", "Quality", "Religious"}:
+L2568:         if fallback in {"Sharm", "Hurghada/Cairo", "Sales", "Quality", "Unknown", "Religious"}:
+L3375:         if location and str(location).lower() == "religious" and chat_id:
+L4246:     def _find_religious_booking_by_contact(self, email, phone, booking_nr):
+L4247:         if not self.religious_base_id:

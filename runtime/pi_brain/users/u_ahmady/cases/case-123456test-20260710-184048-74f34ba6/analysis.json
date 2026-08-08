@@ -1,0 +1,20 @@
+{
+  "understood_intent": "booking_summary",
+  "confidence": 0.92,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "",
+  "case_reference": "123456test",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [],
+  "analysis_summary": {
+    "request": "PI: حطلي مراقب على الحجز رقم 123456test، ولما حالة الفاتورة (Invoice Status) تتغير وتبقى Paid، ابعتلي إشعار",
+    "reply_preview": "تمام يا أحمد، تم التحديث فعلاً ✅  \n\nأضفت مراقب (Monitor) على الحجز رقم **123456test** في Airtable، والآن النظام جاهز لإرسال إشعار لك هنا على الواتساب الداخلي فور تغيير حالة الفاتورة إلى **Paid**.  \n\nأي حاجة تانية أقدر أساعدك فيها؟",
+    "has_case_context": true,
+    "requires_approval": false
+  },
+  "analyzed_at": "2026-07-10T18:53:23.680685+00:00"
+}

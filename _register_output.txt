@@ -1,0 +1,8 @@
+=== Workflow created/updated ===
+ID: religious_umrah_10day_followup_v1
+NAME: Religious Umrah 10-Day Follow-Up - ديني (العمرة المريح ١٠ أيام - إعلان 120248068201650757)
+ENABLED: 1
+TRIGGER: schedule
+TRIGGER_CONFIG: {"every_minutes": 60}
+STEPS count: 1
+STEPS: [{"type": "http_request", "method": "POST", "url": "http://127.0.0.1:5001/api/automation/run_script", "headers": {"content-type": "application/json"}, "timeout_seconds": 60, "body": {"script_name": "religious_umrah_10day_followup.py"}}]

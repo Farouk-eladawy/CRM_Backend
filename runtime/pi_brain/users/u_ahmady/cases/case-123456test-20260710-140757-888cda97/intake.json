@@ -1,0 +1,77 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "- أنشئ فاتورة للحجز 123456test",
+  "assistant_reply": "تم تجهيز إنشاء فاتورة / I prepared a safe invoice action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- يوجد رابط فاتورة حالي / Existing invoice link present: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nSimulation result: التنفيذ محجوب لهذه الأسباب:\n- invoice_already_exists\n\nأرسل `نعم` / `approve` لتنفيذ الفاتورة، أو `إلغاء` / `cancel` للإلغاء.",
+  "intent": "create_invoice",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "workflow_state": {
+    "intent": "create_invoice",
+    "phase": "awaiting_approval",
+    "awaiting": "approval",
+    "case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "note": "تم تجهيز إنشاء فاتورة / I prepared a safe invoice action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- يوجد رابط فاتورة حالي / Existing invoice link present: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nSimulation result: التنفيذ محجوب لهذه الأسباب:\n- invoice_already_exists\n\nأرسل `نعم` / `approve` لتنفيذ الفاتورة، أو `إلغاء` / `cancel` للإلغاء.",
+    "action_type": "create_invoice",
+    "action_mode": "simulate_verify_execute",
+    "updated_at": "2026-07-10T14:07:57.623966+00:00"
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "- أنشئ فاتورة للحجز 123456test"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تجهيز إنشاء فاتورة / I prepared a safe invoice action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- يوجد رابط فاتورة حالي / Existing invoice link present: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nSimulation result: التنفيذ محجوب لهذه الأسباب:\n- invoice_already_exists\n\nأرسل `نعم` / `approve` لتنفيذ الفاتورة، أو `إلغاء` / `cancel` للإلغاء."
+    }
+  ],
+  "pending_action": {
+    "type": "create_invoice",
+    "mode": "simulate_verify_execute",
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "requested_by": "Ahmady",
+    "simulate_result": {
+      "capability_key": "create_invoice",
+      "simulate_only": true,
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "amount": 1740.0,
+      "currency": "USD",
+      "provider": "stripe",
+      "invoice_status": "pending",
+      "existing_payment_url": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap",
+      "existing_payment_id": "in_1Te8ZDLp8xDOkodwsm7RwoM6",
+      "ready_to_execute": false,
+      "warnings": [],
+      "blocked_reasons": [
+        "invoice_already_exists"
+      ],
+      "dry_run_supported": true
+    }
+  },
+  "captured_at": "2026-07-10T14:07:57.623966+00:00"
+}

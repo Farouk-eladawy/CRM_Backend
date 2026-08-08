@@ -1,0 +1,1606 @@
+{
+ "snapshot_time": "2026-08-04T10:32:24.801403",
+ "count": 200,
+ "targets": [
+  {
+   "chat_id": "44731d93-2b85-48c7-a95a-cd8525f8af39",
+   "last_message_time": "2026-08-02T23:08:23.601733",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recLxKJuj8lL2unP5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "4a3490e3-7bd3-4488-a1e6-798d59e84aac",
+   "last_message_time": "2026-08-02T22:24:51.268145",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "rec0rg1pVV8yT0Rnf",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "feb004c4-9d60-49e8-8e28-060a25ee72b6",
+   "last_message_time": "2026-08-02T20:53:55.222857",
+   "needs_help": 1,
+   "force_read_at": "2026-08-02T20:51:18.736270",
+   "airtable_record_id": "recFGoncWFvDEcT2L",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "feae54f9-f9a6-4d37-a378-fc4c0134c490",
+   "last_message_time": "2026-08-02T20:42:14.605497",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recpfoYqx8UjOyLpf",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "31b7f0da-300e-4da1-b171-e9feeba6de4f",
+   "last_message_time": "2026-08-02T19:07:17.768885",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recJHIf9K8LPduzE6",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "8629d446-bc96-4d68-8de7-b48c8cf86abc",
+   "last_message_time": "2026-08-02T18:48:36.910786",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T18:47:51.677825",
+   "airtable_record_id": "recCGgmTKWg844Fce",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ad3b121a-3934-442e-aeca-41f3fc15a7dc",
+   "last_message_time": "2026-08-02T16:19:00.247949",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "receClO63ZNvi5ALF",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "082d8c4b-6c19-4db2-a723-e6381da06453",
+   "last_message_time": "2026-08-02T14:10:14.692601",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recIP0W3KT5ktMs52",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "eb8e8f1c-f79b-472e-af08-c163d4140767",
+   "last_message_time": "2026-08-02T13:32:48.273528",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recm6O02RdI2fBAe0",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e5ec13d8-4025-46dc-ab4a-c963015f4802",
+   "last_message_time": "2026-08-02T12:32:00.754446",
+   "needs_help": 0,
+   "force_read_at": "2026-08-01T22:29:41.619352",
+   "airtable_record_id": "recE8ccHoTxiGDRti",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "58d9f386-4e5b-4cb9-8785-fa9eeb8b5c89",
+   "last_message_time": "2026-08-02T11:53:09.872883",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recZV3hpsqF1udpyG",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6a68d2c5-6efd-4bdc-b5ce-9845cc12bae9",
+   "last_message_time": "2026-08-02T11:30:47.364963",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec7G6VGsSMFBjUmf",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "988f86e6-7a23-4f82-aac5-afa7c56c1d81",
+   "last_message_time": "2026-08-02T11:05:09.624557",
+   "needs_help": 1,
+   "force_read_at": "2026-08-02T10:56:28.655063",
+   "airtable_record_id": "recwWCZmErrG4162G",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "1d048295-688e-4df9-8132-a01bb70206aa",
+   "last_message_time": "2026-08-02T10:16:02.705828",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "rec9XcfLhH9HVunFU",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "f2c41fe5-112e-461a-95c9-f814639f4e89",
+   "last_message_time": "2026-08-02T10:14:20.769213",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recyLbpIIVF2BaTvX",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "7b67d712-8a4c-4c96-87f6-3b17e88c363d",
+   "last_message_time": "2026-08-02T09:59:18.749505",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T09:56:16.269669",
+   "airtable_record_id": "recBNCFdCFGHg0TjE",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "747e3047-7539-4f90-9fc8-55d082920ff5",
+   "last_message_time": "2026-08-02T09:57:38.412130",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T09:52:37.917513",
+   "airtable_record_id": "recwpW7M9fIS4kLNn",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "41ae94e0-f1dc-4103-8b32-8a27bdee2bf4",
+   "last_message_time": "2026-08-02T09:53:33.695910",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T09:52:28.968618",
+   "airtable_record_id": "recbbHJMvpYmtfmwD",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b9eb6eac-6dd2-4654-95c9-dff70107f235",
+   "last_message_time": "2026-08-02T09:28:12.331825",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recyUiw9mymVtAVXo",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "0d32f764-23ef-4589-8b1a-f3480b6ecee7",
+   "last_message_time": "2026-08-02T09:16:12.474409",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recGkPs6w7KCCZwVb",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d5dfa9ce-f31d-4de7-9c92-3e5920190631",
+   "last_message_time": "2026-08-02T09:07:42.310572",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T08:34:19.006975",
+   "airtable_record_id": "recyLD3laBXYMalsk",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6ca56ece-0a14-4de9-be8d-0e68243a7d89",
+   "last_message_time": "2026-08-02T08:23:44.425000",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1CGLYNiSjhp8rW",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "79d5b535-d001-4eac-bcaa-d0c0e6e8af44",
+   "last_message_time": "2026-08-02T08:15:59.103083",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recSjEMyW0ROO8PCl",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "60986ef7-a044-4c15-b166-81e3846177a0",
+   "last_message_time": "2026-08-02T07:37:29.093875",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T07:09:37.491729",
+   "airtable_record_id": "recRjxgRxAyLzFcAd",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "af67808e-c6cf-42f4-b813-112c05a82997",
+   "last_message_time": "2026-08-02T07:32:05.381067",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T07:29:16.024891",
+   "airtable_record_id": "rec43suKI4TxlMCTA",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6a70d0ea-c698-487d-81b4-97a10ea203d0",
+   "last_message_time": "2026-08-02T07:10:35.449699",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec4hDfZfmfcvWzhO",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "1b8e317b-dfab-4266-a360-caf326d53603",
+   "last_message_time": "2026-08-02T06:32:21.624244",
+   "needs_help": 1,
+   "force_read_at": "2026-08-02T06:31:26.197373",
+   "airtable_record_id": "recVQoEN2MkI9BkBM",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "35a1f2ff-b236-49c2-9b91-f57d76df7de9",
+   "last_message_time": "2026-08-02T05:59:10.976411",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recOMDWrdVYNGEezL",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "79f9a170-8e64-486e-88cc-ced68600132c",
+   "last_message_time": "2026-08-02T05:15:45.744432",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recBeLxXJzR2dQyjc",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "dc5209c1-9e64-4e24-b8a7-4d7e3e180db7",
+   "last_message_time": "2026-08-02T05:14:51.871394",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T05:12:56.970932",
+   "airtable_record_id": "recrVlSkpOMmzAhdu",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "99834f37-d021-453d-a8da-17d4763dfe7c",
+   "last_message_time": "2026-08-02T03:41:30.759517",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T02:53:00.400974",
+   "airtable_record_id": "recn7XjQDuNNPosoM",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "19f3b635-203d-41b0-a702-5bbb3708caba",
+   "last_message_time": "2026-08-02T01:31:04.936697",
+   "needs_help": 0,
+   "force_read_at": "2026-08-02T01:10:05.861095",
+   "airtable_record_id": "recPX5tHLcmvMXkch",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "abd0f3f6-75e0-45cd-a3ae-ee2600e57086",
+   "last_message_time": "2026-08-02T01:10:39.938703",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recqzjUveYhV6Tx7n",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "6a609cbf-a2dc-45c2-a752-ec396bb0b0ad",
+   "last_message_time": "2026-08-02T00:52:42.370922",
+   "needs_help": 0,
+   "force_read_at": "2026-08-01T22:20:04.056044",
+   "airtable_record_id": "recgqr2F5o4inIhFe",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "5a483feb-a85b-4733-a7b1-7fbc1a443bea",
+   "last_message_time": "2026-08-02T00:23:28.349590",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rechFMKuhuitgkNFR",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "609c1d45-a0c9-42c4-8249-4c7ee5a5dbf3",
+   "last_message_time": "2026-08-01T22:13:00.888034",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recdRkPvUtboS1AMI",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "397c95c7-ec68-401e-8b82-55c3b690882f",
+   "last_message_time": "2026-08-01T20:34:27.936308",
+   "needs_help": 0,
+   "force_read_at": "2026-08-01T20:30:43.686465",
+   "airtable_record_id": "recXZ2eFvtzw25Yzh",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "69e4a334-d53b-4f92-a604-657bd8b77828",
+   "last_message_time": "2026-08-01T20:25:44.700510",
+   "needs_help": 0,
+   "force_read_at": "2026-08-01T20:23:54.077829",
+   "airtable_record_id": "rec9tFPs5GxTPAyMj",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "05051233-0481-4f77-a360-5c9cc91bd9c7",
+   "last_message_time": "2026-08-01T20:04:10.954935",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recJeUnI6bwX6VIyC",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "a7a30899-a95d-4e16-bf4a-baa81bacc919",
+   "last_message_time": "2026-08-01T19:41:53.792222",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recGO8I4l1iutoXJV",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "2ffaa4f2-1e40-4d49-a1d1-e568f3a0f802",
+   "last_message_time": "2026-08-01T19:23:25.405483",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recgyhvfogbombwXP",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "56aa9201-af54-496e-a39d-aecfccf8b277",
+   "last_message_time": "2026-08-01T18:55:41.265700",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec6CVHTWnyKbZBP4",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ee1b4726-978c-456b-9063-81ebd8b4e90e",
+   "last_message_time": "2026-08-01T17:15:51.898802",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec2tc0UH15hOzwxn",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "334e576a-61a3-40fa-89b5-d41cffb537e4",
+   "last_message_time": "2026-08-01T17:01:10.889030",
+   "needs_help": 0,
+   "force_read_at": "2026-08-01T16:53:53.057813",
+   "airtable_record_id": "recO0GByY5ENtxvOd",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "24339b98-9c1e-4c4c-b0d5-8194853cb2a5",
+   "last_message_time": "2026-08-01T16:25:46.724735",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recYKu0WXDLdm1ND0",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c9e8e4fc-c176-4175-9663-7a8166a6d766",
+   "last_message_time": "2026-08-01T16:23:47.514092",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recLNQ00brh6Y1p3L",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "4fae257e-3fd1-4cf4-bb40-7ae3b7ce664e",
+   "last_message_time": "2026-08-01T15:27:35.178618",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec3pmT0STPAWBO19",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "cb60ef00-d1a3-4dc9-a40b-6d4522495844",
+   "last_message_time": "2026-08-01T15:19:49.565240",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recAjYqg76hUrCQuM",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "2695edad-e373-4632-9e76-701a2cfa7a62",
+   "last_message_time": "2026-08-01T15:00:47.802062",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recgb9GZ7fReuDruv",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "9cd93e4e-3018-4fdf-88c2-cca0c78193d3",
+   "last_message_time": "2026-08-01T14:23:42.395808",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recbra3PaymO7sL2w",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "42cd7722-42a2-439b-9096-891113f28ab4",
+   "last_message_time": "2026-08-01T13:49:50.192530",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rectqiRC86ReJaC08",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "963bee99-2d16-4867-aa12-f48aaa1f70a5",
+   "last_message_time": "2026-08-01T13:19:30.848761",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recsmdDz0nlQ0LRRf",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "d658f1ac-e244-4b08-af41-005e8c4a06a6",
+   "last_message_time": "2026-08-01T13:15:07.640927",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recHMAQvKzMgAEHtv",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6135fcf5-82b2-4463-9074-0b2135a78a39",
+   "last_message_time": "2026-08-01T12:44:13.660907",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec4STuD3Z9DX8Unu",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "96527373-c03b-43ec-8859-b1ecda40f69a",
+   "last_message_time": "2026-08-01T11:41:39.569476",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec6IlbLr6Fc0fqoE",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "84906333-d0a8-46fb-a508-9fc63b44b0b3",
+   "last_message_time": "2026-08-01T09:47:47.896579",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1899uccMqKHaoI",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d3b61cfc-4123-477f-9df1-5fcc5f5adbab",
+   "last_message_time": "2026-08-01T08:56:49.229414",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recF9BJFS6MoNAGTW",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "33d5c540-6f4a-4ac0-9ac1-e1d8c074146f",
+   "last_message_time": "2026-08-01T08:35:32.401252",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recj3T1FT325KrWRv",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "837c844e-2b7a-49bc-a78a-e5cc5adc6af1",
+   "last_message_time": "2026-08-01T05:33:27.812187",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recVhwHWzLzRh1kVf",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ebbaed28-89f4-44fb-ad66-493c2c751e93",
+   "last_message_time": "2026-08-01T01:49:25.850089",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec5mZe1F41MjyAHW",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "51ec5e3a-d7b9-4f94-9b55-812a2ca75afb",
+   "last_message_time": "2026-08-01T01:14:38.281372",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recfHidzOtkudulen",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "4d9eb804-bc0e-41e5-bd94-11729cb4b532",
+   "last_message_time": "2026-08-01T01:11:16.365053",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recr4VH2rWG0U97Jn",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "719ff9e9-7b67-446a-b514-0839c9f3618f",
+   "last_message_time": "2026-07-31T23:21:06.767918",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recHUatILtMSpwJgE",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "9d83d56f-ca02-4f0f-aaa2-642d9fa7ef7c",
+   "last_message_time": "2026-07-31T23:12:05.629063",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1VoOUXzIS7IF8n",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "cf099cbd-506b-4e8a-9001-d0a1a92958b9",
+   "last_message_time": "2026-07-31T21:26:17.141522",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec6HqWUCrVvqQo6r",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "f82e34b7-3d1e-4408-8da4-a670849efd55",
+   "last_message_time": "2026-07-31T21:25:17.320715",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "reciaCEz5yJnAxX66",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "9755f8ee-a203-4e0c-ab90-e9aea7af00e3",
+   "last_message_time": "2026-07-31T20:57:44.924345",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recojZZKWsF7HSOlp",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "01033043-52fa-4273-bf64-9c66616a0fc7",
+   "last_message_time": "2026-07-31T20:53:51.800400",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recLQijabnCx4G7qI",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e19f19c6-8096-4a8a-8c1e-1d4ff70d4e2f",
+   "last_message_time": "2026-07-31T20:05:43.414751",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recvaFTmV1Cf5aiLb",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "de9f44b7-c560-4a48-9efb-6b4ead681ea7",
+   "last_message_time": "2026-07-31T20:05:43.383289",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recxU2oPsbsTh9ICZ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "668d6dc8-1f08-4929-9fed-4485f0a55824",
+   "last_message_time": "2026-07-31T20:05:43.362878",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recVzMv6gJvNLLV5i",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "440f5622-1743-4172-961c-d1dab72a2a6e",
+   "last_message_time": "2026-07-31T20:05:43.351287",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recSqXcXc6xPUQmRe",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "60938975-cb2b-407c-8f67-d9d5a2e84727",
+   "last_message_time": "2026-07-31T20:05:43.344306",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec3taOpS74Yw9G1E",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "f45ac98d-7828-44dc-a36a-0bdce04ab205",
+   "last_message_time": "2026-07-31T20:05:43.335876",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recuKUQvoVAjuyzP9",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "3789e79c-0331-4317-816a-9a56ec85b60a",
+   "last_message_time": "2026-07-31T20:05:43.317263",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recK9MHjKpHEPYmOO",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "86bf53fc-a45e-47f7-807a-2439c6775b99",
+   "last_message_time": "2026-07-31T20:05:43.261807",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "reckQGLVajOXVD3i1",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d87d119f-48d9-423e-a682-1863b6ce5cc0",
+   "last_message_time": "2026-07-31T20:05:43.255799",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recYL2NpQ8saMKtOL",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "64e4bff9-a9dc-4fcb-a33d-7b658b289e63",
+   "last_message_time": "2026-07-31T20:05:43.248264",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recNC2DJ24Dgmd1Kb",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "2e4a6c8b-47d9-4790-be55-06940ae19ee9",
+   "last_message_time": "2026-07-31T20:05:43.242755",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recC76oXSB9qWoYp2",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "65097e71-31d5-4f30-bf0d-771ef94fbbf4",
+   "last_message_time": "2026-07-31T20:05:43.231229",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recyi6NYUXEjAviZH",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "741efde3-e2fb-42d5-92cf-c7dd3cc2c28f",
+   "last_message_time": "2026-07-31T20:05:43.225615",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recNxOcEi7UerXcTV",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ebc65703-c218-4aa8-8436-cbbf12ef3feb",
+   "last_message_time": "2026-07-31T20:05:43.213733",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recpOec580UDCTftB",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "1aee7c66-cdb1-4ad9-8b42-65e4877d9b2a",
+   "last_message_time": "2026-07-31T20:05:43.207331",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "receXyxiOC6mnq0ne",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d80d81e5-ddf3-4d62-8ffa-75df461ef838",
+   "last_message_time": "2026-07-31T20:05:43.200594",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recEATvd3IiZzdCQZ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "a12ac309-5a70-42ce-a58e-ff1a4e74a415",
+   "last_message_time": "2026-07-31T20:05:43.195159",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recCf1OVqrsFoAJWS",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "868f3c31-893f-4947-bc32-8097795562fc",
+   "last_message_time": "2026-07-31T20:05:43.184044",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recGJ63851DhLaY6u",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "07f84507-3055-427c-92bc-231db2203331",
+   "last_message_time": "2026-07-31T20:05:43.172364",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recKuIcEGcowPbZii",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "798e73c1-0197-43b8-85d4-9531cb1108d4",
+   "last_message_time": "2026-07-31T20:05:43.160703",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recJkIBobm9Ouagcp",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "76b030e3-b4f8-4ce1-99e9-246824fdc598",
+   "last_message_time": "2026-07-31T20:05:43.154247",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recZP18dQpW7hhkHK",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "cea71e86-2eaf-4992-a03f-0b92b20047f2",
+   "last_message_time": "2026-07-31T20:05:43.142343",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recVhtV1EVyjelhOM",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "4722e355-46d7-4087-9e91-8f189e76c4df",
+   "last_message_time": "2026-07-31T20:05:43.127522",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rect99lL5riQFpspc",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ba51c1c3-da9d-4e07-8703-8df3fed86ed5",
+   "last_message_time": "2026-07-31T20:05:43.100639",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec35JuiUgsDRbBkV",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "acb1e512-49a3-4149-9ae5-63905d56da72",
+   "last_message_time": "2026-07-31T20:05:43.095137",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recTUTq40ZcbBYmZS",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6f05f3be-45e9-4753-9165-7863ad1213aa",
+   "last_message_time": "2026-07-31T20:05:43.089131",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recfsjU2RqeyLjIrH",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "fc5bb118-6c29-4f71-8487-bc70729dd5eb",
+   "last_message_time": "2026-07-31T20:05:43.075325",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reczLfZrRUoBX42zQ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "7b0c16b3-677b-49eb-aede-0ec9a26bf67b",
+   "last_message_time": "2026-07-31T20:05:43.057201",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recROJqKA5DPDRidR",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e899813d-a936-4bbf-896e-81d8997257c0",
+   "last_message_time": "2026-07-31T20:05:43.050129",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recYLHmAiIeS9SLIR",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "5da7f5fa-59a5-4904-8897-290157fcc1dc",
+   "last_message_time": "2026-07-31T20:05:43.042109",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec57P54jU5NVj4TY",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c9b5db1b-4d2f-4834-b60c-dcbd0e6d7c66",
+   "last_message_time": "2026-07-31T20:05:42.991991",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recXRPvZEaIx8eDMk",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ff87b321-190a-4214-b5c4-1c2ab6bdded9",
+   "last_message_time": "2026-07-31T20:05:42.985255",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recgh6E6oFuoE2ooP",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "cbc665e8-576a-4e1c-8831-2ef9e0e8891a",
+   "last_message_time": "2026-07-31T20:05:42.980474",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1dQj90ukAsaflQ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "81836e6a-8c93-42b7-bd45-e6fe0db3835e",
+   "last_message_time": "2026-07-31T20:05:42.974294",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rechktQZJJrz99rZp",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6195d8c7-80f8-4b92-b888-0a2929600446",
+   "last_message_time": "2026-07-31T20:05:42.951208",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "rec5SEIOg92wz2fHy",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "85f5c8c1-4301-436c-ad1d-0a10c6530302",
+   "last_message_time": "2026-07-31T20:05:42.946304",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recxk112ptXibyILe",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "692ec64a-aa94-443c-945b-48d45b360b0e",
+   "last_message_time": "2026-07-31T20:05:42.941662",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recO0v6WXOkwDAbrv",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "3dcb1dba-7310-400c-b5f2-6ce1a2389f07",
+   "last_message_time": "2026-07-31T20:05:42.935837",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recLz3KRqHKokggN2",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "4da4cfec-ab6e-409a-8873-0ab6e40c491a",
+   "last_message_time": "2026-07-31T20:05:42.930433",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recunzSyLTxwMyVs8",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6feec359-6108-48c8-9688-2b79c505a0e9",
+   "last_message_time": "2026-07-31T20:05:42.924422",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recO9IgeZzLAJomNv",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "fe366ab9-2732-4e7f-acd6-0f0a462e0d55",
+   "last_message_time": "2026-07-31T20:05:42.917358",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recq3SPAOcwu8Me3N",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "fdb931e3-bb39-477d-9c02-e5c81448912a",
+   "last_message_time": "2026-07-31T20:05:42.912860",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recSqaoxfdYtvmR0V",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d04ef34a-b952-4cb9-bfc2-fe943aeea1c5",
+   "last_message_time": "2026-07-31T20:05:42.905613",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recTRBCQItGv9iIY1",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "efae653c-eb8c-4049-9704-75a29a2a0883",
+   "last_message_time": "2026-07-31T20:05:42.900826",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recZRwCbI0fjtU5Iq",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "69f3e77a-202d-419b-bc90-d8292874559a",
+   "last_message_time": "2026-07-31T20:05:42.895400",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reccHOAoBo4HGAirF",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d570e3c5-b3f3-455f-820b-95444b058d43",
+   "last_message_time": "2026-07-31T20:05:42.878871",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recjljTqKq4QumkVz",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ddbc37a9-e345-416f-93b6-6ef5e6723b59",
+   "last_message_time": "2026-07-31T20:05:42.872617",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recLVjuJXp3fU7wh7",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "da55f0e2-a0a3-4040-89e1-8b18c29f1862",
+   "last_message_time": "2026-07-31T20:05:42.867193",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recULueKkcZLLWV9L",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "74d100ea-3c80-4f55-83aa-e83cd1d761b1",
+   "last_message_time": "2026-07-31T20:05:42.861211",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recfW1KTg7T9AH9f3",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "8be12a02-7669-4ef7-8669-2b4444cad4f4",
+   "last_message_time": "2026-07-31T20:05:42.853563",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recHCI2Kajq85H0PC",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "27b2983d-8968-410f-a95d-bffc700e0c1f",
+   "last_message_time": "2026-07-31T20:05:42.849359",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reccGQS0gpTCGPP99",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "5def2d97-0125-4dcb-a0aa-e0808be44e54",
+   "last_message_time": "2026-07-31T20:05:42.844181",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recwCRQGbMoirkPA5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "05bba146-18fd-434a-9700-ebee01a5e187",
+   "last_message_time": "2026-07-31T20:05:42.839033",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recppbpXeMfYlAkGK",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "27857fd7-996f-4d36-aa0e-1d10b4115850",
+   "last_message_time": "2026-07-31T20:05:42.821112",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recZRhTNDWpWCWW90",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "49f65f71-6733-4efa-b977-282b20fec488",
+   "last_message_time": "2026-07-31T20:05:42.811018",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec5wLpeWkkpfJpmg",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b3258414-7a02-4f9e-9370-3f0cb430230f",
+   "last_message_time": "2026-07-31T20:05:42.804728",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recSy0pLlXVlP8QZ5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "a8627984-6135-4b0e-be2c-1688b1b5cf40",
+   "last_message_time": "2026-07-31T20:05:42.790973",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reciQ10tivoei5PBL",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ee9dfbc5-7892-4e7e-a504-483d86d018e4",
+   "last_message_time": "2026-07-31T20:05:42.786312",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recFulCA8WOH3YWwM",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6d30aaaf-155d-4f32-847d-9b5527d01059",
+   "last_message_time": "2026-07-31T20:05:42.763288",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reck33jDToTqwzrlo",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ab4f1176-42d7-4e33-aa3b-7229ab49f631",
+   "last_message_time": "2026-07-31T20:05:42.736979",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recFD9sp2hoH6K5NN",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "129ef039-ec8d-479c-9452-3e05fc580290",
+   "last_message_time": "2026-07-31T20:05:42.731228",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recfjwif4pax9avnq",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "84f83471-acb9-4087-afd4-fa48ff630c02",
+   "last_message_time": "2026-07-31T20:05:42.725931",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recxGOXi8QAzHqhz5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "efad420d-c513-4005-a49e-5fdf3bab4bca",
+   "last_message_time": "2026-07-31T20:05:42.720280",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rececP7o0Lm0ALqSa",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "38a32642-b1ab-4977-aec3-379fa74c750c",
+   "last_message_time": "2026-07-31T20:05:42.713626",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recS3ZkOcRiP8d1hi",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e2bc1b34-5bd0-4bff-8f0d-9d1ad13eda72",
+   "last_message_time": "2026-07-31T20:05:42.707528",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec4JKEkzP5ui6hR3",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "608c6335-dc75-4845-907e-6e055911ea3e",
+   "last_message_time": "2026-07-31T20:05:42.701528",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recYoArhvTWAs4UCl",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "bce2c22b-05db-4e11-bd50-bd68c604dbd5",
+   "last_message_time": "2026-07-31T20:05:42.696304",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recZ6WwSDPi4SRxVJ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "f170b2cd-b22f-480e-b3bd-9bce0e96bc85",
+   "last_message_time": "2026-07-31T20:05:42.691043",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recSBeZjopHQc6Mvr",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c70842b4-3833-49d3-bc80-0ec2fc3196c3",
+   "last_message_time": "2026-07-31T20:05:42.683570",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recoI4JCZNFpyepKp",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d8aaa3d8-d46e-4ae5-8bc4-498b455109bf",
+   "last_message_time": "2026-07-31T20:05:42.666092",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recewsBhlFwm6hlUM",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b72e2305-0f3e-493a-a3a2-280f6050a681",
+   "last_message_time": "2026-07-31T20:05:42.658282",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec5QYZ4ksOhtHScI",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "98379bed-b13e-4ba2-9888-33af64e2f866",
+   "last_message_time": "2026-07-31T20:05:42.648098",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rechXgTpBq67rAixY",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "8a96efa4-2753-44c2-953d-5d384de20419",
+   "last_message_time": "2026-07-31T20:05:42.640901",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec0s8A82QiE0YV22",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c8ad7058-12f0-4852-8739-b132d8c190d1",
+   "last_message_time": "2026-07-31T20:05:42.630115",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recBUmT6sIJKWMKQV",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "0b3cab3c-349f-41bb-a1e0-ce011e12a21b",
+   "last_message_time": "2026-07-31T20:05:42.608828",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recqf8dj9rRBIdWAc",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b484d686-1dc2-4d12-b13f-846113daea34",
+   "last_message_time": "2026-07-31T20:05:42.603828",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reccvba23A86mbVaE",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c83229b7-9851-4b53-bb99-88c776e66e27",
+   "last_message_time": "2026-07-31T20:05:42.589067",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rectXWatYxaCmXcsr",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "41981e7b-5b5c-4aa8-925f-2c732ec24c84",
+   "last_message_time": "2026-07-31T20:05:42.580426",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recp6d0jLSHM9s1O2",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "2ad401bd-519c-497d-a332-710c26369645",
+   "last_message_time": "2026-07-31T20:05:42.573313",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recH1GGd38f4vwTRR",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e94a11e4-8a88-4b33-8703-79f3ae0d69c4",
+   "last_message_time": "2026-07-31T20:05:42.567642",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec5vtvSAzSiEuEeu",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "f2aa90f8-ad0e-49aa-bafa-62400be88a27",
+   "last_message_time": "2026-07-31T20:05:42.560769",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reckIhHvRBGtLVSQ5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "13bd2740-c20e-4700-bc56-dd6b31ac1fcf",
+   "last_message_time": "2026-07-31T20:05:42.549609",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec4KLtMwzLdra7L8",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "a99a317a-a430-4bf2-8746-2350d80ff449",
+   "last_message_time": "2026-07-31T20:05:42.542658",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1XRaRyg1jdvfAN",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "10985a9a-2489-49e3-b4cd-c0236869f350",
+   "last_message_time": "2026-07-31T20:05:42.530995",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recSQjSuxjDypR1pO",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6b5949f8-7b73-49d4-abae-8a792c5930d7",
+   "last_message_time": "2026-07-31T20:05:42.526012",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recP0aApc6Miive8i",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "19777325-bc10-4396-9fa8-b76c78ed06fe",
+   "last_message_time": "2026-07-31T20:05:42.517168",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reckdy21mUvVckdgu",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c5eb3123-aa36-4dd1-8939-bc79a4a44192",
+   "last_message_time": "2026-07-31T20:05:42.410938",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recCPGn2Hf2NxLpP5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6d8480f9-f1c0-4363-a62e-36be987b9581",
+   "last_message_time": "2026-07-31T20:05:42.403856",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recBhMGtpRwywhC5A",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b2156e74-62cb-44fa-8607-98ac6f09daf2",
+   "last_message_time": "2026-07-31T20:05:42.369587",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recGz7IbXrCxncqe7",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "a111211e-5473-4833-9f03-64bbffabd02f",
+   "last_message_time": "2026-07-31T20:05:42.357770",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reco8O7ud1dGtQqLu",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "fafcb033-86a3-4a00-8d70-beda4323ffc6",
+   "last_message_time": "2026-07-31T20:05:42.352088",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "6db6ef0c-993a-4349-90d9-9bf4d16084ee",
+   "last_message_time": "2026-07-31T19:30:31.840242",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1BuuTErx59mgJt",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "2b40fc8f-1a78-441b-bdb4-c69763bc51fa",
+   "last_message_time": "2026-07-31T19:26:17.924755",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recJcqb5bycFdLcRJ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "7487b3e0-09fb-4224-91c8-696a5f2b7207",
+   "last_message_time": "2026-07-31T19:22:31.531661",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recih1MA2T1MBL7Db",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "80d875df-12ac-4839-989b-68021c917077",
+   "last_message_time": "2026-07-31T19:18:43.390322",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recGX4s1O7RDQAagy",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ccdcbfd9-89b9-4295-a3c8-2a41a24a7f6c",
+   "last_message_time": "2026-07-31T18:50:50.248742",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reccoGjH7EfTLL9HQ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "3557a6ba-9400-4827-8eb4-ae377d6dd17a",
+   "last_message_time": "2026-07-31T18:46:59.250533",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec2uVuVSCoJEPPSv",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d8abad4d-b43a-4d91-996e-a9829e29376d",
+   "last_message_time": "2026-07-31T16:35:47.690670",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recWbAgGqdueMvIJG",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b90db4a1-ef7a-43df-bb6b-fadc175879ac",
+   "last_message_time": "2026-07-31T16:01:15.959541",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recqccOXgFzj5moBW",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "2f160f18-e588-4229-85ab-e3c076eba08b",
+   "last_message_time": "2026-07-31T12:06:47.141273",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "reclwt3T2cAC4iORg",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "8d108dfd-4be6-4488-b743-671cb40ab125",
+   "last_message_time": "2026-07-31T11:40:51.211648",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recsm3f7gMRjLJ9Fd",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "1a7a3692-37db-4f52-91b1-6b8162f00cd3",
+   "last_message_time": "2026-07-31T11:24:12.516228",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recDU4TR1LJI1qjOK",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c829976f-eefe-49e2-aadb-a1599b666dc3",
+   "last_message_time": "2026-07-31T10:43:18.930994",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "rec0ppHbpQNHPL2QB",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "11b1a826-c882-4b40-a7ef-20ce1d48d7de",
+   "last_message_time": "2026-07-31T10:15:12.908850",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recd2UwKzeZkhXlOR",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "d5aaede1-7ebe-4b3c-95cb-64310a851624",
+   "last_message_time": "2026-07-31T08:41:25.307654",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recGKSjfBCfJZAa4u",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c718c387-0659-4c55-8561-6c1fa179206c",
+   "last_message_time": "2026-07-31T01:10:46.519485",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recmhTTEBc5WwIxIj",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "fdef5e6b-ddb6-4bff-8ca1-44ea1f037f66",
+   "last_message_time": "2026-07-31T00:54:18.066294",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recd56msN7EkjQeP5",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "fa1955ed-c446-46ca-aa6f-5da3c6f67c3b",
+   "last_message_time": "2026-07-31T00:19:23.365165",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recIx704AY7i7hADa",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "ba1bef30-b2e8-49cd-9c77-0a16a64b63d3",
+   "last_message_time": "2026-07-30T17:12:19.583948",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recwloYsaH0aCuxjZ",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "9b170b9b-890c-4883-adb4-5f39d0c1a2a1",
+   "last_message_time": "2026-07-30T16:02:03.648886",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recugIaGNPG38626P",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "b3afd8d7-eea6-4813-bbb2-55ef627f1250",
+   "last_message_time": "2026-07-30T15:05:37.455759",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recNSZiYVjPSQFPcS",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "c16b8c6d-dcd1-45dd-8276-9827caed0103",
+   "last_message_time": "2026-07-29T14:41:38.306618",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "rec4y2HsyDY6Cb0k7",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "53224e68-a63e-456d-9e17-f37d828a9222",
+   "last_message_time": "2026-07-28T17:38:53.097071",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recyC3A7l10DGHafP",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "880830de-d163-43bb-a7f4-aa03c08fa919",
+   "last_message_time": "2026-07-27T09:32:33.479819",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "rec6XaLFxdspTGRy4",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "b27d976a-d1f3-42ae-adb1-4fec571b35b1",
+   "last_message_time": "2026-07-26T03:16:26.537156",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recjsidG2gUkwfPGp",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e654e7e9-b65a-42f7-bde7-2e92d7c35c6c",
+   "last_message_time": "2026-07-25T21:03:17.103434",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recI5j0jptAXGqoqx",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "90da3219-36be-4fba-9d8d-4950a4d7fd73",
+   "last_message_time": "2026-07-25T20:05:11.779701",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recMm99x3Yhhi1al9",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "54742a33-5954-4e57-a404-c2635b6c4c71",
+   "last_message_time": "2026-07-25T10:48:26.868140",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recP3LJ1OzItAaihW",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "4bbd729c-8240-4089-8120-db918d16a345",
+   "last_message_time": "2026-07-25T10:47:26.871703",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "reckwCgGiTy9Ic8fu",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "f162ece0-4d8a-4a0a-aa69-719e7968bfc3",
+   "last_message_time": "2026-07-24T20:42:31.735209",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recWuY7xJgcxqBMpF",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "c8d93c2b-0f74-4d98-867e-252888e95de5",
+   "last_message_time": "2026-07-24T20:08:47.491916",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recjAYbb2o7tKPmAt",
+   "is_unread_computed": 0
+  },
+  {
+   "chat_id": "0d48b38a-63f6-4b46-ac2d-46cacd882e16",
+   "last_message_time": "2026-07-24T01:50:22.923937",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recCnf14GlSUxFPxr",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "7baa00e7-dfc8-46d9-99de-9d7fc20c5ecc",
+   "last_message_time": "2026-07-23T21:27:46.520038",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recCnf14GlSUxFPxr",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "cbb97bd9-69e2-4a11-b1c3-e2b9efc61f3c",
+   "last_message_time": "2026-07-23T02:18:37.956942",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "reczBQzOmyZqIHTUy",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d3a01801-72b5-4f48-aade-4d9fb63b8e56",
+   "last_message_time": "2026-07-22T22:04:27.799724",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "recK5MDxgSrKsc7xW",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "4b186fa1-a32d-4534-8427-c4ae066dc246",
+   "last_message_time": "2026-07-22T20:05:33.305720",
+   "needs_help": 1,
+   "force_read_at": null,
+   "airtable_record_id": "reclGG5Q0lASVdczi",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "9c534f19-627e-4f56-b559-6124347516cf",
+   "last_message_time": "2026-07-22T04:07:30.501377",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec8l4r4pgniJ85Fj",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "afa0e034-cbcd-4a26-82d5-d1abc96ac3f1",
+   "last_message_time": "2026-07-21T06:39:25.707623",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recCnf14GlSUxFPxr",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "11e9711e-108a-4b3c-9afe-fc60cd18d325",
+   "last_message_time": "2026-07-20T21:17:05.372392",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "recCnf14GlSUxFPxr",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "d84de3f6-1af9-4390-9bf0-ad4133403009",
+   "last_message_time": "2026-07-20T16:18:49.326580",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1OVNtozcqT3eNz",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "7f29ba07-c113-48c5-b9e2-7c3e06ca9549",
+   "last_message_time": "2026-07-20T07:58:40.321040",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec1OVNtozcqT3eNz",
+   "is_unread_computed": 1
+  },
+  {
+   "chat_id": "e81521c8-0c4b-4ee1-90ec-0f85f6ed0d15",
+   "last_message_time": "2026-07-20T02:17:17.287721",
+   "needs_help": 0,
+   "force_read_at": null,
+   "airtable_record_id": "rec8l4r4pgniJ85Fj",
+   "is_unread_computed": 1
+  }
+ ]
+}

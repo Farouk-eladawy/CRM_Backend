@@ -1,0 +1,20 @@
+{
+  "understood_intent": "booking_summary",
+  "confidence": 0.92,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "trip_booking_alert",
+  "case_reference": "123456test",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [],
+  "analysis_summary": {
+    "request": "اي الخجوه التاليه للحجز 123456test",
+    "reply_preview": "أهلاً بك يا Ahmady،\n\nتمام، طلبت ملخص الحجز **123456test** للعميل **Ahmady**. إليك التفاصيل:\n\n---\n\n### 📋 ملخص الحجز\n\n| العنصر | التفاصيل |\n|---|---|\n| **رقم الحجز** | 123456test |\n| **العميل** | Ahmady (Ahmed Elkhatib) |\n| **رقم الهاتف** | 201004655246 |\n| **البريد الإلكتروني** | Amrmahraga@gmail.com |\n| **الرحلة** | The Grand Egyptian Museum |\n| **التاريخ** | 23 يونيو 2026 |\n| **الفندق** | الي Ajira Bay |\n| **حالة Airtable** | موجود ✅ |\n\n---\n\n### 📞 ملخص المحادثات السابقة مع العميل (21 رسالة عبر ",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T13:03:25.838719+00:00"
+}

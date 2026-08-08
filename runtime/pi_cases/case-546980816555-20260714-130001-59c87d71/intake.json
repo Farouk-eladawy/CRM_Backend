@@ -1,0 +1,103 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Admin Manager",
+  "user_request": "حدث حقل Hotel Name للحجز 546980816555 إلى Sunrise Test Hotel",
+  "assistant_reply": "تم تجهيز تعديل Airtable / I prepared the following Airtable update:\n- العميل / Customer: Ahmed Elkhatib\n- رقم الحجز / Booking: 546980816555\n- Hotel Name: Sunrise Arabian Beach Resort -> Sunrise Test Hotel\n\nأرسل `نعم` / `approve` لتنفيذ التعديل، أو `إلغاء` / `cancel` للإلغاء.",
+  "intent": "update_airtable",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "+201013498777",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-09-25T05:00:00.000Z",
+    "hotel": "Sunrise Arabian Beach Resort"
+  },
+  "workflow_state": {
+    "intent": "update_airtable",
+    "phase": "awaiting_approval",
+    "awaiting": "update_approval",
+    "case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "+201013498777",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-09-25T05:00:00.000Z",
+      "hotel": "Sunrise Arabian Beach Resort"
+    },
+    "note": "تم تجهيز تعديل Airtable / I prepared the following Airtable update:\n- العميل / Customer: Ahmed Elkhatib\n- رقم الحجز / Booking: 546980816555\n- Hotel Name: Sunrise Arabian Beach Resort -> Sunrise Test Hotel\n\nأرسل `نعم` / `approve` لتنفيذ التعديل، أو `إلغاء` / `cancel` للإلغاء.",
+    "updated_at": "2026-07-14T13:00:01.426947+00:00",
+    "action_type": "update_airtable",
+    "action_mode": ""
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "اعمل فاتوره للحجز 546980816555 بقيمه 20 يورو",
+      "reference": "546980816555",
+      "intent": "booking_summary",
+      "timestamp": "2026-07-14T12:54:51.694755+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "تم فحص الحجز 546980816555 بنجاح. هذه هي التفاصيل (Live من Airtable):\n📋 *معلومات الحجز*\n- العميل: Ahmed Elkhatib\n- الوكالة: Tiqets\n- الحالة: Active\n- Record ID: rec4mCX8CaQoQrXjI\n🗺️ *الرحلة*\n- الاسم: Grand Egyptian Museum: Skip The Line Ticket\n- الوجهة: Cairo\n- تاريخ التنفيذ (Date Trip): 2026-09-25\n- تاريخ الإنشاء (Create Date): 2026-06-05\n- عدد البالغين: 2\n- الخيار: Skip The Line\n🏨 *الفندق*\n- Sunrise Arabian Beach Resort\n💰 *المالية*\n- المبلغ: 20 USD\n- حالة الفاتورة: succeeded\n- رابط Stripe: `https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc2xvQkVOY0JodnJSTnMwQjdvcUlpMVNJOFhkY05oLDE3NDU1Mjk5OQ0200twb7m8zI?s=ap`\n🔗 *الروابط*\n- Audio Guide: `http://tiqets.ftstravels.com/?GM%2FticketId=546980816555`\n- Customer Link: `https://tracker.ftstravels.net/?booking=546980816555`\n- Driver Link: `https://tracker.ftstravels.net/?booking=546980816555`\n- Tracking Operation: `https://tracker.ftstravels.net/?booking=546980816555&operation=`\n- Voucher: `https://voucher.ftstravels.net/dynamic_voucher.html?bookingNumber=546980816555&customerName=Ahmed+Elkhatib&tripDate=2026-09-25T05%3A00%3A00.000Z&tripName=Grand+Egyptian+Museum&destination=Cairo&hotelName=Sunrise+Arabian+Beach+Resort&pickupPoint=Sunrise+Arabian+Beach+Resort&adults=2&amount=&currency=USD&agency=Tiqets`\n⚠️ *ملاحظات*\n- Net Rate Price: #ERROR!",
+      "reference": "546980816555",
+      "intent": "booking_summary",
+      "timestamp": "2026-07-14T12:54:51.696270+00:00"
+    },
+    {
+      "role": "user",
+      "text": "انشئ فاتورة للحجز 546980816555 بقيمة 20 يورو",
+      "timestamp": "2026-07-14T13:00:00.793883+00:00",
+      "reference": "546980816555",
+      "intent": "create_invoice"
+    },
+    {
+      "role": "assistant",
+      "text": "نتيجة فحص الفاتورة الحالية:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود: wetravel\n- حالة الفاتورة الحالية: succeeded\n- رابط الفاتورة الحالي: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc2xvQkVOY0JodnJSTnMwQjdvcUlpMVNJOFhkY05oLDE3NDU1Mjk5OQ0200twb7m8zI?s=ap\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل على هذا الحجز، لذلك لن أطلب موافقتك على إنشاء واحدة جديدة تلقائيًا.\nإذا أردت، اطلب مني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`.",
+      "timestamp": "2026-07-14T13:00:00.794896+00:00",
+      "reference": "546980816555",
+      "intent": "create_invoice"
+    },
+    {
+      "role": "user",
+      "text": "حدث حقل Hotel Name للحجز 546980816555 إلى Sunrise Test Hotel",
+      "timestamp": "2026-07-14T13:00:01.425935+00:00",
+      "reference": "546980816555",
+      "intent": "update_airtable"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تجهيز تعديل Airtable / I prepared the following Airtable update:\n- العميل / Customer: Ahmed Elkhatib\n- رقم الحجز / Booking: 546980816555\n- Hotel Name: Sunrise Arabian Beach Resort -> Sunrise Test Hotel\n\nأرسل `نعم` / `approve` لتنفيذ التعديل، أو `إلغاء` / `cancel` للإلغاء.",
+      "timestamp": "2026-07-14T13:00:01.426947+00:00",
+      "reference": "546980816555",
+      "intent": "update_airtable"
+    }
+  ],
+  "pending_action": {
+    "type": "update_airtable",
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "table_name": "List",
+    "updates": {
+      "fldf5EuwGjs3L75Yw": "Sunrise Test Hotel"
+    },
+    "update_summary": [
+      {
+        "label": "Hotel Name",
+        "before": "Sunrise Arabian Beach Resort",
+        "after": "Sunrise Test Hotel",
+        "type": "text"
+      }
+    ],
+    "requested_by": "Admin Manager"
+  },
+  "captured_at": "2026-07-14T13:00:01.427926+00:00"
+}

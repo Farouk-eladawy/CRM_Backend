@@ -1,0 +1,38 @@
+{
+  "case_understanding": "المستخدم اختار الخيار رقم 1 بعد أن تم عرض 3 خيارات عليه. الخيار 1 يعني إنشاء فاتورة بقيمة 20 يورو للحجز 546980816555 (السجل: rec4mCX8CaQoQrXjI، العميل: Ahmed Elkhatib) فقط، وسيتم إرسال رابط الدفع تلقائياً للعميل عبر رسالة نصية عادية (وليس عبر قالب Opening). هذا يتوافق مع إجراء create_invoice الموجود في النظام.",
+  "confirmed_facts": [
+    "المستخدم اختار الخيار رقم 1 (إنشاء الفاتورة فقط)",
+    "رقم الحجز: 546980816555",
+    "Airtable record ID: rec4mCX8CaQoQrXjI",
+    "العميل: Ahmed Elkhatib، الهاتف: +201013498777، الإيميل: Ahmedyeladawy@gmail.com",
+    "الرحلة: Grand Egyptian Museum",
+    "المبلغ: 20 يورو",
+    "إجراء create_invoice موجود ويدعم إنشاء الفاتورة وإرسال رابط الدفع تلقائياً عبر واتساب",
+    "create_invoice يتطلب موافقة (requires_approval: true)"
+  ],
+  "missing_information": [],
+  "risk_flags": [
+    "إنشاء فاتورة بقيمة 20 يورو - عملية مالية تتطلب موافقة صريحة قبل التنفيذ",
+    "التأكد من أن المبلغ 20 يورو هو المبلغ الصحيح للفاتورة"
+  ],
+  "recommended_internal_reply": "تم اختيار الخيار 1 ✅\n\nسيتم إنشاء فاتورة بقيمة 20 يورو للحجز 546980816555 (Ahmed Elkhatib). سيتم إرسال رابط الدفع تلقائياً إلى العميل عبر واتساب بعد إنشاء الفاتورة.\n\n📋 ملخص الإجراء:\n- الحجز: 546980816555\n- العميل: Ahmed Elkhatib\n- المبلغ: 20 يورو\n- record_id: rec4mCX8CaQoQrXjI\n- سيتم الإرسال تلقائياً: نعم\n\n🔴 هذا الإجراء يتطلب موافقتك. هل توافق على إنشاء الفاتورة؟\n(أرسل 'موافق' أو 'نعم' للتأكيد)",
+  "recommended_next_step": "طلب تأكيد من المستخدم على إنشاء الفاتورة قبل التنفيذ (لأن requires_approval: true)",
+  "should_ask_clarifying_question": false,
+  "clarifying_question": "",
+  "approval_required": true,
+  "execution_guidance": "approval_gate",
+  "confidence": 0.95,
+  "action_manifest": [
+    {
+      "type": "create_invoice",
+      "target_record": "rec4mCX8CaQoQrXjI",
+      "requires_approval": true,
+      "payload": {
+        "amount": 20,
+        "currency": "EUR",
+        "booking_number": "546980816555",
+        "send_after_create": true
+      }
+    }
+  ]
+}

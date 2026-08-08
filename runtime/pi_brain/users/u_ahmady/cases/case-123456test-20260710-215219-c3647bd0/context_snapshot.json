@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-123456test-20260710-215219-c3647bd0",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "لخص الحجز 12345test"
+      },
+      {
+        "role": "assistant",
+        "text": "وجدت 5 نتائج محتملة / I found 5 possible matches. Send the booking number to identify the exact case:\n1. Moison Sophie | GYGZGZ3BWZZN | Unknown | +33612345003\n2. Test | 32667 | Unknown | +0123456789\n3. developer test | 32669 | Unknown | +20123456789\n4. Batoul Dehrab | 216086953 | Unknown | +201234513307\n5. test | 32672 | Unknown | +0123456789"
+      },
+      {
+        "role": "user",
+        "text": "لخص الحجز 123456test"
+      },
+      {
+        "role": "assistant",
+        "text": "أهلاً بك! أنا فرح. بناءً على طلبك، إليك ملخص الحجز 123456test:\n\n**ملخص الحجز:**\n- **العميل:** Ahmady\n- **رقم الحجز:** 123456test\n- **رقم الهاتف:** 201004655246\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **القسم:** غير معروف\n\n**ملخص المحادثات السابقة (3 محادثات، 21 رسالة):**\n- تم إرسال روابط الدليل الصوتي وحزمة الصور والفيديو للعميل.\n- تم إرسال طلب تقييم (Feedback).\n- العميل رد بـ \"Hello\" و \"Confirm\" في مرات سابقة.\n- تم تحديث بيانات الفندق ورقم الهاتف في Airtable.\n- يبدو أن العميل تفاعل مع الخدمة ولكن لم يتم تسجيل أي شكوى أو طلب محدد حديث.\n\n**الخطوة التالية المقترحة:**\n- نظراً لأن الحجز قديم (يونيو 2026) وتم إرسال كل المواد والروابط، يُقترح التواصل مع العميل للاستفسار عن أي احتياجات إضافية أو تأكيد رضاه عن الخدمة، أو إغلاق التذكرة إذا كانت الرحلة قد انتهت."
+      },
+      {
+        "role": "user",
+        "text": "ارسال قالب Opening"
+      },
+      {
+        "role": "assistant",
+        "text": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- الهاتف / Phone: 201004655246\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء."
+      }
+    ],
+    "last_case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "last_intent": "send_customer_message",
+    "updated_at": "2026-07-10T21:51:50.903450+00:00",
+    "pending_action": {
+      "type": "send_customer_message",
+      "channel": "whatsapp",
+      "mode": "template",
+      "template_name": "opening",
+      "template_language": "en",
+      "text": "",
+      "chat_id": "47b6b529-7d62-48e3-8c37-a2e1e58d8f6e",
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "phone": "201004655246",
+      "location": "Hurghada/Cairo",
+      "receiving_phone_id": "1077199985483939",
+      "requested_by": "Ahmady"
+    },
+    "workflow_state": {
+      "intent": "send_customer_message",
+      "phase": "awaiting_approval",
+      "awaiting": "approval",
+      "note": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- الهاتف / Phone: 201004655246\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء.",
+      "updated_at": "2026-07-10T21:52:19.604819+00:00",
+      "case_context": {
+        "record_id": "recPRC2TeFZTc8gOE",
+        "booking_number": "123456test",
+        "customer_name": "Ahmady",
+        "location": "Unknown",
+        "phone": "201004655246",
+        "email": "Amrmahraga@gmail.com",
+        "trip_name": "The Grand Egyptian Museum",
+        "trip_date": "2026-06-23T01:00:00.000Z",
+        "hotel": "الي Ajira Bay"
+      },
+      "action_type": "send_customer_message",
+      "action_mode": "template"
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-10T21:51:50.887840+00:00",
+      "case_id": "case-123456test-20260710-215219-c3647bd0",
+      "current_stage": "intake",
+      "stage_status": "started",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "123456test",
+      "intent": "send_customer_message",
+      "updated_at": "2026-07-10T21:52:19.604819+00:00"
+    },
+    "topic_reset_meta": {
+      "reason": "reference_changed",
+      "reset_at": "2026-07-10T21:48:25.108390+00:00"
+    }
+  },
+  "captured_at": "2026-07-10T21:52:19.618986+00:00"
+}

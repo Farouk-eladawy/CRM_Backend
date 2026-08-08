@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "user_key": "u:pi.phase4",
+  "case_id": "case-phase4-test",
+  "intent": "next_step",
+  "case_context": {
+    "booking_number": "168827669",
+    "record_id": "rec999"
+  },
+  "workflow_state": {
+    "intent": "next_step"
+  },
+  "pending_action": {},
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "ايه الخطوة التالية؟"
+    }
+  ],
+  "updated_at": "2026-07-10T12:58:24.678584+00:00"
+}

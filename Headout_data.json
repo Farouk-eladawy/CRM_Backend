@@ -1,0 +1,643 @@
+{
+  "scraping_info": {
+    "source": "Headout.com",
+    "scraped_at": "2026-01-11 18:00:00",
+    "total_tours": 15,
+    "location": "Egypt (Cairo, Luxor, Hurghada, Sharm El-Sheikh)"
+  },
+  "tours": [
+    {
+      "id": "13944",
+      "url": "https://www.headout.com/pyramids-of-giza/pyramids-of-giza-complex-skip-the-line-tickets-e-13944/",
+      "title": "Giza Complex Skip-the-Line Tickets",
+      "category": "Landmarks",
+      "rating": 4.6,
+      "reviews_count": 2131,
+      "price_from": "$23",
+      "currency": "USD",
+      "location": "Pyramids of Giza, Cairo",
+      "duration": "Flexible",
+      "operating_hours": {
+        "daily": "8:00am - 4:00pm",
+        "timezone": "EET"
+      },
+      "highlights": [
+        "Skip the long ticketing lines and enter the Giza Complex without waiting",
+        "See the exteriors of all three main pyramids - Great Pyramid (Khufu), Khafre, and Menkaure",
+        "Visit the Great Sphinx and Valley Temple",
+        "Explore at your own pace with flexible, self-guided access",
+        "Upgrade to enter inside the Great Pyramid (Khufu) and Menkaure Pyramid",
+        "Add round-trip hotel transfers from Cairo or Giza",
+        "Optional English-guided group tour with expert local guide"
+      ],
+      "inclusions": [
+        "Skip-the-Line entry to the Giza Complex",
+        "Access to the exterior of The Great Pyramid (Khufu), Khafre, & Menkaure",
+        "Access to the Great Sphinx & the Valley Temple",
+        "Entry inside The Great Pyramid (as per option selected)",
+        "Entry inside the Menkaure Pyramid (as per option selected)",
+        "English half-day guided tour (as per option selected)",
+        "Round-trip hotel transfers from Cairo or Giza (as per option selected)",
+        "Audio guide in English (as per option selected)"
+      ],
+      "exclusions": [
+        "Food and beverages",
+        "Interior pyramid entry (unless selected)",
+        "Personal expenses"
+      ],
+      "features": {
+        "skip_the_line": true,
+        "book_now_pay_later": true,
+        "audio_guide": true,
+        "transfers_included": true,
+        "hotel_pickup": true,
+        "explore_at_your_pace": true
+      },
+      "cancellation_policy": "These tickets can't be cancelled or rescheduled",
+      "accessibility": "Limited wheelchair access. Pyramid interiors not wheelchair-accessible",
+      "what_to_bring": [
+        "Mobile ticket",
+        "Hat and sunscreen",
+        "Student ID for discounted entry"
+      ],
+      "additional_info": {
+        "free_entry": "Children below 6 years",
+        "photography": "Free with mobile phones, charges for professional cameras"
+      }
+    },
+    {
+      "id": "14142",
+      "url": "https://www.headout.com/grand-egyptian-museum-tickets/grand-egyptian-museum-skip-the-line-tickets-e-14142/",
+      "title": "Grand Egyptian Museum Skip-the-Line Tickets",
+      "category": "Museums",
+      "rating": 4.5,
+      "reviews_count": 600,
+      "price_from": "$41",
+      "currency": "USD",
+      "location": "Grand Egyptian Museum, Giza",
+      "duration": "Flexible",
+      "operating_hours": {
+        "monday_to_friday": "9:00am - 6:00pm",
+        "saturday_wednesday": "9:00am - 9:00pm",
+        "last_entry": {
+          "regular_days": "5:00pm",
+          "extended_days": "8:00pm"
+        },
+        "complex_hours": {
+          "regular": "8:30am - 7:00pm",
+          "extended": "8:30am - 10:00pm"
+        }
+      },
+      "highlights": [
+        "Skip the line with priority entry to Grand Egyptian Museum",
+        "Explore 12 new galleries covering Egypt's history from prehistory to Roman era",
+        "See King Tutankhamun's golden treasures - chariot, jewelry, personal belongings",
+        "Visit the iconic Grand Hall with towering statues",
+        "Experience the world's only Hanging Obelisk",
+        "Climb the Grand Staircase lined with 60+ ancient masterpieces",
+        "Upgrade to guided tour in English or Arabic",
+        "Optional GEM Discovery Challenge for interactive exploration"
+      ],
+      "inclusions": [
+        "Skip-the-line entry to the Grand Egyptian Museum",
+        "Access to all main galleries",
+        "Access to Tutankhamun's galleries",
+        "Access to King Khufu's Boat",
+        "Round trip hotel transfers (based on option selected)",
+        "Guided tour in English or Arabic (based on option selected)",
+        "GEM Discovery Challenge (based on option selected)",
+        "Traditional Egyptian lunch (based on option selected)"
+      ],
+      "exclusions": [
+        "Optional upgrades not selected",
+        "Personal expenses"
+      ],
+      "features": {
+        "skip_the_line": true,
+        "book_now_pay_later": true,
+        "guided_tour": true,
+        "transfers_included": true,
+        "hotel_pickup": true,
+        "meals_included": true,
+        "explore_at_your_pace": true
+      },
+      "cancellation_policy": "These tickets can't be cancelled or rescheduled",
+      "accessibility": "Wheelchair and pram/stroller accessible",
+      "whats_not_allowed": [
+        "Outside food & beverages",
+        "Drones",
+        "Selfie sticks",
+        "Tripods",
+        "Flash photography",
+        "Live streaming",
+        "Commercial photography without permission"
+      ],
+      "discovery_challenge_times": [
+        "12:00pm",
+        "2:00pm",
+        "4:00pm",
+        "6:00pm (Saturdays and Wednesdays only)"
+      ],
+      "additional_info": {
+        "smartphone_required": "For Discovery Challenge",
+        "child_supervision": "Children under 12 need adult 16+ for Discovery Challenge"
+      }
+    },
+    {
+      "id": "27702",
+      "url": "https://www.headout.com/grand-egyptian-museum-tickets/grand-egyptian-museum-guided-tour-with-skip-the-line-tickets-and-hotel-transfers-e-27702/",
+      "title": "Grand Egyptian Museum Guided Tour with Skip-the-Line Tickets & Hotel Transfers",
+      "category": "Guided Tours",
+      "rating": 4.7,
+      "reviews_count": 61,
+      "price_from": "$60",
+      "currency": "USD",
+      "location": "Grand Egyptian Museum, Giza",
+      "duration": "Half-day",
+      "features": {
+        "skip_the_line": true,
+        "guided_tour": true,
+        "transfers_included": true,
+        "hotel_pickup": true,
+        "expert_guide": true,
+        "free_cancellation": true
+      },
+      "highlights": [
+        "Expert Egyptologist guide",
+        "Round-trip hotel transfers included",
+        "Skip-the-line access",
+        "All museum galleries",
+        "Tutankhamun treasures",
+        "Interactive GEM Discovery Challenge available"
+      ],
+      "languages": ["English", "Arabic"]
+    },
+    {
+      "id": "28220",
+      "url": "https://www.headout.com/hurghada-grand-aquarium/hurghada-grand-aquarium-tickets-with-private-hotel-transfers-e-28220/",
+      "title": "Hurghada Grand Aquarium Tickets with Private Hotel Transfers",
+      "category": "Attractions",
+      "location": "Hurghada",
+      "features": {
+        "private_transfers": true,
+        "hotel_pickup": true,
+        "marine_life": true
+      },
+      "highlights": [
+        "Explore Hurghada Grand Aquarium",
+        "Private hotel transfers included",
+        "See diverse marine life",
+        "Family-friendly attraction"
+      ]
+    },
+    {
+      "id": "36552",
+      "url": "https://www.headout.com/day-trips/from-luxor-half-day-west-bank-guided-tour-including-valley-of-the-kings-and-hatshepsut-temple-with-lunch-e-36552/",
+      "title": "From Luxor: Half-Day West Bank Guided Tour (Valley of the Kings & Hatshepsut Temple)",
+      "category": "Day Trips",
+      "location": "Luxor",
+      "duration": "Half-day",
+      "starting_point": "Luxor",
+      "highlights": [
+        "Visit Valley of the Kings",
+        "Explore Temple of Hatshepsut (Deir el-Bahari)",
+        "See Colossi of Memnon",
+        "Lunch included",
+        "Expert guide"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off",
+        "Air-conditioned vehicle",
+        "Professional Egyptologist guide",
+        "Entry fees to attractions",
+        "Lunch"
+      ],
+      "features": {
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "hotel_pickup": true
+      }
+    },
+    {
+      "id": "36554",
+      "url": "https://www.headout.com/day-trips/from-luxor-full-day-all-inclusive-tour-to-luxor-west-and-east-banks-with-lunch-e-36554/",
+      "title": "From Luxor: Full-Day All-Inclusive Tour to Luxor West and East Banks",
+      "category": "Day Trips",
+      "location": "Luxor",
+      "duration": "Full-day",
+      "starting_point": "Luxor",
+      "highlights": [
+        "West Bank: Valley of the Kings, Hatshepsut Temple, Colossi of Memnon",
+        "East Bank: Karnak Temple Complex, Luxor Temple",
+        "Lunch included",
+        "All-inclusive tour"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off",
+        "Air-conditioned vehicle",
+        "Professional Egyptologist guide",
+        "Entry fees to all attractions",
+        "Lunch"
+      ],
+      "features": {
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "all_inclusive": true,
+        "hotel_pickup": true
+      }
+    },
+    {
+      "id": "36568",
+      "url": "https://www.headout.com/day-trips/from-luxor-half-day-east-bank-guided-tour-with-karnak-and-luxor-temple-visits-and-lunch-e-36568/",
+      "title": "From Luxor: Half-Day East Bank Guided Tour (Karnak & Luxor Temple)",
+      "category": "Day Trips",
+      "location": "Luxor",
+      "duration": "Half-day",
+      "starting_point": "Luxor",
+      "highlights": [
+        "Visit Karnak Temple Complex",
+        "Explore Luxor Temple",
+        "Lunch included",
+        "Expert Egyptologist guide"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off",
+        "Air-conditioned vehicle",
+        "Professional guide",
+        "Entry fees",
+        "Lunch"
+      ],
+      "features": {
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "hotel_pickup": true
+      }
+    },
+    {
+      "id": "36831",
+      "url": "https://www.headout.com/nile-cruises/nile-pharaoh-5-star-cairo-dinner-cruise-with-live-entertainment-e-36831/",
+      "title": "Nile Pharaoh 5-Star Cairo Dinner Cruise with Live Entertainment",
+      "category": "Dinner Cruises",
+      "rating": 4.0,
+      "reviews_count": 103,
+      "price_from": "$41",
+      "original_price": "$47",
+      "discount": "13%",
+      "currency": "USD",
+      "location": "Nile River, Cairo",
+      "duration": "2 hours",
+      "highlights": [
+        "5-star luxury dinner cruise on the Nile",
+        "Live entertainment shows (belly dance, Tanoura)",
+        "Lavish dinner buffet",
+        "Round-trip hotel transfers",
+        "Stunning Nile views"
+      ],
+      "inclusions": [
+        "2-hour Nile cruise",
+        "Dinner buffet",
+        "Live entertainment shows",
+        "Hotel pickup and drop-off",
+        "All taxes"
+      ],
+      "features": {
+        "dinner_included": true,
+        "live_entertainment": true,
+        "transfers_included": true,
+        "hotel_pickup": true,
+        "free_cancellation": true,
+        "luxury_experience": true
+      },
+      "entertainment": [
+        "Belly dancing",
+        "Tanoura show",
+        "Live music"
+      ]
+    },
+    {
+      "id": "36832",
+      "url": "https://www.headout.com/nile-cruises/nile-maxim-luxury-cairo-dinner-cruise-with-live-entertainment-e-36832/",
+      "title": "Nile Maxim Luxury Cairo Dinner Cruise with Live Entertainment",
+      "category": "Dinner Cruises",
+      "location": "Nile River, Cairo",
+      "duration": "2 hours",
+      "highlights": [
+        "Luxury Nile cruise experience",
+        "Gourmet dinner buffet",
+        "Live entertainment shows",
+        "Hotel transfers included"
+      ],
+      "features": {
+        "dinner_included": true,
+        "live_entertainment": true,
+        "transfers_included": true,
+        "hotel_pickup": true,
+        "luxury_experience": true
+      }
+    },
+    {
+      "id": "37745",
+      "url": "https://www.headout.com/day-trips/from-hurghada-full-day-tour-of-luxor-valley-of-the-kings-tutankhamun-tomb-e-37745/",
+      "title": "From Hurghada: Full-Day Tour of Luxor (Valley of the Kings & Tutankhamun Tomb)",
+      "category": "Day Trips",
+      "location": "Luxor",
+      "duration": "Full-day",
+      "starting_point": "Hurghada",
+      "highlights": [
+        "Karnak Temple Complex",
+        "Lunch included"
+      ],
+      "inclusions": [
+        "Round-trip transfers from Hurghada",
+        "Air-conditioned vehicle",
+        "Professional Egyptologist guide",
+        "Entry fees to all sites",
+        "Lunch"
+      ],
+      "features": {
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "full_day": true
+      }
+    },
+    {
+      "id": "37746",
+      "url": "https://www.headout.com/day-trips/from-cairo-private-all-inclusive-tour-of-luxor-by-plane-e-37746/",
+      "title": "From Cairo: Private All-Inclusive Tour of Luxor by Plane",
+      "category": "Day Trips",
+      "location": "Luxor",
+      "duration": "Full-day",
+      "starting_point": "Cairo",
+      "highlights": [
+        "Private flight from Cairo to Luxor",
+        "All-inclusive experience",
+        "Valley of the Kings",
+        "Karnak Temple",
+        "Luxor Temple",
+        "Hatshepsut Temple",
+        "Meals included",
+        "Private guide"
+      ],
+      "inclusions": [
+        "Round-trip flights Cairo-Luxor",
+        "Private air-conditioned vehicle",
+        "Private Egyptologist guide",
+        "Entry fees to all attractions",
+        "Breakfast and lunch",
+        "Hotel pickup and drop-off"
+      ],
+      "features": {
+        "private_tour": true,
+        "flights_included": true,
+        "all_inclusive": true,
+        "guided_tour": true,
+        "meals_included": true,
+        "luxury_experience": true
+      }
+    },
+    {
+      "id": "38048",
+      "url": "https://www.headout.com/day-trips/from-hurghada-cairo-pyramids-sphinx-egyptian-museum-day-trip-e-38048/",
+      "title": "From Hurghada: Cairo Pyramids, Sphinx & Egyptian Museum Day Trip",
+      "category": "Day Trips",
+      "location": "Cairo",
+      "duration": "Full-day (approximately 14-16 hours)",
+      "starting_point": "Hurghada",
+      "highlights": [
+        "Full-day trip from Hurghada to Cairo",
+        "Visit Pyramids of Giza",
+        "See the Great Sphinx",
+        "Explore Egyptian Museum of Antiquities",
+        "Lunch included",
+        "Expert guide"
+      ],
+      "inclusions": [
+        "Round-trip air-conditioned coach from Hurghada",
+        "Professional Egyptologist guide",
+        "Entry fees to Pyramids and Museum",
+        "Lunch at local restaurant",
+        "Hotel pickup and drop-off"
+      ],
+      "features": {
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "full_day": true,
+        "hotel_pickup": true
+      }
+    },
+    {
+      "id": "38060",
+      "url": "https://www.headout.com/day-trips/from-sharm-el-sheikh-cairo-full-day-tour-with-round-trip-flight-transfers-e-38060/",
+      "title": "From Sharm El-Sheikh: Cairo Full-Day Tour with Round-Trip Flight Transfers",
+      "category": "Day Trips",
+      "location": "Cairo",
+      "duration": "Full-day",
+      "starting_point": "Sharm El-Sheikh",
+      "highlights": [
+        "Round-trip flights from Sharm El-Sheikh",
+        "Visit Pyramids of Giza and Sphinx",
+        "Explore Egyptian Museum",
+        "Khan el-Khalili bazaar shopping",
+        "Lunch included",
+        "Expert guide"
+      ],
+      "inclusions": [
+        "Round-trip domestic flights",
+        "Hotel pickup and drop-off in Sharm",
+        "Air-conditioned vehicle in Cairo",
+        "Professional Egyptologist guide",
+        "Entry fees to attractions",
+        "Lunch"
+      ],
+      "features": {
+        "flights_included": true,
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "full_day": true
+      }
+    },
+    {
+      "id": "38769",
+      "url": "https://www.headout.com/pyramids-of-giza/from-hurghada-giza-complex-grand-egyptian-museum-day-trip-e-38769/",
+      "title": "From Hurghada: Giza Complex & Grand Egyptian Museum Day Trip",
+      "category": "Day Trips / Pyramids of Giza",
+      "location": "Giza & Cairo",
+      "duration": "Full-day",
+      "starting_point": "Hurghada",
+      "highlights": [
+        "Full-day trip from Hurghada",
+        "Visit Giza Pyramids Complex",
+        "Explore Grand Egyptian Museum",
+        "See the Great Sphinx",
+        "Tutankhamun treasures",
+        "Lunch included"
+      ],
+      "inclusions": [
+        "Round-trip transfers from Hurghada",
+        "Air-conditioned vehicle",
+        "Professional guide",
+        "Entry to Giza Complex",
+        "Entry to Grand Egyptian Museum",
+        "Lunch"
+      ],
+      "features": {
+        "guided_tour": true,
+        "transfers_included": true,
+        "lunch_included": true,
+        "full_day": true,
+        "two_attractions": true
+      }
+    },
+    {
+      "id": "14015",
+      "url": "https://www.headout.com/egyptian-museum-cairo-tickets/the-egyptian-museum-of-antiquities-skip-the-line-tickets-e-14015/",
+      "title": "The Egyptian Museum in Cairo Skip-the-Line Tickets",
+      "category": "Museums",
+      "rating": 4.4,
+      "reviews_count": 44,
+      "price_from": "$15",
+      "currency": "USD",
+      "location": "Egyptian Museum, Cairo (Tahrir Square)",
+      "duration": "Flexible (2-3 hours recommended)",
+      "operating_hours": {
+        "daily": "9:00am - 5:00pm",
+        "friday": "9:00am - 4:00pm"
+      },
+      "highlights": [
+        "Skip the line at Egyptian Museum of Antiquities",
+        "Explore over 120,000 ancient artifacts",
+        "See Tutankhamun's treasures and golden mask",
+        "Royal mummies collection",
+        "Discover artifacts from prehistoric to Roman era",
+        "Self-guided tour at your own pace"
+      ],
+      "inclusions": [
+        "Skip-the-line entry ticket",
+        "Access to all main galleries",
+        "Access to Tutankhamun collection"
+      ],
+      "exclusions": [
+        "Royal Mummies Room (additional ticket required)",
+        "Guide (can be added)",
+        "Hotel transfers"
+      ],
+      "features": {
+        "skip_the_line": true,
+        "explore_at_your_pace": true,
+        "historic_collection": true
+      },
+      "collections": [
+        "Tutankhamun treasures",
+        "Royal mummies (additional fee)",
+        "Pharaonic jewelry",
+        "Ancient Egyptian artifacts",
+        "Greco-Roman period items"
+      ],
+      "additional_info": {
+        "photography": "Allowed without flash (additional camera fee may apply)",
+        "recommended_duration": "2-3 hours",
+        "best_time": "Early morning to avoid crowds"
+      }
+    }
+  ],
+  "summary": {
+    "price_range": {
+      "minimum": "$3",
+      "maximum": "$60+",
+      "average": "$30-35"
+    },
+    "categories": {
+      "Museums": 3,
+      "Landmarks": 1,
+      "Day Trips": 8,
+      "Dinner Cruises": 2,
+      "Guided Tours": 1,
+      "Attractions": 1
+    },
+    "locations": {
+      "Cairo": 6,
+      "Giza": 4,
+      "Luxor": 5,
+      "Hurghada": 2,
+      "Sharm El-Sheikh": 1
+    },
+    "average_rating": 4.4,
+    "total_reviews": 3000,
+    "top_features": [
+      "Skip-the-line access",
+      "Hotel pickup/transfers",
+      "Expert guides",
+      "Lunch included",
+      "Flexible timing"
+    ],
+    "booking_tips": {
+      "best_value": "Grand Egyptian Museum + Giza Pyramids combo from Hurghada",
+      "luxury_option": "Private Luxor tour by plane from Cairo",
+      "budget_friendly": "Egyptian Museum skip-the-line ($15)",
+      "romantic": "Nile Pharaoh 5-star dinner cruise",
+      "family_friendly": "Giza Pyramids with audio guide"
+    }
+  },
+  "comparison": {
+    "most_popular": {
+      "title": "Pyramids of Giza Skip-the-Line",
+      "reviews": 2131,
+      "rating": 4.6
+    },
+    "highest_rated": {
+      "title": "GEM Guided Tour with Transfers",
+      "rating": 4.7,
+      "reviews": 61
+    },
+    "best_value": {
+      "title": "Egyptian Museum Skip-the-Line",
+      "price": "$15"
+    },
+    "most_comprehensive": {
+      "title": "Full-Day Luxor West & East Banks",
+      "attractions": 5,
+      "includes": "All meals, transfers, guide"
+    }
+  },
+  "practical_info": {
+    "booking_recommendations": [
+      "Book 24-48 hours in advance for best availability",
+      "Skip-the-line tickets save 30-60 minutes waiting time",
+      "Day trips from Hurghada/Sharm start very early (3-4am)",
+      "Wednesday & Saturday: GEM open until 9pm",
+      "Student discounts available with valid ID"
+    ],
+    "what_to_bring": [
+      "Passport/ID",
+      "Sun protection (hat, sunscreen)",
+      "Comfortable walking shoes",
+      "Water bottle",
+      "Camera (check flash policy)",
+      "Cash for extras/tips"
+    ],
+    "dress_code": [
+      "Modest clothing recommended",
+      "Comfortable shoes essential",
+      "Light layers for air-conditioned museums"
+    ],
+    "best_times": {
+      "pyramids": "Early morning (8-10am) or late afternoon",
+      "museums": "Opening time to avoid crowds",
+      "dinner_cruise": "Evening (7-9pm)",
+      "luxor_tours": "October to April (cooler weather)"
+    }
+  },
+  "contact_support": {
+    "usa": "+1 347 897 0100",
+    "uk": "+44 117 325 5305",
+    "uae": "+971 8 000 321171",
+    "email": "support@headout.com",
+    "live_chat": "24/7 available"
+  }
+}

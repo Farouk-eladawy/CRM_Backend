@@ -1,0 +1,227 @@
+String(v || '').trim().toLowerCase();
+
+const HIDDEN_FIELDS = new Set
+([
+  'Currency'
+]);
+
+const LINKED_RECORD_FIELDS = new Set
+([
+  'Supplier Name & Phone',
+  'Driver Name & Phone',
+  'Tour Guide Name & Phone',
+  'Representative Name & Phone'
+]);
+
+const ATTACHMENT_EDIT_FIELDS = new Set
+(new Map());
+  const progressiveTimersRef = useRef
+([]);
+  const [, startTransition] = useTransition();
+  const draggedSidebarFieldRef = useRef
+(prev.length === 0 ? chunk : [...prev, ...chunk]));
+      });
+      if (index
+(DEFAULT_VIEWS_FULL);
+  const [activeViewId, setActiveViewId] = useState
+('Operation Today');
+  
+  // View creation modal states
+  const [showCreateViewModal, setShowCreateViewModal] = useState(false);
+  const [newViewName, setNewViewName] = useState('');
+  const [newViewClone, setNewViewClone] = useState(true);
+
+  const [records, setRecords] = useState
+([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [switchingViewId, setSwitchingViewId] = useState
+(null);
+  const [renderLimit, setRenderLimit] = useState
+(Number.MAX_SAFE_INTEGER);
+  const [changeSummaryById, setChangeSummaryById] = useState
+(null);
+  const [changeLogById, setChangeLogById] = useState
+(null);
+  const [linkedOptionsByField, setLinkedOptionsByField] = useState
+([]);
+  const [attachmentViewer, setAttachmentViewer] = useState
+(null);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [deletingAttachmentUrl, setDeletingAttachmentUrl] = useState
+(null);
+  const attachmentFileInputRef = useRef
+(null);
+  
+  // Toolbar states
+  const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const [showFieldsPanel, setShowFieldsPanel] = useState(false);
+  const [visibleFields, setVisibleFields] = useState
+!isHiddenField(f))));
+  const [allFields, setAllFields] = useState
+([]);
+  
+  // Advanced Filter state
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filters, setFilters] = useState
+([]);
+  const [draftFilters, setDraftFilters] = useState
+([]);
+
+  // Advanced Sort state
+  const [showSortModal, setShowSortModal] = useState(false);
+  const [sorts, setSorts] = useState
+([]);
+  const [draftSorts, setDraftSorts] = useState
+([]);
+  const [serverSideApplied, setServerSideApplied] = useState(false);
+  const [filterPopupPos, setFilterPopupPos] = useState
+(null);
+  const [sortPopupPos, setSortPopupPos] = useState
+(null);
+  const [fieldsPopupPos, setFieldsPopupPos] = useState
+(null);
+  const deferredRecords = useDeferredValue(records);
+
+  const tableScrollRef = useRef
+(null);
+  const [allBookingNextOffset, setAllBookingNextOffset] = useState
+(null);
+  const filterButtonRef = useRef
+(null);
+  const sortButtonRef = useRef
+(null);
+  const fieldsButtonRef = useRef
+(null);
+  const filterModalRef = useRef
+(null);
+  const sortModalRef = useRef
+(null);
+  const fieldsPanelRef = useRef
+(null);
+  const [editingField, setEditingField] = useState
+(null);
+  const [editingKind, setEditingKind] = useState
+(null);
+  const [editText, setEditText] = useState
+('');
+  const [editMulti, setEditMulti] = useState
+([]);
+  const [editAddValue, setEditAddValue] = useState
+('');
+  const [editMultiOpen, setEditMultiOpen] = useState(false);
+  const editMultiContainerRef = useRef
+(null);
+  const editMultiInputRef = useRef
+(null);
+  const [savingField, setSavingField] = useState
+(null);
+
+  // We need a ref to keep track of the latest fetch request ID
+  // to prevent race conditions where an older, slower fetch overwrites a newer, faster one
+  const currentFetchId = useRef
+();
+      let anyServerFiltered = false;
+      let allServerFiltered = true;
+      
+      while (hasMore && pageCount
+();
+      if (options[field].size
+String(x || '').trim()).filter(Boolean);
+    if (list.length === 0) return '';
+    const show = list.slice(0, 6);
+    const more = list.length - show.length;
+    return (
+) : null}
+View
+;
+      }
+      return
+AI Operation
+Refresh
+Add View
+Records
+Fields
+Filter
+In this view, show records
+No filters applied to this view
+Where
+and
+or
+Any of the following are true...
+All of the following are true...
+) : childType === 'select' ? (
+Select an option...
+)) : child.field === 'Booking Status' ? (
+Confirmed
+Pending
+Cancelled
+No Show
+) : child.field === 'des' ? (
+Sharm El-Sheikh
+Hurghada
+Cairo
+Yes
+) : (
+                                // Render Normal Single Condition
+) : type === 'select' ? (
+)) : filter.field === 'Booking Status' ? (
+) : filter.field === 'des' ? (
+Add condition
+Add condition group
+Copy from another view
+Cancel
+Apply
+Sort by
+Sort records by multiple fields sequentially.
+No sorts applied to this view
+then by
+Add another sort
+Automatically sort records
+Show/Hide Fields
+Show all
+Default
+Loading view...
+Loading operations data...
+) : records.length === 0 ? (
+No bookings found for this view.
+Changes
+: null}
+No changes yet
+Time TBD
+Change log
+Loading...
+) : (changeLogById[record.id] || []).length === 0 ? (
+No edits recorded yet.
+From:
+Loading more...
+Empty
+: renderValue(val, field, false, selectedRecord.id, fieldKey);
+
+                        return (
+(Empty)
+) : editingKind === 'multi_select' ? (
+x !== s) : [...prev, s]));
+                                      };
+
+                                      return (
+No options
+) : editingKind === 'date' ? (
+) : editingKind === 'long_text' ? (
+Additional Details & Logs
+x !== s) : [...prev, s]));
+                                  };
+
+                                  return (
+No file URL
+);
+                      }
+                      return (
+Open file
+Create New View
+View Name
+Filter Settings
+Duplicate current filters
+Start with empty filters
+Create View

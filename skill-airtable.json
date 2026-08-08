@@ -1,0 +1,27 @@
+{
+  "name": "add_lead",
+  "description": "Add a new customer lead or inquiry to the Airtable database.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The customer's name."
+      },
+      "phone": {
+        "type": "string",
+        "description": "The customer's phone number."
+      },
+      "email": {
+        "type": "string",
+        "description": "The customer's email address (optional)."
+      },
+      "notes": {
+        "type": "string",
+        "description": "Any additional notes or request details."
+      }
+    },
+    "required": ["name", "phone"]
+  },
+  "command": "python tools/add_lead.py '{\"name\": \"{name}\", \"phone\": \"{phone}\", \"email\": \"{email}\", \"notes\": \"{notes}\"}'"
+}

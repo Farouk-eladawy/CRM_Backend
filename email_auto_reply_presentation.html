@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض تشغيلي - الرد التلقائي على الإيميل فقط</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #142033;
+      --muted: #4b5c76;
+      --primary: #0b6bcb;
+      --accent: #1f9d55;
+      --warn: #d9822b;
+      --danger: #c23030;
+      --line: #dbe4f0;
+      --shadow: 0 8px 24px rgba(10, 30, 60, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    .container {
+      width: min(1150px, 94%);
+      margin: 28px auto 80px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0b6bcb, #0f4f94);
+      color: #fff;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      opacity: 0.95;
+      font-size: 17px;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .card {
+      grid-column: span 12;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .card h3 {
+      margin: 14px 0 8px;
+      font-size: 18px;
+    }
+
+    .muted { color: var(--muted); }
+
+    ul { margin: 0; padding-right: 18px; }
+    li { margin: 4px 0; }
+
+    .two-col {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 4px 4px 0 0;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: #f8fbff;
+    }
+
+    .ok { color: var(--accent); font-weight: 700; }
+    .warn { color: var(--warn); font-weight: 700; }
+    .danger { color: var(--danger); font-weight: 700; }
+
+    .timeline {
+      border-right: 3px solid #c6dbf4;
+      padding-right: 14px;
+      margin-right: 4px;
+    }
+
+    .step {
+      margin-bottom: 14px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfdff;
+    }
+
+    .step strong { color: #0b4e92; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      vertical-align: top;
+    }
+
+    th { background: #f0f6ff; }
+
+    .footer-note {
+      margin-top: 18px;
+      padding: 12px;
+      border: 1px dashed #9cbce0;
+      background: #f4f9ff;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .two-col { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 24px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .container { width: 100%; margin: 0; }
+      .card, .hero { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>نظام OpenClaw - تشغيل الرد التلقائي على الإيميل فقط</h1>
+      <p>
+        هذا العرض مخصص لتدريب الموظفين على تشغيل النظام بأمان عند تفعيل الإرسال المباشر للإيميل فقط،
+        مع إبقاء واتساب كما هو.
+      </p>
+      <div class="pill-row">
+        <span class="pill">قناة الإيميل: إرسال مباشر</span>
+        <span class="pill">قناة واتساب: بدون تغيير</span>
+        <span class="pill">التركيز: المتابعة + التصحيح + التصعيد</span>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>1) ماذا سيتغير؟</h2>
+        <div class="two-col">
+          <div>
+            <h3>قبل التفعيل</h3>
+            <ul>
+              <li>النظام يولد ردًا على شكل مسودة (Draft) لمراجعة الموظف.</li>
+              <li>الموظف يعدل النص ثم يرسله يدويًا.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>بعد التفعيل</h3>
+            <ul>
+              <li>النظام يرسل الإيميل تلقائيًا مباشرة للعميل.</li>
+              <li>الموظف يتحول دوره إلى المراقبة والتحقق والتصعيد السريع.</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <span class="tag">سرعة أعلى</span>
+          <span class="tag">مجهود يدوي أقل</span>
+          <span class="tag">حاجة أكبر للمتابعة الدقيقة</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2) رحلة الرسالة من العميل إلى الرد</h2>
+        <div class="timeline">
+          <div class="step"><strong>الخطوة 1:</strong> وصول إيميل من العميل.</div>
+          <div class="step"><strong>الخطوة 2:</strong> النظام يحلل محتوى الرسالة وسياق المحادثة وبيانات الحجز.</div>
+          <div class="step"><strong>الخطوة 3:</strong> النظام يولد الرد المناسب آليًا.</div>
+          <div class="step"><strong>الخطوة 4:</strong> في وضع الإرسال المباشر: يتم إرسال الرد فورًا عبر Gmail API.</div>
+          <div class="step"><strong>الخطوة 5:</strong> الموظف يراجع المخرجات في السجلات/المتابعة ويعالج الحالات الحساسة.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>3) دور الموظفين بالتفصيل (اليومي)</h2>
+        <h3>أ) المتابعة كل ساعة</h3>
+        <ul>
+          <li>مراجعة آخر الرسائل المرسلة تلقائيًا (عينات عشوائية + الحالات الحساسة).</li>
+          <li>التحقق من صحة: اسم العميل، رقم الحجز، التاريخ، الروابط، نبرة الرد.</li>
+          <li>رصد أي فشل في الإرسال أو تأخير أو رد غير مناسب.</li>
+        </ul>
+        <h3>ب) المعالجة عند وجود مشكلة</h3>
+        <ul>
+          <li>إيقاف الحالة يدويًا وإرسال تصحيح فوري للعميل إذا لزم.</li>
+          <li>توثيق الخطأ: السبب، الرسالة المتأثرة، الإجراء التصحيحي.</li>
+          <li>تصعيد فوري لفريق الجودة في حالات الاسترداد/الإلغاء/الشكوى الحادة.</li>
+        </ul>
+        <h3>ج) ضبط الجودة</h3>
+        <ul>
+          <li>تجميع أكثر 5 أخطاء متكررة أسبوعيًا.</li>
+          <li>اقتراح قواعد منع جديدة (Guardrails) للسيناريوهات الحساسة.</li>
+          <li>تحديث دليل الردود المعتمد للموظفين.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>4) متى يجب التصعيد وعدم الاكتفاء بالرد الآلي؟</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الحالة</th>
+                <th>القرار</th>
+                <th>إجراء الموظف</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>طلب استرداد أو إلغاء</td>
+                <td><span class="danger">تصعيد إلزامي</span></td>
+                <td>تحويل فوري لفريق الجودة مع متابعة الرد خلال نفس الشيفت.</td>
+              </tr>
+              <tr>
+                <td>نزاع مالي أو اتهام</td>
+                <td><span class="danger">تصعيد فوري</span></td>
+                <td>عدم إعطاء وعود، توثيق الحالة، مراجعة مشرف التشغيل.</td>
+              </tr>
+              <tr>
+                <td>استفسار معلوماتي بسيط</td>
+                <td><span class="ok">يسمح بالرد الآلي</span></td>
+                <td>مراجعة عينة فقط للتأكد من الجودة.</td>
+              </tr>
+              <tr>
+                <td>معلومة غير مؤكدة في الحجز</td>
+                <td><span class="warn">مراجعة بشرية</span></td>
+                <td>تصحيح يدوي قبل أي متابعة إضافية مع العميل.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>5) هل النظام يتعلم حاليًا من الموظفين؟</h2>
+        <p class="muted">
+          <strong>الإجابة المختصرة:</strong> نعم، يوجد مسار تعلم من تصحيحات الموظفين، لكن التعلم يحدث فقط عندما يتم إرسال
+          التصحيح عبر واجهة التغذية الراجعة (Feedback).
+        </p>
+        <ul>
+          <li>عند تعديل الموظف رد الذكاء الاصطناعي واختيار الحفظ/التعليم، يتم استدعاء endpoint التغذية الراجعة.</li>
+          <li>النظام يخزن الفرق بين نص الذكاء الاصطناعي والنص البشري داخل قاعدة تعلم محلية.</li>
+          <li>عند الرسائل الجديدة، النظام يحاول استرجاع دروس مشابهة واستخدامها لتحسين الرد.</li>
+        </ul>
+        <h3>ملاحظات تشغيلية مهمة</h3>
+        <ul>
+          <li>إذا لم يرسل الفريق Feedback، فلن يضيف النظام دروسًا جديدة.</li>
+          <li>في الوضع المباشر الكامل قد تقل التصحيحات اليدوية، وبالتالي قد يقل معدل التعلم إذا لم توجد آلية مراجعة منظمة.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>6) واجبات كل دور داخل الفريق</h2>
+        <div class="two-col">
+          <div>
+            <h3>موظف خدمة العملاء</h3>
+            <ul>
+              <li>متابعة الرسائل المرسلة تلقائيًا في نطاقه.</li>
+              <li>إصلاح أي رد غير مناسب بسرعة.</li>
+              <li>تسجيل الحالات المتكررة ورفعها للمشرف.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>مشرف الشيفت</h3>
+            <ul>
+              <li>مراجعة مؤشرات الجودة اليومية.</li>
+              <li>اتخاذ قرار التصعيد في الحالات عالية المخاطر.</li>
+              <li>متابعة الالتزام بإجراءات التشغيل.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>7) قائمة فحص يومية جاهزة (Checklist)</h2>
+        <ul>
+          <li>[ ] مراجعة عينة من الردود المرسلة تلقائيًا كل ساعة.</li>
+          <li>[ ] فحص حالات الاسترداد/الإلغاء والتحقق من التصعيد.</li>
+          <li>[ ] مراجعة حالات الفشل في الإرسال وإعادة المعالجة.</li>
+          <li>[ ] تسجيل أهم الأخطاء والتعديلات المتكررة.</li>
+          <li>[ ] إرسال تقرير نهاية الشيفت: ما تم تصحيحه وما يحتاج تحسين.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>8) مؤشرات نجاح التطبيق</h2>
+        <ul>
+          <li>زمن الاستجابة الأولى (First Response Time) ينخفض.</li>
+          <li>نسبة التصعيد الصحيح للحالات الحساسة ترتفع.</li>
+          <li>نسبة الشكاوى بسبب صياغة خاطئة تنخفض أسبوعًا بعد أسبوع.</li>
+          <li>ثبات الجودة عبر الشيفتات المختلفة.</li>
+        </ul>
+        <div class="footer-note">
+          توصية: ابدأوا بتفعيل الرد المباشر للإيميل على نطاق محدود أولاً (Pilot) لمدة أسبوع،
+          مع مراجعة يومية دقيقة، ثم توسيع النطاق تدريجيًا.
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>9) أسماء الحقول المطلوبة للمتابعة (الأهم فقط)</h2>
+        <p class="muted">هذه هي الحقول العملية التي تؤثر مباشرة على جودة الرد. راقبوها يوميًا:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>اسم الحقل</th>
+                <th>لماذا مهم؟</th>
+                <th>متى يراجعه الموظف؟</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Booking Nr.</td>
+                <td>مرجع الحجز الأساسي للبحث والتحقق.</td>
+                <td>مع أي استفسار عن حالة الحجز أو تفاصيل الرحلة.</td>
+              </tr>
+              <tr>
+                <td>Customer Phone</td>
+                <td>الربط بين الرسالة والعميل الصحيح.</td>
+                <td>إذا كان البحث تم برقم هاتف أو حصل التباس في الهوية.</td>
+              </tr>
+              <tr>
+                <td>Date Trip</td>
+                <td>تحديد هل الحالة عاجلة قبل الرحلة أم لا.</td>
+                <td>في الرسائل العاجلة وتغيير المواعيد.</td>
+              </tr>
+              <tr>
+                <td>Status / Booking Status</td>
+                <td>وضع الحجز الفعلي (مؤكد/معلق/ملغي).</td>
+                <td>قبل أي رد يحتوي وعد أو تأكيد حالة.</td>
+              </tr>
+              <tr>
+                <td>Stripe invoice</td>
+                <td>رابط الفاتورة المطلوب للدفع.</td>
+                <td>عند سؤال العميل عن الدفع أو الفاتورة.</td>
+              </tr>
+              <tr>
+                <td>Invoice Status</td>
+                <td>حالة الدفع (succeeded / pending / failed).</td>
+                <td>مع كل متابعة مالية.</td>
+              </tr>
+              <tr>
+                <td>Google Maps</td>
+                <td>موقع العميل/نقطة الالتقاط.</td>
+                <td>عند رسائل مشاركة موقع أو تعديل نقطة الالتقاء.</td>
+              </tr>
+              <tr>
+                <td>Note</td>
+                <td>طلبات خاصة وملاحظات تشغيلية مهمة.</td>
+                <td>عند وجود طلب غذائي/كرسي متحرك/حساسية/ملاحظة خاصة.</td>
+              </tr>
+              <tr>
+                <td>Last Modified By</td>
+                <td>يعرف إذا التعديل من موظف أو نظام آلي.</td>
+                <td>عند التحقق من سبب تغيير مفاجئ في البيانات.</td>
+              </tr>
+              <tr>
+                <td>Inquiry Type</td>
+                <td>تصنيف نوع السؤال لتوجيه المعالجة الصحيحة.</td>
+                <td>عند الرسائل غير الواضحة أو المتكررة.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>10) جميع حالات المساعد في الرد (حالة بحالة)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الحالة</th>
+                <th>ماذا يفعل المساعد الآن؟</th>
+                <th>دور الموظف المطلوب</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1) سؤال عام بدون بيانات كافية</td>
+                <td>يرد بسؤال توضيحي ويطلب رقم الحجز أو الهاتف.</td>
+                <td>التأكد أن العميل أرسل معرف صحيح قبل متابعة الرد.</td>
+              </tr>
+              <tr>
+                <td>2) وجود رقم حجز أو هاتف في الرسالة</td>
+                <td>يحاول البحث في Airtable واسترجاع بيانات الحجز.</td>
+                <td>مراجعة أن الحجز المسترجع يخص نفس العميل فعلاً.</td>
+              </tr>
+              <tr>
+                <td>3) استفسار عن الفاتورة/الدفع</td>
+                <td>يعتمد على Stripe invoice + Invoice Status لتحديد الرد.</td>
+                <td>فحص الحقلين قبل اعتماد أي رد نهائي مالي.</td>
+              </tr>
+              <tr>
+                <td>4) طلب استرداد أو إلغاء</td>
+                <td>لا يوافق ولا يرفض، ويحوّل الحالة للجودة.</td>
+                <td>تصعيد إلزامي ومتابعة حتى إغلاق الحالة.</td>
+              </tr>
+              <tr>
+                <td>5) رسالة فيها رابط خرائط</td>
+                <td>يحاول حفظ الرابط في حقل Google Maps.</td>
+                <td>التأكد أن الرابط سُجل على نفس الحجز الصحيح.</td>
+              </tr>
+              <tr>
+                <td>6) طلب خاص (أكل/كرسي/حساسية...)</td>
+                <td>يحاول إضافة الطلب إلى حقل Note.</td>
+                <td>مراجعة صياغة الملاحظة وأنها واضحة لفريق العمليات.</td>
+              </tr>
+              <tr>
+                <td>7) أمر مباشر يبدأ بـ / أو !</td>
+                <td>يدخل وضع أوامر لتنفيذ إجراء تشغيلي مباشر.</td>
+                <td>يستخدمه الموظفون المخولون فقط مع مراجعة النتيجة.</td>
+              </tr>
+              <tr>
+                <td>8) فشل اتصال/خطأ نظام</td>
+                <td>يرجع رسالة خطأ أو لا يرسل بشكل صحيح.</td>
+                <td>إعادة المحاولة يدويًا وتسجيل الواقعة للتتبع.</td>
+              </tr>
+              <tr>
+                <td>9) رد آلي صحيح بدون حساسية</td>
+                <td>يرسل رد طبيعي بناءً على السياق والبيانات.</td>
+                <td>مراجعة عينة دورية فقط (Sampling).</td>
+              </tr>
+              <tr>
+                <td>10) رد فيه مخاطرة (قانوني/مالي/شكوى حادة)</td>
+                <td>قد يحتاج تدخل بشري حتى لو كان الرد آلي.</td>
+                <td>إيقاف الأتمتة للحالة، تصحيح الرد، ثم التصعيد.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>11) أنواع Inquiry Type (المستخدمة حاليًا)</h2>
+        <p class="muted">
+          هذه القيم مبنية على إعدادات النظام الحالية، ويجب على الموظف التأكد من اختيار النوع الصحيح لأنه يؤثر على المتابعة والتصعيد.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>القيمة</th>
+                <th>المعنى العملي</th>
+                <th>ماذا يفعل الموظف؟</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CANCELLATION</td>
+                <td>طلب إلغاء حجز أو انسحاب من الرحلة.</td>
+                <td>تصعيد فوري للجودة، بدون إعطاء وعود استرداد مباشرة.</td>
+              </tr>
+              <tr>
+                <td>PICKUP_QUERY</td>
+                <td>استفسار عن وقت/مكان الالتقاط أو بيانات السائق.</td>
+                <td>مراجعة Date Trip + Pickup Time + Google Maps + Note قبل الرد.</td>
+              </tr>
+              <tr>
+                <td>COMPLAINT</td>
+                <td>شكوى على الخدمة أو التأخير أو سلوك مقدم الخدمة.</td>
+                <td>تصعيد لمشرف الشيفت/الجودة مع توثيق كامل للحالة.</td>
+              </tr>
+              <tr>
+                <td>TRIP_INFO_QUERY</td>
+                <td>سؤال معلوماتي عن تفاصيل الرحلة (موعد، برنامج، نقطة تجمع).</td>
+                <td>الرد من بيانات الحجز المعتمدة ومراجعة أي تفاصيل حساسة.</td>
+              </tr>
+              <tr>
+                <td>FOLLOW_UP</td>
+                <td>متابعة على تذكرة/طلب سابق لم يتم حسمه.</td>
+                <td>الرجوع للمحادثة السابقة وتأكيد آخر إجراء تم.</td>
+              </tr>
+              <tr>
+                <td>OTHER</td>
+                <td>حالة لا تنطبق بوضوح على التصنيفات المتاحة.</td>
+                <td>مراجعة بشرية سريعة وإعادة التصنيف إن أمكن.</td>
+              </tr>
+              <tr>
+                <td>INFO_UPDATE</td>
+                <td>العميل يحدّث بياناته (موقع، ملاحظة، اسم، رقم...).</td>
+                <td>تحديث الحقول الصحيحة أولًا ثم تأكيد الاستلام للعميل.</td>
+              </tr>
+              <tr>
+                <td>TEST_SCENARIO</td>
+                <td>رسالة اختبار/محاكاة تشغيلية.</td>
+                <td>عدم اعتبارها حالة عميل فعلية ووضعها ضمن سجلات الاختبار فقط.</td>
+              </tr>
+              <tr>
+                <td>GENERAL</td>
+                <td>استفسار عام لا يحتاج معالجة تخصصية فورية.</td>
+                <td>متابعة عادية مع مراجعة دقة الرد.</td>
+              </tr>
+              <tr>
+                <td>LOST_ITEM</td>
+                <td>بلاغ عن فقدان متعلقات.</td>
+                <td>تصعيد تشغيلي سريع مع تجميع كل التفاصيل (الوقت/المكان/الوصف).</td>
+              </tr>
+              <tr>
+                <td>URGENT_ISSUE</td>
+                <td>حالة عاجلة تؤثر على تنفيذ الخدمة فورًا.</td>
+                <td>تصعيد فوري للمشرف مع تدخل بشري مباشر.</td>
+              </tr>
+              <tr>
+                <td>CLARIFICATION_REQUEST</td>
+                <td>العميل يطلب توضيح نقطة غير مفهومة.</td>
+                <td>تأكيد المعلومة من الحجز ثم إرسال توضيح واضح ومباشر.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer-note">
+          ملاحظة: تم حذف التكرار في القائمة (LOST_ITEM كان مكررًا) واعتماد نسخة موحدة للتدريب.
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>12) حالات التصعيد (Escalation Cases)</h2>
+        <p class="muted">
+          عند تحقق حالة تصعيد، النظام يرسل إشعارًا لفريق الجودة، ويمكن أيضًا إرسال نفس التفاصيل إلى Webhook للمتابعة المركزية.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الحالة</th>
+                <th>قرار النظام</th>
+                <th>ما الذي يصل لفريق الجودة؟</th>
+                <th>دور الموظف</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Refund / Cancellation</td>
+                <td>تصعيد تلقائي إلزامي.</td>
+                <td>رسالة العميل + الرد المقترح + Trace ID (+ الرد المرسل إذا كان Direct Send).</td>
+                <td>مراجعة فورية والرد الرسمي على العميل حسب سياسة الجودة.</td>
+              </tr>
+              <tr>
+                <td>نزاع مالي / شكوى حادة</td>
+                <td>تصعيد تشغيلي سريع (يدوي أو تلقائي حسب السياسة).</td>
+                <td>تفاصيل الحالة والرسائل المتبادلة.</td>
+                <td>تحويل لمشرف الشيفت + توثيق الإجراء خلال نفس الشيفت.</td>
+              </tr>
+              <tr>
+                <td>معلومة حساسة غير مؤكدة</td>
+                <td>إيقاف الاعتماد الآلي للحالة حتى المراجعة.</td>
+                <td>سبب التوقف والحقل غير المؤكد.</td>
+                <td>التحقق من Airtable ثم اعتماد أو تصحيح الرد.</td>
+              </tr>
+              <tr>
+                <td>فشل إرسال الرد للعميل</td>
+                <td>تنبيه تشغيلي وإعادة المحاولة.</td>
+                <td>وقت الفشل وسبب الخطأ الفني.</td>
+                <td>إعادة الإرسال يدويًا ثم توثيق الحالة.</td>
+              </tr>
+              <tr>
+                <td>أنواع مرتبطة بتصعيد فوري</td>
+                <td>تصعيد حسب النوع مباشرة.</td>
+                <td>CANCELLATION / COMPLAINT / LOST_ITEM / URGENT_ISSUE + كامل تفاصيل الحالة.</td>
+                <td>التدخل البشري الفوري وعدم انتظار رد آلي نهائي.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer-note">
+          ملاحظة تنفيذية: التصعيد لا يعني أن الرد الآلي خاطئ دائمًا، لكنه يعني أن الحالة أعلى خطورة وتحتاج تدخل بشري موثق.
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

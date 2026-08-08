@@ -1,0 +1,54 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Admin Manager",
+  "user_request": "هاتلي تذكرة الطيران اللي علي الحجز ده 546980816555",
+  "assistant_reply": "تم فحص الحجز 546980816555 بنجاح. هذه هي التفاصيل (Live من Airtable):\n📋 *معلومات الحجز*\n- العميل: Ahmed Elkhatib\n- الوكالة: Tiqets\n- الحالة: Active\n- Record ID: rec4mCX8CaQoQrXjI\n🗺️ *الرحلة*\n- الاسم: Grand Egyptian Museum: Skip The Line Ticket\n- الوجهة: Cairo\n- تاريخ التنفيذ (Date Trip): 2026-09-25\n- تاريخ الإنشاء (Create Date): 2026-06-05\n- عدد البالغين: 2\n- الخيار: Skip The Line\n🏨 *الفندق*\n- Sunrise Arabian Beach Resort\n💰 *المالية*\n- المبلغ: 20 USD\n- حالة الفاتورة: succeeded\n- رابط Stripe: `https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc2xvQkVOY0JodnJSTnMwQjdvcUlpMVNJOFhkY05oLDE3NDU1Mjk5OQ0200twb7m8zI?s=ap`\n🔗 *الروابط*\n- Audio Guide: `http://tiqets.ftstravels.com/?GM/ticketId=546980816555`\n- Customer Link: `https://tracker.ftstravels.net/?booking=546980816555\\1`\n- Driver Link: `https://tracker.ftstravels.net/?booking=546980816555`\n- Tracking Operation: `https://tracker.ftstravels.net/?booking=546980816555&operation`\n- Voucher: `https://voucher.ftstravels.net/dynamic_voucher.html?bookingNumber=546980816555&customerName=Ahmed%20Elkhatib\\1\\1&tripDate=2026-09-25T05%3A00%3A00.000Z&tripName=Grand%20Egyptian%20Museum&destination=Cairo&hotelName=Sunrise%20Arabian%20Beach%20Resort&pickupPoint=Sunrise%20Arabian%20Beach%20Resort&adults=2&amount=&currency=USD&agency=Tiqets`\n⚠️ *ملاحظات*\n- Net Rate Price: #ERROR!",
+  "intent": "booking_summary",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "+201013498777",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-09-25T05:00:00.000Z",
+    "hotel": "Sunrise Arabian Beach Resort"
+  },
+  "workflow_state": {
+    "intent": "booking_summary",
+    "phase": "case_active",
+    "awaiting": "followup",
+    "case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "+201013498777",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-09-25T05:00:00.000Z",
+      "hotel": "Sunrise Arabian Beach Resort"
+    },
+    "note": "تم فحص الحجز 546980816555 بنجاح. هذه هي التفاصيل (Live من Airtable):\n📋 *معلومات الحجز*\n- العميل: Ahmed Elkhatib\n- الوكالة: Tiqets\n- الحالة: Active\n- Record ID: rec4mCX8CaQoQrXjI\n🗺️ *الرحلة*\n- الاسم: Grand Egyptian Museum: Skip The Line Ticket\n- الوجهة: Cairo\n- تاريخ التنفيذ (Date Trip): 2026-09-25\n- تاريخ الإنشاء (Create Date): 2026-06-05\n- عدد البالغين: 2\n- الخيار: Skip The Line\n🏨 *الفندق*\n- Sunrise Arabian Beach Resort\n💰 *المالية*\n- المبلغ: 20 USD\n- حالة الفاتورة: succeeded\n- رابط Stripe: `https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc2xvQkVOY0JodnJSTnMwQjdvcUlpMVNJOFhkY05oLDE3NDU1Mjk5OQ0200twb7m8zI?s=ap`\n🔗 *الروابط*\n- Audio Guide: `http://tiqets.ftstravels.com/?GM/ticketId=546980816555`\n- Customer Link: `https://tracker.ftstravels.net/?booking=546980816555\\1`\n- Driver Link: `https://tracker.ftstravels.net/?booking=546980816555`\n- Tracking Operation: `https://tracker.ftstravels.net/?booking=546980816555&operation`\n- Voucher: `https://voucher.ftstravels.net/dynamic_voucher.html?bookingNumber=546980816555&customerName=Ahmed%20Elkhatib\\1\\1&tripDate=2026-09-25T05%3A00%3A00.000Z&tripName=Grand%20Egyptian%20Museum&destination=Cairo&hotelName=S",
+    "updated_at": "2026-07-14T09:56:42.655284+00:00"
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "هاتلي تذكرة الطيران اللي علي الحجز ده 546980816555",
+      "timestamp": "2026-07-14T09:56:42.653761+00:00",
+      "reference": "546980816555",
+      "intent": "booking_summary"
+    },
+    {
+      "role": "assistant",
+      "text": "تم فحص الحجز 546980816555 بنجاح. هذه هي التفاصيل (Live من Airtable):\n📋 *معلومات الحجز*\n- العميل: Ahmed Elkhatib\n- الوكالة: Tiqets\n- الحالة: Active\n- Record ID: rec4mCX8CaQoQrXjI\n🗺️ *الرحلة*\n- الاسم: Grand Egyptian Museum: Skip The Line Ticket\n- الوجهة: Cairo\n- تاريخ التنفيذ (Date Trip): 2026-09-25\n- تاريخ الإنشاء (Create Date): 2026-06-05\n- عدد البالغين: 2\n- الخيار: Skip The Line\n🏨 *الفندق*\n- Sunrise Arabian Beach Resort\n💰 *المالية*\n- المبلغ: 20 USD\n- حالة الفاتورة: succeeded\n- رابط Stripe: `https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc2xvQkVOY0JodnJSTnMwQjdvcUlpMVNJOFhkY05oLDE3NDU1Mjk5OQ0200twb7m8zI?s=ap`\n🔗 *الروابط*\n- Audio Guide: `http://tiqets.ftstravels.com/?GM/ticketId=546980816555`\n- Customer Link: `https://tracker.ftstravels.net/?booking=546980816555\\1`\n- Driver Link: `https://tracker.ftstravels.net/?booking=546980816555`\n- Tracking Operation: `https://tracker.ftstravels.net/?booking=546980816555&operation`\n- Voucher: `https://voucher.ftstravels.net/dynamic_voucher.html?bookingNumber=546980816555&customerName=Ahmed%20Elkhatib\\1\\1&tripDate=2026-09-25T05%3A00%3A00.000Z&tripName=Grand%20Egyptian%20Museum&destination=Cairo&hotelName=Sunrise%20Arabian%20Beach%20Resort&pickupPoint=Sunrise%20Arabian%20Beach%20Resort&adults=2&amount=&currency=USD&agency=Tiqets`\n⚠️ *ملاحظات*\n- Net Rate Price: #ERROR!",
+      "timestamp": "2026-07-14T09:56:42.654775+00:00",
+      "reference": "546980816555",
+      "intent": "booking_summary"
+    }
+  ],
+  "pending_action": {},
+  "captured_at": "2026-07-14T09:56:42.655284+00:00"
+}

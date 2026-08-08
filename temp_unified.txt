@@ -1,0 +1,503 @@
+
+> ai_agent.py:6482:    def process_unified_message(self, sender_identifier, message_body, history_text, source="Email", subject=None, thread_id=None, history_list=None, location="Unknown", receiving_phone_id=None, skip_db_save=False, mailbox=None, incoming_external_message_id=None, email_account_id=None):
+  ai_agent.py:6483:        """
+  ai_agent.py:6484:        Unified logic for processing messages from Email or WhatsApp.
+  ai_agent.py:6485:        Returns a dict with processing results.
+  ai_agent.py:6486:        """
+  ai_agent.py:6487:        # --- FIX: Include Subject in Search Text for Booking Numbers ---
+  ai_agent.py:6488:        # The history_text usually contains only the body. We need the subject too for regex extraction.
+  ai_agent.py:6489:        if subject:
+  ai_agent.py:6490:            full_search_text = f"Subject: {subject}\n\n{history_text}"
+  ai_agent.py:6491:        else:
+  ai_agent.py:6492:            full_search_text = history_text
+  ai_agent.py:6493:        # -------------------------------------------------------------
+  ai_agent.py:6494:
+  ai_agent.py:6495:        # Extract email/contact info
+  ai_agent.py:6496:        customer_email = None
+  ai_agent.py:6497:        contact_phone = None
+  ai_agent.py:6498:        
+  ai_agent.py:6499:        if source == "WhatsApp":
+  ai_agent.py:6500:            contact_phone = sender_identifier
+  ai_agent.py:6501:            # Clean phone if needed (remove spaces, etc)
+  ai_agent.py:6502:            if contact_phone:
+  ai_agent.py:6503:                contact_phone = str(contact_phone).replace(' ', '').replace('-', '').replace('+', '')
+  ai_agent.py:6504:        else:
+  ai_agent.py:6505:            customer_email = sender_identifier
+  ai_agent.py:6506:            if '<' in sender_identifier and '>' in sender_identifier:
+  ai_agent.py:6507:                customer_email = sender_identifier.split('<')[1].split('>')[0]
+  ai_agent.py:6508:
+  ai_agent.py:6509:        channel_key, channel_enabled, routing_location, _channel_cfg = _channel_policy_for_message(source, customer_email or sender_identifier)
+  ai_agent.py:6510:        if not channel_enabled:
+  ai_agent.py:6511:            return None
+  ai_agent.py:6512:        if routing_location and routing_location.lower() != "all":
+  ai_agent.py:6513:            location = routing_location
+  ai_agent.py:6514:            if source == "Email" and routing_location.strip().lower() == "sales" and not mailbox:
+  ai_agent.py:6515:                mailbox = "sales"
+  ai_agent.py:6516:        
+  ai_agent.py:6517:        # --- IGNORE INTERNAL EMAILS & SPECIFIC DOMAINS (Only for Email source or if email detected) ---
+  ai_agent.py:6518:        if customer_email and "@" in customer_email:
+  ai_agent.py:6519:            ignored_domains = [
+  ai_agent.py:6520:                "ftstravels.com", "egymonuments.com", "mailchimp.com",
+  ai_agent.py:6521:                "noreply-apps-scripts-notifications@google.com", "mail.clickup.com",
+  ai_agent.py:6522:                "penniestosave.com", "mail.beehiiv.com", "stripe.com", "amazonses.com", "tawk.to", "aemktng.shutterstock.com", "tawk.to",
+  ai_agent.py:6523:                "excursionmania.com", "waleed@maximrestaurants.com",
+  ai_agent.py:6524:                "us2.make.com", "noreply@trip.com", "businessprofile-noreply@google.com",
+  ai_agent.py:6525:                "bookings@headout.com" # Added to completely ignore these confirmation emails
+  ai_agent.py:6526:            ]
+  ai_agent.py:6527:            if any(d in customer_email.lower() for d in ignored_domains):
+  ai_agent.py:6528:                logging.info(f"Skipping ignored domain email from {customer_email}")
+  ai_agent.py:6529:                return None
+  ai_agent.py:6530:                
+  ai_agent.py:6531:        # --- HEADOUT OTA SYSTEM EMAIL HANDLING ---
+  ai_agent.py:6532:        # Do not let AI auto-reply to Headout booking notification emails, 
+  ai_agent.py:6533:        # but DO allow them to be parsed and saved to the DB/Chat.
+  ai_agent.py:6534:        is_headout_ota_email = False # customer_email and "bookings@headout.com" in customer_email.lower()
+  ai_agent.py:6535:        
+  ai_agent.py:6536:        # --- AI PRE-ANALYSIS FILTER ---
+  ai_agent.py:6537:        # Skip filter for WhatsApp messages (Direct messages are almost always relevant)
+  ai_agent.py:6538:        # Robust check: Check source string AND if sender looks like a phone number
+  ai_agent.py:6539:        is_whatsapp_source = source and source.lower() == "whatsapp"
+  ai_agent.py:6540:        is_tawkto_source = source and source.lower() == "tawk.to"
+  ai_agent.py:6541:        is_phone_sender = sender_identifier and (str(sender_identifier).isdigit() or str(sender_identifier).startswith('+'))
+  ai_agent.py:6542:        
+  ai_agent.py:6543:        if is_whatsapp_source or is_phone_sender or is_tawkto_source:
+  ai_agent.py:6544:            should_process = True
+  ai_agent.py:6545:            reason = f"{source} Source (Always Process)"
+  ai_agent.py:6546:        else:
+  ai_agent.py:6547:            should_process, reason = self.analyze_email_relevance(sender_identifier, subject or "Message", message_body)
+  ai_agent.py:6548:            if self.is_pickup_confirmation(message_body):
+  ai_agent.py:6549:                should_process = True
+  ai_agent.py:6550:                reason = "Pickup confirmation"
+  ai_agent.py:6551:        
+  ai_agent.py:6552:        if not should_process:
+  ai_agent.py:6553:            logging.info(f"Skipping message from {customer_email}: {reason}")
+  ai_agent.py:6554:            return None
+  ai_agent.py:6555:            
+  ai_agent.py:6556:        # Update Session Cache with User Message
+  ai_agent.py:6557:        self.update_session_memory(customer_email, message_body, role="user")
+  ai_agent.py:6558:        
+  ai_agent.py:6559:        # We don't have customer_name yet, we extract it later.
+  ai_agent.py:6560:        # We will use email/phone as a temporary contact_name
+  ai_agent.py:6561:        temp_contact_name = customer_email if source == "Email" else contact_phone
+  ai_agent.py:6562:        
+  ai_agent.py:6563:        # --- RECORD INCOMING CHAT MESSAGE IN DB ---
+  ai_agent.py:6564:        if not skip_db_save:
+  ai_agent.py:6565:            try:
+  ai_agent.py:6566:                import chat_db
+  ai_agent.py:6567:                # Force Religious location for messages hitting the Religious number
+  ai_agent.py:6568:                if receiving_phone_id == "1129614400243143":
+  ai_agent.py:6569:                    location = "Religious"
+  ai_agent.py:6570:                    
+  ai_agent.py:6571:                chat_conv = chat_db.get_or_create_conversation(
+  ai_agent.py:6572:                    source=source,
+  ai_agent.py:6573:                    sender_identifier=sender_identifier,
+  ai_agent.py:6574:                    contact_name=temp_contact_name,
+  ai_agent.py:6575:                    airtable_record_id="",
+  ai_agent.py:6576:                    location=location,
+  ai_agent.py:6577:                    thread_id=thread_id,
+  ai_agent.py:6578:                    receiving_phone_id=receiving_phone_id if receiving_phone_id else "",
+  ai_agent.py:6579:                    sales_inbox=True if (source == "Email" and str(mailbox or "").lower() == "sales") else None,
+  ai_agent.py:6580:                    email_account_id=email_account_id if source == "Email" else None
+  ai_agent.py:6581:                )
+  ai_agent.py:6582:                if source == "Email" and incoming_external_message_id:
+  ai_agent.py:6583:                    try:
+  ai_agent.py:6584:                        existing_id = chat_db.get_message_id_by_external_id(chat_conv['chat_id'], incoming_external_message_id)
+  ai_agent.py:6585:                        if existing_id:
+  ai_agent.py:6586:                            self._current_chat_id = chat_conv['chat_id']
+  ai_agent.py:6587:                            return None
+  ai_agent.py:6588:                    except Exception:
+  ai_agent.py:6589:                        pass
+  ai_agent.py:6590:                if self.is_pickup_confirmation(message_body):
+  ai_agent.py:6591:                    reply_text = self.get_pickup_confirmation_reply_text()
+  ai_agent.py:6592:                    if source == "Email":
+  ai_agent.py:6593:                        try:
+  ai_agent.py:6594:                            import sqlite3
+  ai_agent.py:6595:                            with sqlite3.connect('chat_history.db', timeout=15.0) as _conn:
+  ai_agent.py:6596:                                _c = _conn.cursor()
+  ai_agent.py:6597:                                _c.execute(
+  ai_agent.py:6598:                                    "SELECT 1 FROM messages WHERE chat_id = ? AND sender_type = 'agent' AND text = ? LIMIT 1",
+  ai_agent.py:6599:                                    (chat_conv['chat_id'], reply_text),
+  ai_agent.py:6600:                                )
+  ai_agent.py:6601:                                if _c.fetchone():
+  ai_agent.py:6602:                                    self._current_chat_id = chat_conv['chat_id']
+  ai_agent.py:6603:                                    return None
+  ai_agent.py:6604:                        except Exception:
+  ai_agent.py:6605:                            pass
+  ai_agent.py:6606:                    chat_db.add_message(
+  ai_agent.py:6607:                        chat_id=chat_conv['chat_id'],
+  ai_agent.py:6608:                        sender_type='customer',
+  ai_agent.py:6609:                        text=message_body,
+  ai_agent.py:6610:                        status='received',
+  ai_agent.py:6611:                        increment_unread=False,
+  ai_agent.py:6612:                        source=source,
+  ai_agent.py:6613:                        external_message_id=incoming_external_message_id
+  ai_agent.py:6614:                    )
+  ai_agent.py:6615:                    try:
+  ai_agent.py:6616:                        chat_db.update_conversation_info(chat_conv['chat_id'], last_customer_channel=source)
+  ai_agent.py:6617:                    except Exception:
+  ai_agent.py:6618:                        pass
+  ai_agent.py:6619:                    chat_db.mark_conversation_read(chat_conv['chat_id'])
+  ai_agent.py:6620:                    if source == "Email":
+  ai_agent.py:6621:                        to_email = customer_email
+  ai_agent.py:6622:                        if to_email and '<' in sender_identifier and '>' in sender_identifier:
+  ai_agent.py:6623:                            to_email = sender_identifier.split('<')[1].split('>')[0]
+  ai_agent.py:6624:                        out_subject = subject or "Pickup Confirmation"
+  ai_agent.py:6625:                        if out_subject and not str(out_subject).lower().startswith("re:"):
+  ai_agent.py:6626:                            out_subject = f"Re: {out_subject}"
+  ai_agent.py:6627:                        html_content = reply_text.replace("\n", "<br>")
+  ai_agent.py:6628:                        try:
+  ai_agent.py:6629:                            self.send_email(to_email, out_subject, html_content, thread_id=thread_id, record_id=None)
+  ai_agent.py:6630:                        except Exception:
+  ai_agent.py:6631:                            pass
+  ai_agent.py:6632:                    try:
+  ai_agent.py:6633:                        chat_db.add_message(chat_id=chat_conv['chat_id'], sender_type='agent', text=reply_text, status='sent', source=source)
+  ai_agent.py:6634:                    except Exception:
+  ai_agent.py:6635:                        pass
+  ai_agent.py:6636:                    self._current_chat_id = chat_conv['chat_id']
+  ai_agent.py:6637:                    return {"response_text": reply_text, "booking_record": None, "attachments": [], "was_escalated": False}
+  ai_agent.py:6638:                else:
+  ai_agent.py:6639:                    chat_db.add_message(
+  ai_agent.py:6640:                        chat_id=chat_conv['chat_id'],
+  ai_agent.py:6641:                        sender_type='customer',
+  ai_agent.py:6642:                        text=message_body,
+  ai_agent.py:6643:                        status='received',
+  ai_agent.py:6644:                        source=source,
+  ai_agent.py:6645:                        external_message_id=incoming_external_message_id
+  ai_agent.py:6646:                    )
+  ai_agent.py:6647:                    try:
+  ai_agent.py:6648:                        chat_db.update_conversation_info(chat_conv['chat_id'], last_customer_channel=source)
+  ai_agent.py:6649:                    except Exception:
+  ai_agent.py:6650:                        pass
+  ai_agent.py:6651:                self._current_chat_id = chat_conv['chat_id']
+  ai_agent.py:6652:                
+  ai_agent.py:6653:                # Auto-reset needs_help to 0 when user sends a new message?
+  ai_agent.py:6654:                # Actually, we shouldn't reset it unless the agent replies. Wait, the request asks to flag conversations that NEED human intervention.
+  ai_agent.py:6655:                # We will update it at the end of process_unified_message if it was escalated.
+  ai_agent.py:6656:            except Exception as e:
+  ai_agent.py:6657:                logging.error(f"Error saving incoming chat message: {e}")
+  ai_agent.py:6658:                self._current_chat_id = None
+  ai_agent.py:6659:        else:
+  ai_agent.py:6660:            # We skipped DB save (because it was already saved), but we still need the chat_id for AI processing logs
+  ai_agent.py:6661:            try:
+  ai_agent.py:6662:                import chat_db
+  ai_agent.py:6663:                chat_conv = chat_db.get_or_create_conversation(
+  ai_agent.py:6664:                    source=source,
+  ai_agent.py:6665:                    sender_identifier=sender_identifier,
+  ai_agent.py:6666:                    contact_name=temp_contact_name,
+  ai_agent.py:6667:                    airtable_record_id="",
+  ai_agent.py:6668:                    location=location,
+  ai_agent.py:6669:                    thread_id=thread_id,
+  ai_agent.py:6670:                    receiving_phone_id=receiving_phone_id if receiving_phone_id else "",
+  ai_agent.py:6671:                    sales_inbox=True if (source == "Email" and str(mailbox or "").lower() == "sales") else None,
+  ai_agent.py:6672:                    email_account_id=email_account_id if source == "Email" else None
+  ai_agent.py:6673:                )
+  ai_agent.py:6674:                self._current_chat_id = chat_conv['chat_id']
+  ai_agent.py:6675:            except Exception as e:
+  ai_agent.py:6676:                logging.error(f"Error retrieving chat_id when skip_db_save=True: {e}")
+  ai_agent.py:6677:                self._current_chat_id = None
+  ai_agent.py:6678:        # -------------------------------------------
+  ai_agent.py:6679:
+  ai_agent.py:6680:        if self._current_chat_id:
+  ai_agent.py:6681:            try:
+  ai_agent.py:6682:                import threading
+  ai_agent.py:6683:                threading.Thread(target=self.update_sales_state_from_recent_messages, args=(self._current_chat_id,), daemon=True).start()
+  ai_agent.py:6684:            except Exception:
+  ai_agent.py:6685:                pass
+  ai_agent.py:6686:            try:
+  ai_agent.py:6687:                if getattr(self, "automation_engine", None):
+  ai_agent.py:6688:                    self.automation_engine.emit_message_received(
+  ai_agent.py:6689:                        {
+  ai_agent.py:6690:                            "chat_id": self._current_chat_id,
+  ai_agent.py:6691:                            "source": source,
+  ai_agent.py:6692:                            "sender_identifier": sender_identifier,
+  ai_agent.py:6693:                            "message_body": message_body,
+  ai_agent.py:6694:                            "subject": subject,
+  ai_agent.py:6695:                            "thread_id": thread_id,
+  ai_agent.py:6696:                            "location": location,
+  ai_agent.py:6697:                            "mailbox": mailbox,
+  ai_agent.py:6698:                            "email_account_id": email_account_id,
+  ai_agent.py:6699:                            "receiving_phone_id": receiving_phone_id,
+  ai_agent.py:6700:                            "incoming_external_message_id": incoming_external_message_id,
+  ai_agent.py:6701:                        }
+  ai_agent.py:6702:                    )
+  ai_agent.py:6703:            except Exception:
+  ai_agent.py:6704:                pass
+  ai_agent.py:6705:
+  ai_agent.py:6706:        if source and source.lower() == "whatsapp":
+  ai_agent.py:6707:            mb = str(message_body or "").strip().lower()
+  ai_agent.py:6708:            is_non_text_media = (
+  ai_agent.py:6709:                mb.startswith("[customer sent an audio message.") or
+  ai_agent.py:6710:                mb.startswith("[customer sent a video.") or
+  ai_agent.py:6711:                mb.startswith("[customer sent a sticker.") or
+  ai_agent.py:6712:                mb.startswith("[customer sent a document.") or
+  ai_agent.py:6713:                mb.startswith("[customer sent a message of type:")
+  ai_agent.py:6714:            )
+  ai_agent.py:6715:            if is_non_text_media:
+  ai_agent.py:6716:                try:
+  ai_agent.py:6717:                    import chat_db
+  ai_agent.py:6718:                    if self._current_chat_id:
+  ai_agent.py:6719:                        chat_db.update_conversation_info(self._current_chat_id, needs_help=True)
+  ai_agent.py:6720:                except Exception:
+  ai_agent.py:6721:                    pass
+  ai_agent.py:6722:                return None
+  ai_agent.py:6723:        
+  ai_agent.py:6724:        # 1. Extract Data via AI (Always Extract even if human active)
+  ai_agent.py:6725:        # We pass full_search_text to ensure booking numbers in email subjects are caught
+  ai_agent.py:6726:        
+  ai_agent.py:6727:        # Do not use corporate OTA emails as Customer Email during extraction
+  ai_agent.py:6728:        email_for_extraction = customer_email
+  ai_agent.py:6729:        if customer_email and any(ota_domain in customer_email.lower() for ota_domain in ["headout.com", "getyourguide.com", "trip.com", "viator.com"]):
+  ai_agent.py:6730:            email_for_extraction = None
+  ai_agent.py:6731:            
+  ai_agent.py:6732:        extracted_data = self.extract_booking_data_using_ai(full_search_text, sender_email=email_for_extraction)
+  ai_agent.py:6733:
+  ai_agent.py:6734:        # 2. Extract contacts
+  ai_agent.py:6735:        extracted_phone = extracted_data.get('Customer Phone')
+  ai_agent.py:6736:        if not contact_phone and extracted_phone:
+  ai_agent.py:6737:             contact_phone = extracted_phone
+  ai_agent.py:6738:        
+  ai_agent.py:6739:        if not contact_phone:
+  ai_agent.py:6740:             extracted_contacts = self.extract_contact_from_text(history_text, message_body)
+  ai_agent.py:6741:             contact_phone = extracted_contacts.get("phone")
+  ai_agent.py:6742:        
+  ai_agent.py:6743:        # 3. Identify Booking Record
+  ai_agent.py:6744:        booking_record = self.find_booking_strictly(
+  ai_agent.py:6745:            full_search_text, 
+  ai_agent.py:6746:            sender_email=customer_email, 
+  ai_agent.py:6747:            sender_phone=contact_phone,
+  ai_agent.py:6748:            ai_extracted_data=extracted_data
+  ai_agent.py:6749:        )
+  ai_agent.py:6750:
+  ai_agent.py:6751:        # --- MULTIPLE BOOKING DISAMBIGUATION LOGIC ---
+  ai_agent.py:6752:        if booking_record and booking_record.get('other_related_bookings'):
+  ai_agent.py:6753:            try:
+  ai_agent.py:6754:                # 1. Gather all candidates (Main + Others)
+  ai_agent.py:6755:                all_records = [booking_record] + booking_record['other_related_bookings']
+  ai_agent.py:6756:                
+  ai_agent.py:6757:                # 2. Filter: Ignore Canceled Bookings & Check Dates
+  ai_agent.py:6758:                active_records = []
+  ai_agent.py:6759:                now_cairo = datetime.now(timezone.utc).replace(tzinfo=None) + CAIRO_OFFSET
+  ai_agent.py:6760:                
+  ai_agent.py:6761:                for rec in all_records:
+  ai_agent.py:6762:                    # Ignore cancelled/no-show bookings
+  ai_agent.py:6763:                    b_status = self.get_field_value(rec['fields'], FieldIds.BOOKING_STATUS)
+  ai_agent.py:6764:                    if b_status and str(b_status).strip().lower() in ["canceled", "cancelled", "no show"]:
+  ai_agent.py:6765:                        continue
+  ai_agent.py:6766:                        
+  ai_agent.py:6767:                    d_str = self.get_field_value(rec['fields'], FieldIds.DATE_TRIP)
+  ai_agent.py:6768:                    d_obj, _ = self.get_corrected_trip_date(d_str)
+  ai_agent.py:6769:                    if d_obj:
+  ai_agent.py:6770:                        diff = (d_obj - now_cairo.date()).days
+  ai_agent.py:6771:                        # Include: Future (diff >= 0) OR Recent Past (diff >= -2)
+  ai_agent.py:6772:                        if diff >= -2: 
+  ai_agent.py:6773:                            rec['_parsed_date'] = d_obj
+  ai_agent.py:6774:                            rec['_parsed_date_str'] = d_obj.strftime("%A, %d %B")
+  ai_agent.py:6775:                            active_records.append(rec)
+  ai_agent.py:6776:                
+  ai_agent.py:6777:                if len(active_records) == 1:
+  ai_agent.py:6778:                    # Auto-resolve if only one active booking remains after filtering
+  ai_agent.py:6779:                    booking_record = active_records[0]
+  ai_agent.py:6780:                    logging.info(f"Smart Disambiguation: Selected booking {booking_record['id']} after filtering out canceled bookings.")
+  ai_agent.py:6781:                elif len(active_records) > 1:
+  ai_agent.py:6782:                    # Only if we have multiple *active/relevant* bookings do we need to clarify
+  ai_agent.py:6783:                    logging.info(f"Multiple active bookings found ({len(active_records)}). Attempting disambiguation...")
+  ai_agent.py:6784:                    
+  ai_agent.py:6785:                    # 3. Keyword Matching (Smart Guess)
+  ai_agent.py:6786:                    msg_lower = message_body.lower()
+  ai_agent.py:6787:                    matched_records = []
+  ai_agent.py:6788:                    
+  ai_agent.py:6789:                    for rec in active_records:
+  ai_agent.py:6790:                        trip_name = self.get_field_value(rec['fields'], FieldIds.TRIP_NAME) or ""
+  ai_agent.py:6791:                        # Tokenize trip name (remove common words)
+  ai_agent.py:6792:                        # e.g. "Luxor by Bus" -> "luxor"
+  ai_agent.py:6793:                        trip_name_clean = trip_name.lower()
+  ai_agent.py:6794:                        for stop_word in ["hurghada", "trip", "tour", "excursion", "ticket", "details", "booking", "day", "with", "from", "and"]:
+  ai_agent.py:6795:                            trip_name_clean = trip_name_clean.replace(stop_word, "")
+  ai_agent.py:6796:                        
+  ai_agent.py:6797:                        tokens = [t for t in trip_name_clean.split() if len(t) > 3]
+  ai_agent.py:6798:                        
+  ai_agent.py:6799:                        # Check if ANY specific token is in user message
+  ai_agent.py:6800:                        # e.g. User says "when is luxor?" -> matches "Luxor"
+  ai_agent.py:6801:                        if any(t in msg_lower for t in tokens):
+  ai_agent.py:6802:                            matched_records.append(rec)
+  ai_agent.py:6803:                            
+  ai_agent.py:6804:                    if len(matched_records) == 1:
+  ai_agent.py:6805:                        # SUCCESS: Disambiguated by Keyword!
+  ai_agent.py:6806:                        booking_record = matched_records[0]
+  ai_agent.py:6807:                        logging.info(f"Smart Disambiguation: Selected booking {booking_record['id']} based on message keywords.")
+  ai_agent.py:6808:                    else:
+  ai_agent.py:6809:                        # NEW LOGIC: Just pick the closest upcoming trip instead of asking the user
+  ai_agent.py:6810:                        # Sort active_records by parsed date ascending (closest future date first)
+  ai_agent.py:6811:                        # Filter out past trips, only keep future/today
+  ai_agent.py:6812:                        future_records = [r for r in active_records if (r['_parsed_date'] - now_cairo.date()).days >= 0]
+  ai_agent.py:6813:                        
+  ai_agent.py:6814:                        if future_records:
+  ai_agent.py:6815:                            future_records.sort(key=lambda r: r['_parsed_date'])
+  ai_agent.py:6816:                            booking_record = future_records[0]
+  ai_agent.py:6817:                            logging.info(f"Smart Disambiguation: Selected closest upcoming booking {booking_record['id']} ({booking_record['_parsed_date_str']}).")
+  ai_agent.py:6818:                        else:
+  ai_agent.py:6819:                            # If all are in the past, pick the most recent one
+  ai_agent.py:6820:                            active_records.sort(key=lambda r: r['_parsed_date'], reverse=True)
+  ai_agent.py:6821:                            booking_record = active_records[0]
+  ai_agent.py:6822:                            logging.info(f"Smart Disambiguation: Selected most recent past booking {booking_record['id']} ({booking_record['_parsed_date_str']}).")
+  ai_agent.py:6823:            except Exception as e:
+  ai_agent.py:6824:                logging.error(f"Error in Disambiguation Logic: {e}")
+  ai_agent.py:6825:        # ---------------------------------------------
+  ai_agent.py:6826:        
+  ai_agent.py:6827:        is_leads_table = False
+  ai_agent.py:6828:
+  ai_agent.py:6829:        # 4. Update with AI extracted data
+  ai_agent.py:6830:        if booking_record:
+  ai_agent.py:6831:            is_leads_table = (booking_record.get('table_name') == LEADS_TABLE_NAME)
+  ai_agent.py:6832:
+  ai_agent.py:6833:            if source == "WhatsApp" and not is_leads_table:
+  ai_agent.py:6834:                mb_raw = str(message_body or "")
+  ai_agent.py:6835:                mb_lower = mb_raw.lower()
+  ai_agent.py:6836:                if "maps.google." in mb_lower or "goo.gl/maps" in mb_lower:
+  ai_agent.py:6837:                    try:
+  ai_agent.py:6838:                        m = re.search(r'(https?://\S+)', mb_raw)
+  ai_agent.py:6839:                        loc_url = (m.group(1) if m else None)
+  ai_agent.py:6840:                        if loc_url:
+  ai_agent.py:6841:                            loc_url = loc_url.rstrip(").,]}>\"'")
+  ai_agent.py:6842:                        if loc_url:
+  ai_agent.py:6843:                            current_loc = self.get_field_value(booking_record.get('fields', {}), FieldIds.CUSTOMER_LOCATION_LINK)
+  ai_agent.py:6844:                            if not current_loc or str(current_loc).strip() == "" or str(current_loc).strip() != loc_url:
+  ai_agent.py:6845:                                self.update_booking_record(
+  ai_agent.py:6846:                                    booking_record['id'],
+  ai_agent.py:6847:                                    {FieldIds.CUSTOMER_LOCATION_LINK: loc_url},
+  ai_agent.py:6848:                                    table_name=booking_record.get('table_name')
+  ai_agent.py:6849:                                )
+  ai_agent.py:6850:                                if 'fields' not in booking_record:
+  ai_agent.py:6851:                                    booking_record['fields'] = {}
+  ai_agent.py:6852:                                booking_record['fields'][FieldIds.CUSTOMER_LOCATION_LINK] = loc_url
+  ai_agent.py:6853:                    except Exception:
+  ai_agent.py:6854:                        pass
+  ai_agent.py:6855:
+  ai_agent.py:6856:            # Check for new critical details in email body
+  ai_agent.py:6857:            # Specifically Room Number or Pickup Point updates
+  ai_agent.py:6858:            new_room_number = extracted_data.get('Room number')
+  ai_agent.py:6859:            new_hotel_name = extracted_data.get('Hotel Name')
+  ai_agent.py:6860:
+  ai_agent.py:6861:            updates = {}
+  ai_agent.py:6862:            if not is_leads_table:
+  ai_agent.py:6863:                if new_room_number and str(new_room_number).lower() not in ["none", "n/a", "unknown"]:
+  ai_agent.py:6864:                    # Check if current is empty or different
+  ai_agent.py:6865:                    current_room = self.get_field_value(booking_record.get('fields', {}), FieldIds.ROOM_NUMBER)
+  ai_agent.py:6866:                    if not current_room or str(current_room).strip() == "":
+  ai_agent.py:6867:                        updates[FieldIds.ROOM_NUMBER] = new_room_number
+  ai_agent.py:6868:                        logging.info(f"Detected new Room Number: {new_room_number}")
+  ai_agent.py:6869:                
+  ai_agent.py:6870:                if new_hotel_name and str(new_hotel_name).lower() not in ["none", "n/a", "unknown"]:
+  ai_agent.py:6871:                    current_hotel = self.get_field_value(booking_record.get('fields', {}), FieldIds.HOTEL_NAME)
+  ai_agent.py:6872:                    if not current_hotel or str(current_hotel).strip() == "":
+  ai_agent.py:6873:                         updates[FieldIds.HOTEL_NAME] = new_hotel_name
+  ai_agent.py:6874:                         logging.info(f"Detected new Hotel Name: {new_hotel_name}")
+  ai_agent.py:6875:
+  ai_agent.py:6876:                if updates:
+  ai_agent.py:6877:                    self.update_booking_record(booking_record['id'], updates, table_name=booking_record.get('table_name'))
+  ai_agent.py:6878:                    logging.info(f"Updated booking {booking_record['id']} with new extracted details: {updates}")
+  ai_agent.py:6879:
+  ai_agent.py:6880:                self.update_booking_from_extracted_data(booking_record, extracted_data)
+  ai_agent.py:6881:
+  ai_agent.py:6882:            # --- SPECIAL LOGIC: WhatsApp Email Update (No Inquiry) ---
+  ai_agent.py:6883:            if source == "WhatsApp":
+  ai_agent.py:6884:                # Check for email in message
+  ai_agent.py:6885:                email_candidates = self.extract_emails_regex(message_body)
+  ai_agent.py:6886:                if email_candidates:
+  ai_agent.py:6887:                    email_in_msg = email_candidates[0]
+  ai_agent.py:6888:                    # Check if message is essentially JUST the email (plus simple greeting)
+  ai_agent.py:6889:                    # Remove email
+  ai_agent.py:6890:                    clean_msg = message_body.replace(email_in_msg, "").strip()
+  ai_agent.py:6891:                    # Remove common filler
+  ai_agent.py:6892:                    clean_msg = re.sub(r'(?i)^(hi|hello|hey|my email is|email|here is|thanks|thank you|ok|please|update)\W*', '', clean_msg)
+  ai_agent.py:6893:                    
+  ai_agent.py:6894:                    # If remaining text is very short (< 10 chars), assume it's an update with no inquiry
+  ai_agent.py:6895:                    if len(clean_msg) < 10:
+  ai_agent.py:6896:                        logging.info(f"Detected Email Update via WhatsApp (No Inquiry): {email_in_msg}")
+  ai_agent.py:6897:                        try:
+  ai_agent.py:6898:                            if is_leads_table:
+  ai_agent.py:6899:                                self.update_booking_record(booking_record['id'], {LeadFieldIds.CUSTOMER_EMAIL: email_in_msg}, table_name=booking_record.get('table_name'))
+  ai_agent.py:6900:                            else:
+  ai_agent.py:6901:                                self.update_booking_record(booking_record['id'], {FieldIds.CUSTOMER_PERSONAL_EMAIL: email_in_msg}, table_name=booking_record.get('table_name'))
+  ai_agent.py:6902:                            # If human is active, we just update and return None? No, user might expect reply.
+  ai_agent.py:6903:                            # But standard logic below will handle reply if needed.
+  ai_agent.py:6904:                        except Exception as e:
+  ai_agent.py:6905:                            logging.error(f"Failed to update email from WhatsApp: {e}")
+  ai_agent.py:6906:            # ---------------------------------------------------------
+  ai_agent.py:6907:
+  ai_agent.py:6908:        # Determine Customer Name (Smart Extraction)
+  ai_agent.py:6909:        customer_name = "Guest"
+  ai_agent.py:6910:        
+  ai_agent.py:6911:        # 1. Try from Booking Record
+  ai_agent.py:6912:        if booking_record:
+  ai_agent.py:6913:            db_name = self.get_field_value(booking_record.get('fields', {}), FieldIds.CUSTOMER_NAME)
+  ai_agent.py:6914:            if db_name:
+  ai_agent.py:6915:                customer_name = db_name
+  ai_agent.py:6916:        
+  ai_agent.py:6917:        # 2. Try from AI Extraction (if DB is empty or still "Guest")
+  ai_agent.py:6918:        if customer_name == "Guest" or not customer_name:
+  ai_agent.py:6919:             ai_name = extracted_data.get('Customer Name')
+  ai_agent.py:6920:             if ai_name:
+  ai_agent.py:6921:                 customer_name = ai_name
+  ai_agent.py:6922:
+  ai_agent.py:6923:        # --- UPDATE CONVERSATION WITH RECORD ID AND NAME ---
+  ai_agent.py:6924:        if hasattr(self, '_current_chat_id') and self._current_chat_id:
+  ai_agent.py:6925:            try:
+  ai_agent.py:6926:                import chat_db
+  ai_agent.py:6927:                # If we have a booking record, use its ID. Otherwise, keep it empty.
+  ai_agent.py:6928:                record_id_to_save = booking_record['id'] if booking_record else ""
+  ai_agent.py:6929:                
+  ai_agent.py:6930:                # IMPORTANT PRECAUTION:
+  ai_agent.py:6931:                # Never overwrite an existing linked booking just because a generic message came in.
+  ai_agent.py:6932:                # Only link if the chat wasn't linked before, OR if the AI specifically extracted a new booking number that matches.
+  ai_agent.py:6933:                existing_conv = chat_db.get_conversation(self._current_chat_id)
+  ai_agent.py:6934:                explicit_booking_candidates = self.extract_booking_numbers_regex(full_search_text or message_body or "")
+  ai_agent.py:6935:                explicit_booking_nr = explicit_booking_candidates[0][0] if explicit_booking_candidates else None
+  ai_agent.py:6936:                if self._is_placeholder_booking_number(explicit_booking_nr):
+  ai_agent.py:6937:                    explicit_booking_nr = None
+  ai_agent.py:6938:                existing_booking_nr = existing_conv.get('booking_number') if existing_conv else None
+  ai_agent.py:6939:                has_explicit_new_booking = bool(
+  ai_agent.py:6940:                    explicit_booking_nr
+  ai_agent.py:6941:                    and (not existing_booking_nr or str(existing_booking_nr).strip().lower() != str(explicit_booking_nr).strip().lower())
+  ai_agent.py:6942:                )
+  ai_agent.py:6943:                potential_collision = bool(
+  ai_agent.py:6944:                    existing_conv
+  ai_agent.py:6945:                    and existing_conv.get('airtable_record_id')
+  ai_agent.py:6946:                    and booking_record
+  ai_agent.py:6947:                    and booking_record.get('id')
+  ai_agent.py:6948:                    and booking_record.get('id') != existing_conv.get('airtable_record_id')
+  ai_agent.py:6949:                    and not has_explicit_new_booking
+  ai_agent.py:6950:                )
+  ai_agent.py:6951:                if existing_conv and existing_conv.get('airtable_record_id'):
+  ai_agent.py:6952:                    # If already linked, only update if we explicitly found a new booking record based on a strong identifier
+  ai_agent.py:6953:                    # (like a booking number explicitly stated in this new message).
+  ai_agent.py:6954:                    # Otherwise, retain the old link to prevent accidental unlinking or merging.
+  ai_agent.py:6955:                    if not has_explicit_new_booking:
+  ai_agent.py:6956:                        record_id_to_save = existing_conv['airtable_record_id']
+  ai_agent.py:6957:                        if booking_record and booking_record.get('id') != record_id_to_save:
+  ai_agent.py:6958:                            try:
+  ai_agent.py:6959:                                rec = None
+  ai_agent.py:6960:                                try:
+  ai_agent.py:6961:                                    rec = self.table.get(record_id_to_save)
+  ai_agent.py:6962:                                    if isinstance(rec, dict) and not rec.get('table_name'):
+  ai_agent.py:6963:                                        rec['table_name'] = 'List'
+  ai_agent.py:6964:                                except Exception:
+  ai_agent.py:6965:                                    pass
+  ai_agent.py:6966:                                if not rec and getattr(self, 'leads_table', None):
+  ai_agent.py:6967:                                    try:
+  ai_agent.py:6968:                                        rec = self.leads_table.get(record_id_to_save)
+  ai_agent.py:6969:                                        if isinstance(rec, dict) and not rec.get('table_name'):
+  ai_agent.py:6970:                                            rec['table_name'] = 'Leads CRM'
+  ai_agent.py:6971:                                    except Exception:
+  ai_agent.py:6972:                                        rec = None
+  ai_agent.py:6973:                                if rec:
+  ai_agent.py:6974:                                    booking_record = rec
+  ai_agent.py:6975:                            except Exception as e:
+  ai_agent.py:6976:                                logging.warning(f"Could not re-fetch existing Airtable record {record_id_to_save}: {e}")
+  ai_agent.py:6977:                    else:
+  ai_agent.py:6978:                        logging.info(f"Chat {self._current_chat_id} changing link from {existing_conv['airtable_record_id']} to {record_id_to_save} based on explicit booking number.")
+  ai_agent.py:6979:                
+  ai_agent.py:6980:                db_location = self._derive_chat_location_from_fields(
+  ai_agent.py:6981:                    booking_record.get('fields', {}) if booking_record else {},
+  ai_agent.py:6982:                    fallback_location=location,
+

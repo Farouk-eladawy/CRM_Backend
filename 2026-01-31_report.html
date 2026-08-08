@@ -1,0 +1,129 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+            .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+            h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #34495e; margin-top: 30px; border-left: 5px solid #e67e22; padding-left: 10px; }
+            .summary-card { display: flex; gap: 20px; margin-bottom: 30px; }
+            .card { flex: 1; background: #ecf0f1; padding: 20px; border-radius: 8px; text-align: center; }
+            .card.highlight { background: #dff9fb; border: 1px solid #c7ecee; }
+            .card h4 { margin: 0 0 10px; color: #7f8c8d; font-size: 0.9em; text-transform: uppercase; }
+            .card .number { font-size: 2.5em; font-weight: bold; color: #2980b9; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background-color: #f8f9fa; color: #2c3e50; }
+            .sharm-section { background-color: #fff3e0; padding: 20px; border-radius: 8px; margin-top: 30px; border: 1px solid #ffe0b2; }
+            .footer { margin-top: 40px; text-align: center; font-size: 0.8em; color: #aaa; }
+            
+            /* Chart & Progress Styles */
+            .chart-container { display: flex; align-items: center; gap: 40px; background: #fafafa; padding: 20px; border-radius: 8px; margin-top: 20px; }
+            .pie-chart {
+                width: 120px; height: 120px; border-radius: 50%;
+                background: conic-gradient(#27ae60 0% 4.761904761904762%, #f39c12 4.761904761904762% 100%);
+                position: relative;
+            }
+            .pie-chart::after {
+                content: "4%"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: white; width: 80px; height: 80px; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; color: #2c3e50;
+            }
+            .chart-legend { flex: 1; }
+            .legend-item { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+            .bar-bg { flex: 1; height: 10px; background: #e0e0e0; border-radius: 5px; margin: 0 15px; overflow: hidden; }
+            .bar-fill { height: 100%; border-radius: 5px; }
+            .insight-box { margin-top: 15px; padding: 10px; border-left: 4px solid #c0392b; background: #fff; color: #c0392b; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📊 Shift Report: Morning Shift (08:00 - 18:00)</h1>
+            <p><strong>Date:</strong> 2026-01-31 (Cairo Time)</p>
+            
+            <div class="summary-card">
+                <div class="card highlight">
+                    <h4>Total Processed</h4>
+                    <div class="number">42</div>
+                </div>
+                <div class="card">
+                    <h4>Auto-Replied</h4>
+                    <div class="number" style="color: #27ae60;">2</div>
+                </div>
+                <div class="card">
+                    <h4>Drafts (Review)</h4>
+                    <div class="number" style="color: #f39c12;">40</div>
+                </div>
+            </div>
+
+            <h2>🧠 AI Quality & Performance</h2>
+            <div class="chart-container">
+                <div class="pie-chart"></div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span style="color:#27ae60;">● Auto-Replied</span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 4.761904761904762%; background: #27ae60;"></div></div>
+                        <span>4%</span>
+                    </div>
+                    <div class="legend-item">
+                        <span style="color:#f39c12;">● Human Drafts</span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 95.23809523809523%; background: #f39c12;"></div></div>
+                        <span>95%</span>
+                    </div>
+                    <div class="insight-box">
+                        ⚠️ Needs Attention. High rate of human drafts.
+                    </div>
+                </div>
+            </div>
+
+            <h2>🐫 Sharm El Sheikh (Special Region)</h2>
+            <div class="sharm-section">
+                <table>
+                    <tr><th>Metric</th><th>Count</th></tr>
+                    <tr><td>Total Interactions</td><td>10</td></tr>
+                    <tr><td>Auto-Replied</td><td>0</td></tr>
+                    <tr><td>Drafts Created</td><td>10</td></tr>
+                    <tr><td>Top Inquiries</td><td>PICKUP_QUERY (8), FOLLOW_UP (1), GENERAL (1)</td></tr>
+                </table>
+            </div>
+
+            <h2>🔥 Top Inquiries (This Shift)</h2>
+            <table>
+                <thead>
+                    <tr><th>Inquiry Type</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+    <tr><td>PICKUP_QUERY</td><td>16</td></tr><tr><td>GENERAL</td><td>13</td></tr><tr><td>INFO_UPDATE</td><td>4</td></tr><tr><td>TRIP_INFO_QUERY</td><td>3</td></tr><tr><td>FOLLOW_UP</td><td>2</td></tr>
+                </tbody>
+            </table>
+            
+            <h2>🗣️ Top Recurring Questions (This Shift)</h2>
+            <p>Most frequent questions or messages received from customers during this shift.</p>
+            <table>
+                <thead>
+                    <tr><th>Question / Pattern</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+    <tr><td>loved it!...</td><td>26</td></tr><tr><td>confirm pickup...</td><td>14</td></tr><tr><td>dear sir or madam,...</td><td>11</td></tr><tr><td>##^- please type your reply above this line -^##...</td><td>7</td></tr><tr><td>it was great!...</td><td>5</td></tr>
+                </tbody>
+            </table>
+            
+            <h2>📝 Drafts & Interventions (This Shift)</h2>
+            <table>
+                <thead>
+                    <tr><th>Booking Nr.</th><th>Email</th><th>Inquiry</th><th>Summary / Last Msg</th></tr>
+                </thead>
+                <tbody>
+    <tr><td>FTS-84204385</td><td>rgandhrokia12@hotmail.com</td><td>CLARIFICATION_REQUEST</td><td>We paid the guide Ahmed in Luxor</td></tr><tr><td>595609680</td><td>julianegerroldt@gmail.com</td><td>COMPLAINT</td><td>Dear Sir or Madam,</td></tr><tr><td>BR-1356929587</td><td>s-51e5376723234e25b808bbaef21ff74f+1356929587-16a3s446thpza@expmessaging.tripadvisor.com</td><td>FOLLOW_UP</td><td>Hi, following our reservation we will confirm the pick up location :</td></tr><tr><td>BR-1357440103</td><td>s-51e5376723234e25b808bbaef21ff74f+1357440103-02wktxjsctpmd@expmessaging.tripadvisor.com</td><td>FOLLOW_UP</td><td>Our customer with the Viator, Inc. booking number BR-1357440103 has se..</td></tr><tr><td>BR-1351831411</td><td>s-51e5376723234e25b808bbaef21ff74f+1351831411-0qv82dbajblk0@expmessaging.tripadvisor.com</td><td>GENERAL</td><td>Thank you</td></tr><tr><td>FTS-85261854</td><td>booking@ftstravels.com</td><td>GENERAL</td><td>请问能提前确认下这个酒店是否可以接送呢</td></tr><tr><td>23066</td><td>menaminieri@tiscali.it</td><td>GENERAL</td><td>You are welcome</td></tr><tr><td>GYGWZA3ZAL9G</td><td>customer-y42zwhkoytfotvtz@reply.getyourguide.com</td><td>GENERAL</td><td>everything very well</td></tr><tr><td>BR-1357567371</td><td>s-51e5376723234e25b808bbaef21ff74f+1357567371-20ht9ww2xxlsf@expmessaging.tripadvisor.com</td><td>GENERAL</td><td>Thank you 👍🏼</td></tr><tr><td>BR-1357977357</td><td>s-51e5376723234e25b808bbaef21ff74f+1357977357-2lotksppkcsx6@expmessaging.tripadvisor.com</td><td>GENERAL</td><td>It was great!</td></tr><tr><td>29673130</td><td>gucluburcu@hotmail.com</td><td>GENERAL</td><td>All great we’ve met our guide. Thank you</td></tr><tr><td>BR-1356129837</td><td>s-51e5376723234e25b808bbaef21ff74f+1356129837-2bnc4qz67lcsv@expmessaging.tripadvisor.com</td><td>GENERAL</td><td>It was great!</td></tr><tr><td>1356830271</td><td>marielewis63@outlook.com</td><td>GENERAL</td><td>It was great!</td></tr><tr><td>29806887</td><td>anette.freiberg@gmx.de</td><td>GENERAL</td><td>It was great!</td></tr><tr><td>BR-1346624297</td><td>s-51e5376723234e25b808bbaef21ff74f+1346624297-2pp4jcnf2fkfu@expmessaging.tripadvisor.com</td><td>GENERAL</td><td>Thanksss</td></tr><tr><td>BR-1255947509</td><td>Booking@ftstravels.com</td><td>GENERAL</td><td>Thats alright, thank you anyway</td></tr><tr><td>BR-1355287501</td><td>s-51e5376723234e25b808bbaef21ff74f+1355287501-0qnzszxnn84le@expmessaging.tripadvisor.com</td><td>GENERAL</td><td>Ok thanks</td></tr><tr><td>29819768</td><td>contact@frederiquesamson.com</td><td>INFO_UPDATE</td><td>Loved it!</td></tr><tr><td>BR-1357955427</td><td>s-51e5376723234e25b808bbaef21ff74f+1357955427-32lbzj6b4us53@expmessaging.tripadvisor.com</td><td>INFO_UPDATE</td><td>##^- Please type your reply above this line -^##</td></tr><tr><td>BR-1354304993</td><td>s-51e5376723234e25b808bbaef21ff74f+1354304993-2wqgd5kjzqs7h@expmessaging.tripadvisor.com</td><td>INFO_UPDATE</td><td>##^- Please type your reply above this line -^##</td></tr><tr><td>BR-1356961139</td><td>s-51e5376723234e25b808bbaef21ff74f+1356961139-2ecu3c7ksc17j@expmessaging.tripadvisor.com</td><td>INFO_UPDATE</td><td>##^- Please type your reply above this line -^##</td></tr><tr><td>29809297</td><td>juliane.lenz@yahoo.de</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1358120001</td><td>s-51e5376723234e25b808bbaef21ff74f+1358120001-0rnp5l43fcitm@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1357783661</td><td>s-51e5376723234e25b808bbaef21ff74f+1357783661-2rn9ixlyuo6c0@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1337360515</td><td>s-51e5376723234e25b808bbaef21ff74f+1337360515-23qxjqc9xxmls@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Dear Reservations,</td></tr><tr><td>BR-1351183815</td><td>s-51e5376723234e25b808bbaef21ff74f+1351183815-2bunlxw54zemv@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1358308665</td><td>s-51e5376723234e25b808bbaef21ff74f+1358308665-016q20as4o23k@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1358090063</td><td>s-51e5376723234e25b808bbaef21ff74f+1358090063-0u4e3kyhxnk5b@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>GYG99682A9Z9</td><td>customer-xappsfjakiawymfo@reply.getyourguide.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1358325525</td><td>s-51e5376723234e25b808bbaef21ff74f+1358325525-02d4lrpnjuywp@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Thank you</td></tr><tr><td>BR-1354087709</td><td>s-51e5376723234e25b808bbaef21ff74f+1354087709-1n73b1kk5lucb@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>BR-1356960167</td><td>s-51e5376723234e25b808bbaef21ff74f+1356960167-0sbzyguofewly@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Thank u! I will wait outside</td></tr><tr><td>BR-1348220437</td><td>s-51e5376723234e25b808bbaef21ff74f+1348220437-3k7wdqpkj43rh@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Confirm Pickup</td></tr><tr><td>1128143597321915</td><td>2.50mctludhe932be@atguest.ctrip.com</td><td>PICKUP_QUERY</td><td>GE SHENG HUA 酒店名称喜来登 能不能晚点出发</td></tr><tr><td>29441514</td><td>birzsolt@gmail.com</td><td>PICKUP_QUERY</td><td>Dear Ahmed Taha</td></tr><tr><td>29768504</td><td>favio.mounaged@gmail.com</td><td>PICKUP_QUERY</td><td>Waiting pick up</td></tr><tr><td>BR-1358080507</td><td>s-51e5376723234e25b808bbaef21ff74f+1358080507-3k685sgc7irk5@expmessaging.tripadvisor.com</td><td>PICKUP_QUERY</td><td>Shall I wait outside main gate or reception? I have no signal at main ..</td></tr><tr><td>BR-1358051269</td><td>s-51e5376723234e25b808bbaef21ff74f+1358051269-3c9oxxe6gbweb@expmessaging.tripadvisor.com</td><td>TRIP_INFO_QUERY</td><td>Trip NameFrom Hurghada Legacy TripExplore Cairos Pyramids &amp; Grand ..</td></tr><tr><td>GYGG459RW5RF</td><td>customer-6jmwtmq47t6qy6ph@reply.getyourguide.com</td><td>TRIP_INFO_QUERY</td><td>Tell me if dinner are include</td></tr><tr><td>BR-1358044933</td><td>s-51e5376723234e25b808bbaef21ff74f+1358044933-0aj46na2fl57m@expmessaging.tripadvisor.com</td><td>TRIP_INFO_QUERY</td><td>##^- Please type your reply above this line -^##</td></tr>
+                </tbody>
+            </table>
+
+            <div class="footer">
+                Generated by FTS AI Agent System • Shift Auto-Report
+            </div>
+        </div>
+    </body>
+    </html>
+    

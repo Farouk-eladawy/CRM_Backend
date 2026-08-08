@@ -1,0 +1,13 @@
+{
+  "case_id": "case-546980816555-20260711-005711-4a197239",
+  "status": "active",
+  "current_stage": "intake",
+  "stage_status": "completed",
+  "next_stage": "analysis",
+  "case_reference": "546980816555",
+  "intent": "booking_summary",
+  "requires_approval": false,
+  "execution_allowed": false,
+  "created_at": "2026-07-11T00:57:11.533726+00:00",
+  "updated_at": "2026-07-11T00:57:11.554086+00:00"
+}

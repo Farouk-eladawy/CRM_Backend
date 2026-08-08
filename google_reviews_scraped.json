@@ -1,0 +1,29 @@
+[
+    {
+        "id": "1",
+        "author": "Vicentedelvalle san",
+        "rating": 5,
+        "date": "1 week ago",
+        "content": "Khaled fue un guía excepcional. Gracias a él, nuestra visita al Valle de los Reyes, Luxor y el paseo en barca por el Nilo fue inolvidable.",
+        "platform": "google",
+        "isNew": true
+    },
+    {
+        "id": "2",
+        "author": "alit ali",
+        "rating": 5,
+        "date": "3 weeks ago",
+        "content": "They organized a special Luxor tour for our family group of 12. We planned every step of the trip perfectly.",
+        "platform": "google",
+        "isNew": true
+    },
+    {
+        "id": "3",
+        "author": "Test Negative User",
+        "rating": 2,
+        "date": "1 day ago",
+        "content": "The driver was late for the pickup and the car AC was not working properly. Very disappointing experience.",
+        "platform": "google",
+        "isNew": true
+    }
+]

@@ -1,0 +1,11 @@
+{
+  "type": "create_invoice",
+  "description": "Create a new invoice for a customer booking",
+  "target_record": "string (Airtable record ID, e.g., recXYZ)",
+  "requires_approval": true,
+  "payload": {
+    "amount": "number (The total amount to be invoiced)",
+    "currency": "string (e.g., USD, EGP, EUR)",
+    "provider": "string (Optional, the payment provider, e.g., Stripe, Paypal)"
+  }
+}

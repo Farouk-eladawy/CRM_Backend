@@ -1,0 +1,287 @@
+{
+  "schema_version": "1.0",
+  "intent_totals": {
+    "create_invoice": 6,
+    "invoice_template_select": 2,
+    "send_invoice_template": 2,
+    "agentic_orchestrator": 8,
+    "general_qa": 1
+  },
+  "patterns": [
+    {
+      "signature": "agentic_orchestrator:ابعتلي التذكره",
+      "intent": "agentic_orchestrator",
+      "action_type": "agentic_orchestrator",
+      "label": "PI Orchestration",
+      "sample_request": "ابعتلي التذكره",
+      "count": 2,
+      "hour_counts": {
+        "19": "2"
+      },
+      "first_seen": "2026-07-14T17:09:57.669583+00:00",
+      "last_request": "ابعتلي التذكره",
+      "dominant_hour": 19,
+      "preferred_time": "19:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T17:14:20.375840+00:00"
+    },
+    {
+      "signature": "invoice_template_select:نعم",
+      "intent": "invoice_template_select",
+      "action_type": "invoice_template_select",
+      "label": "invoice_template_select",
+      "sample_request": "نعم",
+      "count": 2,
+      "hour_counts": {
+        "18": "1",
+        "19": "1"
+      },
+      "first_seen": "2026-07-14T16:37:51.837174+00:00",
+      "last_request": "نعم",
+      "dominant_hour": 18,
+      "preferred_time": "18:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T17:07:25.811046+00:00"
+    },
+    {
+      "signature": "send_invoice_template:1",
+      "intent": "send_invoice_template",
+      "action_type": "send_invoice_template",
+      "label": "send_invoice_template",
+      "sample_request": "1",
+      "count": 2,
+      "hour_counts": {
+        "18": "1",
+        "19": "1"
+      },
+      "first_seen": "2026-07-14T16:38:32.229823+00:00",
+      "last_request": "1",
+      "dominant_hour": 18,
+      "preferred_time": "18:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T17:07:41.645536+00:00"
+    },
+    {
+      "signature": "create_invoice:اعمل فاتورة للحجز {phone}",
+      "intent": "create_invoice",
+      "action_type": "create_invoice",
+      "label": "Invoice Creation",
+      "sample_request": "اعمل فاتورة للحجز 546980816555",
+      "count": 1,
+      "hour_counts": {
+        "18": "1"
+      },
+      "first_seen": "2026-07-14T16:37:07.990053+00:00",
+      "last_request": "اعمل فاتورة للحجز 546980816555",
+      "dominant_hour": 18,
+      "preferred_time": "18:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T16:37:07.990053+00:00"
+    },
+    {
+      "signature": "create_invoice:أنشئ فاتورة جديدة بدل الحالية",
+      "intent": "create_invoice",
+      "action_type": "create_invoice",
+      "label": "Invoice Creation",
+      "sample_request": "أنشئ فاتورة جديدة بدل الحالية",
+      "count": 1,
+      "hour_counts": {
+        "18": "1"
+      },
+      "first_seen": "2026-07-14T16:37:29.234475+00:00",
+      "last_request": "أنشئ فاتورة جديدة بدل الحالية",
+      "dominant_hour": 18,
+      "preferred_time": "18:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T16:37:29.234475+00:00"
+    },
+    {
+      "signature": "create_invoice:اعمل فاتورة 120 يورو للحجز {phone}",
+      "intent": "create_invoice",
+      "action_type": "create_invoice",
+      "label": "Invoice Creation",
+      "sample_request": "اعمل فاتورة 120 يورو للحجز 546980816555",
+      "count": 1,
+      "hour_counts": {
+        "19": "1"
+      },
+      "first_seen": "2026-07-14T17:06:29.029769+00:00",
+      "last_request": "اعمل فاتورة 120 يورو للحجز 546980816555",
+      "dominant_hour": 19,
+      "preferred_time": "19:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T17:06:29.029769+00:00"
+    },
+    {
+      "signature": "create_invoice:`أنشئ فاتورة جديدة بدل الحالية`",
+      "intent": "create_invoice",
+      "action_type": "create_invoice",
+      "label": "Invoice Creation",
+      "sample_request": "`أنشئ فاتورة جديدة بدل الحالية`",
+      "count": 1,
+      "hour_counts": {
+        "19": "1"
+      },
+      "first_seen": "2026-07-14T17:07:13.204136+00:00",
+      "last_request": "`أنشئ فاتورة جديدة بدل الحالية`",
+      "dominant_hour": 19,
+      "preferred_time": "19:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T17:07:13.204136+00:00"
+    },
+    {
+      "signature": "agentic_orchestrator:رقم الهاتف",
+      "intent": "agentic_orchestrator",
+      "action_type": "agentic_orchestrator",
+      "label": "PI Orchestration",
+      "sample_request": "رقم الهاتف",
+      "count": 1,
+      "hour_counts": {
+        "18": "1"
+      },
+      "first_seen": "2026-07-14T16:40:17.444342+00:00",
+      "last_request": "رقم الهاتف",
+      "dominant_hour": 18,
+      "preferred_time": "18:00",
+      "last_case_reference": "546980816555",
+      "last_seen": "2026-07-14T16:40:17.444342+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:اعمل فاتورة للحجز {phone}",
+      "intent": "create_invoice",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "اعمل فاتورة للحجز 546980816555",
+      "count": 1,
+      "hour_counts": {
+        "19": "1"
+      },
+      "first_seen": "2026-07-14T17:00:11.901448+00:00",
+      "last_request": "اعمل فاتورة للحجز 546980816555",
+      "dominant_hour": 19,
+      "preferred_time": "19:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-14T17:00:11.901448+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:اعمل فاتورة 120 يورو للحجز {phone}",
+      "intent": "create_invoice",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "اعمل فاتورة 120 يورو للحجز 546980816555",
+      "count": 1,
+      "hour_counts": {
+        "19": "1"
+      },
+      "first_seen": "2026-07-14T17:01:05.237820+00:00",
+      "last_request": "اعمل فاتورة 120 يورو للحجز 546980816555",
+      "dominant_hour": 19,
+      "preferred_time": "19:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-14T17:01:05.237820+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:كم عميل لرحله الاقصر باص من الغرقه غدا",
+      "intent": "general_qa",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "كم عميل لرحله الاقصر باص من الغرقه غدا",
+      "count": 1,
+      "hour_counts": {
+        "20": "1"
+      },
+      "first_seen": "2026-07-14T18:47:28.073343+00:00",
+      "last_request": "كم عميل لرحله الاقصر باص من الغرقه غدا",
+      "dominant_hour": 20,
+      "preferred_time": "20:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-14T18:47:28.073343+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:ابعتلي تقرير رحلات التي سيتم تنفيذها اليوم",
+      "intent": "agentic_orchestrator",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "ابعتلي تقرير رحلات التي سيتم تنفيذها اليوم",
+      "count": 1,
+      "hour_counts": {
+        "20": "1"
+      },
+      "first_seen": "2026-07-14T18:50:25.381548+00:00",
+      "last_request": "ابعتلي تقرير رحلات التي سيتم تنفيذها اليوم",
+      "dominant_hour": 20,
+      "preferred_time": "20:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-14T18:50:25.381548+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:إلغاء",
+      "intent": "agentic_orchestrator",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "إلغاء",
+      "count": 1,
+      "hour_counts": {
+        "20": "1"
+      },
+      "first_seen": "2026-07-14T18:50:28.464395+00:00",
+      "last_request": "إلغاء",
+      "dominant_hour": 20,
+      "preferred_time": "20:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-14T18:50:28.464395+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:كم عميل له اوبشن دخول توت في رحله الاقصر باص من الغردقه",
+      "intent": "agentic_orchestrator",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "كم عميل له اوبشن دخول توت في رحله الاقصر باص من الغردقه",
+      "count": 1,
+      "hour_counts": {
+        "20": "1"
+      },
+      "first_seen": "2026-07-14T18:56:18.911974+00:00",
+      "last_request": "كم عميل له اوبشن دخول توت في رحله الاقصر باص من الغردقه",
+      "dominant_hour": 20,
+      "preferred_time": "20:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-14T18:56:18.911974+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:{phone}",
+      "intent": "agentic_orchestrator",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "201097055558",
+      "count": 1,
+      "hour_counts": {
+        "15": "1"
+      },
+      "first_seen": "2026-07-18T13:43:30.949365+00:00",
+      "last_request": "201097055558",
+      "dominant_hour": 15,
+      "preferred_time": "15:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-18T13:43:30.949389+00:00"
+    },
+    {
+      "signature": "guided_mediator_menu:1",
+      "intent": "agentic_orchestrator",
+      "action_type": "guided_mediator_menu",
+      "label": "guided_mediator_menu",
+      "sample_request": "1",
+      "count": 1,
+      "hour_counts": {
+        "15": "1"
+      },
+      "first_seen": "2026-07-18T13:59:57.377930+00:00",
+      "last_request": "1",
+      "dominant_hour": 15,
+      "preferred_time": "15:00",
+      "last_case_reference": "",
+      "last_seen": "2026-07-18T13:59:57.377930+00:00"
+    }
+  ],
+  "updated_at": "2026-07-18T13:59:57.377930+00:00"
+}

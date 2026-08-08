@@ -1,0 +1,19 @@
+{
+  "name": "manage_main_bookings_schema_aware",
+  "description": "Manages the main Airtable bookings table 'List' in base appTp5YgSp9DV2HYc using live schema awareness. Use it for auditing a booking, reading fields, suggesting editable fields, filtering bookings, updating fields safely, following linked records, and creating linked records when explicitly needed.",
+  "target_record": "booking_or_table",
+  "requires_approval": false,
+  "payload": {
+    "operation": "string (Required. One of: audit_record, list_updatable_fields, get_record_summary, get_field, suggest_actions, filter_records, update_fields, follow_links, create_linked_record.)",
+    "booking_number": "string (Optional but recommended for record-centric operations. Example: 123456test.)",
+    "record_id": "string (Optional alternative to booking_number for record-centric operations.)",
+    "refresh_schema": "boolean (Optional. If true, refresh Main/List metadata from Airtable before executing the operation.)",
+    "field_names": "array of strings (Optional. Used by get_field or follow_links to target specific field names such as 'Customer personal email' or 'Driver Name & Phone'.)",
+    "fields": "object (Optional. Used by update_fields. Provide Airtable field names mapped to desired values. The handler normalizes canonical field names and coerces select/link/attachment values by schema type.)",
+    "filters": "array of objects (Optional. Used by filter_records. Each item supports: field_name, operator [eq|contains|in|not_empty], value.)",
+    "max_records": "integer (Optional. Used by filter_records as the upstream Airtable fetch cap.)",
+    "result_limit": "integer (Optional. Used by filter_records to limit returned records in the action result.)",
+    "link_field_name": "string (Optional. Used by create_linked_record. Must be a multipleRecordLinks field from the List table.)",
+    "linked_record_fields": "object (Optional. Used by create_linked_record to create a record inside the linked table before attaching it to the source booking.)"
+  }
+}

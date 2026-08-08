@@ -1,0 +1,11 @@
+{
+  "type": "schedule_task",
+  "description": "Schedule a task to be executed at a specific future time",
+  "execute_at": "string (ISO 8601 format, e.g., '2026-07-10T15:30:00Z' or relative like '+2 hours', '+1 day')",
+  "action_to_execute": {
+    "type": "string (The action to perform when time is reached, e.g., 'send_reminder')",
+    "target_record": "string (Optional record ID)",
+    "payload": "object (Any data needed for the action)"
+  },
+  "requires_approval": false
+}

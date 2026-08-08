@@ -1,0 +1,22 @@
+{
+  "understood_intent": "create_invoice",
+  "confidence": 0.92,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "create_invoice",
+  "case_reference": "123456test",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "- أنشئ فاتورة للحجز 123456test",
+    "reply_preview": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right n",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T14:12:10.154347+00:00"
+}

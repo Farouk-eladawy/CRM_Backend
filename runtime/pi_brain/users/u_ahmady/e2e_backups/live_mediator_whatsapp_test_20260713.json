@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-07-13 10:41:58",
+  "tests": [
+    {
+      "name": "clarification_for_ambiguous_trips_today",
+      "request": {
+        "status_code": 200,
+        "body": {
+          "status": "success"
+        },
+        "text": "اعرض رحلات اليوم"
+      },
+      "session_after": {
+        "workflow_state": {},
+        "pending_action": {},
+        "recent_turns_tail": [
+          {
+            "role": "user",
+            "text": "اعرض رحلات اليوم",
+            "intent": "agentic_orchestrator",
+            "timestamp": "2026-07-13T17:42:03.480382+00:00"
+          },
+          {
+            "role": "assistant",
+            "text": "هل تقصد رحلات اليوم من جدول List أم من جدول MPC؟ وما هو التاريخ المحدد لليوم؟",
+            "intent": "agentic_orchestrator",
+            "timestamp": "2026-07-13T17:42:03.480893+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "natural_language_safe_update_hotel",
+      "request": {
+        "status_code": 200,
+        "body": {
+          "status": "success"
+        },
+        "text": "الحجز 123456test غير الفندق إلى Mediator Hotel 20260713A"
+      },
+      "session_after": {
+        "workflow_state": {
+          "intent": "agentic_orchestrator",
+          "phase": "queued",
+          "awaiting": "execution",
+          "case_context": {
+            "booking_number": "123456test"
+          },
+          "note": "Queued update for 123456test. ID: man_1a90c8c9",
+          "action_type": "execute_manifest",
+          "action_mode": "",
+          "updated_at": "2026-07-13T17:42:09.650825+00:00"
+        },
+        "pending_action": {},
+        "recent_turns_tail": [
+          {
+            "role": "user",
+            "text": "الحجز 123456test غير الفندق إلى Mediator Hotel 20260713A",
+            "reference": "123456test",
+            "intent": "agentic_orchestrator",
+            "timestamp": "2026-07-13T17:42:09.650825+00:00"
+          },
+          {
+            "role": "assistant",
+            "text": "Queued update for 123456test. ID: man_1a90c8c9",
+            "reference": "123456test",
+            "intent": "agentic_orchestrator",
+            "timestamp": "2026-07-13T17:42:09.650825+00:00"
+          }
+        ]
+      },
+      "hotel_before": "Sunrise Hotel",
+      "hotel_after": "Sunrise Hotel",
+      "expected_hotel": "Mediator Hotel 20260713A",
+      "trace_tail": "{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:03.796881Z\", \"source\": \"backend\", \"event\": \"api_get_chat_messages\", \"data\": {\"chat_id\": \"7aeaacfe-dda3-4f6b-a0ee-e81903717024\", \"include_drafts\": true, \"ms\": 12, \"count\": 8}}\n{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:03.811624Z\", \"source\": \"backend\", \"event\": \"api_get_chat_messages\", \"data\": {\"chat_id\": \"6237b4f0-7cdc-4c17-9fe1-e451e87ffb2b\", \"include_drafts\": true, \"ms\": 29, \"count\": 8}}\n{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:03.950749Z\", \"source\": \"backend\", \"event\": \"api_get_chats\", \"data\": {\"ms\": 171, \"count\": 200, \"limit\": 200, \"offset\": 0, \"total\": 3024}}\n{\"sessionId\":\"duplicate-pickup-send\",\"runId\":\"pre-fix\",\"hypothesisId\":\"A\",\"location\":\"automation_engine.py:198\",\"msg\":\"[DEBUG] workflow run entry\",\"data\":{\"workflow_id\":\"pickup_reminder_10min_v1\",\"workflow_name\":\"Pickup Reminder 30min\",\"event_type\":\"schedule\",\"event_payload\":{\"trigger\":{\"every_minutes\":1}}}}\n{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:08.791773Z\", \"source\": \"backend\", \"event\": \"api_get_chat_messages\", \"data\": {\"chat_id\": \"7aeaacfe-dda3-4f6b-a0ee-e81903717024\", \"include_drafts\": true, \"ms\": 7, \"count\": 8}}\n{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:08.799494Z\", \"source\": \"backend\", \"event\": \"api_get_chat_messages\", \"data\": {\"chat_id\": \"ecc1ff0a-7a98-429c-9a6f-e9652ddc7c06\", \"include_drafts\": true, \"ms\": 9, \"count\": 8}}\n{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:08.826484Z\", \"source\": \"backend\", \"event\": \"api_get_chat_messages\", \"data\": {\"chat_id\": \"6237b4f0-7cdc-4c17-9fe1-e451e87ffb2b\", \"include_drafts\": true, \"ms\": 35, \"count\": 8}}\n{\"sessionId\": \"slow-chat-load\", \"ts\": \"2026-07-13T17:42:08.899617Z\", \"source\": \"backend\", \"event\": \"api_get_chats\", \"data\": {\"ms\": 115, \"count\": 200, \"limit\": 200, \"offset\": 0, \"total\": 3024}}\n{\"sessionId\": \"internal-webhook-timeout\", \"runId\": \"e2e\", \"hypothesisId\": \"e2e\", \"event\": \"internal_assistant.ai_mediator_result\", \"payload\": {\"suggested_intent\": \"update_airtable\", \"confidence\": 0.9, \"booking_number\": \"123456test\", \"needs_clarification\": false, \"approval_required\": false, \"safe_quick_manifest\": true, \"field_updates\": [{\"field_name\": \"Hotel Name\", \"field_value\": \"Mediator Hotel 20260713A\"}], \"risk_flags\": []}}\n{\"sessionId\": \"internal-webhook-timeout\", \"runId\": \"e2e\", \"hypothesisId\": \"e2e\", \"event\": \"manifest.outbox.write\", \"payload\": {\"manifest_id\": \"man_1a90c8c9\", \"intent\": \"update_airtable_via_manifest_engine\", \"stage\": \"\", \"action_count\": 1, \"actions\": [{\"type\": \"manage_main_bookings_schema_aware\", \"requires_approval\": false}], \"file_path\": \"C:\\\\Users\\\\Aloosh2020\\\\Downloads\\\\New Project's\\\\AIAgentProject\\\\OpenClaw_Version\\\\runtime\\\\pi_brain\\\\users\\\\u_ahmady\\\\bridge\\\\outbox\\\\man_1a90c8c9.json\", \"outbox_dir\": \"C:\\\\Users\\\\Aloosh2020\\\\Downloads\\\\New Project's\\\\AIAgentProject\\\\OpenClaw_Version\\\\runtime\\\\pi_brain\\\\users\\\\u_ahmady\\\\bridge\\\\outbox\", \"actor\": \"ahmady\", \"case_id\": \"\"}}"
+    }
+  ]
+}

@@ -1,0 +1,404 @@
+{
+ "chats": [
+  {
+   "chat_id": "03772779-8afb-45a2-ba6f-112af48fd80a",
+   "last_message_time": "2026-08-04T20:05:22.981341",
+   "force_read_at": "2026-08-04T17:05:22.985784",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "04901a47-d445-429c-9648-5a36fd1c8839",
+   "last_message_time": "2026-08-04T20:08:24.867786",
+   "force_read_at": "2026-08-04T17:08:24.870289",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "0e6d4c3b-155d-4038-bedf-50e556205683",
+   "last_message_time": "2026-08-04T20:09:10.905873",
+   "force_read_at": "2026-08-04T17:09:10.909970",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "0f06df40-2872-468d-8891-d759199b7de0",
+   "last_message_time": "2026-08-04T20:07:05.188479",
+   "force_read_at": "2026-08-04T17:07:05.191476",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "18c2d6f1-e04a-47e1-a7e6-d42915bd568b",
+   "last_message_time": "2026-08-04T20:06:00.752214",
+   "force_read_at": "2026-08-04T17:06:00.757230",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "1b877849-7ed5-45a6-a102-59c132c5e542",
+   "last_message_time": "2026-08-04T20:05:48.518416",
+   "force_read_at": "2026-08-04T17:05:48.522909",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "1cacaeef-3079-44cb-b696-d6070a724fd7",
+   "last_message_time": "2026-08-04T20:08:36.246064",
+   "force_read_at": "2026-08-04T17:08:36.250186",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "21012a22-adc9-489d-8de3-04f876ca05d2",
+   "last_message_time": "2026-08-04T20:07:23.499271",
+   "force_read_at": "2026-08-04T17:07:23.502253",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "21a69ddd-66df-4745-bd50-a0c06f3ac075",
+   "last_message_time": "2026-08-04T20:06:43.477590",
+   "force_read_at": "2026-08-04T17:06:43.517728",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "2a27d23a-2fa5-4470-b450-7462b774d631",
+   "last_message_time": "2026-08-04T20:06:39.002143",
+   "force_read_at": "2026-08-04T17:06:39.005644",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "2e90df9c-6694-48c3-8acf-75c4d14077f6",
+   "last_message_time": "2026-08-04T20:06:33.442331",
+   "force_read_at": "2026-08-04T17:06:33.445560",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "3420e91c-20c5-4ef2-8646-3c127bd7807c",
+   "last_message_time": "2026-08-04T20:05:32.700409",
+   "force_read_at": "2026-08-04T17:05:32.703522",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "3a2a4607-af9f-4316-b39e-87c51d0fef1d",
+   "last_message_time": "2026-08-04T20:09:07.432831",
+   "force_read_at": "2026-08-04T17:09:07.435375",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "3f16d56e-bc8e-4fc7-9ab4-e2235335dcc8",
+   "last_message_time": "2026-08-04T20:07:55.921300",
+   "force_read_at": "2026-08-04T17:07:55.924355",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "3f3b963e-9f07-4d62-9f64-eae447b74c87",
+   "last_message_time": "2026-08-04T20:05:12.960048",
+   "force_read_at": "2026-08-04T17:05:12.963160",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "43b7d6e7-9dd1-49f6-8580-684befa1e38b",
+   "last_message_time": "2026-08-04T20:10:21.000059",
+   "force_read_at": "2026-08-04T17:10:21.005680",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "49189844-89e6-4d47-ad43-58cb08a01450",
+   "last_message_time": "2026-08-04T20:05:44.701561",
+   "force_read_at": "2026-08-04T17:05:44.706057",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "4b655bf7-46ab-428c-b6f0-19f9f8668def",
+   "last_message_time": "2026-08-04T20:05:07.637318",
+   "force_read_at": "2026-08-04T17:05:07.641404",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "4fc5837a-eb19-41c4-822b-b35b1153ea95",
+   "last_message_time": "2026-08-04T20:05:40.514714",
+   "force_read_at": "2026-08-04T17:05:40.518688",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "51a7a343-fb6c-4f40-9a54-9dd231e34623",
+   "last_message_time": "2026-08-04T20:09:38.484480",
+   "force_read_at": "2026-08-04T17:09:38.488036",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "5ba5da84-e3e8-4fad-856f-0c28887309f7",
+   "last_message_time": "2026-08-04T20:08:30.146800",
+   "force_read_at": "2026-08-04T17:08:30.149845",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "5ced6cbb-7f7b-4ad7-8b04-c6c105cc2998",
+   "last_message_time": "2026-08-04T20:09:30.139979",
+   "force_read_at": "2026-08-04T17:09:30.143494",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "5f1db927-cc04-43f1-81f5-71b27f180b58",
+   "last_message_time": "2026-08-04T20:05:17.441282",
+   "force_read_at": "2026-08-04T17:05:17.445385",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "6b549582-9de4-40e1-88cd-74ae122e5df7",
+   "last_message_time": "2026-08-04T20:04:27.280594",
+   "force_read_at": "2026-08-04T17:04:27.283664",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "6c5400be-607d-4e0d-ae8d-122a0245f8ca",
+   "last_message_time": "2026-08-04T20:04:18.636198",
+   "force_read_at": "2026-08-04T17:04:18.639288",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "77d43020-ff93-4059-8dac-78b9c976e091",
+   "last_message_time": "2026-08-04T20:04:54.711865",
+   "force_read_at": "2026-08-04T17:04:54.719051",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "7e212340-bd2b-496b-8c7c-fe7684f46aac",
+   "last_message_time": "2026-08-04T20:08:20.156813",
+   "force_read_at": "2026-08-04T17:08:20.160485",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "8858c011-e8a1-477b-bb6f-02211ac3adad",
+   "last_message_time": "2026-08-04T20:10:11.938037",
+   "force_read_at": "2026-08-04T17:10:11.942150",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "924ac6b4-230f-4d14-aa1a-4d5b22a58569",
+   "last_message_time": "2026-08-04T20:07:46.720283",
+   "force_read_at": "2026-08-04T17:07:46.728088",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "97e3a9c1-bee8-41bd-88fa-16a60c675f39",
+   "last_message_time": "2026-08-04T20:10:26.737860",
+   "force_read_at": "2026-08-04T17:10:26.743212",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "99bce307-75ea-4342-975a-378a105e2f60",
+   "last_message_time": "2026-08-04T20:04:31.319382",
+   "force_read_at": "2026-08-04T17:04:31.322484",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "9bcd8847-7d7b-4de4-89b7-377a724ee395",
+   "last_message_time": "2026-08-04T20:09:21.991882",
+   "force_read_at": "2026-08-04T17:09:21.996583",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "9c0c3ce6-c57c-4e80-9b4a-93936f3e15e5",
+   "last_message_time": "2026-08-04T20:11:43.894268",
+   "force_read_at": "2026-08-04T17:11:43.896246",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "9c813f43-b3cd-4cdd-ba03-7424be9af205",
+   "last_message_time": "2026-08-04T20:05:52.844862",
+   "force_read_at": "2026-08-04T17:05:52.847961",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "9deeb254-8587-458d-87de-f472f695b5d5",
+   "last_message_time": "2026-08-04T20:04:49.806326",
+   "force_read_at": "2026-08-04T17:04:49.810281",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "a34c574e-0498-4ace-b0b6-380bbedc6e7b",
+   "last_message_time": "2026-08-04T20:04:45.445059",
+   "force_read_at": "2026-08-04T17:04:45.449168",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "c668b61b-8193-4afa-8b80-eaf35a38ce2c",
+   "last_message_time": "2026-08-04T20:08:40.516458",
+   "force_read_at": "2026-08-04T17:08:40.519482",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "c9f3d641-c977-42eb-be29-d39793f943b2",
+   "last_message_time": "2026-08-04T20:09:14.654107",
+   "force_read_at": "2026-08-04T17:09:14.657161",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "d04f12ce-2a34-4e88-b226-5fdb8a58fbe4",
+   "last_message_time": "2026-08-04T20:09:18.325254",
+   "force_read_at": "2026-08-04T17:09:18.328356",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "d1f760f3-d770-44f9-b7dc-ac5f398e3fa6",
+   "last_message_time": "2026-08-04T20:08:48.482344",
+   "force_read_at": "2026-08-04T17:08:48.485826",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "d8c6e46a-8fb2-4211-8728-09bbcfa3541f",
+   "last_message_time": "2026-08-04T20:10:17.244021",
+   "force_read_at": "2026-08-04T17:10:17.248078",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "d909e962-6e86-40b1-98d7-979f5eb215d3",
+   "last_message_time": "2026-08-04T20:07:30.710120",
+   "force_read_at": "2026-08-04T17:07:30.713229",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "db262c48-2ede-4c55-aa44-24febeaedbae",
+   "last_message_time": "2026-08-04T20:05:28.154717",
+   "force_read_at": "2026-08-04T17:05:28.158905",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "dbfd3066-dd6d-4e18-aec4-91306085d769",
+   "last_message_time": "2026-08-04T20:05:57.447409",
+   "force_read_at": "2026-08-04T17:05:57.451416",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "dededca6-31c8-48bc-a6e2-f02e7484e74b",
+   "last_message_time": "2026-08-04T20:09:33.536941",
+   "force_read_at": "2026-08-04T17:09:33.539613",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "df3241d4-4d77-46f7-aca5-66daae2fe2af",
+   "last_message_time": "2026-08-04T20:04:22.876092",
+   "force_read_at": "2026-08-04T17:04:22.880093",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "dfbbd10b-1d2f-4e68-ae04-0323e7e72c7b",
+   "last_message_time": "2026-08-04T20:04:41.357373",
+   "force_read_at": "2026-08-04T17:04:41.360364",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "e03dd0dd-f805-4a80-b1a4-b5dacdf9eeb3",
+   "last_message_time": "2026-08-04T20:06:05.741677",
+   "force_read_at": "2026-08-04T17:06:05.745721",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "e79fdbe4-b192-41aa-95c3-4051d04a3719",
+   "last_message_time": "2026-08-04T20:09:26.238615",
+   "force_read_at": "2026-08-04T17:09:26.241589",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "eacabe03-1b30-421c-b6a3-1b1a5a4a709b",
+   "last_message_time": "2026-08-04T20:07:41.442003",
+   "force_read_at": "2026-08-04T17:07:41.445242",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "f0148fbb-3c53-4de0-bd2c-529080e1937b",
+   "last_message_time": "2026-08-04T20:04:59.235721",
+   "force_read_at": "2026-08-04T17:04:59.239362",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "f1b4eaa8-e0e4-46d4-97b4-2730fef45e9c",
+   "last_message_time": "2026-08-04T20:09:04.093266",
+   "force_read_at": "2026-08-04T17:09:04.097298",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "f23736cb-0ead-4348-8ac3-f60eb9b68785",
+   "last_message_time": "2026-08-04T20:07:36.647630",
+   "force_read_at": "2026-08-04T17:07:36.650930",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "f255ee7f-6421-4ce6-98b2-c0152ca86db2",
+   "last_message_time": "2026-08-04T20:06:29.946234",
+   "force_read_at": "2026-08-04T17:06:29.948989",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "f6dc3394-033a-4e5e-9e33-08c261096796",
+   "last_message_time": "2026-08-04T20:07:19.120662",
+   "force_read_at": "2026-08-04T17:07:19.123747",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "f9a398f3-83fa-43c6-9868-e448c2921623",
+   "last_message_time": "2026-08-04T20:04:36.373895",
+   "force_read_at": "2026-08-04T17:04:36.377958",
+   "needs_help": 0,
+   "unread_count": 0
+  },
+  {
+   "chat_id": "fbdf2e50-816a-4461-ba35-7fd0ac3bd4bc",
+   "last_message_time": "2026-08-04T20:08:44.534744",
+   "force_read_at": "2026-08-04T17:08:44.537803",
+   "needs_help": 0,
+   "unread_count": 0
+  }
+ ],
+ "msg_pat": "Mohamed Sami 20:04-20:11"
+}

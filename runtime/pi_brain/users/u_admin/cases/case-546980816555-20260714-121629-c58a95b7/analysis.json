@@ -1,0 +1,20 @@
+{
+  "understood_intent": "booking_summary",
+  "confidence": 0.92,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "",
+  "case_reference": "546980816555",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [],
+  "analysis_summary": {
+    "request": "هاتلي تذكرة الطيران اللي علي الحجز ده 546980816555",
+    "reply_preview": "تم العثور على 1 ملف/مرفق للحجز 546980816555.\nهذه هي الملفات/المرفقات المرتبطة بالحجز مباشرة من Airtable:\n- الحقول المفحوصة: Attachments\n1. Pickalbatros Jungle Aqua Park Resort Neverland Hurghada.GYGMX4KLHN98.pdf | Attachments | application/pdf\n   URL: `https://v5.airtableusercontent.com/v3/u/55/55/1784044800000/e4aE1oCKP4p3hXJASyp00A/h9QS2l81hCGWwtm13fT2-WzCbKas4LaWBzHbcCtnQzx-bNro5aL07-3l9XGZ_CW6wLya_AXtmhHlnBbxNiGXb1aX-YJjs3xKD2muxmiTh6gF79Npykqv7CEAWVVK9FNPGMwwAfhw0YQZiJtchBXnpQfBmGlcer5kcq8E",
+    "has_case_context": true,
+    "requires_approval": false
+  },
+  "analyzed_at": "2026-07-14T12:23:48.442685+00:00"
+}

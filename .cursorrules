@@ -1,0 +1,70 @@
+# FTS Travels CRM - AI Agent Development Memory
+
+This file serves as the core system memory and architectural guide. **Read this first** in any new conversation to understand the project context, thereby reducing token consumption by avoiding unnecessary full-file reads of `ai_agent.py` or frontend components.
+
+## 📂 System Structure & Linkage
+- **Backend Core:** `c:\Users\Aloosh2020\Downloads\New Project's\AIAgentProject\OpenClaw_Version\ai_agent.py`
+  - Handles API endpoints, AI routing, Airtable sync, WhatsApp/Email webhooks, and the SQLite Database.
+- **Frontend Dashboard:** `c:\Users\Aloosh2020\Downloads\New Project's\AIAgentProject\OpenClaw_Version\frontend_dashboard\new_frontend_dashboard`
+  - Tech Stack: React, Vite, Tailwind CSS, TypeScript.
+  - Key Views: Inbox (`App.tsx`), Customers 360 Profile (`CustomersView.tsx`), Archive (`ArchiveView.tsx`), Settings (`SettingsView.tsx`).
+
+## 🧠 Architectural Decisions & Rules
+1. **AI Provider Routing (`query_ai`):**
+   - DeepSeek handles primary text analysis.
+   - OpenAI (GPT-4o) / Google Gemini handles Vision (Images) because DeepSeek lacks standard Vision APIs.
+   - Graceful fallback: If all providers fail (e.g., 429 Rate Limit), output a polite apology + `[ESCALATE]` tag instead of raw errors.
+2. **Frontend State Management (React):**
+   - **Race Conditions:** When rapidly switching customer profiles, state ghosting is prevented by instantly calling `setMessages([])` before fetching new data.
+   - **Deployment:** CI/CD via Netlify is bypassed using `deploy_direct_to_netlify.bat` (local build -> direct CLI push) due to persistent Netlify `neon` extension errors.
+3. **Data Integrity & Airtable:**
+   - **Chat Merging:** Never overwrite an existing `airtable_record_id` in a chat unless a completely new booking number is explicitly provided.
+   - **Safe Mode Lookup:** Name-based matching is ONLY allowed for personal emails (e.g., @gmail.com), NEVER for OTA proxies to prevent cross-contamination.
+   - **Field Updates:** Case-insensitive comparisons (`.lower()`) are used when extracting and updating Hotel Names to ensure customer updates override old data.
+4. **Message Handling (WhatsApp & Emails):**
+   - **Debouncing:** WhatsApp messages use a 10-second `threading.Timer` to group rapid texts into a single AI analysis.
+   - **OTA Chat Separation:** Emails from corporate domains (GetYourGuide, Headout) are separated into unique chats by hashing the Email + Booking Number.
+   - **System Emails:** `bookings@headout.com` is completely ignored (spam prevention).
+   - **Replies:** Dashboard replies to GYG proxies are routed directly to the customer's personal email.
+5. **Business Logic & Escalation:**
+   - **Escalation:** No hardcoded 'human' keywords. The AI determines contextually if the user needs a human agent and outputs `[ESCALATE]`.
+   - **Voucher Links:** `dynamic_voucher.html` is STRICTLY restricted to the 'FTS Travels' agency using the `voucher.ftstravels.net` subdomain.
+   - **Location:** 'Ras Mohamed' in Airtable maps to 'Sharm' in the dashboard.
+
+## 🐛 Solved Bugs (Do Not Regress)
+- **100% CPU Usage:** Solved by adding a composite index `(chat_id, timestamp)` to the SQLite `messages` table.
+- **OpenAI NameError:** Fixed by routing copilot calls through the centralized `agent.query_ai()` instead of direct global `openai` library calls.
+- **Silent Airtable Failures:** Fixed by strictly mapping extracted JSON keys to correct `FieldIds` (e.g., `CUSTOMER_PERSONAL_EMAIL`).
+- **Archive React Error:** Fixed missing `useEffect` import in `ArchiveView.tsx`.
+- **Netlify ENOTFOUND:** Resolved by ignoring cloud builds and deploying locally.
+- **Chat Ghosting:** Fixed `useEffect` dependencies and forced state clearing when switching between customer profiles in the Dashboard.
+
+## 🚀 Future Development Plans
+1. **Frontend:** Implement WebSocket/SSE for real-time inbox updates (replacing standard polling).
+2. **Settings:** Expand UI to manage AI API keys, prompts, and team roles dynamically.
+3. **Analytics:** Build performance tracking for human agents and AI resolution rates.
+4. **Self-Learning:** Expand the WhatsApp/Email correction comparison to auto-tune AI prompts and update the `.json` knowledge base.
+
+## 📊 Database Schema & PI Intelligence (Airtable)
+**CRITICAL FOR PI AGENT:**
+You must be highly intelligent and dynamically analyze the user's intent regarding databases. Do not blindly query tables if the request is ambiguous.
+- **Bookings (الحجوزات):** Base main, Table List. Contains booked trips. Fields: 	rip name, Real Product Name, Booking Nr., Booking Status.
+- **Catalog (الكتالوج/الأسعار):** Base main, Table MPC. Contains all available trips and their Product ID.
+- **Website Trips (رحلات الموقع):** Base 	rips, Table Trips. Contains trips specific to the company's website.
+
+**Intelligence Rules:**
+1. If the user asks about "trips" (رحلات) and it's ambiguous which table they mean (Booked trips vs Catalog vs Website), YOU MUST use internal_reply to ASK THE USER FIRST before executing any query_records.
+2. Do not assume. Ask: "هل تقصد رحلات الحجوزات الفعلية أم رحلات الكتالوج (MPC) أم رحلات الموقع الإلكتروني؟"
+3. Be a super-smart orchestrator. Analyze incomplete questions and offer options.
+
+## 📅 Date & Logic Ambiguity Rules
+1. **Date Fields in Bookings:**
+   - **Create Date** (NOT 'Created Date'): The actual Airtable field name is "Create Date  " with two trailing spaces. This is the date the booking was made/received.
+   - Date Trip: The date the trip will actually be executed/traveled.
+2. If the user asks for bookings "today" or "tomorrow", YOU MUST ASK: "هل تقصد الحجوزات التي تم إنشاؤها اليوم (Create Date) أم الحجوزات التي سيتم تنفيذها اليوم (Date Trip)؟"
+3. If the user asks a broad question, present them with numbered options (e.g. 1. Show active bookings, 2. Show by agency) using internal_reply BEFORE doing any data fetching.
+
+## 🐛 Solved Bugs - PI & Query Engine
+- **Zero Results Bug (2026-07-12):** The PI knowledge base used "Created Date" but the actual Airtable field is "Create Date  " (double trailing space). Fixed by:
+  1. Correcting the field name in this knowledge base to "Create Date"
+  2. Adding intelligent field name variation matching in `background_task_engine.py` to try multiple name variations when filtering

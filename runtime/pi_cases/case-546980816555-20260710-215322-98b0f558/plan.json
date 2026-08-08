@@ -1,0 +1,21 @@
+{
+  "recommended_action": "booking_summary",
+  "recommended_steps": [
+    "load_case_snapshot",
+    "compose_contextual_response"
+  ],
+  "missing_inputs": [],
+  "requires_user_question": false,
+  "requires_approval": false,
+  "blocked_reasons": [],
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "case_reference": "546980816555",
+  "plan_summary": {
+    "request": "546980816555",
+    "reply_preview": "تمام، خلينا نلخصلك الموقف للحجز 546980816555:\n\n**ملخص الحجز:**\n- العميل: أحمد الخطيب\n- رقم الحجز: 546980816555\n- الرحلة: المتحف المصري الكبير (Grand Egyptian Museum) - تذكرة Skip The Line\n- التاريخ: 5 يونيو 2026\n- الفندق: Sunrise Arabian Beach Resort\n- عدد الأشخاص: 2 بالغين\n- رقم الهاتف: +20 10 13498777\n- الإيميل: Ahmedyeladawy@gmail.com\n\n**سجل المحادثات السابقة (CRM):**\n- تم إرسال رسالة ترحيب تحتوي على رابط الأوديو جايد، ورد العميل بـ \"Hello\" و \"Confirm\".\n- في محادثة سابقة كان فيه استفسار عن حج",
+    "has_pending_action": false,
+    "has_case_context": true
+  },
+  "planned_at": "2026-07-10T21:55:25.394983+00:00"
+}

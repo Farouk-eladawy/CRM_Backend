@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "language_preference": "mixed",
+  "response_style": "operational_concise",
+  "approval_sensitivity": "high",
+  "preferred_modes": [
+    "summary",
+    "next_step",
+    "draft_reply",
+    "pi_analysis"
+  ],
+  "allowed_bases": [
+    "general",
+    "religious"
+  ],
+  "allowed_locations": [
+    "All",
+    "NeedHelp",
+    "Hurghada/Cairo",
+    "Sharm",
+    "Sales",
+    "Guides",
+    "Drivers",
+    "Quality",
+    "Religious"
+  ],
+  "allowed_actions": [
+    "lookup_case",
+    "draft_reply",
+    "next_step",
+    "send_customer_message",
+    "update_airtable",
+    "create_watcher",
+    "generate_report"
+  ]
+}

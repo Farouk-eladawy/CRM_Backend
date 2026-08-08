@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Command Center</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>🔐 Agent Login</h2>
+            <p style="margin-bottom: 20px; color: #6b7280;">Enter your credentials to access the command center.</p>
+            
+            <input type="text" id="login-username" placeholder="Agent Username" value="agent1">
+            <input type="password" id="login-password" placeholder="Password" value="password">
+            
+            <button id="login-btn">Login & Connect</button>
+            <div id="login-error" class="error-text"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-container" style="display: none;">
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <header>
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <span>Agent</span>
+                </div>
+                <div class="actions">
+                    <button title="Refresh">↻</button>
+                    <button title="Logout">➜</button>
+                </div>
+            </header>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search chats...">
+            </div>
+            
+            <div id="chat-list" class="chat-list">
+                <!-- Chats loaded by JS -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-chat">
+            <header>
+                <div class="chat-header-info">
+                    <div class="avatar-circle">🤖</div>
+                    <div class="info-text">
+                        <span id="header-name">OpenClaw System</span>
+                        <span id="header-status" class="status">System Online</span>
+                    </div>
+                </div>
+            </header>
+
+            <div id="chat-container" class="chat-container">
+                <div class="empty-state">
+                    <div class="icon">👋</div>
+                    <h2>Welcome back, Agent</h2>
+                    <p>Select a conversation or use commands below.</p>
+                    <div class="command-hints">
+                        <p><strong>Quick Commands:</strong></p>
+                        <code>/invoice [BookingID] [Amount] [Currency]</code>
+                        <code>/search [Query]</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="mode-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="command-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="mode-label" style="font-size: 0.9rem; font-weight: 600;">Chat</span>
+                </div>
+
+                <input type="text" id="user-input" placeholder="Type a message...">
+                <button id="send-btn">➤</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

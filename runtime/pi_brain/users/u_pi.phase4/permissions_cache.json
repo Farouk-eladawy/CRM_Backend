@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "role": "Admin",
+  "allowed_bases": [
+    "general",
+    "religious"
+  ],
+  "can_access_general": true,
+  "can_access_religious": true,
+  "approval_required_for_sensitive_actions": true,
+  "execution_guard": "ai_agent_only",
+  "provider_guard": "query_ai_only",
+  "updated_at": "2026-07-10T12:58:24.670721+00:00"
+}

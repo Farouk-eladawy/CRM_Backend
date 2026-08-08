@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "user_key": "u:pi.phase4",
+  "communication_style": "mixed_ar_en",
+  "detail_level": "medium",
+  "decision_style": "approval_first",
+  "prefers_examples": true,
+  "prefers_direct_execution_for_safe_ops": true,
+  "risk_tolerance": "medium_low",
+  "common_sequences": [
+    [
+      "booking_summary",
+      "next_step",
+      "draft_reply"
+    ],
+    [
+      "lookup_case",
+      "update_airtable",
+      "approval"
+    ]
+  ],
+  "rejected_patterns": [
+    "implicit_note_update",
+    "send_without_preview"
+  ],
+  "recent_signal_examples": [],
+  "confidence": 0.6,
+  "updated_at": "2026-07-10T12:58:24.671227+00:00"
+}

@@ -1,0 +1,264 @@
+{
+  "run_id": "trace_20260713T163127Z_ff2388",
+  "booking_number": "123456test",
+  "session_key": "internal_assistant_session:ahmady",
+  "approval_update_trace": {
+    "pre_session": {
+      "updated_at": "2026-07-13T16:31:09.944831+00:00",
+      "last_case_context": {
+        "booking_number": "123456test"
+      },
+      "pending_action": {},
+      "workflow_state": {
+        "intent": "agentic_orchestrator",
+        "phase": "queued",
+        "awaiting": "execution",
+        "case_context": {
+          "booking_number": "123456test"
+        },
+        "note": "Request queued.\nExecution ID: man_211be341\nYou'll receive the result once execution finishes.",
+        "action_type": "execute_manifest",
+        "action_mode": "",
+        "updated_at": "2026-07-13T16:31:09.944831+00:00"
+      },
+      "recent_turns_tail": [
+        {
+          "role": "user",
+          "text": "update Reason to E2E APPROVAL TRACE trace_20260713T162827Z_baa56c",
+          "reference": "APPROVAL",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "I can update the 'Reason' field with the trace `E2E APPROVAL TRACE trace_20260713T162827Z_baa56c`, but I need to know: **which booking should this be applied to?**\n\nPlease provide one of:\n1. **Booking Number** (e.g., 12345test)\n2. **Airtable Record ID** (e.g., recXXXXXXXXXXXX)\n\nAlso, just to confirm - is this the 'Reason' field in the **Bookings (List)** table, or a different table?",
+          "reference": "12345test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "user",
+          "text": "حدث حقل Reason للحجز 123456test إلى E2E MANIFEST TRACE trace_20260713T162827Z_baa56c",
+          "reference": "123456test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:53.533815+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "Queued update for 123456test. ID: man_71f88282",
+          "reference": "123456test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:53.533815+00:00"
+        },
+        {
+          "role": "user",
+          "text": "confirm",
+          "reference": "123456test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:09.944831+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "Request queued.\nExecution ID: man_211be341\nYou'll receive the result once execution finishes.",
+          "reference": "123456test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:09.944831+00:00"
+        }
+      ]
+    },
+    "reset_result": {
+      "status_code": 200,
+      "body": {
+        "status": "success"
+      },
+      "message_id": "trace_20260713T163127Z_ff2388-reset",
+      "text": "جلسة جديدة"
+    },
+    "approval_send": {
+      "status_code": 200,
+      "body": {
+        "status": "success"
+      },
+      "message_id": "trace_20260713T163127Z_ff2388-approval",
+      "text": "انشاء فاتورة رقم الحجز 123456test قيمة 20 يورو"
+    },
+    "pending_session": {
+      "updated_at": "2026-07-13T16:31:54.564378+00:00",
+      "last_case_context": {},
+      "pending_action": {},
+      "workflow_state": {
+        "intent": "agentic_orchestrator",
+        "phase": "queued",
+        "awaiting": "execution",
+        "note": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_d95fd5da\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+        "action_type": "execute_manifest",
+        "action_mode": "",
+        "updated_at": "2026-07-13T16:31:54.563380+00:00"
+      },
+      "recent_turns_tail": [
+        {
+          "role": "user",
+          "text": "update Reason to E2E APPROVAL TRACE trace_20260713T162827Z_baa56c",
+          "reference": "APPROVAL",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "I can update the 'Reason' field with the trace `E2E APPROVAL TRACE trace_20260713T162827Z_baa56c`, but I need to know: **which booking should this be applied to?**\n\nPlease provide one of:\n1. **Booking Number** (e.g., 12345test)\n2. **Airtable Record ID** (e.g., recXXXXXXXXXXXX)\n\nAlso, just to confirm - is this the 'Reason' field in the **Bookings (List)** table, or a different table?",
+          "reference": "12345test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "user",
+          "text": "نعم",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:54.563380+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_d95fd5da\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:54.563380+00:00"
+        }
+      ]
+    },
+    "approve_result": {
+      "status_code": 200,
+      "body": {
+        "status": "success"
+      },
+      "message_id": "trace_20260713T163127Z_ff2388-approve",
+      "text": "نعم"
+    },
+    "done_session": {
+      "updated_at": "2026-07-13T16:31:54.564378+00:00",
+      "last_case_context": {},
+      "pending_action": {},
+      "workflow_state": {
+        "intent": "agentic_orchestrator",
+        "phase": "queued",
+        "awaiting": "execution",
+        "note": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_d95fd5da\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+        "action_type": "execute_manifest",
+        "action_mode": "",
+        "updated_at": "2026-07-13T16:31:54.563380+00:00"
+      },
+      "recent_turns_tail": [
+        {
+          "role": "user",
+          "text": "update Reason to E2E APPROVAL TRACE trace_20260713T162827Z_baa56c",
+          "reference": "APPROVAL",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "I can update the 'Reason' field with the trace `E2E APPROVAL TRACE trace_20260713T162827Z_baa56c`, but I need to know: **which booking should this be applied to?**\n\nPlease provide one of:\n1. **Booking Number** (e.g., 12345test)\n2. **Airtable Record ID** (e.g., recXXXXXXXXXXXX)\n\nAlso, just to confirm - is this the 'Reason' field in the **Bookings (List)** table, or a different table?",
+          "reference": "12345test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "user",
+          "text": "نعم",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:54.563380+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_d95fd5da\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:54.563380+00:00"
+        }
+      ]
+    },
+    "outbox_before": {},
+    "inbox_before": {},
+    "outbox_after": {
+      "man_d95fd5da.json": {
+        "size": 461,
+        "mtime": 1783960314.5528867
+      }
+    },
+    "inbox_after": {},
+    "new_outbox_files": [
+      "man_d95fd5da.json"
+    ],
+    "new_inbox_files": [],
+    "record_after_approval": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "Stripe invoice": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc1dVNktOUkRxMzhSdm1HS0Z2RTB6NHdyNzZGbVRsLDE3NDQ5NjAwMg0200WZWZB25x?s=ap"
+    }
+  },
+  "manifest_trace": {
+    "outbox_before": {
+      "man_d95fd5da.json": {
+        "size": 461,
+        "mtime": 1783960314.5528867
+      }
+    },
+    "inbox_before": {},
+    "manifest_send": {
+      "status_code": 200,
+      "body": {
+        "status": "success"
+      },
+      "message_id": "trace_20260713T163127Z_ff2388-manifest",
+      "text": "حدث حقل Reason للحجز 123456test إلى E2E MANIFEST TRACE trace_20260713T163127Z_ff2388"
+    },
+    "session_after_manifest_send": {
+      "updated_at": "2026-07-13T16:31:54.564378+00:00",
+      "last_case_context": {},
+      "pending_action": {},
+      "workflow_state": {
+        "intent": "agentic_orchestrator",
+        "phase": "queued",
+        "awaiting": "execution",
+        "note": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_d95fd5da\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+        "action_type": "execute_manifest",
+        "action_mode": "",
+        "updated_at": "2026-07-13T16:31:54.563380+00:00"
+      },
+      "recent_turns_tail": [
+        {
+          "role": "user",
+          "text": "update Reason to E2E APPROVAL TRACE trace_20260713T162827Z_baa56c",
+          "reference": "APPROVAL",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "I can update the 'Reason' field with the trace `E2E APPROVAL TRACE trace_20260713T162827Z_baa56c`, but I need to know: **which booking should this be applied to?**\n\nPlease provide one of:\n1. **Booking Number** (e.g., 12345test)\n2. **Airtable Record ID** (e.g., recXXXXXXXXXXXX)\n\nAlso, just to confirm - is this the 'Reason' field in the **Bookings (List)** table, or a different table?",
+          "reference": "12345test",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:29:15.258681+00:00"
+        },
+        {
+          "role": "user",
+          "text": "نعم",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:54.563380+00:00"
+        },
+        {
+          "role": "assistant",
+          "text": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_d95fd5da\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+          "intent": "agentic_orchestrator",
+          "timestamp": "2026-07-13T16:31:54.563380+00:00"
+        }
+      ]
+    },
+    "manifest_id": "man_d95fd5da",
+    "outbox_after": {},
+    "inbox_after": {},
+    "new_outbox_files": [],
+    "new_inbox_files": [],
+    "manifest_result_payload": null,
+    "record_after_manifest": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "Reason": "E2E MANIFEST TRACE trace_20260713T163127Z_ff2388"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-phase4-test",
+  "intent": "next_step",
+  "execution_outcome": "awaiting_identifier",
+  "resolved_action": "next_step",
+  "lesson_learned": "Preserve staged workflow state and ask for clarification before action.",
+  "pi_summary": {
+    "recommended_next_step": "Ask for booking number",
+    "approval_required": false
+  },
+  "updated_at": "2026-07-10T12:58:24.682701+00:00"
+}

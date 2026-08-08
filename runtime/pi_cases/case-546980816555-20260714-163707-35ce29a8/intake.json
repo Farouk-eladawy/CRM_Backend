@@ -1,0 +1,69 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Admin Manager",
+  "user_request": "اعمل فاتورة للحجز 546980816555",
+  "assistant_reply": "نتيجة فحص الفاتورة الحالية:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود: wetravel\n- حالة الفاتورة الحالية: pending\n- رابط الفاتورة الحالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-8403115735\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل على هذا الحجز، لذلك لن أطلب موافقتك على إنشاء واحدة جديدة تلقائيًا.\nإذا أردت، اطلب مني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`.",
+  "intent": "create_invoice",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "201090005205",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-09-25T05:00:00.000Z",
+    "hotel": "Sunrise Test Hotel"
+  },
+  "workflow_state": {
+    "intent": "create_invoice",
+    "phase": "case_active",
+    "awaiting": "followup",
+    "note": "نتيجة فحص الفاتورة الحالية:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود: wetravel\n- حالة الفاتورة الحالية: pending\n- رابط الفاتورة الحالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-8403115735\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل على هذا الحجز، لذلك لن أطلب موافقتك على إنشاء واحدة جديدة تلقائيًا.\nإذا أردت، اطلب مني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`.",
+    "action_type": "execute_manifest",
+    "action_mode": "",
+    "updated_at": "2026-07-14T16:37:07.992047+00:00",
+    "case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "201090005205",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-09-25T05:00:00.000Z",
+      "hotel": "Sunrise Test Hotel"
+    }
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "ابعتلي تذكرة الطيران للحجز 546980816555",
+      "reference": "546980816555",
+      "intent": "agentic_orchestrator",
+      "timestamp": "2026-07-14T14:44:40.325602+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "تم وضع الطلب في مسار التنفيذ.\nExecution ID: man_86468fe5\nسأرسل لك النتيجة فور اكتمال التنفيذ.",
+      "intent": "agentic_orchestrator",
+      "timestamp": "2026-07-14T14:44:40.327597+00:00"
+    },
+    {
+      "role": "user",
+      "text": "اعمل فاتورة للحجز 546980816555",
+      "timestamp": "2026-07-14T16:37:07.991050+00:00",
+      "reference": "546980816555",
+      "intent": "create_invoice"
+    },
+    {
+      "role": "assistant",
+      "text": "نتيجة فحص الفاتورة الحالية:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود: wetravel\n- حالة الفاتورة الحالية: pending\n- رابط الفاتورة الحالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-8403115735\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل على هذا الحجز، لذلك لن أطلب موافقتك على إنشاء واحدة جديدة تلقائيًا.\nإذا أردت، اطلب مني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`.",
+      "timestamp": "2026-07-14T16:37:07.992047+00:00",
+      "reference": "546980816555",
+      "intent": "create_invoice"
+    }
+  ],
+  "pending_action": {},
+  "captured_at": "2026-07-14T16:37:07.992047+00:00"
+}

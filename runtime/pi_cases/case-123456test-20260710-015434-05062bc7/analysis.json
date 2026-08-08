@@ -1,0 +1,22 @@
+{
+  "understood_intent": "send_customer_message",
+  "confidence": 0.73,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "send_customer_message",
+  "case_reference": "123456test",
+  "hard_case_reason": [
+    "short_followup_context_dependency"
+  ],
+  "ambiguities": [],
+  "risk_flags": [
+    "customer_send_operation"
+  ],
+  "analysis_summary": {
+    "request": "نعم",
+    "reply_preview": "تم التنفيذ بنجاح.\nالعميل: Ahmady\nالحجز: 123456test\nالهاتف: 201004655246",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T01:54:40.761105+00:00"
+}

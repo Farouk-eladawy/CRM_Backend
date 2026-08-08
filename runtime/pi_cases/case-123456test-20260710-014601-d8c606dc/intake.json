@@ -1,0 +1,105 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "ارسل قالب Opening",
+  "assistant_reply": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- الهاتف / Phone: 201013498777\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء.",
+  "intent": "send_customer_message",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201013498777",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "workflow_state": {
+    "intent": "send_customer_message",
+    "phase": "awaiting_approval",
+    "awaiting": "approval",
+    "case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201013498777",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "note": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- الهاتف / Phone: 201013498777\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء.",
+    "updated_at": "2026-07-10T01:46:01.674370+00:00",
+    "action_type": "send_customer_message",
+    "action_mode": "template"
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "نعم"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تحديث Airtable بنجاح.\nالعميل: Test User\nالحجز: TIQ-TEST-999"
+    },
+    {
+      "role": "user",
+      "text": "ارسل قالب Opening"
+    },
+    {
+      "role": "assistant",
+      "text": "لا أستطيع إرسال واتساب لأن رقم الهاتف غير متوفر / I can't send WhatsApp because the phone number is missing."
+    },
+    {
+      "role": "user",
+      "text": "رقم الحجز 123456test"
+    },
+    {
+      "role": "assistant",
+      "text": "أهلاً بك، Ahmady. إليك ملخص الحجز وسجل المحادثة:\n\n**ملخص الحجز (Booking Summary)**\n- **العميل:** Ahmady\n- **رقم الحجز:** 123456test\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **رقم الهاتف:** 201013498777\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n\n**سجل المحادثة من CRM (15 رسالة، محادثتان):**\n- تم إرسال قالب افتتاحي ورد العميل بـ \"Hello\".\n- تم إرسال رابط الصور الفوتوغرافية (3 مرات).\n- تم إرسال رابط التقييم (Feedback).\n- تم إرسال قالب افتتاحي آخر ورد العميل بـ \"Confirm\" ثم \"Hello\".\n- آخر رد من الوكيل: سؤال عن تأكيد الدفع (Pending).\n\n**الخطوة التالية المقترحة:**\n- يبدو أن الدفع لا يزال **Pending** حسب آخر محادثة. يُوصى بالتحقق من حالة الدفع في Airtable/CRM أولاً، ثم إرسال رسالة للعميل لتأكيد الدفع أو طلب إثبات الدفع إذا لزم الأمر.\n\nهل تريد متابعة أي إجراء محدد لهذا الحجز؟"
+    },
+    {
+      "role": "user",
+      "text": "عدل رقم الهاتف 201004655246"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تجهيز تعديل Airtable للحالة التالية:\n- العميل: Ahmady\n- رقم الحجز: 123456test\n- Customer Phone: - -> 201004655246\n\nأرسل `نعم` أو `موافق` لتنفيذ التعديل داخل Airtable الآن، أو `إلغاء` لإلغاء الطلب."
+    },
+    {
+      "role": "user",
+      "text": "نعم"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تحديث Airtable بنجاح.\nالعميل: Ahmady\nالحجز: 123456test"
+    },
+    {
+      "role": "user",
+      "text": "ارسل قالب Opening"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- الهاتف / Phone: 201013498777\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء."
+    }
+  ],
+  "pending_action": {
+    "type": "send_customer_message",
+    "channel": "whatsapp",
+    "mode": "template",
+    "template_name": "opening",
+    "template_language": "en",
+    "text": "",
+    "chat_id": "38eba2a5-7869-428e-bd16-fe328469445f",
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "phone": "201013498777",
+    "location": "Hurghada/Cairo",
+    "receiving_phone_id": "1077199985483939",
+    "requested_by": "Ahmady"
+  },
+  "captured_at": "2026-07-10T01:46:01.674370+00:00"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "develop_new_capability",
+  "description": "Auto-generates a new capability (Python handler and JSON schema) for PI when the user requests an action you currently cannot perform. Use this ONLY if no existing schema can fulfill the request. Be careful not to duplicate existing tools.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "tool_name": {
+        "type": "string",
+        "description": "A clear, snake_case name for the new tool (e.g., send_email_report, update_user_status)."
+      },
+      "tool_description": {
+        "type": "string",
+        "description": "A detailed description of what the tool does, so you and the system know when to use it in the future."
+      },
+      "parameters_schema": {
+        "type": "object",
+        "description": "A JSON object defining the parameters this tool will need when called (following JSON Schema draft-07 for 'properties' and 'required')."
+      },
+      "python_code": {
+        "type": "string",
+        "description": "The exact Python logic. MUST be a function named handle_<tool_name>(payload, user_id) that executes the logic and returns a dict with status, message, and optionally data. You can import necessary standard libraries. DO NOT break existing core systems."
+      }
+    },
+    "required": ["tool_name", "tool_description", "parameters_schema", "python_code"]
+  }
+}

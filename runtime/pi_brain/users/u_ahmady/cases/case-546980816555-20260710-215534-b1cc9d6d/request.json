@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-546980816555-20260710-215534-b1cc9d6d",
+  "intent": "send_customer_message",
+  "request_source": "internal_whatsapp_assistant",
+  "captured_at": "2026-07-10T21:55:46.119590+00:00"
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "memory_types": [
+    {
+      "name": "episodic_memory",
+      "file": "episodic_memory.jsonl",
+      "purpose": "Chronological reusable case summaries."
+    },
+    {
+      "name": "semantic_memory",
+      "file": "semantic_memory.json",
+      "purpose": "Stable rules, preferences, and business facts."
+    },
+    {
+      "name": "decisions",
+      "file": "decisions.jsonl",
+      "purpose": "Decision records with rationale and outcome."
+    },
+    {
+      "name": "patterns",
+      "file": "patterns.json",
+      "purpose": "Repeated operational sequences and preferences."
+    },
+    {
+      "name": "rare_cases",
+      "file": "rare_cases.json",
+      "purpose": "Rare high-value cases and lessons learned."
+    }
+  ],
+  "updated_at": "2026-07-10T12:55:45.920716+00:00"
+}

@@ -1,0 +1,65 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI Agent Tawk.to Integration",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://exam-nascar-toddler-savannah.trycloudflare.com"
+    }
+  ],
+  "paths": {
+    "/tawkto-webhook": {
+      "post": {
+        "operationId": "tawkto_webhook",
+        "summary": "Handle Tawk.to Webhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "event": { "type": "string" },
+                  "chatId": { "type": "string" },
+                  "message": { 
+                    "type": "object",
+                    "properties": {
+                      "text": { "type": "string" },
+                      "type": { "type": "string" },
+                      "sender": { 
+                        "type": "object",
+                        "properties": {
+                           "type": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reply": { 
+                        "type": "string",
+                        "description": "The text reply to send back to the visitor"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

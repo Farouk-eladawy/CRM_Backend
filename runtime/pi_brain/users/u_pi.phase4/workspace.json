@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "workspace_id": "pi-ws-u_pi.phase4",
+  "actor_key": "u:pi.phase4",
+  "owner": {
+    "name": "PI Phase4",
+    "role": "Admin",
+    "phone": "201001112226",
+    "username": "pi.phase4"
+  },
+  "allowed_bases": [
+    "general",
+    "religious"
+  ],
+  "status": "active",
+  "created_at": "2026-07-10T12:58:24.658554+00:00",
+  "updated_at": "2026-07-10T12:58:24.658554+00:00"
+}

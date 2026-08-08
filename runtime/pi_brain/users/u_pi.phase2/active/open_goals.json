@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "goal_ids": [
+    "goal_personal_assistant_mode",
+    "goal_religious_booking_support"
+  ],
+  "updated_at": "2026-07-10T12:55:45.926392+00:00"
+}

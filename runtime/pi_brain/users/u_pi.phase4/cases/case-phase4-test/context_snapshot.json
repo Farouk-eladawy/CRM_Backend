@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-phase4-test",
+  "case_context": {
+    "booking_number": "168827669",
+    "record_id": "rec999"
+  },
+  "session_state": {
+    "workflow_state": {
+      "intent": "next_step"
+    },
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "ايه الخطوة التالية؟"
+      }
+    ]
+  },
+  "captured_at": "2026-07-10T12:58:24.678584+00:00"
+}

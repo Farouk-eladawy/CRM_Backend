@@ -1,0 +1,21 @@
+{
+  "recommended_action": "booking_summary",
+  "recommended_steps": [
+    "load_case_snapshot",
+    "compose_contextual_response"
+  ],
+  "missing_inputs": [],
+  "requires_user_question": false,
+  "requires_approval": false,
+  "blocked_reasons": [],
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "case_reference": "123456test",
+  "plan_summary": {
+    "request": "قم بانشاء رابط الدفع وارساله الي العميل 123456test",
+    "reply_preview": "أهلاً بك يا Ahmady،\n\nتمام، طلبت إنشاء رابط دفع للحجز **123456test** للعميل **Ahmady** وإرساله إليه.\n\nللأسف، لا أملك صلاحية مباشرة لإنشاء رابط دفع (مثل رابط Stripe أو PayPal) من خلال النظام الحالي. لكن أقدر أساعدك بالخطوات التالية بناءً على السياق المتاح:\n\n---\n\n### ✅ الخطوة التالية الموصى بها\n\n1. **تأكيد حالة الدفع الحالية** في Airtable:\n   - هل الدفع لا يزال **Pending** كما ورد في المحادثات السابقة؟\n   - أم تم تحديثه مؤخراً؟\n\n2. **إذا كان الدفع معلقاً**، أقترح:\n   - إنشاء رابط الدفع يدوياً من نظ",
+    "has_pending_action": false,
+    "has_case_context": true
+  },
+  "planned_at": "2026-07-10T13:05:07.374713+00:00"
+}

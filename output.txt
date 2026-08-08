@@ -1,0 +1,326 @@
+def get_conversations_page(
+    limit=200,
+    offset=0,
+    location=None,
+    locations=None,
+    include_unknown=0,
+    needs_help=None,
+    sales_only=0,
+    source=None,
+    exclude_source=None,
+    chat_id=None,
+    include_deleted=0,
+    trash=0,
+    assigned_to=None,
+    dedicated_whatsapp=None,
+    ad_id=None,
+):
+    purge_trashed_conversations(retention_days=7)
+    try:
+        limit_i = int(limit or 0)
+    except Exception:
+        limit_i = 200
+    limit_i = max(1, min(limit_i, 500))
+    try:
+        offset_i = int(offset or 0)
+    except Exception:
+        offset_i = 0
+    offset_i = max(0, offset_i)
+
+    where = []
+    params = []
+
+    try:
+        trash_i = 1 if str(trash or "0").strip().lower() in ("1", "true", "yes") else 0
+    except Exception:
+        trash_i = 0
+    try:
+        include_deleted_i = 1 if str(include_deleted or "0").strip().lower() in ("1", "true", "yes") else 0
+    except Exception:
+        include_deleted_i = 0
+
+    if trash_i == 1:
+        where.append("COALESCE(is_deleted, 0) = 1")
+    elif include_deleted_i == 1:
+        pass
+    else:
+        where.append("COALESCE(is_deleted, 0) = 0")
+
+    if chat_id:
+        where.append("chat_id = ?")
+        params.append(str(chat_id))
+
+    if source:
+        where.append("LOWER(source) = LOWER(?)")
+        params.append(str(source))
+    if exclude_source:
+        where.append("LOWER(COALESCE(source, '')) <> LOWER(?)")
+        params.append(str(exclude_source))
+
+    if needs_help is not None and str(needs_help) != "":
+        try:
+            nh = int(needs_help)
+        except Exception:
+            nh = None
+        if nh in (0, 1):
+            where.append("needs_help = ?")
+            params.append(nh)
+
+    if int(sales_only or 0) == 1:
+        where.append("(sales_inbox = 1 OR location = 'Sales')")
+    else:
+        if locations and isinstance(locations, (list, tuple)) and len(locations) > 0:
+            locs = [str(x) for x in locations if str(x).strip() != ""]
+            if locs:
+                where.append("location IN (" + ",".join(["?"] * len(locs)) + ")")
+                params.extend(locs)
+        elif location:
+            loc = str(location)
+            if loc == "Quality":
+                where.append("location = ?")
+                params.append(loc)
+            elif int(include_unknown or 0) == 1 and loc == "Hurghada/Cairo":
+                # Keep legitimate Unknown chats visible in the external inbox, but hide
+                # synthetic Email placeholders created from Airtable record IDs or PSIDs.
+                where.append(
+                    "((location = ? OR "
+                    "(((location = 'Unknown' OR location = '') "
+                    "AND NOT (LOWER(COALESCE(source, '')) = 'email' AND ("
+                    "LOWER(COALESCE(sender_identifier, '')) LIKE 'record-%' OR "
+                    "(COALESCE(sender_identifier, '') <> '' "
+                    "AND COALESCE(sender_identifier, '') GLOB '[0-9]*' "
+                    "AND COALESCE(sender_identifier, '') NOT GLOB '*[^0-9]*')))))"
+                    ") OR (location = 'Quality' AND quality_from_location = ?))"
+                )
+                params.extend([loc, loc])
+            else:
+                where.append("(location = ? OR (location = 'Quality' AND quality_from_location = ?))")
+                params.extend([loc, loc])
+
+    if assigned_to:
+        if isinstance(assigned_to, (list, tuple)) and assigned_to:
+            placeholders = ",".join(["?"] * len(assigned_to))
+            where.append(f"(COALESCE(lead_owner_user_id, '') IN ({placeholders}) OR COALESCE(assigned_to, '') IN ({placeholders}))")
+            params.extend([str(x) for x in assigned_to])
+            params.extend([str(x) for x in assigned_to])
+        else:
+            where.append("(COALESCE(lead_owner_user_id, '') = ? OR COALESCE(assigned_to, '') = ?)")
+            params.extend([str(assigned_to), str(assigned_to)])
+        
+    if dedicated_whatsapp:
+        where.append("receiving_phone_id = ?")
+        params.append(str(dedicated_whatsapp))
+
+    if ad_id:
+        if ad_id == "normal":
+            where.append("(facebook_ad_id IS NULL OR facebook_ad_id = '')")
+        else:
+            where.append("facebook_ad_id = ?")
+            params.append(str(ad_id))
+
+    where_sql = ("WHERE " + " AND ".join(where)) if where else ""
+
+    with sqlite3.connect(DB_FILE, timeout=30.0) as conn:
+        conn.row_factory = sqlite3.Row
+        try:
+            conn.execute("PRAGMA busy_timeout = 30000;")
+        except Exception:
+            pass
+        c = conn.cursor()
+
+        c.execute(f"SELECT COUNT(1) as cnt FROM (SELECT 1 FROM conversations {where_sql} GROUP BY CASE WHEN COALESCE(airtable_record_id, '') != '' THEN airtable_record_id ELSE chat_id END)", params)
+        _row = c.fetchone()
+        try:
+            total = int(_row["cnt"] if _row is not None else 0)
+        except Exception:
+            try:
+                total = int(dict(_row).get("cnt") if _row is not None else 0)
+            except Exception:
+                total = 0
+
+        c.execute(
+            f"""
+            SELECT *
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY CASE WHEN COALESCE(airtable_record_id, '') != '' THEN airtable_record_id ELSE chat_id END
+                           ORDER BY last_message_time DESC
+                       ) as rn
+                FROM conversations
+                {where_sql}
+            )
+            WHERE rn = 1
+            ORDER BY last_message_time DESC
+            LIMIT ? OFFSET ?
+            """,
+            params + [limit_i, offset_i],
+        )
+        conv_rows = [dict(r) for r in c.fetchall()]
+        if not conv_rows:
+            return {"items": [], "total": total, "limit": limit_i, "offset": offset_i}
+
+        chat_ids = [str(r.get("chat_id")) for r in conv_rows if r.get("chat_id")]
+        placeholders = ",".join(["?"] * len(chat_ids))
+
+        derived = {}
+        c.execute(
+            f"""
+            WITH conv AS (
+              SELECT chat_id, force_read_at
+              FROM conversations
+              WHERE chat_id IN ({placeholders})
+            ),
+            last_msg AS (
+              SELECT
+                m.chat_id,
+                m.text AS last_message_text,
+                m.sender_type AS last_sender_type,
+                ROW_NUMBER() OVER (PARTITION BY m.chat_id ORDER BY m.timestamp DESC) AS rn
+              FROM messages m
+              WHERE m.chat_id IN ({placeholders})
+                AND m.text NOT LIKE '[PROPOSED_DRAFT]%'
+            ),
+            last_msg_one AS (
+              SELECT chat_id, last_message_text, last_sender_type
+              FROM last_msg
+              WHERE rn = 1
+            ),
+            unread_msg AS (
+              SELECT
+                m2.chat_id,
+                CASE
+                  WHEN m2.sender_type = 'customer' THEN 1
+                  WHEN m2.text LIKE '%[PROPOSED_DRAFT]%' THEN 1
+                  ELSE 0
+                END AS is_unread_computed,
+                ROW_NUMBER() OVER (PARTITION BY m2.chat_id ORDER BY m2.timestamp DESC) AS rn
+              FROM messages m2
+              JOIN conv c2 ON c2.chat_id = m2.chat_id
+              WHERE (c2.force_read_at IS NULL OR m2.timestamp > c2.force_read_at)
+                AND (
+                  m2.sender_type = 'customer'
+                  OR (m2.text LIKE '%[PROPOSED_DRAFT]%')
+                  OR (
+                    m2.sender_type IN ('agent', 'ai')
+                    AND m2.text NOT LIKE '%[PROPOSED_DRAFT]%'
+                    AND m2.text NOT LIKE '%Pickup Email Sent%'
+                    AND m2.text NOT LIKE '%Ticket Email Sent%'
+                    AND m2.text NOT LIKE '%Airport Email Sent%'
+                    AND m2.text NOT LIKE '%Missing Info Request Sent%'
+                  )
+                )
+            ),
+            unread_one AS (
+              SELECT chat_id, is_unread_computed
+              FROM unread_msg
+              WHERE rn = 1
+            )
+            SELECT
+              conv.chat_id,
+              lm.last_message_text,
+              lm.last_sender_type,
+              COALESCE(uo.is_unread_computed, 0) AS is_unread_computed
+            FROM conv
+            LEFT JOIN last_msg_one lm ON lm.chat_id = conv.chat_id
+            LEFT JOIN unread_one uo ON uo.chat_id = conv.chat_id
+            """,
+            chat_ids + chat_ids,
+        )
+        for r in c.fetchall():
+            rr = dict(r)
+            derived[str(rr.get("chat_id"))] = rr
+
+        referral_meta = {}
+        c.execute(
+            f"""
+            SELECT chat_id, text
+            FROM messages
+            WHERE chat_id IN ({placeholders})
+              AND text LIKE '[Facebook%Referral]%'
+            ORDER BY timestamp DESC
+            """,
+            chat_ids,
+        )
+        for row in c.fetchall():
+            chat_id = str(row["chat_id"] or "").strip()
+            if not chat_id or chat_id in referral_meta:
+                continue
+            parsed = _parse_facebook_referral_notice(row["text"])
+            if parsed:
+                referral_meta[chat_id] = parsed
+
+        record_ids = []
+        for r in conv_rows:
+            rid = str(r.get("airtable_record_id") or "").strip()
+            if rid:
+                record_ids.append(rid)
+        record_ids = sorted(set(record_ids))
+
+        grouped_by_record = {}
+        if record_ids:
+            rp = ",".join(["?"] * len(record_ids))
+            c.execute(
+                f"""
+                SELECT airtable_record_id, GROUP_CONCAT(chat_id) AS ids, GROUP_CONCAT(source) AS sources
+                FROM conversations
+                WHERE airtable_record_id IN ({rp})
+                GROUP BY airtable_record_id
+                """,
+                record_ids,
+            )
+            for r in c.fetchall():
+                rid = str(r["airtable_record_id"] or "").strip()
+                ids = str(r["ids"] or "").strip()
+                sources = str(r["sources"] or "").strip()
+                if rid and ids:
+                    grouped_by_record[rid] = {
+                        "ids": [x for x in ids.split(",") if x],
+                        "sources": list(set([x for x in sources.split(",") if x]))
+                    }
+
+        out = []
+        for r in conv_rows:
+            cid = str(r.get("chat_id") or "")
+            d = derived.get(cid) or {}
+            r["last_message_text"] = d.get("last_message_text")
+            r["last_sender_type"] = d.get("last_sender_type")
+            r["is_unread_computed"] = int(d.get("is_unread_computed") or 0)
+            r["is_deleted"] = int(r.get("is_deleted") or 0)
+            r["deleted_at"] = r.get("deleted_at")
+            referral = referral_meta.get(cid) or {}
+            backfill_updates = {}
+            referral_field_map = {
+                "facebook_ad_source": "source",
+                "facebook_ad_type": "type",
+                "facebook_ad_id": "ad_id",
+                "facebook_ad_ref": "ref",
+                "facebook_ad_title": "ad_title",
+                "facebook_post_id": "post_id",
+            }
+            for field, referral_key in referral_field_map.items():
+                current_value = str(r.get(field) or "").strip()
+                fallback_value = str(referral.get(referral_key) or "").strip()
+                if not current_value and fallback_value:
+                    r[field] = fallback_value
+                    backfill_updates[field] = fallback_value
+            if backfill_updates:
+                set_sql = ", ".join([f"{col} = ?" for col in backfill_updates.keys()])
+                c.execute(
+                    f"UPDATE conversations SET {set_sql} WHERE chat_id = ?",
+                    list(backfill_updates.values()) + [cid],
+                )
+            rid = str(r.get("airtable_record_id") or "").strip()
+            if rid and rid in grouped_by_record:
+                r["grouped_chat_ids"] = grouped_by_record[rid]["ids"]
+                r["sources"] = grouped_by_record[rid]["sources"]
+            else:
+                r["grouped_chat_ids"] = [cid] if cid else []
+                r["sources"] = [r.get("source")] if r.get("source") else []
+            out.append(r)
+
+        if referral_meta:
+            conn.commit()
+
+        return {"items": out, "total": total, "limit": limit_i, "offset": offset_i}
+

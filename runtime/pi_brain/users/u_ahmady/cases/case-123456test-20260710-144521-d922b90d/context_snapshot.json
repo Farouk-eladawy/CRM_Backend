@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-123456test-20260710-144521-d922b90d",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "- أنشئ فاتورة للحجز 123456test"
+      },
+      {
+        "role": "assistant",
+        "text": "تم تجهيز إنشاء فاتورة / I prepared a safe invoice action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- يوجد رابط فاتورة حالي / Existing invoice link present: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nSimulation result: التنفيذ محجوب لهذه الأسباب:\n- invoice_already_exists\n\nأرسل `نعم` / `approve` لتنفيذ الفاتورة، أو `إلغاء` / `cancel` للإلغاء."
+      },
+      {
+        "role": "user",
+        "text": "- أنشئ فاتورة للحجز 123456test"
+      },
+      {
+        "role": "assistant",
+        "text": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right now:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل، لذلك لن أطلب approval لإنشاء جديدة.\nإذا أردت يمكنني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل."
+      },
+      {
+        "role": "user",
+        "text": "أنا عاوز أفهم الحالة دي المفروض أعمل إيه"
+      },
+      {
+        "role": "assistant",
+        "text": "أهلاً بك يا أحمدي،\n\nأنا فرح. خلينا نفهم الموقف مع بعض:\n\n- الحجز `123456test` باسمك (Ahmady) عليه فاتورة موجودة بالفعل على Stripe.\n- المبلغ: 1740 دولار.\n- حالة الفاتورة: pending (أي لم يتم الدفع بعد).\n- الرابط الحالي شغال: https://invoice.stripe.com/i/...\n\nالمشكلة إن النظام منع إنشاء فاتورة جديدة لأن في فاتورة موجودة مسبقاً (invoice_already_exists).\n\n**الخيارات المتاحة دلوقتي:**\n\n1. **إعادة إرسال رابط الفاتورة الحالي للعميل** — لو عاوز أبعته تاني عشان يدفع.\n2. **استخدام الرابط الحالي** في أي حاجة تانية محتاجها.\n\nعاوز أعمل إيه بالظبط؟ أبعته للعميل تاني ولا في حاجة تانية؟"
+      },
+      {
+        "role": "user",
+        "text": "في حاجه تانيه"
+      },
+      {
+        "role": "assistant",
+        "text": "أهلاً بك يا أحمدي، أنا فرح 😊\n\nخلينا نفهم الموقف مع بعض:\n\n- الحجز `123456test` باسمك عليه فاتورة موجودة فعلاً على Stripe.\n- المبلغ: 1740 دولار.\n- حالة الفاتورة: **pending** (أي لسه ما اتدفعتش).\n- الرابط الحالي شغال: https://invoice.stripe.com/i/...\n\nالنظام منع إنشاء فاتورة جديدة لأن في فاتورة موجودة مسبقاً (invoice_already_exists).\n\n**الخيارات المتاحة دلوقتي:**\n\n1. **إعادة إرسال رابط الفاتورة الحالي للعميل** — لو عاوز أبعته تاني عشان يدفع.\n2. **إلغاء الفاتورة القديمة** (لو العميل طلب تعديل أو تغيير) — بس ده محتاج منك تأكيد عشان أبدأ إجراء الإلغاء.\n3. **تحديث بيانات الفاتورة** لو في حاجة ناقصة أو غلط — عاوز أعرف إيه اللي عاوز تغيره بالظبط.\n\nعاوز أعمل إيه بالظبط؟ أبعته للعميل تاني ولا في حاجة تانية؟"
+      },
+      {
+        "role": "user",
+        "text": "PI: حلل الحالة دي وقولي أفضل خطوة"
+      },
+      {
+        "role": "assistant",
+        "text": "لم أجد نتيجة مطابقة / I couldn't find a match for: PI: حلل الحالة دي وقولي أفضل خطوة\nSend booking number / phone / email / name more clearly, or ask your question directly."
+      },
+      {
+        "role": "user",
+        "text": "PI: حلل الحالة دي وقولي أفضل خطوة"
+      },
+      {
+        "role": "assistant",
+        "text": "لم أجد نتيجة مطابقة / I couldn't find a match for: PI: حلل الحالة دي وقولي أفضل خطوة\nSend booking number / phone / email / name more clearly, or ask your question directly."
+      },
+      {
+        "role": "user",
+        "text": "PI: حلل الحجز `123456test`وقولي أفضل خطوة"
+      },
+      {
+        "role": "assistant",
+        "text": "أهلاً بك يا أحمدي، أنا فرح 😊\n\nتمام، خلينا نحلل الحجز `123456test` ونشوف أفضل خطوة:\n\n**ملخص الحجز:**\n- **العميل:** Ahmady\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **رقم الهاتف:** 201004655246\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n\n**ملخص المحادثات السابقة (21 رسالة):**\n- تم إرسال روابط الأوديو جايد والصور (Photographer) وطلب فيدباك.\n- العميل رد بـ \"Hello\" و \"Confirm\" في مرات مختلفة.\n- تم تحديث بيانات الفندق ورقم الهاتف في Airtable.\n- في فاتورة موجودة مسبقاً على Stripe بمبلغ **1740 دولار** وحالتها **pending** (لم تُدفع بعد).\n\n**أفضل خطوة مقترحة:**\n- بما أن الفاتورة موجودة ولم تُدفع، والعميل لم يشتكي أو يطلب تعديل، **أفضل خطوة هي إعادة إرسال رابط الفاتورة الحالي للعميل** مع رسالة تذكير بسيطة.\n- السبب: العميل أظهر تفاعلاً سابقاً (رد بـ Hello/Confirm)، والفاتورة جاهزة، فالتذكير قد يحفز الدفع.\n\n**هل تريد مني صياغة رسالة تذكير للعميل؟**"
+      }
+    ],
+    "last_case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "last_intent": "booking_summary",
+    "updated_at": "2026-07-10T14:41:44.087546+00:00",
+    "pending_action": {},
+    "workflow_state": {
+      "intent": "booking_summary",
+      "phase": "case_active",
+      "awaiting": "followup",
+      "case_context": {
+        "record_id": "recPRC2TeFZTc8gOE",
+        "booking_number": "123456test",
+        "customer_name": "Ahmady",
+        "location": "Unknown",
+        "phone": "201004655246",
+        "email": "Amrmahraga@gmail.com",
+        "trip_name": "The Grand Egyptian Museum",
+        "trip_date": "2026-06-23T01:00:00.000Z",
+        "hotel": "الي Ajira Bay"
+      },
+      "note": "أهلاً بك يا أحمدي، أنا فرح 😊\n\nتمام، خلينا نحلل الحجز `123456test` ونشوف أفضل خطوة:\n\n**ملخص الحجز:**\n- **العميل:** Ahmady\n- **الرحلة:** The Grand Egyptian Museum\n- **التاريخ:** 23 يونيو 2026\n- **الفندق:** الي Ajira Bay\n- **رقم الهاتف:** 201004655246\n- **البريد الإلكتروني:** Amrmahraga@gmail.com\n\n**ملخص المحادثات السابقة (21 رسالة):**\n- تم إرسال روابط الأوديو جايد والصور (Photographer) وطلب فيدباك.\n- العميل رد بـ \"Hello\" و \"Confirm\" في مرات مختلفة.\n- تم تحديث بيانات الفندق ورقم الهاتف في Airtable.\n- في فاتورة موجودة مسبقاً على Stripe بمبلغ **1740 دولار** وحالتها **pending** (لم تُدفع بعد).\n\n**أفضل خطوة مقترحة:**\n- بما أن الفاتورة موجودة ولم تُدفع، والعميل لم يشتكي أو يطلب تعديل، **أفضل خطوة هي إعادة إرسال رابط الفاتورة الحالي للعميل** مع رسالة تذكير بسيطة.\n- السبب: العميل أظهر تفاعلاً سابقاً (رد بـ Hello/Confirm)، والفاتورة جاهزة، فالتذكير قد يحفز الدفع.\n\n**هل تريد مني صياغة رسالة تذكير للعميل؟**",
+      "action_type": "create_invoice",
+      "action_mode": "simulate_verify_execute",
+      "updated_at": "2026-07-10T14:45:21.715943+00:00"
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-10T14:07:57.623966+00:00",
+      "case_id": "case-123456test-20260710-144521-d922b90d",
+      "current_stage": "intake",
+      "stage_status": "started",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "123456test",
+      "intent": "booking_summary",
+      "updated_at": "2026-07-10T14:45:21.715943+00:00"
+    },
+    "topic_reset_meta": {
+      "reason": "reference_changed",
+      "reset_at": "2026-07-10T14:07:55.861340+00:00"
+    }
+  },
+  "captured_at": "2026-07-10T14:45:21.726965+00:00"
+}

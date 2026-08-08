@@ -1,0 +1,25 @@
+{
+  "recommended_action": "create_invoice",
+  "recommended_steps": [
+    "load_latest_airtable_record",
+    "simulate_invoice_generation",
+    "verify_invoice_prerequisites",
+    "prepare_invoice_pending_action"
+  ],
+  "missing_inputs": [
+    "record_id"
+  ],
+  "requires_user_question": true,
+  "requires_approval": true,
+  "blocked_reasons": [],
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "case_reference": "123456test",
+  "plan_summary": {
+    "request": "رابط الفاتورة الجديده ؟",
+    "reply_preview": "نتيجة فحص الفاتورة الحالية:\n- العميل: Ahmady\n- رقم الحجز: 123456test\n- المبلغ: 1740.0 USD\n- المزود: stripe\n- حالة الفاتورة الحالية: pending\n- رابط الفاتورة الحالي: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VclZ2MDlYRTFqMlhKdUJkQngycUFUV0t5M1VScUZRLDE3NDI2MzI5MQ0200lPKGYo9p?s=ap\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل على هذا الحجز، لذلك لن أطلب موافقتك على إنشاء واحدة جديدة تلقائيًا.\nإذا أردت، اط",
+    "has_pending_action": false,
+    "has_case_context": true
+  },
+  "planned_at": "2026-07-10T22:28:55.999420+00:00"
+}

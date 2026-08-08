@@ -1,0 +1,97 @@
+{
+  "source": "internal_whatsapp_assistant",
+  "actor_name": "Ahmady",
+  "user_request": "ارسال قالب Opening",
+  "assistant_reply": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmed Elkhatib\n- رقم الحجز / Booking: 546980816555\n- الهاتف / Phone: +201013498777\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء.",
+  "intent": "send_customer_message",
+  "case_context": {
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "location": "Unknown",
+    "phone": "+201013498777",
+    "email": "Ahmedyeladawy@gmail.com",
+    "trip_name": "Grand Egyptian Museum",
+    "trip_date": "2026-06-05T05:00:00.000Z",
+    "hotel": "Sunrise Arabian Beach Resort"
+  },
+  "workflow_state": {
+    "intent": "send_customer_message",
+    "phase": "awaiting_approval",
+    "awaiting": "approval",
+    "case_context": {
+      "record_id": "rec4mCX8CaQoQrXjI",
+      "booking_number": "546980816555",
+      "customer_name": "Ahmed Elkhatib",
+      "location": "Unknown",
+      "phone": "+201013498777",
+      "email": "Ahmedyeladawy@gmail.com",
+      "trip_name": "Grand Egyptian Museum",
+      "trip_date": "2026-06-05T05:00:00.000Z",
+      "hotel": "Sunrise Arabian Beach Resort"
+    },
+    "note": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmed Elkhatib\n- رقم الحجز / Booking: 546980816555\n- الهاتف / Phone: +201013498777\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء.",
+    "updated_at": "2026-07-10T21:55:34.826944+00:00",
+    "action_type": "send_customer_message",
+    "action_mode": "template"
+  },
+  "recent_turns": [
+    {
+      "role": "user",
+      "text": "عدل رقم الهاتف +20 10 13498777"
+    },
+    {
+      "role": "assistant",
+      "text": "تمام، خلينا نلخصلك الموقف:\n\n**ملخص الحجز:**\n- العميل: أحمد الخطيب\n- رقم الحجز: 546980816555\n- الرحلة: المتحف المصري الكبير (Grand Egyptian Museum)\n- التاريخ: 5 يونيو 2026\n- الفندق: Sunrise Arabian Beach Resort\n- عدد الأشخاص: 2 بالغين\n- رقم الهاتف الحالي: +20 10 13498777\n- الإيميل: Ahmedyeladawy@gmail.com\n\n**سجل المحادثات السابقة (CRM):**\nتم إرسال رسالة ترحيب للعميل تحتوي على رابط الأوديو جايد، ورد العميل بـ \"Hello\" و \"Confirm\".  \nفي محادثة سابقة أخرى، كان فيه استفسار عن حجز مختلف (رقم 123456test) وكانت حالة الدفع \"Pending\".  \nتم تحديث Airtable أكثر من مرة (اسم الفندق ورقم الهاتف) بواسطة المساعد الداخلي.\n\n**الخطوة التالية المقترحة:**\nالعميل طلب تعديل رقم الهاتف. الرقم المطلوب (+20 10 13498777) هو نفسه المسجل حالياً في Airtable.  \nلو عاوز تأكد إن التعديل خلاص مطبق، تقدر تتأكد من Airtable.  \nولو عاوز ترسل تأكيد للعميل، أقدر أصيغ رسالة جاهزة.\n\nعاوز أرسل رسالة تأكيد للعميل ولا في حاجة تانية؟"
+    },
+    {
+      "role": "user",
+      "text": "قم بانشاء فاتوره لهذا الحجز"
+    },
+    {
+      "role": "assistant",
+      "text": "لم أجد نتيجة مطابقة لـ: قم بانشاء فاتوره لهذا الحجز\nأرسل رقم الحجز أو الهاتف أو الإيميل أو الاسم بشكل أوضح، أو اكتب سؤالك وسأساعدك."
+    },
+    {
+      "role": "user",
+      "text": "قم بانشاء فاتوره لهذا الحجز 546980816555"
+    },
+    {
+      "role": "assistant",
+      "text": "تمام، خلينا نلخصلك الموقف للحجز 546980816555:\n\n**ملخص الحجز:**\n- العميل: أحمد الخطيب\n- رقم الحجز: 546980816555\n- الرحلة: المتحف المصري الكبير (Grand Egyptian Museum) - تذكرة Skip The Line\n- التاريخ: 5 يونيو 2026\n- الفندق: Sunrise Arabian Beach Resort\n- عدد الأشخاص: 2 بالغين\n- رقم الهاتف: +20 10 13498777\n- الإيميل: Ahmedyeladawy@gmail.com\n\n**سجل المحادثات السابقة (CRM):**\n- تم إرسال رسالة ترحيب تحتوي على رابط الأوديو جايد، ورد العميل بـ \"Hello\" و \"Confirm\".\n- في محادثة سابقة كان فيه استفسار عن حجز آخر (رقم 123456test) بحالة دفع \"Pending\".\n- تم تحديث Airtable سابقاً (اسم الفندق ورقم الهاتف).\n\n**الخطوة التالية المقترحة:**\nبالنسبة لطلب إنشاء فاتورة — أنا في وضع قراءة فقط (read-only) ولا أقدر إنشاء فاتورة مباشرة. لكن أقدر أساعدك بالآتي:\n1. لو عاوز ترسل للعميل تأكيد بالحجز والفندق، أقدر أصيغ رسالة جاهزة.\n2. لو عاوز الفاتورة تُرفع من النظام المحاسبي، يلزم شخص لديه صلاحية التعديل أو الإدارة المالية.\n3. تقدر تطلب مني صيغة إيميل أو واتساب للعميل يوضح تفاصيل الحجز تحضيراً للفاتورة.\n\nعاوز إيه بالضبط؟ رسالة تأكيد للعميل ولا تحويل للمحاسبة؟"
+    },
+    {
+      "role": "user",
+      "text": "546980816555"
+    },
+    {
+      "role": "assistant",
+      "text": "تمام، خلينا نلخصلك الموقف للحجز 546980816555:\n\n**ملخص الحجز:**\n- العميل: أحمد الخطيب\n- رقم الحجز: 546980816555\n- الرحلة: المتحف المصري الكبير (Grand Egyptian Museum) - تذكرة Skip The Line\n- التاريخ: 5 يونيو 2026\n- الفندق: Sunrise Arabian Beach Resort\n- عدد الأشخاص: 2 بالغين\n- رقم الهاتف: +20 10 13498777\n- الإيميل: Ahmedyeladawy@gmail.com\n\n**سجل المحادثات السابقة (CRM):**\n- تم إرسال رسالة ترحيب تحتوي على رابط الأوديو جايد، ورد العميل بـ \"Hello\" و \"Confirm\".\n- في محادثة سابقة كان فيه استفسار عن حجز آخر (رقم 123456test) بحالة دفع \"Pending\".\n- تم تحديث Airtable سابقاً (اسم الفندق ورقم الهاتف).\n\n**الخطوة التالية المقترحة:**\nبالنسبة لطلب إنشاء فاتورة — أنا في وضع قراءة فقط (read-only) ولا أقدر إنشاء فاتورة مباشرة. لكن أقدر أساعدك بالآتي:\n1. لو عاوز ترسل للعميل تأكيد بالحجز والفندق، أقدر أصيغ رسالة جاهزة.\n2. لو عاوز الفاتورة تُرفع من النظام المحاسبي، يلزم شخص لديه صلاحية التعديل أو الإدارة المالية.\n3. تقدر تطلب مني صيغة إيميل أو واتساب للعميل يوضح تفاصيل الحجز تحضيراً للفاتورة.\n\nعاوز إيه بالضبط؟ رسالة تأكيد للعميل ولا تحويل للمحاسبة؟"
+    },
+    {
+      "role": "user",
+      "text": "ارسال قالب Opening"
+    },
+    {
+      "role": "assistant",
+      "text": "تم تجهيز إجراء إرسال / I prepared the following send action:\n- العميل / Customer: Ahmed Elkhatib\n- رقم الحجز / Booking: 546980816555\n- الهاتف / Phone: +201013498777\n- النوع / Type: Template `opening`\n\nأرسل `نعم` / `approve` للتنفيذ، أو `إلغاء` / `cancel` للإلغاء."
+    }
+  ],
+  "pending_action": {
+    "type": "send_customer_message",
+    "channel": "whatsapp",
+    "mode": "template",
+    "template_name": "opening",
+    "template_language": "en",
+    "text": "",
+    "chat_id": "38eba2a5-7869-428e-bd16-fe328469445f",
+    "record_id": "rec4mCX8CaQoQrXjI",
+    "booking_number": "546980816555",
+    "customer_name": "Ahmed Elkhatib",
+    "phone": "+201013498777",
+    "location": "Hurghada/Cairo",
+    "receiving_phone_id": "1077199985483939",
+    "requested_by": "Ahmady"
+  },
+  "captured_at": "2026-07-10T21:55:34.826944+00:00"
+}

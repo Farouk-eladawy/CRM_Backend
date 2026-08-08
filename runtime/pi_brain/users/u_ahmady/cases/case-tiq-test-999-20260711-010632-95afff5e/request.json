@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-tiq-test-999-20260711-010632-95afff5e",
+  "intent": "booking_summary",
+  "request_source": "internal_whatsapp_assistant",
+  "captured_at": "2026-07-11T01:06:32.506007+00:00"
+}

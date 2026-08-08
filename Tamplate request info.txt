@@ -1,0 +1,440 @@
+email: {
+    alertEmail: 'Ahmadyeladawy@gmail.com',
+    senderName: 'FTS Travels',
+    contactEmail: 'booking@ftstravels.com',
+    contactPhone: '+2 01030774440',
+    businessAddress: '12h/4 Shawky Abdelmenim St., Maadi, Cairo'
+  },
+  branding: {
+    logoUrl: 'https://ftstravels.com/cropped-logo-2.png',
+    primaryColor: '#FF5722',
+    secondaryColor: '#2196F3',
+    backgroundColor: '#ECEFF1'
+  }
+};
+
+// ✅ API Request headers
+const HEADERS = {
+  "Authorization": `Bearer ${CONFIG.airtable.apiKey}`,
+  "Content-Type": "application/json"
+};
+
+/**
+ * Main function - Entry point for the script
+ * Gets records and processes each one
+ */
+function sendThanksEmails() {
+  // Fetch records that haven't received welcome emails yet
+  const filterFormula = encodeURIComponent('NOT({Welcome email sent?})');
+  const records = fetchRecordsFromAirtable(filterFormula);
+  
+  if (!records.length) {
+    Logger.log('📭 No new bookings found requiring welcome emails.');
+    return;
+  }
+  
+  Logger.log(`🔍 Found ${records.length} new bookings to process.`);
+  
+  // Process each record
+  let successCount = 0;
+  let errorCount = 0;
+  
+  records.forEach(record => {
+    try {
+      const result = processBooking(record);
+      if (result) successCount++;
+    } catch (error) {
+      errorCount++;
+      Logger.log(`❌ Error processing booking (${record.id}): ${error.message}`);
+    }
+  });
+  
+  Logger.log(`✅ Process completed. Success: ${successCount}, Errors: ${errorCount}`);
+}
+
+/**
+ * Process a single booking record
+ * @param {Object} record - The Airtable record to process
+ * @returns {boolean} Success status
+ */
+function processBooking(record) {
+  const fields = record.fields;
+  
+  // Extract and clean essential fields
+  const bookingData = {
+    recordId: record.id,
+    customerEmail: cleanField(fields['Customer Email']),
+    tripName: cleanField(fields['trip Name']),
+    bookingNr: cleanField(fields['Booking Nr.']),
+    customerName: formatCustomerName(cleanField(fields['Customer Name'])),
+    optionName: cleanField(fields['Option']),
+    agency: cleanField(fields['Agency']), // ✅ إضافة حقل Agency
+    destination: cleanField(fields['des']) // ✅ إضافة حقل الوجهة
+  };
+  
+  // Validate email
+  if (!bookingData.customerEmail || !isValidEmail(bookingData.customerEmail)) {
+    Logger.log(`⚠️ Skipping booking due to invalid email: Booking Nr. ${bookingData.bookingNr}, Email: ${bookingData.customerEmail}`);
+    return false;
+  }
+  
+  // Create full trip name with option if available
+  const fullTripName = bookingData.optionName ? 
+    `${bookingData.tripName} (${bookingData.optionName})` : 
+    bookingData.tripName;
+  
+  // ✅ تحديث شرط إرسال إيميل التذاكر ليشمل Agency = Tiqets
+  let emailSent = false;
+  if (bookingData.tripName.includes('QR') || 
+      bookingData.tripName.includes('Sound') || 
+      bookingData.agency === 'Tiqets') {
+    emailSent = sendTicketEmail(bookingData, fullTripName);
+  } else {
+    emailSent = sendBookingConfirmationEmail(bookingData, fullTripName);
+  }
+  
+  // Update record status if email was sent successfully
+  if (emailSent) {
+    updateWelcomeEmailStatus(bookingData.recordId);
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * Send ticket-type email for QR code, Sound & Light shows, or Tiqets bookings
+ * @param {Object} bookingData - The booking information
+ * @param {string} fullTripName - Complete trip name with options
+ * @returns {boolean} Success status
+ */
+function sendTicketEmail(bookingData, fullTripName) {
+  const subject = `Your Tickets for ${fullTripName} - ${bookingData.bookingNr} ✨`;
+  // ✅ تمرير معلومة Agency إلى دالة generateTicketEmail
+  const body = generateTicketEmail(bookingData.customerName, fullTripName, bookingData.bookingNr, bookingData.agency);
+  
+  try {
+    GmailApp.sendEmail(bookingData.customerEmail, subject, '', {
+      htmlBody: body,
+      name: CONFIG.email.senderName
+    });
+    
+    Logger.log(`🎟️ Ticket email sent to: ${bookingData.customerEmail} (Booking: ${bookingData.bookingNr})`);
+    return true;
+  } catch (error) {
+    Logger.log(`❌ Failed to send ticket email: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Send standard booking confirmation email
+ * @param {Object} bookingData - The booking information
+ * @param {string} fullTripName - Complete trip name with options
+ * @returns {boolean} Success status
+ */
+function sendBookingConfirmationEmail(bookingData, fullTripName) {
+  const subject = `Your booking for ${fullTripName} - ${bookingData.bookingNr} is confirmed! ✨`;
+  const body = generateBookingConfirmationEmail(
+    bookingData.customerName, 
+    fullTripName, 
+    bookingData.bookingNr,
+    bookingData.destination, // ✅ تمرير الوجهة
+    bookingData.tripName    // ✅ تمرير اسم الرحلة
+  );
+  
+  try {
+    GmailApp.sendEmail(bookingData.customerEmail, subject, '', {
+      htmlBody: body,
+      name: CONFIG.email.senderName
+    });
+    
+    Logger.log(`📩 Confirmation email sent to: ${bookingData.customerEmail} (Booking: ${bookingData.bookingNr})`);
+    return true;
+  } catch (error) {
+    Logger.log(`❌ Failed to send confirmation email: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Fetch records from Airtable with optional filter
+ * @param {string} filterFormula - Optional Airtable filter formula
+ * @returns {Array} Array of record objects
+ */
+function fetchRecordsFromAirtable(filterFormula = '') {
+  const baseUrl = `https://api.airtable.com/v0/${CONFIG.airtable.baseId}/${CONFIG.airtable.tableName}?view=${CONFIG.airtable.viewName}`;
+  const url = filterFormula ? `${baseUrl}&filterByFormula=${filterFormula}` : baseUrl;
+  
+  try {
+    const response = UrlFetchApp.fetch(url, {
+      method: 'get',
+      headers: HEADERS,
+      muteHttpExceptions: true
+    });
+    
+    const responseCode = response.getResponseCode();
+    
+    if (responseCode !== 200) {
+      Logger.log(`⚠️ Airtable API returned status ${responseCode}`);
+      return [];
+    }
+    
+    const json = JSON.parse(response.getContentText());
+    return json.records || [];
+  } catch (error) {
+    Logger.log(`❌ Failed to fetch records: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * Update the "Welcome email sent?" field in Airtable
+ * @param {string} recordId - The Airtable record ID
+ * @returns {boolean} Success status
+ */
+function updateWelcomeEmailStatus(recordId) {
+  const url = `https://api.airtable.com/v0/${CONFIG.airtable.baseId}/${CONFIG.airtable.tableName}/${recordId}`;
+  const payload = JSON.stringify({
+    fields: {
+      "Welcome email sent?": true
+    }
+  });
+  
+  try {
+    const response = UrlFetchApp.fetch(url, {
+      method: 'patch',
+      headers: HEADERS,
+      payload: payload,
+      muteHttpExceptions: true
+    });
+    
+    const responseCode = response.getResponseCode();
+    if (responseCode === 200) {
+      Logger.log(`✅ Updated record status: ${recordId}`);
+      return true;
+    } else {
+      Logger.log(`⚠️ Failed to update record status. Response code: ${responseCode}`);
+      return false;
+    }
+  } catch (error) {
+    Logger.log(`❌ Error updating record status: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Validate email format
+ * @param {string} email - Email address to validate
+ * @returns {boolean} Is valid email
+ */
+function isValidEmail(email) {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailPattern.test(email);
+}
+
+/**
+ * Clean and format text fields
+ * @param {string} value - Raw text value
+ * @returns {string} Cleaned text
+ */
+function cleanField(value) {
+  return (value || '')
+    .toString()
+    .replace(/[\r\n]+/g, ' ')      // Replace newlines with spaces
+    .replace(/\([^\)]*\)/g, '')    // Remove content in parentheses
+    .replace(/,+/g, ',')           // Merge multiple commas
+    .replace(/\s*,\s*/g, ',')      // Remove spaces around commas
+    .replace(/\s+/g, ' ')          // Merge multiple spaces
+    .trim();
+}
+
+/**
+ * Format customer name nicely
+ * @param {string} name - Raw customer name
+ * @returns {string} Formatted name
+ */
+function formatCustomerName(name) {
+  const cleanedName = cleanField(name);
+  const parts = cleanedName.split(' ');
+  
+  if (parts.length > 1) {
+    // Format name with first two parts as first name, rest as last name
+    return parts.slice(0, 2).join(' ') + (parts.length > 2 ? ', ' + parts.slice(2).join(' ') : '');
+  }
+  
+  return cleanedName;
+}
+
+///////////////////////////
+// ✅ EMAIL TEMPLATES
+///////////////////////////
+
+/**
+ * Generate HTML email template for tickets
+ * @param {string} customerName - Customer name
+ * @param {string} fullTripName - Full trip name with options
+ * @param {string} bookingNr - Booking number
+ * @param {string} agency - Agency name
+ * @returns {string} HTML email content
+ */
+function generateTicketEmail(customerName, fullTripName, bookingNr, agency) {
+  // ✅ تحديد النص المناسب بناءً على Agency
+  let voucherText = "the GetYourGuide voucher";
+  if (agency === 'Tiqets') {
+    voucherText = "the FTS Travels QR voucher";
+  }
+  
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; background-color: ${CONFIG.branding.backgroundColor}; padding: 30px; margin: 0;">
+  <div style="max-width: 600px; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div style="background-color: ${CONFIG.branding.primaryColor}; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+      <img src="${CONFIG.branding.logoUrl}" 
+           alt="FTS Travels Logo" 
+           style="max-height: 80px; margin-bottom: 10px;">
+      <h1 style="color: white; margin: 0;">FTS Travels</h1>
+      <p style="color: #FFE0B2; margin: 5px 0 0;">Your Entry Tickets</p>
+    </div>
+    
+    <!-- Content -->
+    <div style="padding: 25px;">
+      <p style="font-size: 18px;">Dear <b>${customerName}</b>,</p>
+      
+      <p style="font-size: 16px;">Thank you for booking <b>${fullTripName}</b> with FTS Travels!</p>
+      <p style="font-size: 14px;">Booking Number: <b>${bookingNr}</b></p>
+      
+      <!-- Important Notice Box -->
+      <div style="margin-top: 20px; background-color: #f5f5f5; padding: 15px; border-radius: 6px; border-left: 4px solid ${CONFIG.branding.primaryColor};">
+        <p style="margin: 0; font-size: 15px;"><b>⚠️ Important:</b></p>
+        <p style="margin: 10px 0 0;">Please use only the attached tickets (not ${voucherText}).<br>If any issue happens, please call <b>${CONFIG.email.contactPhone}</b> before making any payment.</p>
+      </div>
+      
+      <!-- Contact Button -->
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="mailto:${CONFIG.email.contactEmail}" 
+           style="background-color: ${CONFIG.branding.secondaryColor}; color: white; padding: 12px 25px; font-size: 16px; text-decoration: none; border-radius: 8px; display: inline-block;">
+           Contact Us
+        </a>
+      </div>
+      
+      <!-- Footer -->
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+        <p style="font-size: 12px; color: #999; margin-bottom: 5px;">
+          ${CONFIG.email.businessAddress}
+        </p>
+        <p style="font-size: 12px; color: #999; margin-top: 0;">
+          📞 ${CONFIG.email.contactPhone} | ✉️ ${CONFIG.email.contactEmail}
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Generate HTML email template for standard booking confirmations
+ * @param {string} customerName - Customer name
+ * @param {string} fullTripName - Full trip name with options
+ * @param {string} bookingNr - Booking number
+ * @param {string} destination - Trip destination
+ * @param {string} tripName - Trip name
+ * @returns {string} HTML email content
+ */
+function generateBookingConfirmationEmail(customerName, fullTripName, bookingNr, destination, tripName) {
+  // ✅ التحقق من رحلات شرم الشيخ - القاهرة
+  const isSharmToCairo = destination && tripName && 
+                         destination.toLowerCase().includes('sharm') && 
+                         tripName.toLowerCase().includes('cairo');
+  
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; background-color: ${CONFIG.branding.backgroundColor}; padding: 30px; margin: 0;">
+  <div style="max-width: 600px; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div style="background-color: ${CONFIG.branding.primaryColor}; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+      <img src="${CONFIG.branding.logoUrl}" 
+           alt="FTS Travels Logo" 
+           style="max-height: 80px; margin-bottom: 10px;">
+      <h1 style="color: white; margin: 0;">FTS Travels</h1>
+      <p style="color: #FFE0B2; margin: 5px 0 0;">Booking Confirmation</p>
+    </div>
+    
+    <!-- Content -->
+    <div style="padding: 25px;">
+      <p style="font-size: 18px;">Dear <b>${customerName}</b>,</p>
+      
+      <p style="font-size: 16px;">Thank you for choosing <b>FTS Travels</b>!</p>
+      
+      <!-- Booking Details Table -->
+      <div style="margin: 25px 0; border: 1px solid #eee; border-radius: 6px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="background-color: #f5f5f5;">
+            <td style="padding: 12px 15px; font-weight: bold; width: 40%;">Trip Name</td>
+            <td style="padding: 12px 15px;">${fullTripName}</td>
+          </tr>
+          <tr style="background-color: white;">
+            <td style="padding: 12px 15px; font-weight: bold; border-top: 1px solid #eee;">Booking Number</td>
+            <td style="padding: 12px 15px; border-top: 1px solid #eee;"><b>${bookingNr}</b></td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td style="padding: 12px 15px; font-weight: bold; border-top: 1px solid #eee;">Pickup Info</td>
+            <td style="padding: 12px 15px; border-top: 1px solid #eee;">Details will be sent one day before at 6:00 PM</td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Student Discount Notice -->
+      <div style="margin: 20px 0; background-color: #E3F2FD; padding: 15px; border-radius: 6px; border-left: 4px solid #2196F3;">
+        <p style="margin: 0;"><b>Note:</b> Students can get discounts by showing a valid EU ID.</p>
+      </div>
+      
+      <!-- Request Info Box -->
+      <div style="margin: 25px 0; background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+        <p style="margin-top: 0; font-weight: bold;">Please send us the following information:</p>
+        <ul style="padding-left: 25px; margin-bottom: ${isSharmToCairo ? '10px' : '0'};">
+          <li>Traveler names</li>
+          <li>Children ages (if any)</li>
+          <li>Hotel name</li>
+          <li>Room number</li>
+        </ul>
+        ${isSharmToCairo ? `
+        <p style="margin: 10px 0 0; padding-top: 10px; border-top: 1px solid #e0e0e0; color: #d32f2f; font-weight: bold;">
+          ⚠️ Please confirm you have Egypt visa and passport stamp
+        </p>` : ''}
+      </div>
+      
+      <!-- Contact Button -->
+      <div style="margin-top: 30px; text-align: center;">
+        <a href="mailto:${CONFIG.email.contactEmail}" 
+           style="background-color: ${CONFIG.branding.secondaryColor}; color: white; padding: 12px 30px; font-size: 16px; text-decoration: none; border-radius: 8px; display: inline-block;">
+           Contact Us
+        </a>
+      </div>
+      
+      <!-- Footer -->
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+        <p style="font-size: 12px; color: #999; margin-bottom: 5px;">
+          ${CONFIG.email.businessAddress}
+        </p>
+        <p style="font-size: 12px; color: #999; margin-top: 0;">
+          📞 ${CONFIG.email.contactPhone} | ✉️ ${CONFIG.email.contactEmail}
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}

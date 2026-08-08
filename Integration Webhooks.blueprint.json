@@ -1,0 +1,3113 @@
+{
+    "name": "Integration Webhooks",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 1332610,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "Wetravel Payment Update"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "airtable:ActionSearchRecords",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 1574021
+            },
+            "filter": {
+                "name": "",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{1.type}}",
+                            "b": "payment.created",
+                            "o": "text:contain"
+                        },
+                        {
+                            "a": "{{1.data.status}}",
+                            "b": "processed",
+                            "o": "text:contain"
+                        },
+                        {
+                            "a": "{{1.data.type}}",
+                            "b": "full_amount",
+                            "o": "text:contain"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "base": "appTp5YgSp9DV2HYc",
+                "view": "viwRVysx7H3fV2YpM",
+                "table": "tblJodXmOWKiYqiXS",
+                "fields": [
+                    "Agency",
+                    "Booking Nr.",
+                    "Date Trip",
+                    "trip Name",
+                    "Customer Name",
+                    "Credit Card",
+                    "Stripe invoice",
+                    "Photo invoice",
+                    "Note",
+                    "Trip UUID"
+                ],
+                "formula": "{Trip UUID} = \"{{1.data.trip.uuid}}\"",
+                "maxRecords": "10",
+                "useColumnId": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "base": {
+                            "mode": "chose",
+                            "label": "FTS reservations"
+                        },
+                        "sort": {
+                            "mode": "chose"
+                        },
+                        "view": {
+                            "mode": "chose",
+                            "label": "Grid view"
+                        },
+                        "table": {
+                            "mode": "chose",
+                            "label": "List"
+                        },
+                        "fields": {
+                            "mode": "chose",
+                            "label": [
+                                "Agency",
+                                "Booking Nr.",
+                                "Date Trip",
+                                "trip Name",
+                                "Customer Name",
+                                "Credit Card",
+                                "Stripe invoice",
+                                "Photo invoice",
+                                "Note",
+                                "Trip UUID"
+                            ]
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable2"
+                            },
+                            "label": "For All Base"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:airtable3,airtable2",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "base",
+                        "type": "select",
+                        "label": "Base",
+                        "required": true
+                    },
+                    {
+                        "name": "useColumnId",
+                        "type": "boolean",
+                        "label": "Use Column ID",
+                        "required": true
+                    },
+                    {
+                        "name": "table",
+                        "type": "select",
+                        "label": "Table",
+                        "required": true
+                    },
+                    {
+                        "name": "formula",
+                        "type": "text",
+                        "label": "Formula"
+                    },
+                    {
+                        "name": "maxRecords",
+                        "type": "integer",
+                        "label": "Limit"
+                    },
+                    {
+                        "name": "sort",
+                        "spec": [
+                            {
+                                "name": "field",
+                                "type": "select",
+                                "label": "Field",
+                                "dynamic": true,
+                                "options": []
+                            },
+                            {
+                                "name": "direction",
+                                "type": "select",
+                                "label": "Direction",
+                                "options": [
+                                    {
+                                        "label": "Descending",
+                                        "value": "desc"
+                                    },
+                                    {
+                                        "label": "Ascending",
+                                        "value": "asc"
+                                    }
+                                ]
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Sort"
+                    },
+                    {
+                        "name": "view",
+                        "type": "select",
+                        "label": "View"
+                    },
+                    {
+                        "name": "fields",
+                        "type": "select",
+                        "label": "Output Fields",
+                        "multiple": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "type": "uinteger",
+                        "label": "Bundle order position"
+                    },
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "ID"
+                    },
+                    {
+                        "name": "createdTime",
+                        "type": "date",
+                        "label": "Created Time"
+                    },
+                    {
+                        "name": "Agency",
+                        "type": "text",
+                        "label": "Agency"
+                    },
+                    {
+                        "name": "Booking Nr.",
+                        "type": "text",
+                        "label": "Booking Nr.",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Date Trip",
+                        "time": true,
+                        "type": "date",
+                        "label": "Date Trip"
+                    },
+                    {
+                        "name": "trip Name",
+                        "type": "text",
+                        "label": "trip Name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Customer Name",
+                        "type": "text",
+                        "label": "Customer Name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Credit Card",
+                        "type": "text",
+                        "label": "Credit Card",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Stripe invoice",
+                        "type": "text",
+                        "label": "Stripe invoice"
+                    },
+                    {
+                        "name": "Photo invoice",
+                        "type": "text",
+                        "label": "Photo invoice"
+                    },
+                    {
+                        "name": "Note",
+                        "type": "text",
+                        "label": "Note",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Trip UUID",
+                        "type": "text",
+                        "label": "Trip UUID"
+                    }
+                ]
+            },
+            "onerror": [
+                {
+                    "id": 4,
+                    "module": "builtin:Ignore",
+                    "version": 1,
+                    "metadata": {
+                        "designer": {
+                            "x": 600,
+                            "y": 150
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "module": "airtable:ActionUpdateRecords",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 1574021
+            },
+            "filter": {
+                "name": "",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{2.`__IMTLENGTH__`}}",
+                            "b": "0",
+                            "o": "number:greater"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "id": "{{2.id}}",
+                "base": "appTp5YgSp9DV2HYc",
+                "table": "tblJodXmOWKiYqiXS",
+                "record": {
+                    "fldi0Utcnul8za2gg": "succeeded"
+                },
+                "typecast": false,
+                "useColumnId": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": -150
+                },
+                "restore": {
+                    "expect": {
+                        "base": {
+                            "label": "FTS reservations"
+                        },
+                        "table": {
+                            "label": "List"
+                        },
+                        "record": {
+                            "nested": {
+                                "fld0WkstjBxxcOxaq": {
+                                    "mode": "chose"
+                                },
+                                "fld3LDk2Afq9LptZA": {
+                                    "mode": "edit"
+                                },
+                                "fld4AsPdRUQJqHVia": {
+                                    "mode": "edit"
+                                },
+                                "fld5pX4AlVUCSsLyl": {
+                                    "mode": "edit"
+                                },
+                                "fld6qf33d3uKSUk7i": {
+                                    "mode": "chose"
+                                },
+                                "fld86EpJz89M4LvcQ": {
+                                    "mode": "chose"
+                                },
+                                "fld8PcVhsKPBYCz8E": {
+                                    "mode": "edit"
+                                },
+                                "fldEfaIZioTEAhPF0": {
+                                    "mode": "chose"
+                                },
+                                "fldFZp5jfFSOxLC1Z": {
+                                    "mode": "chose"
+                                },
+                                "fldGOpXkSgFSLSTQA": {
+                                    "mode": "edit"
+                                },
+                                "fldIuq1WEI81jF30u": {
+                                    "mode": "chose"
+                                },
+                                "fldN9TkRiGVgPUB0t": {
+                                    "mode": "edit"
+                                },
+                                "fldNPy7zfFxERlp5z": {
+                                    "mode": "chose"
+                                },
+                                "fldOOCUaCGdRpjWsi": {
+                                    "mode": "edit"
+                                },
+                                "fldSPTTHIB6Tqu9fm": {
+                                    "mode": "chose"
+                                },
+                                "fldTo8xOfiuYXAJf3": {
+                                    "mode": "chose"
+                                },
+                                "fldU2tOjTxrnxIRty": {
+                                    "mode": "chose"
+                                },
+                                "fldUFRYj8a7Rvqn1a": {
+                                    "mode": "chose"
+                                },
+                                "fldUYs3AVojqdTSdq": {
+                                    "mode": "edit"
+                                },
+                                "fldeFPwzOqWreOrXy": {
+                                    "mode": "chose"
+                                },
+                                "fldi0Utcnul8za2gg": {
+                                    "mode": "chose",
+                                    "label": "succeeded"
+                                },
+                                "fldiOioY51CxhDvFM": {
+                                    "mode": "edit"
+                                },
+                                "fldj4fVrrG1AXawe6": {
+                                    "mode": "chose"
+                                },
+                                "fldjzxYjMjPu8RAz6": {
+                                    "mode": "chose"
+                                },
+                                "fldkViGQFDDXeCFav": {
+                                    "mode": "chose"
+                                },
+                                "fldlnGdLQW6lgZdhP": {
+                                    "mode": "chose"
+                                },
+                                "fldmacIbiGeZPTgJF": {
+                                    "mode": "chose"
+                                },
+                                "fldo4iSY1R6afdRjq": {
+                                    "mode": "edit"
+                                },
+                                "fldpbHDv83p4tXgKR": {
+                                    "mode": "chose"
+                                },
+                                "fldpuypjj4RbGmxYp": {
+                                    "mode": "edit"
+                                },
+                                "fldqywL6UFtu9vpSD": {
+                                    "mode": "chose"
+                                },
+                                "fldtCWmlaWWlq7SDd": {
+                                    "mode": "chose"
+                                },
+                                "fldv8AHtWzxvhRczG": {
+                                    "mode": "edit"
+                                },
+                                "fldwxsi9yVHwwtQSE": {
+                                    "mode": "edit"
+                                },
+                                "fldxYcZ9eUhIywv10": {
+                                    "mode": "chose"
+                                },
+                                "fldz2Q8Pdtk4JI582": {
+                                    "mode": "edit"
+                                },
+                                "fldzItiGxw8W4Z6D6": {
+                                    "mode": "edit"
+                                }
+                            }
+                        },
+                        "typecast": {
+                            "mode": "chose"
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable2"
+                            },
+                            "label": "For All Base"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:airtable3,airtable2",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "base",
+                        "type": "select",
+                        "label": "Base",
+                        "required": true
+                    },
+                    {
+                        "name": "typecast",
+                        "type": "boolean",
+                        "label": "Smart links",
+                        "required": true
+                    },
+                    {
+                        "name": "useColumnId",
+                        "type": "boolean",
+                        "label": "Use Column ID",
+                        "required": true
+                    },
+                    {
+                        "name": "table",
+                        "type": "select",
+                        "label": "Table",
+                        "required": true
+                    },
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "Record ID",
+                        "required": true
+                    },
+                    {
+                        "name": "record",
+                        "spec": [
+                            {
+                                "name": "fldNkXuR3rytcsswQ",
+                                "type": "text",
+                                "label": "Agency"
+                            },
+                            {
+                                "name": "fldZGLB1NXyaM530F",
+                                "type": "text",
+                                "label": "Booking Nr."
+                            },
+                            {
+                                "name": "fld0vi9Gg4Q4FrQqN",
+                                "time": true,
+                                "type": "date",
+                                "label": "Date Trip"
+                            },
+                            {
+                                "name": "fldTi5WQWiggTyYLF",
+                                "type": "text",
+                                "label": "trip Name"
+                            },
+                            {
+                                "name": "fldxeRvCQakzWaRTw",
+                                "type": "text",
+                                "label": "Customer Name"
+                            },
+                            {
+                                "name": "fldycSvjVrtHeApBU",
+                                "type": "text",
+                                "label": "Option"
+                            },
+                            {
+                                "name": "fld0VpYP86zx6e7wM",
+                                "type": "text",
+                                "label": "des"
+                            },
+                            {
+                                "name": "fldkiK6tdHq7O5WEA",
+                                "type": "text",
+                                "label": "Guide"
+                            },
+                            {
+                                "name": "fldTU4QOjSU8eGwcG",
+                                "type": "number",
+                                "label": "ADT"
+                            },
+                            {
+                                "name": "fld464qO0Er9lZqTy",
+                                "type": "number",
+                                "label": "STD"
+                            },
+                            {
+                                "name": "flddUFVXlX2tM2aFa",
+                                "type": "number",
+                                "label": "CHD"
+                            },
+                            {
+                                "name": "fldZxfA1KPxW4f0U1",
+                                "type": "number",
+                                "label": "Inf"
+                            },
+                            {
+                                "name": "fldsDHetRtwrR2Yo2",
+                                "type": "text",
+                                "label": "Add - Ons"
+                            },
+                            {
+                                "name": "fldf5EuwGjs3L75Yw",
+                                "type": "text",
+                                "label": "Hotel Name"
+                            },
+                            {
+                                "name": "fld1AwHLTD5KYyUeQ",
+                                "type": "text",
+                                "label": "Room number"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldiOioY51CxhDvFM",
+                                "type": "select",
+                                "label": "pickup time"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldz2Q8Pdtk4JI582",
+                                "type": "select",
+                                "label": "Issue Tickets "
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldzItiGxw8W4Z6D6",
+                                "type": "select",
+                                "label": "From"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldwxsi9yVHwwtQSE",
+                                "type": "select",
+                                "label": "to"
+                            },
+                            {
+                                "name": "fldipGqkuotnrZNzl",
+                                "type": "text",
+                                "label": "Product ID"
+                            },
+                            {
+                                "name": "fldROrdKaJ4LMBCv0",
+                                "type": "number",
+                                "label": "Collecting on date Trip"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldOOCUaCGdRpjWsi",
+                                "type": "select",
+                                "label": "Review WhatsApp & Email Sent"
+                            },
+                            {
+                                "name": "fld1Hru77i6BbON3X",
+                                "type": "text",
+                                "label": "Credit Card"
+                            },
+                            {
+                                "name": "fldDeFCFR74boCvJe",
+                                "time": true,
+                                "type": "date",
+                                "label": "CXL Date"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldGOpXkSgFSLSTQA",
+                                "type": "select",
+                                "label": "Remarks"
+                            },
+                            {
+                                "name": "fldlnGdLQW6lgZdhP",
+                                "spec": [
+                                    {
+                                        "name": "url",
+                                        "type": "text",
+                                        "label": "File URL"
+                                    },
+                                    {
+                                        "name": "filename",
+                                        "type": "filename",
+                                        "label": "File name"
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Attachments"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fld5pX4AlVUCSsLyl",
+                                "type": "select",
+                                "label": "Whatsapp Room & Hotel Sent"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fld4AsPdRUQJqHVia",
+                                "type": "select",
+                                "label": "Whatsapp Pickup Time2"
+                            },
+                            {
+                                "name": "fldjzxYjMjPu8RAz6",
+                                "spec": {
+                                    "mode": "edit",
+                                    "name": "value",
+                                    "type": "select",
+                                    "label": "Value",
+                                    "dynamic": true,
+                                    "options": [
+                                        {
+                                            "label": "*= Notes:* Women should please wear appropriate clothing in the old town.....to preserve our tradition, because the Egyptians are not used to it (only City Tour)",
+                                            "value": "*= Notes:* Women should please wear appropriate clothing in the old town.....to preserve our tradition, because the Egyptians are not used to it (only City Tour)"
+                                        },
+                                        {
+                                            "label": "*= Notes:* 1 $€£ will be collected from each person for the intelligence services >> Safari Tour",
+                                            "value": "*= Notes:* 1 $€£ will be collected from each person for the intelligence services >> Safari Tour"
+                                        },
+                                        {
+                                            "label": "*= The Entrance fees are not included:* If you need to visit them, you will *pay 1850 EGP  per person* there",
+                                            "value": "*= The Entrance fees are not included:* If you need to visit them, you will *pay 1850 EGP  per person* there"
+                                        },
+                                        {
+                                            "label": "*= The Entrance fees are not included:* If you need to visit them, you will *pay 1500 EGP  per person* there",
+                                            "value": "*= The Entrance fees are not included:* If you need to visit them, you will *pay 1500 EGP  per person* there"
+                                        },
+                                        {
+                                            "label": "at the main street before the security check",
+                                            "value": "at the main street before the security check"
+                                        },
+                                        {
+                                            "label": "at the main street before the security check, beside Prima Life",
+                                            "value": "at the main street before the security check, beside Prima Life"
+                                        },
+                                        {
+                                            "label": "in front of the CIB Bank, which is opposite the hotel ",
+                                            "value": "in front of the CIB Bank, which is opposite the hotel "
+                                        },
+                                        {
+                                            "label": "Orange Bay >>> Entry National park isn't included, please note that you will pay it 5$ per person cash on the trip",
+                                            "value": "Orange Bay >>> Entry National park isn't included, please note that you will pay it 5$ per person cash on the trip"
+                                        },
+                                        {
+                                            "label": "Dolphin >>> Entry National park isn't included, please note that you will pay it 5$ per person cash on the trip",
+                                            "value": "Dolphin >>> Entry National park isn't included, please note that you will pay it 5$ per person cash on the trip"
+                                        },
+                                        {
+                                            "label": "Non-billable addons",
+                                            "value": "Non-billable addons"
+                                        },
+                                        {
+                                            "label": "*• Boarding Pass:* Kindly find the boarding pass attached. Please review it carefully before heading to the airport.",
+                                            "value": "*• Boarding Pass:* Kindly find the boarding pass attached. Please review it carefully before heading to the airport."
+                                        },
+                                        {
+                                            "label": "*• Boarding Pass:* Please find the Air Cairo flight ticket attached. Note that boarding passes for Air Cairo are issued at the airport, not online. Review carefully before heading to the airport.",
+                                            "value": "*• Boarding Pass:* Please find the Air Cairo flight ticket attached. Note that boarding passes for Air Cairo are issued at the airport, not online. Review carefully before heading to the airport."
+                                        },
+                                        {
+                                            "label": "\"Orange Bay >>>  A tourist tax isn't included. Please note that you will pay €5 per adult or child in cash on the trip",
+                                            "value": "\"Orange Bay >>>  A tourist tax isn't included. Please note that you will pay €5 per adult or child in cash on the trip"
+                                        },
+                                        {
+                                            "label": "\"Dolphin >>>  A tourist tax isn't included. Please note that you will pay €5 per adult or child in cash on the trip",
+                                            "value": "\"Dolphin >>>  A tourist tax isn't included. Please note that you will pay €5 per adult or child in cash on the trip"
+                                        },
+                                        {
+                                            "label": "\"Orange By >>>  The National Park fee isn't included. Please note that you will pay €5 per adult or child in cash on the trip\"",
+                                            "value": "\"Orange By >>>  The National Park fee isn't included. Please note that you will pay €5 per adult or child in cash on the trip\""
+                                        },
+                                        {
+                                            "label": " Makadi Water World  >>> Kindly keep your passport or a printed copy with you during your visit, as it may be required at the entrance.  ",
+                                            "value": " Makadi Water World  >>> Kindly keep your passport or a printed copy with you during your visit, as it may be required at the entrance.  "
+                                        },
+                                        {
+                                            "label": "10",
+                                            "value": "10"
+                                        },
+                                        {
+                                            "label": "Diving >>>  The National Park fee isn't included. Please note that you will pay €5 per adult or child in cash on the trip",
+                                            "value": "Diving >>>  The National Park fee isn't included. Please note that you will pay €5 per adult or child in cash on the trip"
+                                        },
+                                        {
+                                            "label": "Neverland Aqua Park >>> Kindly keep your passport or a printed copy with you during your visit, as it may be required at the entrance.",
+                                            "value": "Neverland Aqua Park >>> Kindly keep your passport or a printed copy with you during your visit, as it may be required at the entrance."
+                                        },
+                                        {
+                                            "label": "https://airtable.com/tblMHa59G2ned6LcV/rectKz7eoYkRWhzNo?blocks=blidW9c0esEtE7xdo",
+                                            "value": "https://airtable.com/tblMHa59G2ned6LcV/rectKz7eoYkRWhzNo?blocks=blidW9c0esEtE7xdo"
+                                        },
+                                        {
+                                            "label": "https://airtable.com/tblMHa59G2ned6LcV/recgtmAfeiDxSpEEq?blocks=blidW9c0esEtE7xdo",
+                                            "value": "https://airtable.com/tblMHa59G2ned6LcV/recgtmAfeiDxSpEEq?blocks=blidW9c0esEtE7xdo"
+                                        },
+                                        {
+                                            "label": "\"Sataya Reefs >>> National park/environmental entrance fee: €7.00 per person.\"",
+                                            "value": "\"Sataya Reefs >>> National park/environmental entrance fee: €7.00 per person.\""
+                                        },
+                                        {
+                                            "label": "Reminder: Please ensure you send a photo of your passport or keep a printed copy with you to guarantee the continuity of your booking.",
+                                            "value": "Reminder: Please ensure you send a photo of your passport or keep a printed copy with you to guarantee the continuity of your booking."
+                                        },
+                                        {
+                                            "label": "Admission fee - Entry fees Orange Bay USD 10.00 per person",
+                                            "value": "Admission fee - Entry fees Orange Bay USD 10.00 per person"
+                                        },
+                                        {
+                                            "label": "National park/environmental entrance fee, 7 euros per person.",
+                                            "value": "National park/environmental entrance fee, 7 euros per person."
+                                        },
+                                        {
+                                            "label": "Shaab Samadai Reef >>> National park/environmental entrance fee: €7.00 per person",
+                                            "value": "Shaab Samadai Reef >>> National park/environmental entrance fee: €7.00 per person"
+                                        },
+                                        {
+                                            "label": "Please take note that the meeting location is at the street's main entry gate.",
+                                            "value": "Please take note that the meeting location is at the street's main entry gate."
+                                        },
+                                        {
+                                            "label": "Shaab Samadai Reef >>> National park/environmental entrance fee: €10.00 per person",
+                                            "value": "Shaab Samadai Reef >>> National park/environmental entrance fee: €10.00 per person"
+                                        },
+                                        {
+                                            "label": "Kindly keep your passport or a printed copy with you during your visit",
+                                            "value": "Kindly keep your passport or a printed copy with you during your visit"
+                                        },
+                                        {
+                                            "label": "as it may be required at the entrance.",
+                                            "value": "as it may be required at the entrance."
+                                        }
+                                    ],
+                                    "validate": false
+                                },
+                                "type": "array",
+                                "label": "Non-billable addons"
+                            },
+                            {
+                                "name": "fldkfIJOHizwtG6Sp",
+                                "type": "uinteger",
+                                "label": "GYG Rating",
+                                "validate": {
+                                    "min": 1
+                                }
+                            },
+                            {
+                                "name": "fldybgXWJ9tcpIDWo",
+                                "type": "text",
+                                "label": "Customer Review"
+                            },
+                            {
+                                "name": "fldJ8Cr935rIsv0qP",
+                                "type": "text",
+                                "label": "Customer Email"
+                            },
+                            {
+                                "name": "flduE2TbOmhEv7ebR",
+                                "type": "text",
+                                "label": "Customer Phone"
+                            },
+                            {
+                                "name": "fldbQ0TODViVqfrDX",
+                                "type": "number",
+                                "label": "Total price EUR"
+                            },
+                            {
+                                "name": "flddJDtMPvFxZRjpW",
+                                "type": "number",
+                                "label": "Total price USD "
+                            },
+                            {
+                                "name": "fldF680MyZ3TZhE5q",
+                                "type": "number",
+                                "label": "Total price GBP "
+                            },
+                            {
+                                "name": "fldNPy7zfFxERlp5z",
+                                "type": "boolean",
+                                "label": "Welcome email sent?"
+                            },
+                            {
+                                "name": "fld86EpJz89M4LvcQ",
+                                "spec": {
+                                    "mode": "edit",
+                                    "name": "value",
+                                    "type": "select",
+                                    "label": "Value",
+                                    "dynamic": true,
+                                    "options": [
+                                        {
+                                            "label": "Transfer Extra: You will pay 10 euros per person for an extra transfer",
+                                            "value": "Transfer Extra: You will pay 10 euros per person for an extra transfer"
+                                        },
+                                        {
+                                            "label": "Paid",
+                                            "value": "Paid"
+                                        },
+                                        {
+                                            "label": "Transfer Extra:  TUI MAGIC LIFE Kalawy, You will pay 25 euros per person for an extra transfer",
+                                            "value": "Transfer Extra:  TUI MAGIC LIFE Kalawy, You will pay 25 euros per person for an extra transfer"
+                                        },
+                                        {
+                                            "label": "\"Transfer Extra: TUI MAGIC LIFE Kalawy, You will pay 30 euros per person for an extra transfer.\"",
+                                            "value": "\"Transfer Extra: TUI MAGIC LIFE Kalawy, You will pay 30 euros per person for an extra transfer.\""
+                                        },
+                                        {
+                                            "label": "\"Transfer Extra: Vivia blue , You will pay 15 euros per person for an extra transfer.\"",
+                                            "value": "\"Transfer Extra: Vivia blue , You will pay 15 euros per person for an extra transfer.\""
+                                        },
+                                        {
+                                            "label": "Participants Photography Session for a Trip",
+                                            "value": "Participants Photography Session for a Trip"
+                                        },
+                                        {
+                                            "label": "An additional amount of €5 will be collected during the trip.",
+                                            "value": "An additional amount of €5 will be collected during the trip."
+                                        },
+                                        {
+                                            "label": "Extra fees to change the day",
+                                            "value": "Extra fees to change the day"
+                                        },
+                                        {
+                                            "label": "20",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "label": "tut",
+                                            "value": "tut"
+                                        },
+                                        {
+                                            "label": "Cairo entrance fees",
+                                            "value": "Cairo entrance fees"
+                                        },
+                                        {
+                                            "label": "Extra transfer from Hurghada",
+                                            "value": "Extra transfer from Hurghada"
+                                        },
+                                        {
+                                            "label": "Entry Fees to Tutankhamun Tomb",
+                                            "value": "Entry Fees to Tutankhamun Tomb"
+                                        },
+                                        {
+                                            "label": "Transfer Extra: You will pay 15 euros per person for an extra transfer Safaga or Soma Bay",
+                                            "value": "Transfer Extra: You will pay 15 euros per person for an extra transfer Safaga or Soma Bay"
+                                        }
+                                    ],
+                                    "validate": false
+                                },
+                                "type": "array",
+                                "label": "Add-Ons ((MultiSelect))"
+                            },
+                            {
+                                "name": "fldj4fVrrG1AXawe6",
+                                "spec": {
+                                    "mode": "edit",
+                                    "name": "value",
+                                    "type": "select",
+                                    "label": "Value",
+                                    "dynamic": true,
+                                    "options": [
+                                        {
+                                            "label": "No show",
+                                            "value": "No show"
+                                        },
+                                        {
+                                            "label": "Refund",
+                                            "value": "Refund"
+                                        },
+                                        {
+                                            "label": "Complaint",
+                                            "value": "Complaint"
+                                        },
+                                        {
+                                            "label": "No show & refund",
+                                            "value": "No show & refund"
+                                        },
+                                        {
+                                            "label": "now show 1 pax",
+                                            "value": "now show 1 pax"
+                                        },
+                                        {
+                                            "label": "تعديل سعر التذكره كان 11100 بعد بعد تعديل العميل زاد علي الفرد 2600",
+                                            "value": "تعديل سعر التذكره كان 11100 بعد بعد تعديل العميل زاد علي الفرد 2600"
+                                        },
+                                        {
+                                            "label": "تم تبليغ وائل",
+                                            "value": "تم تبليغ وائل"
+                                        },
+                                        {
+                                            "label": "حسب الطفل زي الكبير",
+                                            "value": "حسب الطفل زي الكبير"
+                                        },
+                                        {
+                                            "label": "منتظر سعر الكنسله ",
+                                            "value": "منتظر سعر الكنسله "
+                                        },
+                                        {
+                                            "label": "Delphenia Vincent",
+                                            "value": "Delphenia Vincent"
+                                        },
+                                        {
+                                            "label": "الاسم ده كنسل الحجز ب 17 فقط والاسم كان تذكرته متصدره ",
+                                            "value": "الاسم ده كنسل الحجز ب 17 فقط والاسم كان تذكرته متصدره "
+                                        },
+                                        {
+                                            "label": "no show 3 pax",
+                                            "value": "no show 3 pax"
+                                        },
+                                        {
+                                            "label": "no show 2 pax",
+                                            "value": "no show 2 pax"
+                                        },
+                                        {
+                                            "label": "تنفيذ م وائل",
+                                            "value": "تنفيذ م وائل"
+                                        },
+                                        {
+                                            "label": "تم اصدار وكنسلت التذكره القديمه",
+                                            "value": "تم اصدار وكنسلت التذكره القديمه"
+                                        },
+                                        {
+                                            "label": "في انتظار سعر الكنسله",
+                                            "value": "في انتظار سعر الكنسله"
+                                        },
+                                        {
+                                            "label": "تم تبليغ وائل ",
+                                            "value": "تم تبليغ وائل "
+                                        },
+                                        {
+                                            "label": "6630",
+                                            "value": "6630"
+                                        },
+                                        {
+                                            "label": "تم ابلاغ مسر وائل قبل الاصدار",
+                                            "value": "تم ابلاغ مسر وائل قبل الاصدار"
+                                        },
+                                        {
+                                            "label": "تم ابلاغ مستر وائل قبل الاصدار ",
+                                            "value": "تم ابلاغ مستر وائل قبل الاصدار "
+                                        },
+                                        {
+                                            "label": "6600",
+                                            "value": "6600"
+                                        },
+                                        {
+                                            "label": "Cancel",
+                                            "value": "Cancel"
+                                        },
+                                        {
+                                            "label": "مكرر",
+                                            "value": "مكرر"
+                                        },
+                                        {
+                                            "label": "مكر",
+                                            "value": "مكر"
+                                        },
+                                        {
+                                            "label": "لاغى",
+                                            "value": "لاغى"
+                                        },
+                                        {
+                                            "label": "Customer Name",
+                                            "value": "Customer Name"
+                                        },
+                                        {
+                                            "label": "Shaun Lyons",
+                                            "value": "Shaun Lyons"
+                                        },
+                                        {
+                                            "label": "Stefan Hügel",
+                                            "value": "Stefan Hügel"
+                                        },
+                                        {
+                                            "label": "the customer didn't showed up",
+                                            "value": "the customer didn't showed up"
+                                        },
+                                        {
+                                            "label": ".",
+                                            "value": "."
+                                        },
+                                        {
+                                            "label": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9TZDQ2MmJ2Wko2dnl3WmMyY2JRRTNsc3d0RTZhbXVsLDE0MjMzMTQ3OA0200j5QcArVc?s=ap",
+                                            "value": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9TZDQ2MmJ2Wko2dnl3WmMyY2JRRTNsc3d0RTZhbXVsLDE0MjMzMTQ3OA0200j5QcArVc?s=ap"
+                                        },
+                                        {
+                                            "label": "في انتظار سعر كنسله العوده ",
+                                            "value": "في انتظار سعر كنسله العوده "
+                                        },
+                                        {
+                                            "label": "تم ابلاغ مستر وائل NO Show",
+                                            "value": "تم ابلاغ مستر وائل NO Show"
+                                        },
+                                        {
+                                            "label": "تم ابلاغ امجد بالكنسله",
+                                            "value": "تم ابلاغ امجد بالكنسله"
+                                        },
+                                        {
+                                            "label": "العميل عاوز العوده 4 او 5",
+                                            "value": "العميل عاوز العوده 4 او 5"
+                                        },
+                                        {
+                                            "label": "العميل عيد ميلاد مراته ",
+                                            "value": "العميل عيد ميلاد مراته "
+                                        },
+                                        {
+                                            "label": "لازم يكونو لوحدهم ",
+                                            "value": "لازم يكونو لوحدهم "
+                                        },
+                                        {
+                                            "label": "كنسله طياره",
+                                            "value": "كنسله طياره"
+                                        },
+                                        {
+                                            "label": "Osama Samir Cinderlla",
+                                            "value": "Osama Samir Cinderlla"
+                                        },
+                                        {
+                                            "label": "الطيارة اتأخرت ما تنفذش",
+                                            "value": "الطيارة اتأخرت ما تنفذش"
+                                        },
+                                        {
+                                            "label": "ريفند راجع بلده",
+                                            "value": "ريفند راجع بلده"
+                                        },
+                                        {
+                                            "label": "طالب ريفند ومش راضي يحول",
+                                            "value": "طالب ريفند ومش راضي يحول"
+                                        },
+                                        {
+                                            "label": "الطيارة كنسلت والعميل راجع بلده تاني يوم ",
+                                            "value": "الطيارة كنسلت والعميل راجع بلده تاني يوم "
+                                        },
+                                        {
+                                            "label": "no availability",
+                                            "value": "no availability"
+                                        },
+                                        {
+                                            "label": "العميل مش هيطلع عنده حالة وفاة وموضح ف الكومنت",
+                                            "value": "العميل مش هيطلع عنده حالة وفاة وموضح ف الكومنت"
+                                        },
+                                        {
+                                            "label": "العميل طلب انه يكنسل اولاده تعبانين ",
+                                            "value": "العميل طلب انه يكنسل اولاده تعبانين "
+                                        },
+                                        {
+                                            "label": "6700",
+                                            "value": "6700"
+                                        },
+                                        {
+                                            "label": "العميل عاوز المكان جنب الشباك",
+                                            "value": "العميل عاوز المكان جنب الشباك"
+                                        },
+                                        {
+                                            "label": "ريفند لعدم توافر امكانية طيران ",
+                                            "value": "ريفند لعدم توافر امكانية طيران "
+                                        },
+                                        {
+                                            "label": "ماسافرش والتوضيح بالكومنت",
+                                            "value": "ماسافرش والتوضيح بالكومنت"
+                                        },
+                                        {
+                                            "label": "كنسل قبل اصدار التذاكر",
+                                            "value": "كنسل قبل اصدار التذاكر"
+                                        },
+                                        {
+                                            "label": "فرد كنسل في انتظار سعر الكنسله ",
+                                            "value": "فرد كنسل في انتظار سعر الكنسله "
+                                        },
+                                        {
+                                            "label": "نو شو عشان تعبان",
+                                            "value": "نو شو عشان تعبان"
+                                        },
+                                        {
+                                            "label": "JörnKwauka",
+                                            "value": "JörnKwauka"
+                                        },
+                                        {
+                                            "label": "الاسم ده نوشو هو بس اللي ما سافرش ",
+                                            "value": "الاسم ده نوشو هو بس اللي ما سافرش "
+                                        },
+                                        {
+                                            "label": "الاسم ده اللي ما سافرش فقط JörnKwauka",
+                                            "value": "الاسم ده اللي ما سافرش فقط JörnKwauka"
+                                        },
+                                        {
+                                            "label": "تبع م وائل تنفيذ اف تي اس",
+                                            "value": "تبع م وائل تنفيذ اف تي اس"
+                                        },
+                                        {
+                                            "label": "ماتنفذش",
+                                            "value": "ماتنفذش"
+                                        },
+                                        {
+                                            "label": "هيكنسل",
+                                            "value": "هيكنسل"
+                                        },
+                                        {
+                                            "label": "بعت ايميل للعميل رد وقال الطيارة فاتته",
+                                            "value": "بعت ايميل للعميل رد وقال الطيارة فاتته"
+                                        }
+                                    ],
+                                    "validate": false
+                                },
+                                "type": "array",
+                                "label": "No show & refund"
+                            },
+                            {
+                                "name": "fldTThKkbsLQbOqlx",
+                                "type": "text",
+                                "label": "Reason "
+                            },
+                            {
+                                "name": "fldYaTY94QklaDUoI",
+                                "type": "text",
+                                "label": "Stripe invoice"
+                            },
+                            {
+                                "name": "fldGaaJPPBzWWatqn",
+                                "type": "number",
+                                "label": "Youth"
+                            },
+                            {
+                                "name": "fldMgP7tlXi2fV406",
+                                "type": "text",
+                                "label": "CHD Age"
+                            },
+                            {
+                                "name": "fld6qf33d3uKSUk7i",
+                                "spec": [
+                                    {
+                                        "name": "url",
+                                        "type": "text",
+                                        "label": "File URL"
+                                    },
+                                    {
+                                        "name": "filename",
+                                        "type": "filename",
+                                        "label": "File name"
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Attachments Boarding"
+                            },
+                            {
+                                "name": "fldqywL6UFtu9vpSD",
+                                "type": "boolean",
+                                "label": "Status"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldUYs3AVojqdTSdq",
+                                "type": "select",
+                                "label": "On Our Way "
+                            },
+                            {
+                                "name": "fldRrSkZn40wvzI4f",
+                                "type": "text",
+                                "label": "Ticket Flight Price EGP"
+                            },
+                            {
+                                "name": "fldxojZr9QM07M5Bb",
+                                "type": "text",
+                                "label": "Net Rate"
+                            },
+                            {
+                                "name": "fldSPTTHIB6Tqu9fm",
+                                "spec": {
+                                    "mode": "edit",
+                                    "name": "value",
+                                    "type": "select",
+                                    "label": "Value",
+                                    "dynamic": true,
+                                    "options": [],
+                                    "validate": false
+                                },
+                                "type": "array",
+                                "label": "Traffic Hurghada "
+                            },
+                            {
+                                "name": "fldmacIbiGeZPTgJF",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Tour Guide Name & Phone"
+                            },
+                            {
+                                "name": "fldpbHDv83p4tXgKR",
+                                "spec": {
+                                    "mode": "edit",
+                                    "name": "value",
+                                    "type": "select",
+                                    "label": "Value",
+                                    "dynamic": true,
+                                    "options": [
+                                        {
+                                            "label": "Limousine",
+                                            "value": "Limousine"
+                                        },
+                                        {
+                                            "label": "Hiace",
+                                            "value": "Hiace"
+                                        },
+                                        {
+                                            "label": "Costar",
+                                            "value": "Costar"
+                                        },
+                                        {
+                                            "label": "Bus",
+                                            "value": "Bus"
+                                        },
+                                        {
+                                            "label": "HIS 1",
+                                            "value": "HIS 1"
+                                        },
+                                        {
+                                            "label": "HIS 2",
+                                            "value": "HIS 2"
+                                        },
+                                        {
+                                            "label": "HIS 3",
+                                            "value": "HIS 3"
+                                        },
+                                        {
+                                            "label": "HIS 4",
+                                            "value": "HIS 4"
+                                        },
+                                        {
+                                            "label": "H1",
+                                            "value": "H1"
+                                        },
+                                        {
+                                            "label": "HIS 5",
+                                            "value": "HIS 5"
+                                        },
+                                        {
+                                            "label": "HIS 6",
+                                            "value": "HIS 6"
+                                        },
+                                        {
+                                            "label": "H1 ( 2 )",
+                                            "value": "H1 ( 2 )"
+                                        },
+                                        {
+                                            "label": "H1 ( 1 )",
+                                            "value": "H1 ( 1 )"
+                                        },
+                                        {
+                                            "label": "H1 ( 3 )",
+                                            "value": "H1 ( 3 )"
+                                        },
+                                        {
+                                            "label": "LIMOUSINE 1",
+                                            "value": "LIMOUSINE 1"
+                                        },
+                                        {
+                                            "label": "LIMO 1",
+                                            "value": "LIMO 1"
+                                        },
+                                        {
+                                            "label": "LIMO 2",
+                                            "value": "LIMO 2"
+                                        },
+                                        {
+                                            "label": "LIMO 3",
+                                            "value": "LIMO 3"
+                                        },
+                                        {
+                                            "label": "COSTER ( 1 ",
+                                            "value": "COSTER ( 1 "
+                                        },
+                                        {
+                                            "label": "COSTER ( 1 )",
+                                            "value": "COSTER ( 1 )"
+                                        },
+                                        {
+                                            "label": "COSTER ( 2 )",
+                                            "value": "COSTER ( 2 )"
+                                        },
+                                        {
+                                            "label": "H1 ( 4 )",
+                                            "value": "H1 ( 4 )"
+                                        },
+                                        {
+                                            "label": "HIS 7",
+                                            "value": "HIS 7"
+                                        },
+                                        {
+                                            "label": "LIMO 4",
+                                            "value": "LIMO 4"
+                                        },
+                                        {
+                                            "label": "H1 ( 5 )",
+                                            "value": "H1 ( 5 )"
+                                        },
+                                        {
+                                            "label": "LIMO 5",
+                                            "value": "LIMO 5"
+                                        },
+                                        {
+                                            "label": "LIMO 6",
+                                            "value": "LIMO 6"
+                                        },
+                                        {
+                                            "label": "LIMO 7",
+                                            "value": "LIMO 7"
+                                        },
+                                        {
+                                            "label": "HIS (ssh)",
+                                            "value": "HIS (ssh)"
+                                        },
+                                        {
+                                            "label": "HIS 1 (HRG)",
+                                            "value": "HIS 1 (HRG)"
+                                        },
+                                        {
+                                            "label": "jeep",
+                                            "value": "jeep"
+                                        },
+                                        {
+                                            "label": "coastar (SSH)",
+                                            "value": "coastar (SSH)"
+                                        },
+                                        {
+                                            "label": "HIS 8",
+                                            "value": "HIS 8"
+                                        },
+                                        {
+                                            "label": "HIS 9",
+                                            "value": "HIS 9"
+                                        },
+                                        {
+                                            "label": "jeep 2",
+                                            "value": "jeep 2"
+                                        },
+                                        {
+                                            "label": "His 1 ( SSH)",
+                                            "value": "His 1 ( SSH)"
+                                        },
+                                        {
+                                            "label": "His 2 ( SSH)",
+                                            "value": "His 2 ( SSH)"
+                                        },
+                                        {
+                                            "label": "H1(1) ssh",
+                                            "value": "H1(1) ssh"
+                                        },
+                                        {
+                                            "label": "H1(2) ssh",
+                                            "value": "H1(2) ssh"
+                                        },
+                                        {
+                                            "label": "HIS",
+                                            "value": "HIS"
+                                        },
+                                        {
+                                            "label": "LIMO 8",
+                                            "value": "LIMO 8"
+                                        },
+                                        {
+                                            "label": "LIMO 9",
+                                            "value": "LIMO 9"
+                                        },
+                                        {
+                                            "label": "COSTER (3)",
+                                            "value": "COSTER (3)"
+                                        },
+                                        {
+                                            "label": "Azure Cone from Pisa",
+                                            "value": "Azure Cone from Pisa"
+                                        },
+                                        {
+                                            "label": "HIS (SSH)2",
+                                            "value": "HIS (SSH)2"
+                                        },
+                                        {
+                                            "label": "bus SSH",
+                                            "value": "bus SSH"
+                                        },
+                                        {
+                                            "label": "Mercedes",
+                                            "value": "Mercedes"
+                                        },
+                                        {
+                                            "label": "LIMO 10",
+                                            "value": "LIMO 10"
+                                        },
+                                        {
+                                            "label": "LIMO 10",
+                                            "value": "LIMO 10"
+                                        }
+                                    ],
+                                    "validate": false
+                                },
+                                "type": "array",
+                                "label": "Car Type"
+                            },
+                            {
+                                "name": "fldxYcZ9eUhIywv10",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Driver Name & Phone"
+                            },
+                            {
+                                "name": "fldmUrQIo2cAnSmOR",
+                                "time": true,
+                                "type": "date",
+                                "label": "Last Sent"
+                            },
+                            {
+                                "name": "fldtoDLlCLdrHa7bD",
+                                "type": "text",
+                                "label": "Customer Country"
+                            },
+                            {
+                                "name": "fldUSc37tXMuNKQa1",
+                                "type": "number",
+                                "label": "Amount"
+                            },
+                            {
+                                "name": "fldqYNM9cO0gP0j0y",
+                                "type": "text",
+                                "label": "Booking Status"
+                            },
+                            {
+                                "name": "fldaJ5gPFpfMoMkRI",
+                                "type": "text",
+                                "label": "Google Maps"
+                            },
+                            {
+                                "name": "fldTo8xOfiuYXAJf3",
+                                "spec": {
+                                    "mode": "edit",
+                                    "name": "value",
+                                    "type": "select",
+                                    "label": "Value",
+                                    "dynamic": true,
+                                    "options": [
+                                        {
+                                            "label": "USD",
+                                            "value": "USD"
+                                        },
+                                        {
+                                            "label": "EUR",
+                                            "value": "EUR"
+                                        },
+                                        {
+                                            "label": "GBP",
+                                            "value": "GBP"
+                                        },
+                                        {
+                                            "label": "EGP",
+                                            "value": "EGP"
+                                        },
+                                        {
+                                            "label": "20",
+                                            "value": "20"
+                                        }
+                                    ],
+                                    "validate": false
+                                },
+                                "type": "array",
+                                "label": "Currency"
+                            },
+                            {
+                                "name": "fldlYBCgxRYbPPmzk",
+                                "type": "text",
+                                "label": "Traveler name"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldv8AHtWzxvhRczG",
+                                "type": "select",
+                                "label": "Send Status Driver & Guide"
+                            },
+                            {
+                                "name": "fldwt7CHgweBP9In7",
+                                "time": false,
+                                "type": "date",
+                                "label": "Review Date"
+                            },
+                            {
+                                "name": "fldZr5Uy7dmKQCDSY",
+                                "type": "number",
+                                "label": "Cost EGP"
+                            },
+                            {
+                                "name": "fldeFPwzOqWreOrXy",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Representative Name & Phone"
+                            },
+                            {
+                                "name": "fld0x8Utw31NzTe3I",
+                                "type": "text",
+                                "label": "FTS Travels Important Notice"
+                            },
+                            {
+                                "name": "fldsYBmk0iN3sSUHK",
+                                "type": "text",
+                                "label": "Real Product Name"
+                            },
+                            {
+                                "name": "fldzXd4R8TzMPKonk",
+                                "type": "number",
+                                "label": "Refund Amount"
+                            },
+                            {
+                                "name": "fldmSuO5mHBpNg4ot",
+                                "type": "text",
+                                "label": "Photo invoice"
+                            },
+                            {
+                                "name": "fldyn4LGMcYOPACtH",
+                                "type": "text",
+                                "label": "Customer personal email"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldpuypjj4RbGmxYp",
+                                "type": "select",
+                                "label": "Cancelled Send Status"
+                            },
+                            {
+                                "name": "fldFZp5jfFSOxLC1Z",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Supplier Name & Phone"
+                            },
+                            {
+                                "name": "fldpYGxzy8dYaCBbn",
+                                "type": "text",
+                                "label": "Note"
+                            },
+                            {
+                                "name": "fldStOtT8aDZ3rYm0",
+                                "type": "text",
+                                "label": "Kommo Conversation Backup"
+                            },
+                            {
+                                "name": "fldCXruY59UFiIkUd",
+                                "type": "text",
+                                "label": "Conversations"
+                            },
+                            {
+                                "name": "fldVn6KXd2zALVh32",
+                                "time": false,
+                                "type": "date",
+                                "label": "Issue Tickets Date"
+                            },
+                            {
+                                "name": "fld9fAZm1VH7RwIkY",
+                                "type": "text",
+                                "label": "Chat Driver log"
+                            },
+                            {
+                                "name": "fldLxKq3OlhWTwMGF",
+                                "time": true,
+                                "type": "date",
+                                "label": "Link First Opened"
+                            },
+                            {
+                                "name": "fldkViGQFDDXeCFav",
+                                "type": "boolean",
+                                "label": "Link Used"
+                            },
+                            {
+                                "name": "fldY05nkv49VYEavE",
+                                "type": "text",
+                                "label": "message"
+                            },
+                            {
+                                "name": "fldFDlwedfBDGCo2S",
+                                "type": "text",
+                                "label": "Driver Location link"
+                            },
+                            {
+                                "name": "fldrSpzhtYTtnF7o3",
+                                "type": "text",
+                                "label": "Customer Location link"
+                            },
+                            {
+                                "name": "fldUFRYj8a7Rvqn1a",
+                                "spec": [
+                                    {
+                                        "name": "url",
+                                        "type": "text",
+                                        "label": "File URL"
+                                    },
+                                    {
+                                        "name": "filename",
+                                        "type": "filename",
+                                        "label": "File name"
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Attachments Chat"
+                            },
+                            {
+                                "name": "fldyqKqRJDGKHIsLP",
+                                "time": true,
+                                "type": "date",
+                                "label": "Customer Link Opened"
+                            },
+                            {
+                                "name": "fldyURpYcVPIdrHPD",
+                                "type": "text",
+                                "label": "Customer Last Message"
+                            },
+                            {
+                                "name": "fldIuq1WEI81jF30u",
+                                "type": "boolean",
+                                "label": "End trip"
+                            },
+                            {
+                                "name": "fldvDzTZoYd3jwonU",
+                                "type": "text",
+                                "label": "Chat Customer log"
+                            },
+                            {
+                                "name": "fldo03tVxYOkKYR59",
+                                "type": "uinteger",
+                                "label": "Driver Star",
+                                "validate": {
+                                    "min": 1
+                                }
+                            },
+                            {
+                                "name": "fldGuv25HViefumk5",
+                                "type": "text",
+                                "label": "Trip Status"
+                            },
+                            {
+                                "name": "fldxkIrsk66Ya4ojL",
+                                "time": true,
+                                "type": "date",
+                                "label": "Trip Start Time"
+                            },
+                            {
+                                "name": "fldQvitXogi6eTjBJ",
+                                "type": "text",
+                                "label": "Created By Username"
+                            },
+                            {
+                                "name": "fld0mOLIgfwoFpXMU",
+                                "type": "text",
+                                "label": "Created By Email"
+                            },
+                            {
+                                "name": "fldEfaIZioTEAhPF0",
+                                "type": "boolean",
+                                "label": "Invoice Requested"
+                            },
+                            {
+                                "name": "fldx4H3HZ1loBt7ZC",
+                                "time": true,
+                                "type": "date",
+                                "label": "Invoice Request Date"
+                            },
+                            {
+                                "name": "fldDaUv0t4kDPOA4u",
+                                "type": "text",
+                                "label": "Invoice Requested By"
+                            },
+                            {
+                                "name": "flduuuMSIrGromYIj",
+                                "type": "text",
+                                "label": "AI Chat log"
+                            },
+                            {
+                                "name": "fldtCWmlaWWlq7SDd",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Local Driver"
+                            },
+                            {
+                                "name": "fldIXg0wCQ2KqFmnG",
+                                "type": "text",
+                                "label": "Coupon"
+                            },
+                            {
+                                "name": "fldU2tOjTxrnxIRty",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Contacts"
+                            },
+                            {
+                                "name": "fld0WkstjBxxcOxaq",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Conversations 2"
+                            },
+                            {
+                                "name": "fldohy6zV4BfC436S",
+                                "type": "text",
+                                "label": "Photographer Link"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fld3LDk2Afq9LptZA",
+                                "type": "select",
+                                "label": "Status Photographer WhatsApp"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldN9TkRiGVgPUB0t",
+                                "type": "select",
+                                "label": "Payment Method"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fld8PcVhsKPBYCz8E",
+                                "type": "select",
+                                "label": "voucher_link"
+                            },
+                            {
+                                "name": "fldMoKW1FzQoHnJSh",
+                                "type": "text",
+                                "label": "WA Thread ID"
+                            },
+                            {
+                                "name": "fldO96xTtakRbLOgR",
+                                "type": "text",
+                                "label": "WA Message UUID"
+                            },
+                            {
+                                "name": "fldz0kPLoGAN1kVtq",
+                                "time": true,
+                                "type": "date",
+                                "label": "Ops Notified At"
+                            },
+                            {
+                                "name": "fld5H6xxen1R86Atz",
+                                "type": "text",
+                                "label": "Last WA Msg"
+                            },
+                            {
+                                "name": "fldLJk2k9S61Bt3uk",
+                                "type": "number",
+                                "label": "AI Confidence"
+                            },
+                            {
+                                "name": "fldXd54wUrSzp6BhU",
+                                "type": "text",
+                                "label": "AI Notes"
+                            },
+                            {
+                                "name": "fldL6SxTprxkCRoZ0",
+                                "time": true,
+                                "type": "date",
+                                "label": "Last Processed"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldi0Utcnul8za2gg",
+                                "type": "select",
+                                "label": "Invoice Status"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldo4iSY1R6afdRjq",
+                                "type": "select",
+                                "label": "Local Send Status Driver & Guide"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Record"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "ID"
+                    },
+                    {
+                        "name": "createdTime",
+                        "type": "date",
+                        "label": "Created Time"
+                    },
+                    {
+                        "name": "Agency",
+                        "type": "text",
+                        "label": "Agency"
+                    },
+                    {
+                        "name": "Booking Nr.",
+                        "type": "text",
+                        "label": "Booking Nr.",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Date Trip",
+                        "time": true,
+                        "type": "date",
+                        "label": "Date Trip"
+                    },
+                    {
+                        "name": "trip Name",
+                        "type": "text",
+                        "label": "trip Name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Customer Name",
+                        "type": "text",
+                        "label": "Customer Name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Option",
+                        "type": "text",
+                        "label": "Option",
+                        "multiline": true
+                    },
+                    {
+                        "name": "des",
+                        "type": "text",
+                        "label": "des"
+                    },
+                    {
+                        "name": "Guide",
+                        "type": "text",
+                        "label": "Guide",
+                        "multiline": true
+                    },
+                    {
+                        "name": "ADT",
+                        "type": "number",
+                        "label": "ADT"
+                    },
+                    {
+                        "name": "STD",
+                        "type": "number",
+                        "label": "STD"
+                    },
+                    {
+                        "name": "CHD",
+                        "type": "number",
+                        "label": "CHD"
+                    },
+                    {
+                        "name": "Inf",
+                        "type": "number",
+                        "label": "Inf"
+                    },
+                    {
+                        "name": "Add - Ons",
+                        "type": "text",
+                        "label": "Add - Ons",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Hotel Name",
+                        "type": "text",
+                        "label": "Hotel Name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Room number",
+                        "type": "text",
+                        "label": "Room number",
+                        "multiline": true
+                    },
+                    {
+                        "name": "pickup time",
+                        "type": "text",
+                        "label": "pickup time"
+                    },
+                    {
+                        "name": "Issue Tickets ",
+                        "type": "text",
+                        "label": "Issue Tickets "
+                    },
+                    {
+                        "name": "From",
+                        "type": "text",
+                        "label": "From"
+                    },
+                    {
+                        "name": "to",
+                        "type": "text",
+                        "label": "to"
+                    },
+                    {
+                        "name": "Product ID",
+                        "type": "text",
+                        "label": "Product ID",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Collecting on date Trip",
+                        "type": "number",
+                        "label": "Collecting on date Trip"
+                    },
+                    {
+                        "name": "Review WhatsApp & Email Sent",
+                        "type": "text",
+                        "label": "Review WhatsApp & Email Sent"
+                    },
+                    {
+                        "name": "Credit Card",
+                        "type": "text",
+                        "label": "Credit Card",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Create Date  ",
+                        "type": "date",
+                        "label": "Create Date  "
+                    },
+                    {
+                        "name": "CXL Date",
+                        "time": true,
+                        "type": "date",
+                        "label": "CXL Date"
+                    },
+                    {
+                        "name": "Remarks",
+                        "type": "text",
+                        "label": "Remarks"
+                    },
+                    {
+                        "name": "Attachments",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "width",
+                                "type": "uinteger",
+                                "label": "Width"
+                            },
+                            {
+                                "name": "height",
+                                "type": "uinteger",
+                                "label": "Height"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            },
+                            {
+                                "name": "filename",
+                                "type": "filename",
+                                "label": "File name"
+                            },
+                            {
+                                "name": "size",
+                                "type": "uinteger",
+                                "label": "Size"
+                            },
+                            {
+                                "name": "type",
+                                "type": "text",
+                                "label": "MIME type"
+                            },
+                            {
+                                "name": "thumbnails",
+                                "spec": [
+                                    {
+                                        "name": "small",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Small"
+                                    },
+                                    {
+                                        "name": "large",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Large"
+                                    },
+                                    {
+                                        "name": "full",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Full"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "Thumbnails"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Attachments"
+                    },
+                    {
+                        "name": "Last Modified",
+                        "type": "date",
+                        "label": "Last Modified"
+                    },
+                    {
+                        "name": "Whatsapp Room & Hotel Sent",
+                        "type": "text",
+                        "label": "Whatsapp Room & Hotel Sent"
+                    },
+                    {
+                        "name": "Whatsapp Pickup Time2",
+                        "type": "text",
+                        "label": "Whatsapp Pickup Time2"
+                    },
+                    {
+                        "name": "Non-billable addons",
+                        "type": "array",
+                        "label": "Non-billable addons",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "GYG Rating",
+                        "type": "uinteger",
+                        "label": "GYG Rating",
+                        "validate": {
+                            "min": 1
+                        }
+                    },
+                    {
+                        "name": "Customer Review",
+                        "type": "text",
+                        "label": "Customer Review",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Customer Email",
+                        "type": "text",
+                        "label": "Customer Email"
+                    },
+                    {
+                        "name": "Customer Phone",
+                        "type": "text",
+                        "label": "Customer Phone"
+                    },
+                    {
+                        "name": "Total price EUR",
+                        "type": "number",
+                        "label": "Total price EUR"
+                    },
+                    {
+                        "name": "Total price USD ",
+                        "type": "number",
+                        "label": "Total price USD "
+                    },
+                    {
+                        "name": "Total price GBP ",
+                        "type": "number",
+                        "label": "Total price GBP "
+                    },
+                    {
+                        "name": "Welcome email sent?",
+                        "type": "boolean",
+                        "label": "Welcome email sent?"
+                    },
+                    {
+                        "name": "Created By",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "email",
+                                "type": "text",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Created By"
+                    },
+                    {
+                        "name": "Add-Ons ((MultiSelect))",
+                        "type": "array",
+                        "label": "Add-Ons ((MultiSelect))",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "No show & refund",
+                        "type": "array",
+                        "label": "No show & refund",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "Reason ",
+                        "type": "text",
+                        "label": "Reason ",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Last Modified By",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "email",
+                                "type": "text",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Last Modified By"
+                    },
+                    {
+                        "name": "Teka Send V2",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Teka Send V2"
+                    },
+                    {
+                        "name": "Stripe invoice",
+                        "type": "text",
+                        "label": "Stripe invoice"
+                    },
+                    {
+                        "name": "Teka Send V3",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Teka Send V3"
+                    },
+                    {
+                        "name": "Youth",
+                        "type": "number",
+                        "label": "Youth"
+                    },
+                    {
+                        "name": "CHD Age",
+                        "type": "text",
+                        "label": "CHD Age"
+                    },
+                    {
+                        "name": "Send Review",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Send Review"
+                    },
+                    {
+                        "name": "Attachments Boarding",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "width",
+                                "type": "uinteger",
+                                "label": "Width"
+                            },
+                            {
+                                "name": "height",
+                                "type": "uinteger",
+                                "label": "Height"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            },
+                            {
+                                "name": "filename",
+                                "type": "filename",
+                                "label": "File name"
+                            },
+                            {
+                                "name": "size",
+                                "type": "uinteger",
+                                "label": "Size"
+                            },
+                            {
+                                "name": "type",
+                                "type": "text",
+                                "label": "MIME type"
+                            },
+                            {
+                                "name": "thumbnails",
+                                "spec": [
+                                    {
+                                        "name": "small",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Small"
+                                    },
+                                    {
+                                        "name": "large",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Large"
+                                    },
+                                    {
+                                        "name": "full",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Full"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "Thumbnails"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Attachments Boarding"
+                    },
+                    {
+                        "name": "SendAuto",
+                        "type": "date",
+                        "label": "SendAuto"
+                    },
+                    {
+                        "name": "Pickup Scheduled",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Pickup Scheduled"
+                    },
+                    {
+                        "name": "Status",
+                        "type": "boolean",
+                        "label": "Status"
+                    },
+                    {
+                        "name": "On Our Way ",
+                        "type": "text",
+                        "label": "On Our Way "
+                    },
+                    {
+                        "name": "Ticket Flight Price EGP",
+                        "type": "text",
+                        "label": "Ticket Flight Price EGP"
+                    },
+                    {
+                        "name": "Net Rate",
+                        "type": "text",
+                        "label": "Net Rate",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Traffic Hurghada ",
+                        "type": "array",
+                        "label": "Traffic Hurghada ",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "Tour Guide Name & Phone",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Tour Guide Name & Phone"
+                    },
+                    {
+                        "name": "Car Type",
+                        "type": "array",
+                        "label": "Car Type",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "Driver Name & Phone",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Driver Name & Phone"
+                    },
+                    {
+                        "name": "Last Sent",
+                        "time": true,
+                        "type": "date",
+                        "label": "Last Sent"
+                    },
+                    {
+                        "name": "Customer Country",
+                        "type": "text",
+                        "label": "Customer Country"
+                    },
+                    {
+                        "name": "Amount",
+                        "type": "number",
+                        "label": "Amount"
+                    },
+                    {
+                        "name": "Booking Status",
+                        "type": "text",
+                        "label": "Booking Status"
+                    },
+                    {
+                        "name": "Google Maps",
+                        "type": "text",
+                        "label": "Google Maps"
+                    },
+                    {
+                        "name": "Currency",
+                        "type": "array",
+                        "label": "Currency",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "Traveler name",
+                        "type": "text",
+                        "label": "Traveler name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Send Status Driver & Guide",
+                        "type": "text",
+                        "label": "Send Status Driver & Guide"
+                    },
+                    {
+                        "name": "Review Date",
+                        "time": false,
+                        "type": "date",
+                        "label": "Review Date"
+                    },
+                    {
+                        "name": "Send Sharm Pickup",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Send Sharm Pickup"
+                    },
+                    {
+                        "name": "Cost EGP",
+                        "type": "number",
+                        "label": "Cost EGP"
+                    },
+                    {
+                        "name": "Representative Name & Phone",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Representative Name & Phone"
+                    },
+                    {
+                        "name": "FTS Travels Important Notice",
+                        "type": "text",
+                        "label": "FTS Travels Important Notice",
+                        "multiline": true
+                    },
+                    {
+                        "name": "CancelBookingUpdateCXLDate",
+                        "type": "text",
+                        "label": "CancelBookingUpdateCXLDate"
+                    },
+                    {
+                        "name": "Generate Invoice",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Generate Invoice"
+                    },
+                    {
+                        "name": "Real Product Name",
+                        "type": "text",
+                        "label": "Real Product Name",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Refund Amount",
+                        "type": "number",
+                        "label": "Refund Amount"
+                    },
+                    {
+                        "name": "Total Travelers",
+                        "type": "text",
+                        "label": "Total Travelers"
+                    },
+                    {
+                        "name": "Photo invoice",
+                        "type": "text",
+                        "label": "Photo invoice"
+                    },
+                    {
+                        "name": "Customer personal email",
+                        "type": "text",
+                        "label": "Customer personal email"
+                    },
+                    {
+                        "name": "Cancelled Send Status",
+                        "type": "text",
+                        "label": "Cancelled Send Status"
+                    },
+                    {
+                        "name": "Supplier Name & Phone",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Supplier Name & Phone"
+                    },
+                    {
+                        "name": "Note",
+                        "type": "text",
+                        "label": "Note",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Kommo Conversation Backup",
+                        "type": "text",
+                        "label": "Kommo Conversation Backup"
+                    },
+                    {
+                        "name": "Conversations",
+                        "type": "text",
+                        "label": "Conversations"
+                    },
+                    {
+                        "name": "Issue Tickets Date",
+                        "time": false,
+                        "type": "date",
+                        "label": "Issue Tickets Date"
+                    },
+                    {
+                        "name": "Summary (Booking Nr.)",
+                        "type": "text",
+                        "label": "Summary (Booking Nr.)"
+                    },
+                    {
+                        "name": "Chat Driver log",
+                        "type": "text",
+                        "label": "Chat Driver log",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Link First Opened",
+                        "time": true,
+                        "type": "date",
+                        "label": "Link First Opened"
+                    },
+                    {
+                        "name": "Link Used",
+                        "type": "boolean",
+                        "label": "Link Used"
+                    },
+                    {
+                        "name": "message",
+                        "type": "text",
+                        "label": "message",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Driver Location link",
+                        "type": "text",
+                        "label": "Driver Location link"
+                    },
+                    {
+                        "name": "Driver Link",
+                        "type": "text",
+                        "label": "Driver Link"
+                    },
+                    {
+                        "name": "Customer Location link",
+                        "type": "text",
+                        "label": "Customer Location link"
+                    },
+                    {
+                        "name": "Attachments Chat",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "width",
+                                "type": "uinteger",
+                                "label": "Width"
+                            },
+                            {
+                                "name": "height",
+                                "type": "uinteger",
+                                "label": "Height"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            },
+                            {
+                                "name": "filename",
+                                "type": "filename",
+                                "label": "File name"
+                            },
+                            {
+                                "name": "size",
+                                "type": "uinteger",
+                                "label": "Size"
+                            },
+                            {
+                                "name": "type",
+                                "type": "text",
+                                "label": "MIME type"
+                            },
+                            {
+                                "name": "thumbnails",
+                                "spec": [
+                                    {
+                                        "name": "small",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Small"
+                                    },
+                                    {
+                                        "name": "large",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Large"
+                                    },
+                                    {
+                                        "name": "full",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Full"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "Thumbnails"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Attachments Chat"
+                    },
+                    {
+                        "name": "Customer Link",
+                        "type": "text",
+                        "label": "Customer Link"
+                    },
+                    {
+                        "name": "Customer Link Opened",
+                        "time": true,
+                        "type": "date",
+                        "label": "Customer Link Opened"
+                    },
+                    {
+                        "name": "Customer Last Message",
+                        "type": "text",
+                        "label": "Customer Last Message",
+                        "multiline": true
+                    },
+                    {
+                        "name": "End trip",
+                        "type": "boolean",
+                        "label": "End trip"
+                    },
+                    {
+                        "name": "Chat Customer log",
+                        "type": "text",
+                        "label": "Chat Customer log",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Driver Star",
+                        "type": "uinteger",
+                        "label": "Driver Star",
+                        "validate": {
+                            "min": 1
+                        }
+                    },
+                    {
+                        "name": "Trip Status",
+                        "type": "text",
+                        "label": "Trip Status"
+                    },
+                    {
+                        "name": "Trip Start Time",
+                        "time": true,
+                        "type": "date",
+                        "label": "Trip Start Time"
+                    },
+                    {
+                        "name": "Control Portal",
+                        "type": "text",
+                        "label": "Control Portal"
+                    },
+                    {
+                        "name": "Created By Username",
+                        "type": "text",
+                        "label": "Created By Username",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Created By Email",
+                        "type": "text",
+                        "label": "Created By Email",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Invoice Requested",
+                        "type": "boolean",
+                        "label": "Invoice Requested"
+                    },
+                    {
+                        "name": "Invoice Request Date",
+                        "time": true,
+                        "type": "date",
+                        "label": "Invoice Request Date"
+                    },
+                    {
+                        "name": "Invoice Requested By",
+                        "type": "text",
+                        "label": "Invoice Requested By",
+                        "multiline": true
+                    },
+                    {
+                        "name": "AI Chat log",
+                        "type": "text",
+                        "label": "AI Chat log",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Local Driver",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Local Driver"
+                    },
+                    {
+                        "name": "Guide Link Portal",
+                        "type": "array",
+                        "label": "Guide Link Portal"
+                    },
+                    {
+                        "name": "Driver Link Portal",
+                        "type": "array",
+                        "label": "Driver Link Portal"
+                    },
+                    {
+                        "name": "Coupon",
+                        "type": "text",
+                        "label": "Coupon"
+                    },
+                    {
+                        "name": "Supp Link Portal",
+                        "type": "array",
+                        "label": "Supp Link Portal"
+                    },
+                    {
+                        "name": "Contacts",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Contacts"
+                    },
+                    {
+                        "name": "Conversations 2",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Conversations 2"
+                    },
+                    {
+                        "name": "Photographer Link",
+                        "type": "text",
+                        "label": "Photographer Link"
+                    },
+                    {
+                        "name": "Status Photographer WhatsApp",
+                        "type": "text",
+                        "label": "Status Photographer WhatsApp"
+                    },
+                    {
+                        "name": "Payment Method",
+                        "type": "text",
+                        "label": "Payment Method"
+                    },
+                    {
+                        "name": "voucher_link",
+                        "type": "text",
+                        "label": "voucher_link"
+                    },
+                    {
+                        "name": "Wetravel Generate Invoice",
+                        "spec": [
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Wetravel Generate Invoice"
+                    },
+                    {
+                        "name": "WA Thread ID",
+                        "type": "text",
+                        "label": "WA Thread ID"
+                    },
+                    {
+                        "name": "WA Message UUID",
+                        "type": "text",
+                        "label": "WA Message UUID"
+                    },
+                    {
+                        "name": "Ops Notified At",
+                        "time": true,
+                        "type": "date",
+                        "label": "Ops Notified At"
+                    },
+                    {
+                        "name": "Last WA Msg",
+                        "type": "text",
+                        "label": "Last WA Msg",
+                        "multiline": true
+                    },
+                    {
+                        "name": "AI Confidence",
+                        "type": "number",
+                        "label": "AI Confidence"
+                    },
+                    {
+                        "name": "AI Notes",
+                        "type": "text",
+                        "label": "AI Notes",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Last Processed",
+                        "time": true,
+                        "type": "date",
+                        "label": "Last Processed"
+                    },
+                    {
+                        "name": "Invoice Status",
+                        "type": "text",
+                        "label": "Invoice Status"
+                    },
+                    {
+                        "name": "Local Send Status Driver & Guide",
+                        "type": "text",
+                        "label": "Local Send Status Driver & Guide"
+                    }
+                ]
+            },
+            "onerror": [
+                {
+                    "id": 5,
+                    "module": "builtin:Ignore",
+                    "version": 1,
+                    "metadata": {
+                        "designer": {
+                            "x": 900,
+                            "y": -150
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": []
+    }
+}

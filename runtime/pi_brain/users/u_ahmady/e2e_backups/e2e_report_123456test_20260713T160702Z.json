@@ -1,0 +1,1433 @@
+{
+  "booking_number": "123456test",
+  "record_id": "recPRC2TeFZTc8gOE",
+  "timestamp": "20260713T160702Z",
+  "before_backup": "runtime\\pi_brain\\users\\u_ahmady\\e2e_backups\\before_123456test_20260713T160702Z.json",
+  "after_backup": "runtime\\pi_brain\\users\\u_ahmady\\e2e_backups\\after_123456test_20260713T160702Z.json",
+  "candidate_count": 67,
+  "excluded_count": 51,
+  "success_count": 67,
+  "failure_count": 0,
+  "excluded_fields": [
+    {
+      "field_name": "Customer Phone",
+      "field_type": "phoneNumber",
+      "reason": "kw:customer phone"
+    },
+    {
+      "field_name": "Booking Nr.",
+      "field_type": "multilineText",
+      "reason": "kw:booking nr"
+    },
+    {
+      "field_name": "Whatsapp Pickup Time2",
+      "field_type": "singleSelect",
+      "reason": "kw:whatsapp"
+    },
+    {
+      "field_name": "Stripe invoice",
+      "field_type": "url",
+      "reason": "kw:stripe invoice"
+    },
+    {
+      "field_name": "Attachments",
+      "field_type": "multipleAttachments",
+      "reason": "type:multipleAttachments"
+    },
+    {
+      "field_name": "Issue Tickets",
+      "field_type": "singleSelect",
+      "reason": "kw:issue tickets"
+    },
+    {
+      "field_name": "Customer Email",
+      "field_type": "singleLineText",
+      "reason": "kw:customer email"
+    },
+    {
+      "field_name": "Google Maps",
+      "field_type": "url",
+      "reason": "kw:google maps"
+    },
+    {
+      "field_name": "Review WhatsApp & Email Sent",
+      "field_type": "singleSelect",
+      "reason": "kw:whatsapp"
+    },
+    {
+      "field_name": "Created By Username",
+      "field_type": "singleSelect",
+      "reason": "kw:created by"
+    },
+    {
+      "field_name": "Photo invoice",
+      "field_type": "url",
+      "reason": "kw:photo invoice"
+    },
+    {
+      "field_name": "Whatsapp Room & Hotel Sent",
+      "field_type": "singleSelect",
+      "reason": "kw:whatsapp"
+    },
+    {
+      "field_name": "Attachments Boarding",
+      "field_type": "multipleAttachments",
+      "reason": "type:multipleAttachments"
+    },
+    {
+      "field_name": "Last Sent",
+      "field_type": "dateTime",
+      "reason": "kw:last sent"
+    },
+    {
+      "field_name": "Send Status Driver & Guide",
+      "field_type": "singleSelect",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Customer personal email",
+      "field_type": "email",
+      "reason": "kw:customer personal email"
+    },
+    {
+      "field_name": "Cancelled Send Status",
+      "field_type": "singleSelect",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Conversations",
+      "field_type": "singleLineText",
+      "reason": "kw:conversations"
+    },
+    {
+      "field_name": "Issue Tickets Date",
+      "field_type": "date",
+      "reason": "kw:issue tickets"
+    },
+    {
+      "field_name": "Summary (Booking Nr.)",
+      "field_type": "aiText",
+      "reason": "type:aiText"
+    },
+    {
+      "field_name": "Chat Driver log",
+      "field_type": "multilineText",
+      "reason": "kw:chat driver log"
+    },
+    {
+      "field_name": "Link First Opened",
+      "field_type": "dateTime",
+      "reason": "kw:link "
+    },
+    {
+      "field_name": "Link Used",
+      "field_type": "checkbox",
+      "reason": "kw:link "
+    },
+    {
+      "field_name": "message",
+      "field_type": "multilineText",
+      "reason": "kw:message"
+    },
+    {
+      "field_name": "Driver Location link",
+      "field_type": "url",
+      "reason": "kw:location link"
+    },
+    {
+      "field_name": "Customer Location link",
+      "field_type": "url",
+      "reason": "kw:location link"
+    },
+    {
+      "field_name": "Attachments Chat",
+      "field_type": "multipleAttachments",
+      "reason": "type:multipleAttachments"
+    },
+    {
+      "field_name": "Customer Link Opened",
+      "field_type": "dateTime",
+      "reason": "kw:link "
+    },
+    {
+      "field_name": "Customer Last Message",
+      "field_type": "multilineText",
+      "reason": "kw:customer last message"
+    },
+    {
+      "field_name": "Chat Customer log",
+      "field_type": "multilineText",
+      "reason": "kw:chat customer log"
+    },
+    {
+      "field_name": "Created By Email",
+      "field_type": "multilineText",
+      "reason": "kw:created by"
+    },
+    {
+      "field_name": "Invoice Requested",
+      "field_type": "checkbox",
+      "reason": "kw:invoice request"
+    },
+    {
+      "field_name": "Invoice Request Date",
+      "field_type": "dateTime",
+      "reason": "kw:invoice request"
+    },
+    {
+      "field_name": "Invoice Requested By",
+      "field_type": "multilineText",
+      "reason": "kw:invoice request"
+    },
+    {
+      "field_name": "AI Chat Log",
+      "field_type": "multilineText",
+      "reason": "kw:ai chat log"
+    },
+    {
+      "field_name": "Offer Send Status",
+      "field_type": "checkbox",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Photographer Link",
+      "field_type": "url",
+      "reason": "kw:photographer link"
+    },
+    {
+      "field_name": "Status Photographer WhatsApp",
+      "field_type": "singleSelect",
+      "reason": "kw:whatsapp"
+    },
+    {
+      "field_name": "Last Processed",
+      "field_type": "dateTime",
+      "reason": "kw:last processed"
+    },
+    {
+      "field_name": "Invoice Status",
+      "field_type": "singleSelect",
+      "reason": "kw:invoice status"
+    },
+    {
+      "field_name": "Local Send Status Driver & Guide",
+      "field_type": "singleSelect",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Trip UUID",
+      "field_type": "singleLineText",
+      "reason": "kw:trip uuid"
+    },
+    {
+      "field_name": "Follow sales",
+      "field_type": "singleCollaborator",
+      "reason": "type:singleCollaborator"
+    },
+    {
+      "field_name": "Country from Phone",
+      "field_type": "aiText",
+      "reason": "type:aiText"
+    },
+    {
+      "field_name": "Synced to mailchamp",
+      "field_type": "checkbox",
+      "reason": "kw:synced to mailchamp"
+    },
+    {
+      "field_name": "Checksum",
+      "field_type": "multilineText",
+      "reason": "kw:checksum"
+    },
+    {
+      "field_name": "Send Personal Email Status",
+      "field_type": "checkbox",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Tickets Created?",
+      "field_type": "checkbox",
+      "reason": "kw:tickets created"
+    },
+    {
+      "field_name": "Send Guide Tickets",
+      "field_type": "singleSelect",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Send Reminder Pickup",
+      "field_type": "singleSelect",
+      "reason": "kw:send "
+    },
+    {
+      "field_name": "Attachments Operations",
+      "field_type": "multipleAttachments",
+      "reason": "type:multipleAttachments"
+    }
+  ],
+  "results": [
+    {
+      "field_name": "Agency",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Agency 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Agency": "E2E Agency 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Customer Name",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Customer Name 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Customer Name": "E2E Customer Name 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Hotel Name",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Hotel Name 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Hotel Name": "E2E Hotel Name 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Room number",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Room number 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Room number": "E2E Room number 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "pickup time",
+      "field_type": "singleSelect",
+      "attempted_value": "00:00",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "pickup time": "00:00"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "trip Name",
+      "field_type": "multilineText",
+      "attempted_value": "E2E trip Name 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "trip Name": "E2E trip Name 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Option",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Option 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Option": "E2E Option 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Non-billable addons",
+      "field_type": "multipleSelects",
+      "attempted_value": [
+        "*= Notes:* Women should please wear appropriate clothing in the old town.....to preserve our tradition, because the Egyptians are not used to it (only City Tour)"
+      ],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Non-billable addons": [
+              "*= Notes:* Women should please wear appropriate clothing in the old town.....to preserve our tradition, because the Egyptians are not used to it (only City Tour)"
+            ]
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Add-Ons ((MultiSelect))",
+      "field_type": "multipleSelects",
+      "attempted_value": [
+        "Transfer Extra: You will pay 10 euros per person for an extra transfer"
+      ],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Add-Ons ((MultiSelect))": [
+              "Transfer Extra: You will pay 10 euros per person for an extra transfer"
+            ]
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Collecting on date Trip",
+      "field_type": "number",
+      "attempted_value": 11,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Collecting on date Trip": 11
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Credit Card",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Credit Card 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Credit Card": "E2E Credit Card 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Currency",
+      "field_type": "multipleSelects",
+      "attempted_value": [
+        "USD"
+      ],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Currency": [
+              "USD"
+            ]
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Amount",
+      "field_type": "number",
+      "attempted_value": 14,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Amount": 14
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Remarks",
+      "field_type": "singleSelect",
+      "attempted_value": "€ 40.00",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Remarks": "€ 40.00"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Add - Ons",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Add - Ons 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Add - Ons": "E2E Add - Ons 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "des",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E des 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "des": "E2E des 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Car Type",
+      "field_type": "multipleSelects",
+      "attempted_value": [
+        "Limousine"
+      ],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Car Type": [
+              "Limousine"
+            ]
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Guide",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Guide 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Guide": "E2E Guide 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "ADT",
+      "field_type": "number",
+      "attempted_value": 20,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "ADT": 20
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "STD",
+      "field_type": "number",
+      "attempted_value": 21,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "STD": 21
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Inf",
+      "field_type": "number",
+      "attempted_value": 22,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Inf": 22
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Youth",
+      "field_type": "number",
+      "attempted_value": 23,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Youth": 23
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "CHD",
+      "field_type": "number",
+      "attempted_value": 24,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "CHD": 24
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Date Trip",
+      "field_type": "dateTime",
+      "attempted_value": "2026-07-20T10:30:00.000Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Date Trip": "2026-07-20T10:30:00.000Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "No show & refund",
+      "field_type": "multipleSelects",
+      "attempted_value": [
+        "No show"
+      ],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "No show & refund": [
+              "No show"
+            ]
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Reason",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Reason 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Reason ": "E2E Reason 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "From",
+      "field_type": "singleSelect",
+      "attempted_value": "SM 07:05",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "From": "SM 07:05"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "to",
+      "field_type": "singleSelect",
+      "attempted_value": "MS 20:50",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "to": "MS 20:50"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Product ID",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Product ID 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Product ID": "E2E Product ID 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Net Rate",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Net Rate 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Net Rate": "E2E Net Rate 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Customer Review",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Customer Review 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Customer Review": "E2E Customer Review 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Traveler name",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Traveler name 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Traveler name": "E2E Traveler name 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Real Product Name",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Real Product Name 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Real Product Name": "E2E Real Product Name 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Booking Status",
+      "field_type": "singleSelect",
+      "attempted_value": "Active",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Booking Status": "Active"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "CHD Age",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E CHD Age 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "CHD Age": "E2E CHD Age 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Total price EUR",
+      "field_type": "number",
+      "attempted_value": 37,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Total price EUR": 37
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Total price USD",
+      "field_type": "number",
+      "attempted_value": 38,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Total price USD ": 38
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Total price GBP",
+      "field_type": "number",
+      "attempted_value": 39,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Total price GBP ": 39
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Welcome email sent?",
+      "field_type": "checkbox",
+      "attempted_value": true,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Welcome email sent?": true
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "GYG Rating",
+      "field_type": "rating",
+      "attempted_value": 4,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "GYG Rating": 4
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Status",
+      "field_type": "checkbox",
+      "attempted_value": true,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Status": true
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "On Our Way",
+      "field_type": "singleSelect",
+      "attempted_value": "Try again",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "On Our Way ": "Try again"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Ticket Flight Price EGP",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Ticket Flight Price EGP 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Ticket Flight Price EGP": "E2E Ticket Flight Price EGP 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Traffic Hurghada",
+      "field_type": "multipleSelects",
+      "attempted_value": [],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Traffic Hurghada ": []
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Customer Country",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Customer Country 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Customer Country": "E2E Customer Country 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Review Date",
+      "field_type": "date",
+      "attempted_value": "2026-07-20",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Review Date": "2026-07-20"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Cost EGP",
+      "field_type": "number",
+      "attempted_value": 48,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Cost EGP": 48
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "FTS Travels Important Notice",
+      "field_type": "checkbox",
+      "attempted_value": true,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "FTS Travels Important Notice": true
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Refund Amount",
+      "field_type": "number",
+      "attempted_value": 50,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Refund Amount": 50
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Total Travelers",
+      "field_type": "number",
+      "attempted_value": 51,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Total Travelers": 51
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Note",
+      "field_type": "multilineText",
+      "attempted_value": "E2E Note 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Note": "E2E Note 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Sent Bad Review Status",
+      "field_type": "checkbox",
+      "attempted_value": true,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Sent Bad Review Status": true
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "End trip",
+      "field_type": "checkbox",
+      "attempted_value": true,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "End trip": true
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Driver Star",
+      "field_type": "rating",
+      "attempted_value": 4,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Driver Star": 4
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Trip Status",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Trip Status 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Trip Status": "E2E Trip Status 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Trip Start Time",
+      "field_type": "dateTime",
+      "attempted_value": "2026-07-20T10:30:00.000Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Trip Start Time": "2026-07-20T10:30:00.000Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Coupon",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Coupon 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Coupon": "E2E Coupon 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Payment Method",
+      "field_type": "singleSelect",
+      "attempted_value": "Cash",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Payment Method": "Cash"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Local Car Type",
+      "field_type": "multipleSelects",
+      "attempted_value": [
+        "Limousine"
+      ],
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Local Car Type": [
+              "Limousine"
+            ]
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Hotel Cost",
+      "field_type": "number",
+      "attempted_value": 61,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Hotel Cost": 61
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "AI Chat Status",
+      "field_type": "singleSelect",
+      "attempted_value": "ESCALATED",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "AI Chat Status": "ESCALATED"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Tour Type",
+      "field_type": "singleSelect",
+      "attempted_value": "Museum",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Tour Type": "Museum"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Commission Breakdown",
+      "field_type": "percent",
+      "attempted_value": 0.15,
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Commission Breakdown": 0.15
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Retail Price",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Retail Price 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Retail Price": "E2E Retail Price 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Revenue",
+      "field_type": "singleLineText",
+      "attempted_value": "E2E Revenue 20260713T160702Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Revenue": "E2E Revenue 20260713T160702Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Inquiry Type",
+      "field_type": "singleSelect",
+      "attempted_value": "CANCELLATION",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Inquiry Type": "CANCELLATION"
+          },
+          "blocked_fields": []
+        }
+      }
+    },
+    {
+      "field_name": "Real Date Trip",
+      "field_type": "dateTime",
+      "attempted_value": "2026-07-20T10:30:00.000Z",
+      "ok": true,
+      "response": {
+        "status": "success",
+        "message": "Main/List record updated successfully.",
+        "data": {
+          "record_id": "recPRC2TeFZTc8gOE",
+          "applied_fields": {
+            "Real Date Trip": "2026-07-20T10:30:00.000Z"
+          },
+          "blocked_fields": []
+        }
+      }
+    }
+  ]
+}

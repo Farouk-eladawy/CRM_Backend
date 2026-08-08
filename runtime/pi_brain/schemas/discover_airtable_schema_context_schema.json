@@ -1,0 +1,13 @@
+{
+  "name": "discover_airtable_schema_context",
+  "description": "Discovers all configured Airtable bases, tables, fields, field types, select choices, and linked-table relations. Stores a schema snapshot for PI so it can suggest updateable fields even when the user does not explicitly mention the field name.",
+  "target_record": "all",
+  "requires_approval": false,
+  "payload": {
+    "refresh": "boolean (Optional. If true, force a fresh metadata read from Airtable instead of relying on cached schema context.)",
+    "base_labels": "array of strings (Optional. Restrict discovery to configured bases such as 'main', 'trips', or 'religious'.)",
+    "target_table": "string (Optional. Restrict discovery output to a specific Airtable table name such as 'List' or 'Leads CRM'.)",
+    "include_field_options": "boolean (Optional. If true, include select/multi-select choices where available.)",
+    "max_fields_per_table": "integer (Optional. Limits returned fields per table in the action result while still saving the full snapshot.)"
+  }
+}

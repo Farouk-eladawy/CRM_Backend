@@ -1,0 +1,153 @@
+id	name	type
+fldNkXuR3rytcsswQ	Agency	singleLineText
+fldZGLB1NXyaM530F	Booking Nr.	multilineText
+fld0vi9Gg4Q4FrQqN	Date Trip	dateTime
+fldTi5WQWiggTyYLF	trip Name	multilineText
+fldxeRvCQakzWaRTw	Customer Name	multilineText
+fldycSvjVrtHeApBU	Option	multilineText
+fld0VpYP86zx6e7wM	des	singleLineText
+fldkiK6tdHq7O5WEA	Guide	multilineText
+fldTU4QOjSU8eGwcG	ADT	number
+fld464qO0Er9lZqTy	STD	number
+flddUFVXlX2tM2aFa	CHD	number
+fldZxfA1KPxW4f0U1	Inf	number
+fldsDHetRtwrR2Yo2	Add - Ons	multilineText
+fldf5EuwGjs3L75Yw	Hotel Name	multilineText
+fld1AwHLTD5KYyUeQ	Room number	multilineText
+fldiOioY51CxhDvFM	pickup time	singleSelect
+fldz2Q8Pdtk4JI582	Issue Tickets 	singleSelect
+fldzItiGxw8W4Z6D6	From	singleSelect
+fldwxsi9yVHwwtQSE	to	singleSelect
+fldipGqkuotnrZNzl	Product ID	multilineText
+fldROrdKaJ4LMBCv0	Collecting on date Trip	number
+fldOOCUaCGdRpjWsi	Review WhatsApp & Email Sent	singleSelect
+fld1Hru77i6BbON3X	Credit Card	multilineText
+fldjbRrkW8jOtYqHP	Create Date  	createdTime
+fldDeFCFR74boCvJe	CXL Date	dateTime
+fldGOpXkSgFSLSTQA	Remarks	singleSelect
+fldlnGdLQW6lgZdhP	Attachments	multipleAttachments
+fldR8egO7k0QyirPZ	Last Modified	lastModifiedTime
+fld5pX4AlVUCSsLyl	Whatsapp Room & Hotel Sent	singleSelect
+fld4AsPdRUQJqHVia	Whatsapp Pickup Time2	singleSelect
+fldjzxYjMjPu8RAz6	Non-billable addons	multipleSelects
+fldkfIJOHizwtG6Sp	GYG Rating	rating
+fldybgXWJ9tcpIDWo	Customer Review	multilineText
+fldJ8Cr935rIsv0qP	Customer Email	singleLineText
+flduE2TbOmhEv7ebR	Customer Phone	phoneNumber
+fldbQ0TODViVqfrDX	Total price EUR	number
+flddJDtMPvFxZRjpW	Total price USD 	number
+fldF680MyZ3TZhE5q	Total price GBP 	number
+fldNPy7zfFxERlp5z	Welcome email sent?	checkbox
+fldQJqMeoNiCY9gZa	Created By	createdBy
+fld86EpJz89M4LvcQ	Add-Ons ((MultiSelect))	multipleSelects
+fldj4fVrrG1AXawe6	No show & refund	multipleSelects
+fldTThKkbsLQbOqlx	Reason 	multilineText
+fld9XKDr7skie8aj3	Last Modified By	lastModifiedBy
+fldvTmeTAiZvv8S4e	Teka Send V2	button
+fldYaTY94QklaDUoI	Stripe invoice	url
+fld4603hqMTTLNhUx	Teka Send V3	button
+fldGaaJPPBzWWatqn	Youth	number
+fldMgP7tlXi2fV406	CHD Age	singleLineText
+flddIZ0saICNyK3Oo	Send Review	button
+fld6qf33d3uKSUk7i	Attachments Boarding	multipleAttachments
+fldn7tX2vmKx8YDPg	SendAuto	lastModifiedTime
+fldUvqUlROJ8bMxjo	Pickup Scheduled	button
+fldqywL6UFtu9vpSD	Status	checkbox
+fldUYs3AVojqdTSdq	On Our Way 	singleSelect
+fldRrSkZn40wvzI4f	Ticket Flight Price EGP	singleLineText
+fldxojZr9QM07M5Bb	Net Rate	multilineText
+fldSPTTHIB6Tqu9fm	Traffic Hurghada 	multipleSelects
+fldmacIbiGeZPTgJF	Tour Guide Name & Phone	multipleRecordLinks
+fldpbHDv83p4tXgKR	Car Type	multipleSelects
+fldxYcZ9eUhIywv10	Driver Name & Phone	multipleRecordLinks
+fldmUrQIo2cAnSmOR	Last Sent	dateTime
+fldtoDLlCLdrHa7bD	Customer Country	singleLineText
+fldUSc37tXMuNKQa1	Amount	number
+fldqYNM9cO0gP0j0y	Booking Status	singleLineText
+fldaJ5gPFpfMoMkRI	Google Maps	url
+fldTo8xOfiuYXAJf3	Currency	multipleSelects
+fldlYBCgxRYbPPmzk	Traveler name	multilineText
+fldv8AHtWzxvhRczG	Send Status Driver & Guide	singleSelect
+fldwt7CHgweBP9In7	Review Date	date
+fldBOlPbmAT3HOgPE	Send Sharm Pickup	button
+fldZr5Uy7dmKQCDSY	Cost EGP	number
+fldeFPwzOqWreOrXy	Representative Name & Phone	multipleRecordLinks
+fld0x8Utw31NzTe3I	FTS Travels Important Notice	checkbox
+fldb5nYiQ1IySwMz7	CancelBookingUpdateCXLDate	formula
+fldLarr8JRaok4E1r	Generate Invoice	button
+fldsYBmk0iN3sSUHK	Real Product Name	multilineText
+fldzXd4R8TzMPKonk	Refund Amount	number
+fldWgPfS8X35JxZzI	Total Travelers	number
+fldmSuO5mHBpNg4ot	Photo invoice	url
+fldyn4LGMcYOPACtH	Customer personal email	email
+fldpuypjj4RbGmxYp	Cancelled Send Status	singleSelect
+fldFZp5jfFSOxLC1Z	Supplier Name & Phone	multipleRecordLinks
+fldpYGxzy8dYaCBbn	Note	multilineText
+fldStOtT8aDZ3rYm0	Kommo Conversation Backup	singleLineText
+fldCXruY59UFiIkUd	Conversations	singleLineText
+fldVn6KXd2zALVh32	Issue Tickets Date	date
+fldYRjbui0LDzNTRG	Summary (Booking Nr.)	aiText
+fld9fAZm1VH7RwIkY	Chat Driver log	multilineText
+fldLxKq3OlhWTwMGF	Link First Opened	dateTime
+fldkViGQFDDXeCFav	Link Used	checkbox
+fldY05nkv49VYEavE	message	multilineText
+fldFDlwedfBDGCo2S	Driver Location link	url
+fldb63YgLNZpGkCRZ	Driver Link	formula
+fldrSpzhtYTtnF7o3	Customer Location link	url
+fldUFRYj8a7Rvqn1a	Attachments Chat	multipleAttachments
+fldxQUvFZ4ksr1B5b	Customer Link	formula
+fldyqKqRJDGKHIsLP	Customer Link Opened	dateTime
+fldyURpYcVPIdrHPD	Customer Last Message	multilineText
+fldIuq1WEI81jF30u	End trip	checkbox
+fldvDzTZoYd3jwonU	Chat Customer log	multilineText
+fldo03tVxYOkKYR59	Driver Star	rating
+fldGuv25HViefumk5	Trip Status	singleLineText
+fldxkIrsk66Ya4ojL	Trip Start Time	dateTime
+fld2drH7Hm9Lm5iUs	Control Portal	formula
+fldQvitXogi6eTjBJ	Created By Username	multilineText
+fld0mOLIgfwoFpXMU	Created By Email	multilineText
+fldEfaIZioTEAhPF0	Invoice Requested	checkbox
+fldx4H3HZ1loBt7ZC	Invoice Request Date	dateTime
+fldDaUv0t4kDPOA4u	Invoice Requested By	multilineText
+flduuuMSIrGromYIj	AI Chat Log	multilineText
+fldtCWmlaWWlq7SDd	Local Driver	multipleRecordLinks
+fld5Hswu0bnLmgPJt	Guide Link Portal	rollup
+fld8NzVTdwFCn7ILf	Driver Link Portal	rollup
+fldIXg0wCQ2KqFmnG	Coupon	singleLineText
+fld3SZidxdPnEIdQW	Supp Link Portal	rollup
+fldU2tOjTxrnxIRty	Contacts	multipleRecordLinks
+fld0WkstjBxxcOxaq	Conversations 2	multipleRecordLinks
+fldohy6zV4BfC436S	Photographer Link	url
+fld3LDk2Afq9LptZA	Status Photographer WhatsApp	singleSelect
+fldN9TkRiGVgPUB0t	Payment Method	singleSelect
+fld8PcVhsKPBYCz8E	voucher	formula
+fldL6SxTprxkCRoZ0	Last Processed	dateTime
+fldi0Utcnul8za2gg	Invoice Status	singleSelect
+fldo4iSY1R6afdRjq	Local Send Status Driver & Guide	singleSelect
+fldVI88SxWBWf2KDC	Trip UUID	singleLineText
+fldwi7tQNzN6ILOXW	Hotel Changed	lastModifiedTime
+fldmNO7fO7Aa2QbBN	Local Car Type	multipleSelects
+fldm7PCAqS50GENkc	Follow sales	singleCollaborator
+fldSAEgLiHT651CfX	Hotel Cost	number
+fldaX6jc5XUD7F1n2	Country from Phone	aiText
+flddoMrzBCoX0cxII	Synced to mailchamp	checkbox
+fldprPowa5HfDO3lA	Checksum	multilineText
+fldpxGExN6gvgdWVE	Send Personal Email Status	checkbox
+fldAQ043jxHuIu7Ic	Tickets	multipleRecordLinks
+fld1UmSKfwns2U1Bl	Tickets Created?	checkbox
+fldDvxy6ki5E1hRLE	Date Trip Changed	lastModifiedTime
+fld9AN7eXdTlkbbsF	Send Guide Tickets	singleSelect
+fldStOtT8aDZ3rYm0	Sent Bad Review Status	checkbox
+fldU2tOjTxrnxIRty	Offer Send Status	checkbox
+fldlTmUsJViiXoJDv	AI Chat Status	singleSelect
+fldSjZvgwqZgSFHqj	Last Modified AI Chat log	lastModifiedTime
+fldZ14ejBngcCdgzg	Tour Type	singleSelect
+fld2lVVQweQXYDhVE	Commission Breakdown	percent
+fld2ksW4kv3tBMdEe	Retail Price	singleLineText
+fldJbMsRiqjPf4GPJ	Revenue	singleLineText
+fldPPveib2cdrrCUb	Inquiry Type	singleSelect
+fldgr24ttMvEtYxOJ	Last_Modified_Customer_Location	lastModifiedTime
+fldIrNBWjplensx7m	Real Date Trip	dateTime
+fld7MwcdGpnmsGc8B	Tracking Operation Link	formula
+fldSBUxaHIAkuoqhh	Audio Guide Link	formula
+fldYKQGG0z8bi7rsw	Send Reminder Pickup	singleSelect

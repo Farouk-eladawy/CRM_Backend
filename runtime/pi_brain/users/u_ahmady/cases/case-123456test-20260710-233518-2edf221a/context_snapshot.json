@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-123456test-20260710-233518-2edf221a",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "قم بانشاء حجز جديد \nاسم/ Ahmed Elkhatib\n2010134987777\nabkareno50@gmail.com\ntrip name = Orange Bay Day Trip\nOption = Diving with transfer\nDate 12/7/2026\nGuide = English\ntotal price = 50 USD \nقم بانشاء الحجز وانشاء فاتورة 25 دولار"
+      },
+      {
+        "role": "assistant",
+        "text": "وجدت 5 نتائج محتملة / I found 5 possible matches. Send the booking number to identify the exact case:\n1. Kimiya afag | GYG83XN4VGN6 | Unknown | +491733503827\n2. Šimon Kubík | BR-1340342275 | Unknown | +420775324450\n3. Marie Billot | GYG6H8BLXK8X | Unknown | +32470500471\n4. Nadine Ibrahim inbrah abusetta | 29408688 | Unknown | +971502663307\n5. Abalache CE | 763028588 | Unknown | +33614556508"
+      },
+      {
+        "role": "user",
+        "text": "\"PI: حطلي مراقب على الحجز رقم 123456test، ولما حالة الفاتورة (Invoice Status) تتغير وتبقى Paid، ابعتلي إشعار.\""
+      },
+      {
+        "role": "assistant",
+        "text": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right now:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل، لذلك لن أطلب approval لإنشاء جديدة تلقائيًا.\nإذا أردت يمكنني إعادة استخدام الرابط الحالي أو إعادة إرساله، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`."
+      },
+      {
+        "role": "user",
+        "text": "ابعتلي اشعار لما الفاتورة حالتها تتغير الي Successed او Paid"
+      },
+      {
+        "role": "assistant",
+        "text": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right now:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل، لذلك لن أطلب approval لإنشاء جديدة تلقائيًا.\nإذا أردت يمكنني إعادة استخدام الرابط الحالي أو إعادة إرساله، أو اطلب صراحة `أنشئ فاتورة جديدة بدل الحالية`."
+      },
+      {
+        "role": "user",
+        "text": "PI: حطلي مراقب على الحجز رقم 123456test، ولما حالة الفاتورة (Invoice Status) تتغير وتبقى Paid، ابعتلي إشعار."
+      },
+      {
+        "role": "assistant",
+        "text": "تمام يا باشا، تم تسجيل طلب المراقبة على الحجز رقم **123456test**.\n\nهتلاقي كمان ملخص الحجز وتفاصيل المحادثة السابقة مع العميل:\n\n**ملخص الحجز:**\n- العميل: Ahmady\n- الرحلة: The Grand Egyptian Museum\n- التاريخ: 23 يونيو 2026\n- الفندق: Ajira Bay\n- الفاتورة: موجودة (Pending) بقيمة 1740 USD عبر Stripe\n- رابط الفاتورة: https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672\n\n**ملخص المحادثات السابقة مع العميل (8 رسائل):**\n- تم إرسال رابط صور الرحلة (Photographer Email) 3 مرات.\n- تم إرسال طلب تقييم (Feedback) للحجز.\n- العميل رد بـ \"Hello\" وتم الرد عليه من Farah Elkhatib.\n\n**الخطوة التالية:**\n- أنا في انتظار تغير حالة الفاتورة من **Pending** إلى **Paid** أو **Successed**.\n- حالما تتغير الحالة، هبعتلك إشعار فوري هنا على الواتساب.\n- لو عايز تعمل حاجة تانية زي إعادة إرسال رابط الفاتورة للعميل، قولي."
+      }
+    ],
+    "last_case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "last_intent": "booking_summary",
+    "updated_at": "2026-07-10T23:27:57.342748+00:00",
+    "pending_action": {},
+    "workflow_state": {
+      "intent": "booking_summary",
+      "phase": "case_active",
+      "awaiting": "followup",
+      "note": "تمام يا باشا، تم تسجيل طلب المراقبة على الحجز رقم **123456test**.\n\nهتلاقي كمان ملخص الحجز وتفاصيل المحادثة السابقة مع العميل:\n\n**ملخص الحجز:**\n- العميل: Ahmady\n- الرحلة: The Grand Egyptian Museum\n- التاريخ: 23 يونيو 2026\n- الفندق: Ajira Bay\n- الفاتورة: موجودة (Pending) بقيمة 1740 USD عبر Stripe\n- رابط الفاتورة: https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672\n\n**ملخص المحادثات السابقة مع العميل (8 رسائل):**\n- تم إرسال رابط صور الرحلة (Photographer Email) 3 مرات.\n- تم إرسال طلب تقييم (Feedback) للحجز.\n- العميل رد بـ \"Hello\" وتم الرد عليه من Farah Elkhatib.\n\n**الخطوة التالية:**\n- أنا في انتظار تغير حالة الفاتورة من **Pending** إلى **Paid** أو **Successed**.\n- حالما تتغير الحالة، هبعتلك إشعار فوري هنا على الواتساب.\n- لو عايز تعمل حاجة تانية زي إعادة إرسال رابط الفاتورة للعميل، قولي.",
+      "updated_at": "2026-07-10T23:35:18.702022+00:00",
+      "case_context": {
+        "record_id": "recPRC2TeFZTc8gOE",
+        "booking_number": "123456test",
+        "customer_name": "Ahmady",
+        "location": "Unknown",
+        "phone": "201004655246",
+        "email": "Amrmahraga@gmail.com",
+        "trip_name": "The Grand Egyptian Museum",
+        "trip_date": "2026-06-23T01:00:00.000Z",
+        "hotel": "الي Ajira Bay"
+      }
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-10T23:27:15.451574+00:00",
+      "case_id": "case-123456test-20260710-233518-2edf221a",
+      "current_stage": "intake",
+      "stage_status": "started",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "123456test",
+      "intent": "booking_summary",
+      "updated_at": "2026-07-10T23:35:18.702022+00:00"
+    },
+    "topic_reset_meta": {
+      "reason": "reference_changed",
+      "reset_at": "2026-07-10T23:11:19.146613+00:00"
+    }
+  },
+  "captured_at": "2026-07-10T23:35:18.718149+00:00"
+}

@@ -1,0 +1,220 @@
+{
+  "mode": "apply",
+  "db_path": "C:\\Users\\Aloosh2020\\Downloads\\New Project's\\AIAgentProject\\OpenClaw_Version\\chat_history.db",
+  "backup_path": "C:\\Users\\Aloosh2020\\Downloads\\New Project's\\AIAgentProject\\OpenClaw_Version\\chat_history.backup_20260612_232314.db",
+  "conversation_repairs": [
+    {
+      "before": {
+        "chat_id": "a99ce367-dc3b-420d-b787-fb2ed15711af",
+        "source": "Email",
+        "sender_identifier": "rr_zhang@trip.com",
+        "contact_name": "Anna Konate",
+        "airtable_record_id": "recODGJXsJSqxPW75",
+        "booking_number": "received",
+        "thread_id": "19eb70c15337558f",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T22:49:15.695652"
+      },
+      "after": {
+        "chat_id": "a99ce367-dc3b-420d-b787-fb2ed15711af",
+        "source": "Email",
+        "sender_identifier": "rr_zhang@trip.com",
+        "contact_name": "Rongrong Zhang",
+        "airtable_record_id": "recGjpB5ThtsbROGL",
+        "booking_number": null,
+        "thread_id": "19eb70c15337558f",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T22:49:15.695652"
+      },
+      "label": "Rongrong Zhang"
+    },
+    {
+      "before": {
+        "chat_id": "506b1180-ec02-468e-8d70-961cffd53f03",
+        "source": "Email",
+        "sender_identifier": "fabcov@gmail.com",
+        "contact_name": "Anna Konate",
+        "airtable_record_id": "recODGJXsJSqxPW75",
+        "booking_number": "received",
+        "thread_id": "19ebc6a3dabd1273",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T18:27:44.482668"
+      },
+      "after": {
+        "chat_id": "506b1180-ec02-468e-8d70-961cffd53f03",
+        "source": "Email",
+        "sender_identifier": "fabcov@gmail.com",
+        "contact_name": "Fabio Covelli",
+        "airtable_record_id": "rec0USG4nMhweiXj7",
+        "booking_number": "BR-1408048409",
+        "thread_id": "19ebc6a3dabd1273",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T18:27:44.482668"
+      },
+      "label": "Fabio Covelli"
+    },
+    {
+      "before": {
+        "chat_id": "6cbb3ea3-443b-4e3d-b183-4368e4ec7ce5",
+        "source": "Email",
+        "sender_identifier": "rozzagelsomina@gmail.com",
+        "contact_name": "Anna Konate",
+        "airtable_record_id": "recODGJXsJSqxPW75",
+        "booking_number": "received",
+        "thread_id": "19ebd4dfba8283d8",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T22:46:58.921259"
+      },
+      "after": {
+        "chat_id": "6cbb3ea3-443b-4e3d-b183-4368e4ec7ce5",
+        "source": "Email",
+        "sender_identifier": "rozzagelsomina@gmail.com",
+        "contact_name": "Gelsomina Rozza",
+        "airtable_record_id": "recyzD5K9lYnEtUpH",
+        "booking_number": null,
+        "thread_id": "19ebd4dfba8283d8",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T22:46:58.921259"
+      },
+      "label": "Gelsomina Rozza"
+    },
+    {
+      "before": {
+        "chat_id": "aee24b48-5381-4116-95da-9c67ad490b99",
+        "source": "Email",
+        "sender_identifier": "customer-7jlsqqxat6zpfaa7@reply.getyourguide.com::GYGFWV66NVKB",
+        "contact_name": "Anna Konate",
+        "airtable_record_id": "recjdOr7j8X48Lr85",
+        "booking_number": "GYGFWV66NVKB",
+        "thread_id": "19eb2be0579ae625:GYGFWV66NVKB",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T00:08:22.539288"
+      },
+      "after": {
+        "chat_id": "aee24b48-5381-4116-95da-9c67ad490b99",
+        "source": "Email",
+        "sender_identifier": "customer-7jlsqqxat6zpfaa7@reply.getyourguide.com::GYGFWV66NVKB",
+        "contact_name": "Anna Konate",
+        "airtable_record_id": "recjdOr7j8X48Lr85",
+        "booking_number": "GYGFWV66NVKB",
+        "thread_id": "19eb2be0579ae625:GYGFWV66NVKB",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T00:08:22.539288"
+      },
+      "label": "Anna Konate"
+    }
+  ],
+  "message_moves": [
+    {
+      "source_chat_id": "a99ce367-dc3b-420d-b787-fb2ed15711af",
+      "target_chat_id": "6cbb3ea3-443b-4e3d-b183-4368e4ec7ce5",
+      "reason": "Moved Gelsomina follow-up replies out of Rongrong thread",
+      "moved_count": 4,
+      "messages": [
+        {
+          "msg_id": "315121a1-7ffb-4fbf-916d-394490cf23fc",
+          "timestamp": "2026-06-12T22:40:34.212533",
+          "sender_type": "ai",
+          "text": "Thank you for sharing your booking confirmation number BK344386779823262. I have looked up your reservation.\n\nBased on our records, your booking is for the **Quad ATV** tour scheduled for **tomorrow, Saturday, 13 June 2026**. You are staying at the **Reef Oasis Beach Aqua Park Resort**, room **8181**.\n\nRegarding your questions:\n\n**Where will you go?**  \nYou will be taken on a Quad ATV adventure in the Sharm El-Sheikh area, which typically includes riding through the desert and enjoying the scenery.\n\n**What time will we pick you up?**  \nYour confirmed pickup time has not yet been finalized. It will be sent to you via WhatsApp and Email later today (by 6:00 PM Cairo time), as is standard for trips scheduled the next day. Please keep an eye on your messages.\n\nIf you have any other questions, feel free to ask!\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib"
+        },
+        {
+          "msg_id": "813a9769-3958-4f06-b72d-8277ae8f247d",
+          "timestamp": "2026-06-12T22:44:54.306070",
+          "sender_type": "agent",
+          "text": "[PROPOSED_DRAFT]\nThank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib"
+        },
+        {
+          "msg_id": "0cf7c88f-06c9-4a14-9f9d-9ba4b1803141",
+          "timestamp": "2026-06-12T22:47:14.240623",
+          "sender_type": "agent",
+          "text": "[PROPOSED_DRAFT]\nThank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib"
+        },
+        {
+          "msg_id": "02a0506d-5948-4c29-a330-5e3cf21fa62f",
+          "timestamp": "2026-06-12T22:49:15.695652",
+          "sender_type": "agent",
+          "text": "[System Log] Conversation transferred by Hazem_Mohamed from Hurghada/Cairo to Sharm"
+        }
+      ]
+    }
+  ],
+  "airtable_patches": [
+    {
+      "table": "main",
+      "record_id": "rec0USG4nMhweiXj7",
+      "field_count": 4
+    },
+    {
+      "table": "leads",
+      "record_id": "recGjpB5ThtsbROGL",
+      "field_count": 2
+    },
+    {
+      "table": "leads",
+      "record_id": "recyzD5K9lYnEtUpH",
+      "field_count": 2
+    }
+  ],
+  "post_checks": [
+    {
+      "chat_id": "a99ce367-dc3b-420d-b787-fb2ed15711af",
+      "conversation": {
+        "chat_id": "a99ce367-dc3b-420d-b787-fb2ed15711af",
+        "source": "Email",
+        "sender_identifier": "rr_zhang@trip.com",
+        "contact_name": "Rongrong Zhang",
+        "airtable_record_id": "recGjpB5ThtsbROGL",
+        "booking_number": null,
+        "thread_id": "19eb70c15337558f",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T18:35:03.046661"
+      },
+      "message_count": 7
+    },
+    {
+      "chat_id": "506b1180-ec02-468e-8d70-961cffd53f03",
+      "conversation": {
+        "chat_id": "506b1180-ec02-468e-8d70-961cffd53f03",
+        "source": "Email",
+        "sender_identifier": "fabcov@gmail.com",
+        "contact_name": "Fabio Covelli",
+        "airtable_record_id": "rec0USG4nMhweiXj7",
+        "booking_number": "BR-1408048409",
+        "thread_id": "19ebc6a3dabd1273",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T18:27:44.482668"
+      },
+      "message_count": 4
+    },
+    {
+      "chat_id": "6cbb3ea3-443b-4e3d-b183-4368e4ec7ce5",
+      "conversation": {
+        "chat_id": "6cbb3ea3-443b-4e3d-b183-4368e4ec7ce5",
+        "source": "Email",
+        "sender_identifier": "rozzagelsomina@gmail.com",
+        "contact_name": "Gelsomina Rozza",
+        "airtable_record_id": "recyzD5K9lYnEtUpH",
+        "booking_number": null,
+        "thread_id": "19ebd4dfba8283d8",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T22:49:15.695652"
+      },
+      "message_count": 9
+    },
+    {
+      "chat_id": "aee24b48-5381-4116-95da-9c67ad490b99",
+      "conversation": {
+        "chat_id": "aee24b48-5381-4116-95da-9c67ad490b99",
+        "source": "Email",
+        "sender_identifier": "customer-7jlsqqxat6zpfaa7@reply.getyourguide.com::GYGFWV66NVKB",
+        "contact_name": "Anna Konate",
+        "airtable_record_id": "recjdOr7j8X48Lr85",
+        "booking_number": "GYGFWV66NVKB",
+        "thread_id": "19eb2be0579ae625:GYGFWV66NVKB",
+        "is_deleted": 0,
+        "last_message_time": "2026-06-12T00:08:22.539288"
+      },
+      "message_count": 8
+    }
+  ]
+}

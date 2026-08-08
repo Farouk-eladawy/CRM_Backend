@@ -1,0 +1,26 @@
+{
+  "understood_intent": "next_step",
+  "confidence": 0.73,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "send_customer_message",
+  "case_reference": "123456test",
+  "hard_case_reason": [
+    "short_followup_context_dependency",
+    "context_sensitive_reasoning"
+  ],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [
+    "customer_send_operation",
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "next step 123456test",
+    "reply_preview": "مرحباً،\n\nبناءً على طلبك للحصول على الخطوة التالية للحجز **123456test** للعميل **Ahmady**:\n\n**الوضع الحالي:**\n- تم إرسال قالب Opening ورد العميل بـ \"Hello\".\n- آخر تفاعل من الوكيل: سؤال عن تأكيد الدفع (Pending).\n- الدفع لا يزال معلقاً حسب آخر محادثة في CRM.\n\n**الخطوة التالية الموصى بها:**\n- **تحقق من حالة الدفع في Airtable/CRM أولاً** للتأكد مما إذا تم تحديثها إلى \"Confirmed\" أو لا تزال \"Pending\".\n- إذا كان الدفع لا يزال **Pending**، يُوصى بإرسال رسالة للعميل تطلب منه تأكيد الدفع أو مشاركة إثبات ا",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T03:35:08.231617+00:00"
+}

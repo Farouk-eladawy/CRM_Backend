@@ -1,0 +1,754 @@
+// ✅ إعدادات Airtable وWebhook
+const AIRTABLE_API_KEY = 'patPlKVK4bsSNcUY1.6a0bc7165b9eac5ee3050a58ccbeaf1f91517593c9e62a246e70dbae29d679f9';
+const BASE_ID = 'appTp5YgSp9DV2HYc';
+const TABLE_NAME = 'List';
+const VIEW_NAME = '30Min Pickup Time';
+const WEBHOOK_URL = 'https://hook.us2.make.com/le0els992f3154c9w6mdwkil15ybxfko';
+const ALERT_EMAIL = 'Ahmadyeladawy@gmail.com';
+const COMPANY_EMAIL = 'booking@ftstravels.com';
+const COMPANY_PHONE = '+2 01030774440';
+const COMPANY_ADDRESS = '12h/4 Shawky Abdelmenim St., Maadi, Cairo';
+const COMPANY_NAME = 'FTS Travels';
+const COMPANY_LOGO = 'https://ftstravels.com/cropped-logo-2.png';
+
+// إعدادات معدل الإرسال
+const EMAIL_DELAY_MS = 2000; // تأخير 2 ثانية بين كل إيميل
+const BATCH_SIZE = 5; // عدد الإيميلات في كل دفعة
+const BATCH_DELAY_MS = 10000; // تأخير 10 ثواني بين كل دفعة
+
+// ثوابت تنسيق الرسائل
+const EMAIL_COLORS = {
+  primary: '#FF5722',
+  secondary: '#2196F3',
+  background: '#ECEFF1',
+  textLight: '#FFE0B2',
+  warning: '#fff3cd',
+  info: '#E3F2FD',
+  grey: '#f5f5f5'
+};
+
+const HEADERS = {
+  "Authorization": `Bearer ${AIRTABLE_API_KEY}`,
+  "Content-Type": "application/json"
+};
+
+// رحلات الشاطئ التي تحتاج ملاحظة خاصة
+const BEACH_TRIPS = ['orange bay day trip', 'dolphin watching & snorkeling'];
+const BEACH_TRIP_NOTE = 'What to bring: sunglasses, hat, swimwear, towel, sunscreen, and cash';
+
+/**
+ * الدالة الرئيسية - تعالج السجلات وترسل التفاصيل عبر الإيميل و Webhook
+ */
+function sendPickupDetails() {
+  try {
+    const records = fetchAirtableRecords();
+    if (!records.length) {
+      Logger.log('📭 لا توجد سجلات جديدة للمعالجة.');
+      return;
+    }
+
+    Logger.log(`🔄 جاري معالجة ${records.length} سجل...`);
+    
+    let successCount = 0;
+    let errorCount = 0;
+    let emailsSentInBatch = 0;
+
+    records.forEach((record, index) => {
+      try {
+        // إضافة تأخير بين كل إيميل
+        if (index > 0) {
+          Utilities.sleep(EMAIL_DELAY_MS);
+        }
+        
+        // إضافة تأخير إضافي بعد كل دفعة
+        if (emailsSentInBatch >= BATCH_SIZE) {
+          Logger.log(`⏸️ الانتظار ${BATCH_DELAY_MS / 1000} ثانية بعد إرسال ${BATCH_SIZE} إيميلات...`);
+          Utilities.sleep(BATCH_DELAY_MS);
+          emailsSentInBatch = 0;
+        }
+        
+        const result = processRecord(record);
+        if (result.emailSent) {
+          emailsSentInBatch++;
+        }
+        successCount++;
+      } catch (error) {
+        errorCount++;
+        Logger.log(`❌ خطأ أثناء معالجة السجل ${record.id}: ${error.message}`);
+        
+        // إذا كان الخطأ بسبب تجاوز الحد، توقف عن المعالجة
+        if (error.message.includes('User-rate limit exceeded')) {
+          Logger.log('⚠️ تم الوصول إلى حد معدل الإرسال. سيتم إيقاف المعالجة.');
+          return;
+        }
+      }
+    });
+
+    Logger.log(`✅ اكتملت المعالجة. نجاح: ${successCount}, فشل: ${errorCount}`);
+  } catch (error) {
+    Logger.log(`❌ خطأ عام: ${error.message}`);
+  }
+}
+
+/**
+ * تحميل ملف من رابط URL ورفعه إلى Google Drive ثم استخراج رابط مشاركة عام
+ * @param {String} url - رابط الملف الأصلي
+ * @param {String} filename - اسم الملف بعد الرفع
+ * @return {String} - رابط المشاركة العام من Google Drive
+ */
+function uploadToDriveAndGetPublicUrl(url, filename) {
+  try {
+    const response = UrlFetchApp.fetch(url);
+    const blob = response.getBlob().setName(filename);
+    const folder = DriveApp.getFolderById("19kxt_vaqX3ZuvfxmuR7gO9ffpRc2-kXb"); // ضع ID المجلد هنا
+    const file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return file.getUrl();
+  } catch (error) {
+    Logger.log(`❌ فشل رفع الملف إلى Google Drive: ${error.message}`);
+    return url; // fallback to original URL if upload fails
+  }
+}
+
+/**
+ * التحقق من كون الرحلة رحلة طيران
+ * @param {String} tripName - اسم الرحلة
+ * @return {Boolean} - true إذا كانت رحلة طيران
+ */
+function isFlightTrip(tripName) {
+  const tripNameLower = tripName.toLowerCase();
+  return tripNameLower.includes('plane') || tripNameLower.includes('flight');
+}
+
+/**
+ * التحقق من كون الرحلة رحلة شاطئ تحتاج ملاحظة خاصة
+ * @param {String} tripName - اسم الرحلة
+ * @return {Boolean} - true إذا كانت رحلة شاطئ
+ */
+function isBeachTrip(tripName) {
+  const tripNameLower = tripName.toLowerCase();
+  return BEACH_TRIPS.some(beachTrip => tripNameLower.includes(beachTrip));
+}
+
+/**
+ * تحديد نوع الإيميل الأساسي
+ * @param {String} tripName - اسم الرحلة
+ * @return {String} - نوع الإيميل (ticket, pickup)
+ */
+function determineEmailType(tripName) {
+  const tripNameLower = tripName.toLowerCase();
+  
+  // إيميل التذاكر للرحلات التي تحتوي على QR أو Sound
+  if (tripNameLower.includes('qr') || tripNameLower.includes('sound')) {
+    return 'ticket';
+  }
+  
+  // إيميل تفاصيل الاستلام العادي (بما في ذلك رحلات الطيران)
+  return 'pickup';
+}
+
+/**
+ * معالجة سجل واحد من البيانات
+ * @param {Object} record - سجل البيانات من Airtable
+ * @return {Object} - نتيجة المعالجة
+ */
+function processRecord(record) {
+  const fields = record.fields;
+  Logger.log(` Attachments field type: ${Object.prototype.toString.call(fields['Attachments'])}`);
+  
+  // استخراج البيانات وتنظيفها
+  const bookingData = extractBookingData(fields);
+  
+  // تحديد نوع الإيميل الأساسي
+  const emailType = determineEmailType(bookingData.tripName);
+  const isFlightBooking = isFlightTrip(bookingData.tripName);
+  Logger.log(`📧 نوع الإيميل المحدد: ${emailType} للرحلة: ${bookingData.tripName}${isFlightBooking ? ' (رحلة طيران - سيتم إرسال رسالة مطار إضافية)' : ''}`);
+
+  // تجهيز محتوى الإيميل الأساسي
+  const emailSubject = generateEmailSubject(bookingData);
+  let emailBody = '';
+  
+  switch (emailType) {
+    case 'ticket':
+      emailBody = generateTicketEmail(bookingData);
+      break;
+    default:
+      emailBody = generatePickupDetailsEmail(bookingData);
+  }
+  
+  // تجهيز بيانات الـ Webhook
+  const webhookPayload = prepareWebhookPayload(record.id, bookingData);
+  
+  // إرسال الإيميل الأساسي والتعامل مع الأخطاء
+  let emailSent = false;
+  let airportEmailSent = false;
+  
+  if (bookingData.customerEmail && isValidEmail(bookingData.customerEmail)) {
+    try {
+      // إرسال الإيميل الأساسي (pickup أو ticket)
+      sendEmailWithRetry(bookingData.customerEmail, emailSubject, emailBody);
+      Logger.log(`📧 تم إرسال إيميل ${emailType} إلى: ${bookingData.customerEmail}`);
+      emailSent = true;
+      
+      // إرسال رسالة المطار الإضافية للرحلات الجوية
+      if (isFlightBooking) {
+        try {
+          // إضافة تأخير قبل إرسال الإيميل الثاني
+          Utilities.sleep(EMAIL_DELAY_MS);
+          
+          const airportSubject = `Important Airport Instructions - ${bookingData.tripName} ${bookingData.bookingNr}`;
+          const airportBody = generateAirportEmail(bookingData);
+          
+          sendEmailWithRetry(bookingData.customerEmail, airportSubject, airportBody);
+          Logger.log(`✈️ تم إرسال رسالة المطار الإضافية إلى: ${bookingData.customerEmail}`);
+          airportEmailSent = true;
+        } catch (airportError) {
+          Logger.log(`❌ فشل إرسال رسالة المطار: ${airportError.message}`);
+          sendErrorAlert(bookingData, `فشل إرسال رسالة المطار: ${airportError.message}`);
+        }
+      }
+      
+    } catch (emailError) {
+      Logger.log(`❌ فشل إرسال الإيميل الأساسي: ${emailError.message}`);
+      sendErrorAlert(bookingData, `فشل إرسال الإيميل الأساسي: ${emailError.message}`);
+      throw emailError; // إعادة رمي الخطأ للتعامل معه في الدالة الرئيسية
+    }
+  } else if (bookingData.customerEmail) {
+    // إرسال تنبيه عن إيميل غير صالح
+    sendErrorAlert(bookingData, 'الإيميل غير صالح');
+  }
+  
+  // إرسال Webhook
+  const webhookSent = sendWebhook(webhookPayload);
+  
+  // تحديد حالة الإرسال
+  const overallEmailSuccess = emailSent && (!isFlightBooking || airportEmailSent);
+  
+  // تحديث حالة السجل
+  const status = (overallEmailSuccess || !bookingData.customerEmail) && webhookSent ? 'Done' : 'Try Again';
+  updateWhatsappStatus(record.id, status);
+  
+  Logger.log(`✓ تمت معالجة السجل ${record.id}: إيميل أساسي=${emailSent}${isFlightBooking ? `, إيميل مطار=${airportEmailSent}` : ''}, webhook=${webhookSent}, الحالة=${status}`);
+  
+  return { emailSent: emailSent || airportEmailSent };
+}
+
+/**
+ * إرسال إيميل مع إعادة المحاولة في حالة الفشل
+ * @param {String} to - البريد الإلكتروني للمستلم
+ * @param {String} subject - عنوان الإيميل
+ * @param {String} htmlBody - محتوى الإيميل HTML
+ */
+function sendEmailWithRetry(to, subject, htmlBody, maxRetries = 3) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      GmailApp.sendEmail(to, subject, '', {
+        htmlBody: htmlBody,
+        name: COMPANY_NAME
+      });
+      return; // نجح الإرسال
+    } catch (error) {
+      lastError = error;
+      
+      if (error.message.includes('User-rate limit exceeded')) {
+        // استخراج وقت إعادة المحاولة من رسالة الخطأ
+        const retryMatch = error.message.match(/Retry after (.+?) \(/);
+        if (retryMatch) {
+          const retryTime = new Date(retryMatch[1]);
+          const waitTime = Math.max(0, retryTime - new Date()) + 1000; // إضافة ثانية إضافية
+          
+          if (attempt < maxRetries) {
+            Logger.log(`⏳ الانتظار ${Math.ceil(waitTime / 1000)} ثانية قبل إعادة المحاولة ${attempt + 1}/${maxRetries}...`);
+            Utilities.sleep(waitTime);
+          }
+        } else if (attempt < maxRetries) {
+          // إذا لم نتمكن من استخراج وقت إعادة المحاولة، انتظر وقت افتراضي
+          const defaultWait = 5000 * attempt; // 5، 10، 15 ثانية
+          Logger.log(`⏳ الانتظار ${defaultWait / 1000} ثانية قبل إعادة المحاولة ${attempt + 1}/${maxRetries}...`);
+          Utilities.sleep(defaultWait);
+        }
+      } else {
+        // خطأ آخر غير متعلق بمعدل الإرسال
+        throw error;
+      }
+    }
+  }
+  
+  // فشلت جميع المحاولات
+  throw lastError;
+}
+
+/**
+ * استخراج وتنظيف بيانات الحجز من حقول السجل
+ * @param {Object} fields - حقول السجل من Airtable
+ * @return {Object} - بيانات الحجز المنظفة
+ */
+function extractBookingData(fields) {
+  const attachmentsArray = fields['Attachments'] || [];
+
+  return {
+    bookingNr: cleanField(fields['Booking Nr.']),
+    dateTrip: formatDate(fields['Date Trip']),
+    tripName: cleanField(fields['trip Name']),
+    optionName: cleanField(fields['Option']),
+    customerName: formatCustomerName(cleanField(fields['Customer Name'])),
+    customerEmail: cleanField(fields['Customer Email']),
+    customerPhone: cleanPhone(fields['Customer Phone']),
+    hotelName: cleanField(fields['Hotel Name']),
+    pickupTime: cleanField(fields['pickup time']),
+    addOns: cleanField(fields['Collecting on date Trip']),
+    nonBillableAddons: cleanField(fields['Non-billable addons']),
+    googleMaps: cleanField(fields['Google Maps']),
+    attachments: extractAttachmentsHTML(attachmentsArray), // لعرض المرفقات في الإيميل
+    attachmentsArray: attachmentsArray,                    // لإرسالها في Webhook
+    fullTripName: prepareFullTripName(
+      cleanField(fields['trip Name']),
+      cleanField(fields['Option'])
+    )
+  };
+}
+
+/**
+ * تجهيز Payload لـ Webhook بعد تنظيف البيانات
+ * @param {String} recordId - معرف السجل
+ * @param {Object} data - بيانات الحجز
+ * @return {Object} - Payload جاهز للإرسال
+ */
+function prepareWebhookPayload(recordId, data) {
+  const attachmentsForWebhook = extractAttachmentsForWebhook(data.attachmentsArray);
+
+  const payload = {
+    recordId: recordId,
+    bookingNr: data.bookingNr,
+    dateTrip: data.dateTrip,
+    tripName: data.tripName,
+    optionName: data.optionName,
+    customerName: data.customerName,
+    customerEmail: data.customerEmail,
+    customerPhone: data.customerPhone,
+    hotelName: data.hotelName,
+    pickupTime: data.pickupTime,
+    addOns: data.addOns,
+    nonBillableAddons: data.nonBillableAddons,
+    googleMaps: data.googleMaps,
+    ...attachmentsForWebhook
+  };
+
+  return cleanPayload(payload);
+}
+
+/**
+ * انشاء عنوان الإيميل المناسب
+ * @param {Object} data - بيانات الحجز
+ * @return {String} - عنوان الإيميل
+ */
+function generateEmailSubject({ tripName, optionName, bookingNr }) {
+  return `Your booking for ${tripName} ${optionName ? ' ' + optionName : ''} ${bookingNr} is confirmed! ✨`;
+}
+
+/**
+ * إرسال تنبيه خطأ إلى البريد الإلكتروني للمسؤول
+ * @param {Object} data - بيانات الحجز
+ * @param {String} errorMessage - رسالة الخطأ
+ */
+function sendErrorAlert(data, errorMessage) {
+  try {
+    // إضافة تأخير صغير قبل إرسال تنبيه الخطأ
+    Utilities.sleep(1000);
+    
+    GmailApp.sendEmail(
+      ALERT_EMAIL, 
+      `❗ مشكلة في حجز العميل #${data.bookingNr}`, 
+      `Booking Number: ${data.bookingNr}
+Customer Name: ${data.customerName}
+Customer Email: ${data.customerEmail}
+Customer Phone: ${data.customerPhone}
+
+⚠️ ${errorMessage}، الرجاء المراجعة والتدخل اليدوي.`
+    );
+    Logger.log(`⚠️ تم إرسال تنبيه: ${errorMessage}`);
+  } catch (alertError) {
+    Logger.log(`❌ فشل إرسال تنبيه الخطأ: ${alertError.message}`);
+  }
+}
+
+/**
+ * جلب السجلات من Airtable
+ * @return {Array} - مصفوفة من السجلات
+ */
+function fetchAirtableRecords() {
+  try {
+    const response = UrlFetchApp.fetch(
+      `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?view=${encodeURIComponent(VIEW_NAME)}`, 
+      { method: 'get', headers: HEADERS, muteHttpExceptions: true }
+    );
+    
+    const statusCode = response.getResponseCode();
+    if (statusCode !== 200) {
+      throw new Error(`فشل جلب السجلات. كود الاستجابة: ${statusCode}`);
+    }
+    
+    const content = JSON.parse(response.getContentText());
+    return content.records || [];
+  } catch (error) {
+    Logger.log(`❌ خطأ في جلب السجلات: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * إرسال البيانات إلى Webhook
+ * @param {Object} payload - البيانات المراد إرسالها
+ * @return {Boolean} - نجاح العملية
+ */
+function sendWebhook(payload) {
+  try {
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+    
+    const response = UrlFetchApp.fetch(WEBHOOK_URL, options);
+    const statusCode = response.getResponseCode();
+    
+    if (statusCode !== 200) {
+      Logger.log(`⚠️ استجابة Webhook غير متوقعة: ${statusCode}`);
+    }
+    
+    return statusCode === 200;
+  } catch (error) {
+    Logger.log(`❌ فشل إرسال Webhook: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * تحديث حالة الـ Whatsapp في السجل
+ * @param {String} recordId - معرف السجل
+ * @param {String} status - الحالة الجديدة
+ */
+function updateWhatsappStatus(recordId, status) {
+  try {
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}/${recordId}`;
+    const payload = JSON.stringify({
+      fields: { "Whatsapp Pickup Time2": status }
+    });
+    
+    UrlFetchApp.fetch(url, { 
+      method: 'patch', 
+      headers: HEADERS, 
+      payload: payload, 
+      muteHttpExceptions: true 
+    });
+    
+    Logger.log(`✓ تم تحديث حالة السجل ${recordId} إلى "${status}"`);
+  } catch (error) {
+    Logger.log(`❌ فشل تحديث الحالة للسجل ${recordId}: ${error.message}`);
+  }
+}
+
+/**
+ * التحقق من صحة الإيميل
+ * @param {String} email - البريد الإلكتروني للتحقق
+ * @return {Boolean} - صحة البريد الإلكتروني
+ */
+function isValidEmail(email) {
+  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return pattern.test(email);
+}
+
+/**
+ * تنظيف حقل نصي
+ * @param {String} value - القيمة المراد تنظيفها
+ * @return {String} - القيمة بعد التنظيف
+ */
+function cleanField(value) {
+  return (value || '')
+    .toString()
+    .replace(/[\r\n]+/g, ' ')      // إزالة أي أسطر جديدة وتحويلها إلى مسافة واحدة
+    .replace(/\([^\)]*\)/g, '')    // حذف أي محتوى داخل أقواس ()
+    .replace(/,+/g, ',')           // دمج الفواصل المكررة إلى فاصلة واحدة فقط
+    .replace(/\s*,\s*/g, ',')      // حذف المسافات حول الفواصل
+    .replace(/\s+/g, ' ')          // دمج كل المسافات الزائدة إلى مسافة واحدة
+    .trim();
+}
+
+/**
+ * تنظيف نص وتحويل المسافات إلى فواصل
+ * @param {String} text - النص المراد تنظيفه
+ * @return {String} - النص بعد التنظيف
+ */
+function cleanText(text) {
+  return (text || '').toString().trim().replace(/\s+/g, ',');
+}
+
+/**
+ * تنظيف رقم الهاتف من المسافات
+ * @param {String} phone - رقم الهاتف المراد تنظيفه
+ * @return {String} - رقم الهاتف بعد التنظيف
+ */
+function cleanPhone(phone) {
+  return (phone || '').toString().trim().replace(/\s+/g, '');
+}
+
+/**
+ * تنسيق التاريخ بصيغة dd/MM/yyyy
+ * @param {String} dateStr - سلسلة التاريخ
+ * @return {String} - التاريخ المنسق
+ */
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const date = new Date(dateStr);
+    return Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+  } catch (error) {
+    return dateStr || '';
+  }
+}
+
+/**
+ * تجهيز اسم الرحلة الكامل
+ * @param {String} tripName - اسم الرحلة
+ * @param {String} optionName - اسم الخيار
+ * @return {String} - اسم الرحلة الكامل
+ */
+function prepareFullTripName(tripName, optionName) {
+  if (optionName) {
+    return `${tripName} - ${optionName}`;
+  }
+  return tripName;
+}
+
+/**
+ * تنسيق اسم العميل
+ * @param {String} name - اسم العميل
+ * @return {String} - اسم العميل المنسق
+ */
+function formatCustomerName(name) {
+  const parts = cleanField(name).split(' ');
+  if (parts.length > 1) {
+    return parts.slice(0, 2).join(' ') + ',' + (parts.length > 2 ? ' ' + parts.slice(2).join(' ') : '');
+  }
+  return name;
+}
+
+/**
+ * حذف الحقول الفارغة من الـ Payload
+ * @param {Object} payload - الكائن المراد تنظيفه
+ * @return {Object} - الكائن بعد التنظيف
+ */
+function cleanPayload(payload) {
+  const cleaned = {};
+  for (const key in payload) {
+    if (payload[key] !== undefined && 
+        payload[key] !== null && 
+        payload[key].toString().trim() !== '') {
+      cleaned[key] = payload[key];
+    }
+  }
+  return cleaned;
+}
+
+/**
+ * تجهيز HTML للمرفقات في الإيميل
+ * @param {Array} attachments - مصفوفة المرفقات
+ * @return {String} - HTML المرفقات
+ */
+function extractAttachmentsHTML(attachments) {
+  if (!attachments || !attachments.length) return '';
+
+  return attachments.map((att, idx) => {
+    const driveUrl = uploadToDriveAndGetPublicUrl(att.url, att.filename || `Attachment_${idx + 1}.pdf`);
+    return `<p><b>${att.filename || 'Attachment ' + (idx + 1)}</b>: 
+      <a href="${driveUrl}" target="_blank" style="background-color: ${EMAIL_COLORS.secondary}; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px;">View Ticket</a></p>`;
+  }).join('');
+}
+
+/**
+ * تجهيز معلومات المرفقات للـ Webhook
+ * @param {Array} attachments - مصفوفة المرفقات
+ * @return {Object} - كائن يحتوي على معلومات المرفقات
+ */
+function extractAttachmentsForWebhook(attachments) {
+  let result = {};
+  if (attachments && attachments.forEach) {
+    attachments.forEach((att, idx) => {
+      result[`Attachment ${idx + 1} Name`] = att.filename || `Attachment ${idx + 1}`;
+      result[`Attachment ${idx + 1} Download URL`] = att.url || '';
+    });
+  }
+  return result;
+}
+
+/**
+ * إنشاء HTML لرسالة المطار الإضافية - للرحلات الجوية فقط
+ * @param {Object} data - بيانات الحجز
+ * @return {String} - HTML الإيميل
+ */
+function generateAirportEmail({
+  customerName,
+  bookingNr,
+  fullTripName
+}) {
+  return `
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; background-color: ${EMAIL_COLORS.background}; padding: 30px;">
+<div style="max-width: 600px; margin: auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+<div style="background-color: ${EMAIL_COLORS.primary}; padding: 20px; text-align: center;">
+<img src="${COMPANY_LOGO}" alt="${COMPANY_NAME} Logo" style="max-height: 80px; margin-bottom: 10px;">
+<h1 style="color: white; margin: 0;">${COMPANY_NAME}</h1>
+<p style="color: ${EMAIL_COLORS.textLight};">Important Airport Instructions</p></div>
+<div style="padding: 25px;">
+<p>Dear <b>${customerName || ''}</b>,</p>
+
+<p>Regarding your booking <b>${fullTripName || ''}</b> (${bookingNr || ''}):</p>
+
+<div style="background-color: ${EMAIL_COLORS.info}; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${EMAIL_COLORS.secondary};">
+<h3 style="margin-top: 0; color: ${EMAIL_COLORS.primary};">Important Airport Information:</h3>
+<p><strong>We kindly inform you that upon your arrival at the airport, you will need to exit the arrival hall entirely and proceed to the outside area. Our guide will be waiting for you outside the terminal, holding a sign bearing our company name, FTS, for easy identification.</strong></p>
+<p><strong>Should you require any assistance, please do not hesitate to contact us at any time.</strong></p>
+</div>
+
+<div style="margin-top: 30px; text-align: center;">
+<a href="tel:${COMPANY_PHONE}" style="background-color: ${EMAIL_COLORS.secondary}; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; margin-right: 10px;">Call Us</a>
+<a href="mailto:${COMPANY_EMAIL}" style="background-color: ${EMAIL_COLORS.primary}; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px;">Email Us</a>
+</div>
+
+<p style="margin-top: 30px; text-align: center; color: ${EMAIL_COLORS.primary}; font-weight: bold; font-size: 16px;">Best regards,<br>FTS Travels Team</p>
+
+<p style="font-size:12px; color:#888; text-align:center; margin-top: 20px;">${COMPANY_ADDRESS}<br>${COMPANY_PHONE} | ${COMPANY_EMAIL}</p>
+
+</div></div></body></html>`;
+}
+
+/**
+ * إنشاء HTML لإيميل تفاصيل الاستلام
+ * @param {Object} data - بيانات الحجز
+ * @return {String} - HTML الإيميل
+ */
+function generatePickupDetailsEmail({
+  customerName,
+  bookingNr,
+  dateTrip,
+  pickupTime,
+  hotelName,
+  nonBillableAddons,
+  attachments,
+  addOns,
+  tripName
+}) {
+  // توليد تنبيه الدفع الكاش إذا توفر addOns
+  let cashNote = '';
+  if (addOns) {
+    cashNote = `<div style="background-color:${EMAIL_COLORS.warning};padding:15px;border:1px solid #ffeeba;border-radius:6px;margin-bottom:15px;">
+    <strong> Payment Notice:</strong> Please note that you have to pay cash for the following services on the day of the trip:<br>
+    <b>${addOns}</b>
+    </div>`;
+  }
+
+  // إضافة ملاحظة رحلات الشاطئ إذا كانت الرحلة من الرحلات المحددة
+  let beachTripNote = '';
+  if (isBeachTrip(tripName)) {
+    beachTripNote = `<div style="background-color:${EMAIL_COLORS.info};padding:15px;border:1px solid #BEE5EB;border-radius:6px;margin-bottom:15px;">
+    <strong> ${BEACH_TRIP_NOTE}</strong>
+    </div>`;
+  }
+
+  return `
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; background-color: ${EMAIL_COLORS.background}; padding: 30px;">
+<div style="max-width: 600px; margin: auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+<div style="background-color: ${EMAIL_COLORS.primary}; padding: 20px; text-align: center;">
+<img src="${COMPANY_LOGO}" alt="${COMPANY_NAME} Logo" style="max-height: 80px; margin-bottom: 10px;">
+<h1 style="color: white; margin: 0;">${COMPANY_NAME}</h1>
+<p style="color: ${EMAIL_COLORS.textLight};">Booking Confirmation & Pickup Details</p></div>
+<div style="padding: 25px;">
+<p>Dear <b>${customerName || ''}</b>,</p>
+<h3>Pickup Details:</h3>
+<p><b>Booking Number:</b> ${bookingNr || ''}</p>
+<p><b>Date:</b> ${dateTrip || ''}</p>
+<p><b>Time:</b> ${pickupTime || ''}</p>
+<p><b>Location:</b> ${hotelName || ''}</p>
+${nonBillableAddons ? `<h4> Note:</h4><p>${nonBillableAddons}</p>` : ''}
+${cashNote}
+${beachTripNote}
+${attachments ? `<h4> Attachments:</h4><div style="background: ${EMAIL_COLORS.grey}; padding: 10px;">${attachments}</div>` : ''}
+<h4>⏰ Be Ready on Time!</h4>
+<p>Kindly be ready 5 minutes before pickup. Driver waits up to 5 minutes.</p>
+<h4>✅ Check Your Belongings!</h4>
+<p>Please check all your items before leaving.</p>
+<h4>⚠️ Quick Confirmation Needed!</h4>
+<p>Reply to confirm your pickup details for priority support!</p>
+<div style="margin-top: 30px; text-align: center;">
+<a href="mailto:${COMPANY_EMAIL}" style="background-color: ${EMAIL_COLORS.secondary}; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px;">Contact Us</a>
+</div>
+<p style="font-size:12px; color:#888;">${COMPANY_ADDRESS} | ${COMPANY_PHONE} | ${COMPANY_EMAIL}</p>
+</div></div></body></html>`;
+}
+
+/**
+ * إنشاء HTML لإيميل التذاكر
+ * @param {Object} data - بيانات الحجز
+ * @return {String} - HTML الإيميل
+ */
+function generateTicketEmail({
+  customerName, 
+  fullTripName, 
+  attachments, 
+  pickupTime, 
+  hotelName,
+  tripName
+}) {
+  // إضافة ملاحظة رحلات الشاطئ إذا كانت الرحلة من الرحلات المحددة
+  let beachTripNote = '';
+  if (isBeachTrip(tripName)) {
+    beachTripNote = `<div style="background-color:${EMAIL_COLORS.info};padding:15px;border:1px solid #BEE5EB;border-radius:6px;margin-bottom:15px;">
+    <strong> ${BEACH_TRIP_NOTE}</strong>
+    </div>`;
+  }
+
+  return `
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; background-color: ${EMAIL_COLORS.background}; padding: 30px;">
+<div style="max-width: 600px; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+<div style="background-color: ${EMAIL_COLORS.primary}; padding: 20px; text-align: center;">
+<img src="${COMPANY_LOGO}" alt="${COMPANY_NAME} Logo" style="max-height: 80px; margin-bottom: 10px;">
+<h1 style="color: white; margin: 0;">${COMPANY_NAME}</h1>
+<p style="color: ${EMAIL_COLORS.textLight};">Your Entry Tickets</p></div>
+<div style="padding: 25px;">
+<p>Dear <b>${customerName || ''}</b>,</p>
+
+<p>Thank you for booking <b>${fullTripName || ''}</b> with ${COMPANY_NAME}!</p>
+
+<!-- عرض ميعاد الالتقاط إذا وجد -->
+${pickupTime && hotelName ? `
+<div style="background-color: ${EMAIL_COLORS.info}; padding: 15px; margin: 20px 0; border-radius: 6px;">
+<p><b>Pickup Information:</b><br>
+Your pickup time is at <b>${pickupTime}</b> from <b>${hotelName}</b>.</p>
+</div>
+` : ''}
+
+<!-- إضافة ملاحظة رحلات الشاطئ -->
+${beachTripNote}
+
+<!-- ملاحظة حول التذاكر -->
+<div style="background-color: ${EMAIL_COLORS.grey}; padding: 15px; border-radius: 6px;">
+<p>⚠️ Please use only the attached tickets (not the Platform voucher).<br>If any issue happens, please call <b>${COMPANY_PHONE}</b> before making any payment.</p>
+</div>
+
+<!-- عرض المرفقات -->
+${attachments ? `<h4>Attachments:</h4><div style="background: ${EMAIL_COLORS.grey}; padding: 10px;">${attachments}</div>` : ''}
+
+<!-- زر تواصل -->
+<div style="margin-top: 30px; text-align: center;">
+<a href="mailto:${COMPANY_EMAIL}" style="background-color: ${EMAIL_COLORS.secondary}; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px;">Contact Us</a>
+</div>
+
+<p style="font-size:12px; color:#888; text-align:center;">${COMPANY_ADDRESS} | ${COMPANY_PHONE} | ${COMPANY_EMAIL}</p>
+
+</div></div></body></html>`;
+}

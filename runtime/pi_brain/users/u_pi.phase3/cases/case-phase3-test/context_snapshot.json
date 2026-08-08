@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-phase3-test",
+  "case_context": {
+    "record_id": "rec123",
+    "booking_number": "168827669"
+  },
+  "session_state": {
+    "pending_action": {
+      "type": "update_airtable",
+      "record_id": "rec123",
+      "text": "Customer requested callback tomorrow"
+    },
+    "workflow_state": {
+      "intent": "update_airtable",
+      "phase": "awaiting_approval"
+    },
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "حدث الملاحظة للعميل"
+      },
+      {
+        "role": "assistant",
+        "text": "تم تجهيز التحديث للموافقة"
+      }
+    ]
+  },
+  "captured_at": "2026-07-10T12:57:06.363584+00:00"
+}

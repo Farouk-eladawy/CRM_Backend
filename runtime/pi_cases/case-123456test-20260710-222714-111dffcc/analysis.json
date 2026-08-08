@@ -1,0 +1,23 @@
+{
+  "understood_intent": "create_invoice",
+  "confidence": 0.84,
+  "is_clean": true,
+  "workflow_phase": "awaiting_approval",
+  "workflow_awaiting": "approval",
+  "pending_action_type": "create_invoice",
+  "case_reference": "123456test",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [
+    "approval_required",
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "`أنشئ فاتورة جديدة بدل الحالية`",
+    "reply_preview": "تم تجهيز إنشاء فاتورة بشكل آمن:\n- العميل: Ahmady\n- رقم الحجز: 123456test\n- المبلغ: 1740.0 USD\n- المزود المتوقع: stripe\n- نوع الحجز: audio_guide\n- حالة الفاتورة الحالية: Paid\n- يوجد رابط فاتورة حالي: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n- وضع التنفيذ: إنشاء فاتورة جديدة بدل الحالية\n\nنتيجة المحاكاة: الحالة جاهزة للتنفيذ الفعلي بعد موافقتك.\n\nتحذيرات:\n- existing_invoice_will_be_",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T22:27:31.544733+00:00"
+}

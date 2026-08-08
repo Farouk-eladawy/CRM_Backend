@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-123456test-20260710-140757-888cda97",
+  "case_context": {
+    "record_id": "recPRC2TeFZTc8gOE",
+    "booking_number": "123456test",
+    "customer_name": "Ahmady",
+    "location": "Unknown",
+    "phone": "201004655246",
+    "email": "Amrmahraga@gmail.com",
+    "trip_name": "The Grand Egyptian Museum",
+    "trip_date": "2026-06-23T01:00:00.000Z",
+    "hotel": "الي Ajira Bay"
+  },
+  "session_state": {
+    "recent_turns": [
+      {
+        "role": "user",
+        "text": "- أنشئ فاتورة للحجز 123456test"
+      },
+      {
+        "role": "assistant",
+        "text": "تم تجهيز إنشاء فاتورة / I prepared a safe invoice action:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- يوجد رابط فاتورة حالي / Existing invoice link present: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nSimulation result: التنفيذ محجوب لهذه الأسباب:\n- invoice_already_exists\n\nأرسل `نعم` / `approve` لتنفيذ الفاتورة، أو `إلغاء` / `cancel` للإلغاء."
+      },
+      {
+        "role": "user",
+        "text": "- أنشئ فاتورة للحجز 123456test"
+      },
+      {
+        "role": "assistant",
+        "text": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right now:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل، لذلك لن أطلب approval لإنشاء جديدة.\nإذا أردت يمكنني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل."
+      }
+    ],
+    "last_case_context": {
+      "record_id": "recPRC2TeFZTc8gOE",
+      "booking_number": "123456test",
+      "customer_name": "Ahmady",
+      "location": "Unknown",
+      "phone": "201004655246",
+      "email": "Amrmahraga@gmail.com",
+      "trip_name": "The Grand Egyptian Museum",
+      "trip_date": "2026-06-23T01:00:00.000Z",
+      "hotel": "الي Ajira Bay"
+    },
+    "last_intent": "create_invoice",
+    "updated_at": "2026-07-10T14:07:57.648007+00:00",
+    "pending_action": {},
+    "workflow_state": {
+      "intent": "create_invoice",
+      "phase": "case_active",
+      "awaiting": "followup",
+      "case_context": {
+        "record_id": "recPRC2TeFZTc8gOE",
+        "booking_number": "123456test",
+        "customer_name": "Ahmady",
+        "location": "Unknown",
+        "phone": "201004655246",
+        "email": "Amrmahraga@gmail.com",
+        "trip_name": "The Grand Egyptian Museum",
+        "trip_date": "2026-06-23T01:00:00.000Z",
+        "hotel": "الي Ajira Bay"
+      },
+      "note": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9VZFBOZmh4TEZMbzJVTEV4NDdmeDFCbElydXViemZrLDE3MTAwOTk4Mg0200sLQ6EPo5?s=ap\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right now:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل، لذلك لن أطلب approval لإنشاء جديدة.\nإذا أردت يمكنني إعادة استخدام الرابط الحالي أو إعادة إرساله للعميل.",
+      "action_type": "create_invoice",
+      "action_mode": "simulate_verify_execute",
+      "updated_at": "2026-07-10T14:12:10.154347+00:00"
+    },
+    "pi_case_state": {
+      "created_at": "2026-07-10T14:07:57.623966+00:00",
+      "case_id": "case-123456test-20260710-140757-888cda97",
+      "current_stage": "intake",
+      "stage_status": "completed",
+      "next_stage": "analysis",
+      "status": "active",
+      "case_reference": "123456test",
+      "intent": "create_invoice",
+      "updated_at": "2026-07-10T14:07:57.648007+00:00"
+    },
+    "topic_reset_meta": {
+      "reason": "reference_changed",
+      "reset_at": "2026-07-10T14:07:55.861340+00:00"
+    }
+  },
+  "captured_at": "2026-07-10T14:12:10.181264+00:00"
+}

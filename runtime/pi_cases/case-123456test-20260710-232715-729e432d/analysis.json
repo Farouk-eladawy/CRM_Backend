@@ -1,0 +1,20 @@
+{
+  "understood_intent": "create_invoice",
+  "confidence": 0.92,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "",
+  "case_reference": "123456test",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [],
+  "analysis_summary": {
+    "request": "ابعتلي اشعار لما الفاتورة حالتها تتغير الي Successed او Paid",
+    "reply_preview": "نتيجة فحص الفاتورة / Current invoice check result:\n- العميل / Customer: Ahmady\n- رقم الحجز / Booking: 123456test\n- المبلغ / Amount: 1740.0 USD\n- المزود / Provider: stripe\n- حالة الفاتورة / Invoice status: pending\n- رابط الفاتورة / Current invoice link: https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672\n\nلا يمكن إنشاء فاتورة جديدة الآن لهذه الأسباب / A new invoice cannot be created right now:\n- invoice_already_exists\n\nالفاتورة موجودة بالفعل، لذلك لن أطلب approval لإنش",
+    "has_case_context": true,
+    "requires_approval": false
+  },
+  "analyzed_at": "2026-07-10T23:27:57.304168+00:00"
+}

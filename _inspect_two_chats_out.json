@@ -1,0 +1,203 @@
+{
+  "db": "C:\\Users\\Aloosh2020\\Downloads\\New Project's\\AIAgentProject\\OpenClaw_Version\\chat_history.db",
+  "chats": [
+    {
+      "record": "recwKBwCxP3FuCBDV",
+      "conv": {
+        "chat_id": "677535d8-8c5f-4271-ad9c-c53c3ccf4f2b",
+        "contact_name": "",
+        "location": "Religious",
+        "source": "Facebook",
+        "sender_identifier": "37466886776291561",
+        "airtable_record_id": "recwKBwCxP3FuCBDV",
+        "last_message_time": "2026-08-08T15:36:28.859002",
+        "unread_count": 0,
+        "force_read_at": "2026-08-08T15:36:28.954447",
+        "needs_help": 0,
+        "facebook_ad_id": "120248254436010757",
+        "facebook_ad_title": "New Sales Ad",
+        "lead_owner_name": "أحمد خليل"
+      },
+      "drafts_in_last12": 0,
+      "is_unread_computed": 0,
+      "last_msgs": [
+        {
+          "sender_type": "agent",
+          "text": "بخصوص سؤالك يا فندم — في برنامج العمرة الاقتصادي ١٥ يوم، فندق مكة هو فندق منازل العين في امتداد شارع أجياد، ومش على المشي، لكن في باصات شغالة طول اليوم توصل الح",
+          "timestamp": "2026-08-08T15:36:28.859002",
+          "status": "sent",
+          "source": "facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "رباعي",
+          "timestamp": "2026-08-08T15:31:40.857084",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "اهلا وسهلا بك من تاني بسال فنادق مكه المكرمه فين بالباص ولا قريبة",
+          "timestamp": "2026-08-08T15:30:59.594794",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "فنادق مكه المكرمه فين بالباص ولا قريبة",
+          "timestamp": "2026-08-08T15:29:59.169857",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "١٥ يوم — اقتصادي",
+          "timestamp": "2026-08-08T15:29:24.711411",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "١٥ يوم — اقتصادي",
+          "timestamp": "2026-08-08T15:29:23.230755",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "agent",
+          "text": "تمام ✅ متاح ان شاء الله— والغرفة نوعها إيه (رباعي ولا ثلاثي ولا ثنائي )\nوعددكم كام؟",
+          "timestamp": "2026-08-08T15:29:22.962533",
+          "status": "sent",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "١٥ يوم — اقتصادي",
+          "timestamp": "2026-08-08T15:29:21.622939",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120248254436010757 ad_title=New Sales Ad post_id=122315483648031170",
+          "timestamp": "2026-08-08T15:29:19.076916",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "agent",
+          "text": "أهلاً بيك تاني 🧡\nحبينا نطمنك إن الحجز مش محتاج غير جواز سفر ساري ٦ شهور + صورة شخصية، والدفع ٥٠٪ بس مقدم والباقي قبل السفر بأسبوعين.\nولو حابب تستشير حد من العيل",
+          "timestamp": "2026-08-06T13:58:06.383053",
+          "status": "sent",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "agent",
+          "text": "تفهمت قلق حضرتك تمامًا — فندق منازل العين في امتداد أجياد بعيد عن الحرم، وخصوصًا إنه بعد النفق، فده فعلاً مش هيكون مريح خاصة لو حضرتك بتفضل المشي.\n\nعندنا بديل م",
+          "timestamp": "2026-08-06T09:48:05.782493",
+          "status": "sent",
+          "source": "facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "فنادق مكة بعيدة امتداد اجياد يعني بعد النفق بكتيير للاسف غير مناسب",
+          "timestamp": "2026-08-06T03:58:30.156322",
+          "status": "sent",
+          "source": null
+        }
+      ]
+    },
+    {
+      "record": "recgnTNmJcc7SWm9x",
+      "conv": {
+        "chat_id": "6ace8a20-b829-4044-bcbd-ceb0d6f4362f",
+        "contact_name": "",
+        "location": "Religious",
+        "source": "Facebook",
+        "sender_identifier": "6618213451623326",
+        "airtable_record_id": "recgnTNmJcc7SWm9x",
+        "last_message_time": "2026-08-08T15:32:28.934181",
+        "unread_count": 0,
+        "force_read_at": "2026-08-08T15:32:29.006388",
+        "needs_help": 0,
+        "facebook_ad_id": "120246971083710757",
+        "facebook_ad_title": "New Sales Ad",
+        "lead_owner_name": "عبدالرحمن إبراهيم"
+      },
+      "drafts_in_last12": 1,
+      "is_unread_computed": 0,
+      "last_msgs": [
+        {
+          "sender_type": "agent",
+          "text": "[PROPOSED_DRAFT] أهلًا بحضرتك معانا تاني 🕋 وربنا يكتبها لنا جميعًا السنة دي 🤲\n\nبالنسبة لسؤالك عن القرعة:\n\n📌 مواعيد التقديم الرسمي للقرعة لسه **مش هتتفتح دلوقتي*",
+          "timestamp": "2026-08-08T15:32:28.934181",
+          "status": "sent",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "انا مقدم فعلا عندكم\nبس مش عارف مواعيد التقديم للقرعه ونتيجه القرعه امتي وايه المبلغ اللي المفروض احضره علشان التقديم للقرعه",
+          "timestamp": "2026-08-08T15:32:04.753575",
+          "status": "sent",
+          "source": null
+        },
+        {
+          "sender_type": "customer",
+          "text": "انا مقدم فعلا عندكم\nبس مش عارف مواعيد التقديم للقرعه ونتيجه القرعه امتي وايه المبلغ اللي المفروض احضره علشان التقديم للقرعه",
+          "timestamp": "2026-08-08T15:31:52.932393",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "agent",
+          "text": "حضرتك لسه معانا؟ 📋\nلأن حضرتك سألت عن الحجز، دي خطوات الحجز في برنامج طيران تحسين:\n✅ المطلوب من حضرتك: صورة البطاقة ورقم تليفون لحضرتك\nلو في أي سؤال تاني، اكتبهو",
+          "timestamp": "2026-08-08T14:33:07.906902",
+          "status": "sent",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "agent",
+          "text": "✅ للتقديم: صورة البطاقة فقط \n\n📌 ملحوظة مهمة: الخصم ساري للحجز المبكر فقط، وحصة الشركة من الحج محدودة جدًا — وبالفعل أكتر من نصها اكتمل.\n\n📱 مع حضرتك عبدالرحمن: 0",
+          "timestamp": "2026-08-08T11:56:15.316554",
+          "status": "sent",
+          "source": "facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "إزاي أحجز؟",
+          "timestamp": "2026-08-08T11:13:05.506606",
+          "status": "sent",
+          "source": null
+        },
+        {
+          "sender_type": "customer",
+          "text": "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120246971083710757 ad_title=New Sales Ad post_id=122310278234031170",
+          "timestamp": "2026-08-08T11:13:02.545576",
+          "status": "sent",
+          "source": null
+        },
+        {
+          "sender_type": "customer",
+          "text": "إزاي أحجز؟",
+          "timestamp": "2026-08-08T11:12:56.986452",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120246971083710757 ad_title=New Sales Ad post_id=122310278234031170",
+          "timestamp": "2026-08-08T11:12:56.914650",
+          "status": "received",
+          "source": "Facebook"
+        },
+        {
+          "sender_type": "customer",
+          "text": "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120246971083710757 ad_title=New Sales Ad post_id=122310278234031170",
+          "timestamp": "2026-08-08T11:12:52.403631",
+          "status": "received",
+          "source": "Facebook"
+        }
+      ]
+    }
+  ]
+}

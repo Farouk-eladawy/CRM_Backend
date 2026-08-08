@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "patterns": [
+    {
+      "name": "ambiguous_lookup_case",
+      "count": 1,
+      "last_case_id": "case-phase4-test",
+      "last_outcome": "awaiting_identifier"
+    }
+  ],
+  "updated_at": "2026-07-10T12:58:24.680882+00:00"
+}

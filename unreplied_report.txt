@@ -1,0 +1,67 @@
+Traceback (most recent call last):
+  File "<string>", line 47, in <module>
+  File "C:\Program Files\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 29-32: character maps to <undefined>
+=== UNREPLIED CONVERSATIONS BY LOCATION ===
+Religious: 756
+Hurghada/Cairo: 502
+Sales: 93
+Sharm: 85
+Unknown: 16
+Drivers: 10
+Guides: 8
+TOTAL: 1470
+
+=== DETAILED REPORT - Total 1470 conversations ===
+#     Record ID              Name                      Location             Last Msg Time                  Messages   Unread  
+========================================================================================================================
+1                            NEVEN                     Guides               2026-07-30T18:40:34.606101     159        0       
+2     rec1Hx44dyZ0uDBMJ      Vanessa Preux             Hurghada/Cairo       2026-07-30T18:36:56.962484     4          3       
+3     recEruu6Upt2Ce2uH      Mario Grabow              Hurghada/Cairo       2026-07-30T18:36:04.943475     1          0       
+4                            Mohamed Saad FTS          Drivers              2026-07-30T18:29:32.327236     283        0       
+5     rec5hStpsWg4IzwGC      Franck Lanique            Hurghada/Cairo       2026-07-30T18:25:33.940850     1          0       
+6                            AHMED WAHIB               Guides               2026-07-30T18:25:32.393417     87         0       
+7     reced470OoZx4pkUy      Fred                      Sharm                2026-07-30T18:25:31.965030     3          0       
+8                            Hesham city tour          Guides               2026-07-30T18:25:16.400517     106        0       
+9                            Shapan m                  Guides               2026-07-30T18:24:36.534295     207        0       
+10    reciRFD8poSozH1mg      Mohamed Khaled FTS        Drivers              2026-07-30T18:23:21.689487     123        3       
+11                           Mahmoud Limo FTS          Drivers              2026-07-30T18:22:40.638723     172        0       
+12    recA3ajYKX7C4QTsG                                Religious            2026-07-30T18:10:47.638937     4          0       
+13    recLQijabnCx4G7qI                                Religious            2026-07-30T18:09:32.651013     15         0       
+14    recYop7xbkCfjIH5r                                Religious            2026-07-30T18:00:49.468063     4          0       
+15    recDzdAPfxVjROxRV                                Religious            2026-07-30T18:00:29.196090     4          0       
+16    rec9A2m1N6n3DOfPW                                Religious            2026-07-30T17:54:48.559756     13         1       
+17    recWgd6nlYK5Rq32z      Guest                     Religious            2026-07-30T17:48:28.104906     13         1       
+18    recwloYsaH0aCuxjZ                                Religious            2026-07-30T17:12:19.583948     14         0       
+19    recFm1yONQjzkCXSE                                Religious            2026-07-30T16:59:34.139430     4          1       
+20    recCI5IJXSI334dpv      Ieva Ernstreite           Sharm                2026-07-30T16:54:45.478146     15         0       
+21    reczdWOXMNHrUKWP8                                Religious            2026-07-30T16:31:58.126808     8          1       
+22    recugIaGNPG38626P                                Religious            2026-07-30T16:02:03.648886     27         1       
+23    recoKK9JMWMCPdA3a                                Religious            2026-07-30T15:57:59.255793     6          1       
+24    recNSZiYVjPSQFPcS                                Religious            2026-07-30T15:05:37.455759     8          2       
+25    recefEngNE7d8cZBA                                Religious            2026-07-30T15:05:12.385674     6          1       
+26    rec1iulJu6S1AWWny                                Religious            2026-07-30T14:13:27.798258     15         2       
+27    recdzU8tRjBCHiomU                                Religious            2026-07-30T13:51:56.921309     4          1       
+28    recZL9WPqlC4ekgeM                                Religious            2026-07-30T13:29:29.254763     31         0       
+29    recSz15aDj94qcvcW                                Religious            2026-07-30T12:58:12.778229     13         0       
+30    recJlmSA7rxKavXmt                                Religious            2026-07-30T12:56:18.991429     15         0       
+31                           AHMED YEHIA GERMAN        Guides               2026-07-30T10:17:42.332632     15         0       
+32    recgShllvpZhPkUhe      Natálie Slabová           Hurghada/Cairo       2026-07-30T09:59:11.699974     1          0       
+33    recjbofPCapjBCRJM      Máté Bálint Zsákai        Hurghada/Cairo       2026-07-30T09:52:33.335773     1          1       
+34    recpWlOILtGjEKiN5      Maria Spataru             Hurghada/Cairo       2026-07-30T09:52:01.449241     1          0       
+35    recgqvdjHHNiLgCTq      Alessia Coruzzi           Sharm                2026-07-30T07:59:40.856535     1          1       
+36    rec25d1i13WBaS7Nr      Erik Schneider            Hurghada/Cairo       2026-07-30T04:23:40.031430     2          0       
+37    recRLdIoutPOYkcxR      Emerson Fraulini          Hurghada/Cairo       2026-07-30T04:22:47.323277     1          1       
+38    reciQxbN3PivBWjZd      Ernesto Carralero         Hurghada/Cairo       2026-07-30T04:22:09.629477     4          2       
+39                           IBRAHIM FUODA             Guides               2026-07-29T21:45:06.257175     59         0       
+40    recxU2oPsbsTh9ICZ      Guest                     Religious            2026-07-29T20:44:23.488176     4          0       
+41    rech5c8vy59Lp1gXc      Amine Kh                  Hurghada/Cairo       2026-07-29T20:44:11.735904     1          0       
+42    recrr804GDNt6OED9      Stefanie Kolter           Hurghada/Cairo       2026-07-29T20:42:56.896370     1          0       
+43    rec9pe1KHUA7WJHpU      Ilona Weeterings          Hurghada/Cairo       2026-07-29T20:42:16.071045     3          2       
+44    recdCeJgfUcj1yP8k      Ana Maria Busa            Hurghada/Cairo       2026-07-29T20:40:55.052005     1          0       
+45                           Ragab Ahmed               Guides               2026-07-29T20:19:23.364959     130        0       
+46                           Khaled Kamel              Guides               2026-07-29T20:16:57.254537     118        0       
+47    rec9vCA9QmQmH3zSV      Francesca Mongiardo       Sharm                2026-07-29T19:05:24.399596     5          0       
+48                           Khaled Refaat FTS         Drivers              2026-07-29T18:33:11.064085     147        0       

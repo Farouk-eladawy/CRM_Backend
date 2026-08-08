@@ -1,0 +1,161 @@
+{
+  "id": "recPRC2TeFZTc8gOE",
+  "createdTime": "2026-06-07T09:29:43.000Z",
+  "fields": {
+    "des": "E2E-DES-20260713",
+    "Date Trip": "2026-07-15T00:00:00.000Z",
+    "Room number": "404",
+    "Control Portal": "https://supplier.ftstravels.net/control.html",
+    "Status Photographer WhatsApp": "Done",
+    "Supp Link Portal": [],
+    "Teka Send V3": {
+      "label": "Teka Send V3",
+      "url": "https://hook.us2.make.com/16g0msqzkkdgrhvcjq5vtlplb2p5xbqf?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-07-15&hotel_name=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&des=E2E-DES-20260713&trip_name=The%20Grand%20Egyptian%20Museum&add_ons=&total_price_eur=&total_price_usd=&total_price_gbp=&adt=2&std=0&chd=1&customer_phone=201004655246&Option=Skip%20The%20Line%20%2B%20Audio%20Guide&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=&record_id=recPRC2TeFZTc8gOE"
+    },
+    "STD": 0,
+    "Whatsapp Pickup Time2": "Done",
+    "Guide Link Portal": [
+      "https://guide.ftstravels.net/index.html?id=recOSqKvrJP3rY4H4"
+    ],
+    "Net Rate Price (Number Only)": 1740,
+    "Tracking Operation Link": "https://tracker.ftstravels.net/?booking=123456test&operation",
+    "Driver Link Portal": [
+      "http://driver.ftstravels.net/driver-control.html?id=recbSN2beDLkfp7Rf"
+    ],
+    "voucher": "dynamic_voucher.html?bookingNumber=123456test&customerName=Ahmady&email=Amrmahraga%40gmail.com&phone=201004655246&tripDate=2026-07-15T00%3A00%3A00.000Z&tripName=The%20Grand%20Egyptian%20Museum&destination=E2E-DES-20260713&hotelName=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&roomNumber=404&pickupPoint=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&adults=2&children=1&students=0&infants=0&youth=0&amount=1740&currency=USD&paymentMethod=Cash&guideLanguage=English&language=English&agency=Tiqets",
+    "Send Guide Tickets": "Done",
+    "Last Modified By": {
+      "id": "usr3u5inRqvXzhRui",
+      "email": "booking@ftstravels.com",
+      "name": "Booking Ftstravel"
+    },
+    "Chat Driver log": "\n[2026-02-10T23:53:39.405Z] DRIVER: مرحباً، أنا السائق الخاص بك. أنا في الطريق إليك\n[2026-02-10T23:59:23.369Z] DRIVER: أعتذر عن التأخير ساصل قريبا\n[2026-02-11T00:06:06.450Z] DRIVER: No Show Proof: https://i.ibb.co/yF6whq21/17707683413264029840034336623155.jpg\n[2026-02-11T00:16:38.581Z] DRIVER: أعتذر عن التأخير ساصل قريبا",
+    "Send Sharm Pickup": {
+      "label": "Send Sharm",
+      "url": "https://hook.us2.make.com/dxbjvsbob2ur94g67gg6rmvqvso8n8bj?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-07-15&hotel_name=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&des=E2E-DES-20260713&trip_name=The%20Grand%20Egyptian%20Museum&add_ons=&total_price_eur=&total_price_usd=&total_price_gbp=&adt=2&std=0&chd=1&customer_phone=201004655246&Option=Skip%20The%20Line%20%2B%20Audio%20Guide&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=&record_id=recPRC2TeFZTc8gOE"
+    },
+    "Date Trip Changed": "2026-07-13T11:43:11.000Z",
+    "Invoice Requested": true,
+    "Driver Location link": "https://www.google.com/maps?q=30.2984757,31.3585844",
+    "Youth": 0,
+    "Trip Status": "no_show",
+    "Customer Email": "Amrmahraga@gmail.com",
+    "Generate Invoice": {
+      "label": "Generate Invoice",
+      "url": "https://hook.us2.make.com/35vgcw6t3t8iv2f87p9jgfor34766nly?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&Agency=Tiqets&pickup_time=&customer_name=Ahmady&date_trip=2026-07-15&hotel_name=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&des=E2E-DES-20260713&trip_name=The%20Grand%20Egyptian%20Museum&add_ons=&customer_phone=201004655246&Option=Skip%20The%20Line%20%2B%20Audio%20Guide&total_travelers=7&non_billable_addons=&record_id=recPRC2TeFZTc8gOE&youth=0&chd_age=Years&gyg_rating=&customer_review=E2E%20review%20seed&net_rate=17401740&booking_status=Confirmed&google_maps=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FPickalbatros%2BBlu%2BSpa%2BResort%2B-%2BHurghada%2F%4027.1825934%2C33.8223907%2C775m%2Fdata%3D%213m1%211e3%214m10%213m9%211s0x144d7d2fa6963acf%3A0x9db37298868172aa%215m3%211s2026-05-01%214m1%211i2%218m2%213d27.1825934%214d33.8249656%2116s%252Fg%252F11qbkrxyjq%215m1%211e2%3Fentry%3Dtts%26g_ep%3DEgoyMDI2MDIwOC4wIPu8ASoASAFQAw%253D%253D%26skid%3Ddc2a34d5-4e4d-4367-85d0-49a6e8944ef7&currency=USD&traveler_name=&Amount=1740&Add_Ons Multiselect="
+    },
+    "CHD Age": "Years",
+    "Payment Method": "Cash",
+    "Welcome email sent?": true,
+    "Agency": "Tiqets",
+    "Review WhatsApp & Email Sent": "Done",
+    "Inquiry Type": "FOLLOW_UP",
+    "Created By": {
+      "id": "usr3u5inRqvXzhRui",
+      "email": "booking@ftstravels.com",
+      "name": "Booking Ftstravel"
+    },
+    "Last Modified": "2026-07-13T16:06:08.000Z",
+    "Audio Guide Link": "http://tiqets.ftstravels.com/?GM/ticketId=123456test",
+    "Last Modified AI Chat log": "2026-07-09T22:43:23.000Z",
+    "Reason ": "E2E NORMALIZE 20260713",
+    "ADT": 2,
+    "trip Name": "The Grand Egyptian Museum",
+    "Currency": [
+      "USD"
+    ],
+    "Amount": 1740,
+    "Pickup Scheduled": {
+      "label": "Send Schadewald",
+      "url": "https://hook.us2.make.com/6dbwnjp0ox4uv9zrp6rlerjr5cyr2iab?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-07-15&hotel_name=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&des=E2E-DES-20260713&trip_name=The%20Grand%20Egyptian%20Museum&add_ons=&total_price_eur=&total_price_usd=&total_price_gbp=&adt=2&std=0&chd=1&customer_phone=201004655246&Option=Skip%20The%20Line%20%2B%20Audio%20Guide&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=&record_id=recPRC2TeFZTc8gOE"
+    },
+    "Trip UUID": "in_1TslRKLp8xDOkodwSRrXY0vw",
+    "Total Travelers": 7,
+    "message": "أعتذر عن التأخير ساصل قريبا",
+    "Send Reminder Pickup": "Done",
+    "Summary (Booking Nr.)": {
+      "state": "empty",
+      "value": null,
+      "isStale": true
+    },
+    "Stripe invoice": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9Vc1dVNktOUkRxMzhSdm1HS0Z2RTB6NHdyNzZGbVRsLDE3NDQ5NjAwMg0200WZWZB25x?s=ap",
+    "Tour Type": "Museum",
+    "Booking Nr.": "123456test",
+    "Cost EGP": 1234,
+    "Inf": 0,
+    "Google Maps": "https://www.google.com/maps/place/Pickalbatros+Blu+Spa+Resort+-+Hurghada/@27.1825934,33.8223907,775m/data=!3m1!1e3!4m10!3m9!1s0x144d7d2fa6963acf:0x9db37298868172aa!5m3!1s2026-05-01!4m1!1i2!8m2!3d27.1825934!4d33.8249656!16s%2Fg%2F11qbkrxyjq!5m1!1e2?entry=tts&g_ep=EgoyMDI2MDIwOC4wIPu8ASoASAFQAw%3D%3D&skid=dc2a34d5-4e4d-4367-85d0-49a6e8944ef7",
+    "Country from Phone": {
+      "state": "generated",
+      "value": "Egypt",
+      "isStale": false
+    },
+    "Driver Link": "https://tracker.ftstravels.net/?booking=123456test",
+    "Send Review": {
+      "label": "Send Review",
+      "url": "https://hook.us2.make.com/muioyztmt6hfguaci12uxxpo9k3v27rn?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-07-15&hotel_name=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&des=E2E-DES-20260713&trip_name=The%20Grand%20Egyptian%20Museum&add_ons=&total_price_eur=&total_price_usd=&total_price_gbp=&adt=2&std=0&chd=1&customer_phone=201004655246&Option=Skip%20The%20Line%20%2B%20Audio%20Guide&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=&record_id=recPRC2TeFZTc8gOE&Guide=English"
+    },
+    "CHD": 1,
+    "Synced to mailchamp": true,
+    "Hotel Name": "الي Ajira Bay",
+    "Invoice Status": "succeeded",
+    "No show & refund": [
+      "No show"
+    ],
+    "Create Date  ": "2026-06-07T09:29:43.000Z",
+    "Guide": "English",
+    "Attachments": [
+      {
+        "id": "attyF4LMZWHr1SKtk",
+        "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783972800000/vqnyvrJGkWY6hC-41UqTeQ/xpdO4K6dvb_5IkSZzpw95f9Eb37w0M-rKQ9MGkpoi06MVwRLs9WRaDICFZTvb8RyFtC3sOsbKEY_VXQgyF8M4Exj_xDjXjtyT1Hwov1na_IU8QtV0_lVx6s5n7FV0Fum70GSiX_or6TFmPIA8vWip1oLY-PqyqY7-ZRcdp16Jl0/U9Segnupn5CDZs3krXIAZWBrv-J_69cURgFl3UJsSuM",
+        "filename": "Bel Air Azur Resort.pdf",
+        "size": 4187009,
+        "type": "application/pdf",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783972800000/88Ekeu3k00GIJ1vh0bTTpw/KtXR6PM96FvR6HXpz135QKWySCFEfy_b543jKAqf1uAZHOoHtxS_MBqUXNJLDCGQPMUeu4NjBE5y6b7TI1fcTTEEbfpnxhCfh-quD3H0K35HkqpFa_C0Xl1DYGSHZmRzaTQAXbK70JSMTz8ylge_SA/09pvz8FMOW0HNxDuXLHowqcC-evHd1q556hK0Qgje9o",
+            "width": 28,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/55/55/1783972800000/EMMHw8NCQwlo9NOKu36ygw/nl7t9KiXHGmLoUYMA0i-yqH5EfwjbGZ7848gXT1baoNFej-uBa5Qfwaajr_a7iAZ48BKBwmwFChci2GVgTNo1OGaXTD-bkHUsq6Lsobkulw1-_zp__-B99unIK5R62U4QY_AU9kS4v6TEg7GSKcTLw/x5eXBcYKD3OFidaAovOliqs79Nd0WLcT0YOpzoHoeK4",
+            "width": 512,
+            "height": 663
+          }
+        }
+      }
+    ],
+    "Last Sent": "2026-04-23T04:30:00.076Z",
+    "Tour Guide Name & Phone": [
+      "recOSqKvrJP3rY4H4"
+    ],
+    "Photographer Link": "https://drive.google.com/drive/folders/1X9cOMkea8KPaSh6NRJFp3XeqnFMwg8G1?usp=drive_link",
+    "Note": "E2E NOTE 20260713",
+    "Car Type": [
+      "HIS 3 (HRG)"
+    ],
+    "Cancelled Send Status": "Done",
+    "Booking Status": "Confirmed",
+    "Real Product Name": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
+    "Customer Phone": "201004655246",
+    "AI Chat Log": "\n\n[2026-06-03 09:46:10] [WhatsApp - User]: hola\ntest\n\n[2026-06-03 09:46:15] [WhatsApp_Auto - System]: Thank you for reaching out! How can I assist you today? Do you have any questions about your booking or would you like information about our tours and trips?\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib\n\n[2026-06-07 04:04:57] [WhatsApp - User]: Confirm i have paid\n\n[2026-06-07 04:05:04] [WhatsApp_Auto - System]: Thank you for reaching out. I have checked our system, and your payment is currently showing as **Pending**. We are now verifying the transaction with the bank. Once it is confirmed (usually within a few minutes), we will send you the final confirmation. If you have a receipt or transaction ID, feel free to share it here so we can speed up the process.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib\n\n[2026-07-10 01:43:14] [WhatsApp - User]: Confirm\nHello\n\n[2026-07-10 01:43:22] [WhatsApp_Auto - System]: Thank you for reaching out again! I see from our records that you previously asked about confirming your payment for booking **123456test** — the **Hurghada to Cairo: Pyramids & Museum for First-Time Visitors** trip scheduled for **June 23, 2026**.\n\nI checked our system, and your payment was showing as **Pending** at that time. Has your payment now been fully processed? If you have a receipt or transaction ID, please share it here so I can verify the status for you.\n\nIf you're referring to a different booking or have a new question, feel free to let me know!\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "Send Status Driver & Guide": "Done",
+    "Teka Send V2": {
+      "label": "Teka Send",
+      "url": "https://hook.us2.make.com/pqywaq4qn6vamdhk3sso446lfcflni6s?booking_nr=123456test&customer_email=Amrmahraga%40gmail.com&pickup_time=&customer_name=Ahmady&date_trip=2026-07-15&hotel_name=%D8%A7%D9%84%D9%8A%20Ajira%20Bay&des=E2E-DES-20260713&trip_name=The%20Grand%20Egyptian%20Museum&add_ons=&total_price_eur=&total_price_usd=&total_price_gbp=&adt=2&std=0&chd=1&customer_phone=201004655246&Option=Skip%20The%20Line%20%2B%20Audio%20Guide&Attachments=Bel%20Air%20Azur%20Resort.pdf%20%28https%3A%2F%2Fdl.airtable.com%2F.directUploadAttachment%2F969025b30bf164ef4a8c9367c473294b%2F34f86e13%2FBelAirAzurResort.pdf%29&non_billable_addons=&record_id=recPRC2TeFZTc8gOE"
+    },
+    "Hotel Changed": "2026-07-09T22:07:54.000Z",
+    "Review Date": "2026-06-07",
+    "to": "MS 20:50",
+    "Customer Link": "https://tracker.ftstravels.net/?booking=123456test&phone=201004655246",
+    "Driver Name & Phone": [
+      "recbSN2beDLkfp7Rf"
+    ],
+    "Customer Name": "Ahmady",
+    "Net Rate": "1740",
+    "Customer Review": "E2E review seed",
+    "Option": "Skip The Line + Audio Guide",
+    "Customer personal email": "Amrmahraga@gmail.com",
+    "From": "SM 07:05",
+    "Refund Amount": 55
+  }
+}

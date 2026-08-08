@@ -1,0 +1,10 @@
+{
+  "type": "add_watcher",
+  "description": "Add a watcher to monitor a specific condition on a specific record and trigger a follow-up action",
+  "target_record": "string (The Airtable record ID to watch, e.g., recXYZ)",
+  "target_base": "string (e.g., main, religious, leads)",
+  "condition_field": "string (The Airtable field name to check, e.g., 'Status' or 'Payment Status')",
+  "condition_value": "string (The value that triggers the action, e.g., 'Paid')",
+  "requires_approval": false,
+  "action_on_trigger": "string (What PI should do when triggered, e.g., send_welcome_message)"
+}

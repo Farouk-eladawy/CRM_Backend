@@ -1,0 +1,24 @@
+{
+  "understood_intent": "create_invoice",
+  "confidence": 0.73,
+  "is_clean": true,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "create_invoice",
+  "case_reference": "123456test",
+  "hard_case_reason": [
+    "short_followup_context_dependency"
+  ],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "نعم",
+    "reply_preview": "تم إنشاء الفاتورة بنجاح.\n- الحجز: 123456test\n- المزود: wetravel\n- الرابط: https://www.wetravel.com/trips/the-grand-egyptian-museum-fts-travels-6356889672",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T23:05:15.464603+00:00"
+}

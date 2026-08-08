@@ -1,0 +1,17 @@
+29076:                        desired_channel = 'whatsapp'
+29078:                        desired_channel = 'email'
+29080:                        desired_channel = str(source or '').strip().lower()
+29082:                    desired_channel = rc
+29085:                    desired_channel = 'whatsapp'
+29089:                    import json as _dbg_json, urllib.request as _dbg_urlreq; _p='.dbg/whatsapp-send-failure.env'; _u,_s='http://127.0.0.1:7777/event','whatsapp-send-failure'; exec("try:\n with open(_p,'r',encoding='utf-8') as f: c=f.read(); _u=next((l.split('=',1)[1] for l in c.split('\\n') if l.startswith('DEBUG_SERVER_URL=')),_u); _s=next((l.split('=',1)[1] for l in c.split('\\n') if l.startswith('DEBUG_SESSION_ID=')),_s)\nexcept: pass"); _dbg_urlreq.urlopen(_dbg_urlreq.Request(_u, data=_dbg_json.dumps({"sessionId":_s,"runId":"pre-fix","hypothesisId":"E","location":"ai_agent.py:api_send_message:routing","msg":"[DEBUG] api_send_message resolved routing","data":{"chat_id":chat_id,"source":str(source or ""),"identifier":str(identifier or ""),"reply_channel":str(reply_channel or ""),"desired_channel":str(desired_channel or ""),"template_name":str(template_name or ""),"location_override":str(location_override or ""),"receiving_phone_id_override":str(receiving_phone_id_override or "")}}).encode(), headers={"Content-Type":"application/json"}), timeout=2).read()
+29094:                _enabled, _routing, _cfg = _get_channel_config(desired_channel)
+29096:                    return jsonify({"status": "error", "message": f"Channel '{desired_channel}' is disabled by admin settings."}), 403
+29112:                    if desired_channel in ('whatsapp', 'facebook'):
+29163:                if desired_channel == 'whatsapp':
+29580:                elif desired_channel == 'email':
+29709:                elif desired_channel == 'facebook':
+29758:                    return jsonify({"status": "error", "message": f"Unsupported reply channel: {desired_channel}"}), 400
+29803:                        ext_id = sent_message_id if is_first_saved and str(desired_channel or '').strip().lower() in {'whatsapp', 'facebook'} else None
+29804:                        chat_db.add_message(chat_id, 'agent', _t, status='sent', source=desired_channel, external_message_id=ext_id)
+29816:                    if str(desired_channel or '').strip().lower() == 'whatsapp':
+29829:                        "recipient_phone": recipient_phone if desired_channel == "whatsapp" else None,

@@ -1,0 +1,13 @@
+{
+  "case_id": "case-123456test-20260710-230457-43b888de",
+  "status": "active",
+  "current_stage": "analysis",
+  "stage_status": "completed",
+  "next_stage": "plan",
+  "case_reference": "123456test",
+  "intent": "create_invoice",
+  "requires_approval": false,
+  "execution_allowed": false,
+  "created_at": "2026-07-10T22:18:16.033231+00:00",
+  "updated_at": "2026-07-10T23:05:15.483412+00:00"
+}

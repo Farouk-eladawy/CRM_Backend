@@ -1,0 +1,23 @@
+{
+  "name": "learn_from_feedback",
+  "description": "Records corrections made by human agents to AI drafts. Use this tool whenever a human edits the proposed response before sending.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "ai_draft": {
+        "type": "string",
+        "description": "The original text proposed by the AI."
+      },
+      "human_final": {
+        "type": "string",
+        "description": "The final text sent by the human agent."
+      },
+      "context": {
+        "type": "string",
+        "description": "Brief context of the conversation (e.g., 'price inquiry', 'complaint')."
+      }
+    },
+    "required": ["ai_draft", "human_final"]
+  },
+  "command": "python tools/learn_from_feedback.py \"{ai_draft}\" \"{human_final}\" \"{context}\""
+}

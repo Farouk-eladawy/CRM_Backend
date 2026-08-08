@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-168827669-20260710-131810-935b685a",
+  "intent": "booking_summary",
+  "request_source": "internal_whatsapp_assistant",
+  "captured_at": "2026-07-10T13:18:10.820269+00:00"
+}

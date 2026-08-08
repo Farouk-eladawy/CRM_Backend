@@ -1,0 +1,176 @@
+[
+  {
+    "tour_info": {
+      "platform": "Viator",
+      "url": "https://www.viator.com/tours/Luxor/Private-Full-Day-Luxor-Tour-Customize-Your-Adventure/d826-14976P141",
+      "product_code": "14976P141",
+      "title": "Unknown Title",
+      "location": "Egypt",
+      "category": "Tours",
+      "breadcrumb": [
+        "Home",
+        "Egypt",
+        "Tours"
+      ]
+    },
+    "pricing": {
+      "price_from": 0.0,
+      "currency": "USD",
+      "price_unit": "per person",
+      "discounted_rates_for_kids": true,
+      "lowest_price_guarantee": true
+    },
+    "overview": {
+      "description": "Experience Unknown Title.",
+      "duration": "Flexible",
+      "start_time": "Varies",
+      "languages": [
+        "English"
+      ]
+    },
+    "features": {
+      "pickup_offered": false,
+      "mobile_ticket": false,
+      "wheelchair_accessible": false,
+      "private_tour": false
+    },
+    "whats_included": [
+      "See website"
+    ],
+    "whats_not_included": [],
+    "meeting_and_pickup": {
+      "pickup_points": "Select a pickup point",
+      "pickup_details": "Check voucher for details.",
+      "start_time": "Varies"
+    },
+    "itinerary": [],
+    "additional_info": [],
+    "supplier": {
+      "name": "FTS Travels"
+    },
+    "cancellation_policy": {
+      "description": "Check website for policy.",
+      "free_cancellation": "Check details"
+    },
+    "booking_options": {
+      "reserve_now_pay_later": true,
+      "reserve_now_pay_later_description": "Secure your spot while staying flexible"
+    }
+  },
+  {
+    "tour_info": {
+      "platform": "Viator",
+      "url": "https://www.viator.com/tours/Marsa-Alam/Cairo-Day-Tour-by-Plane-from-Marsa-Alam/d25556-14976P140",
+      "product_code": "14976P140",
+      "title": "Unknown Title",
+      "location": "Egypt",
+      "category": "Tours",
+      "breadcrumb": [
+        "Home",
+        "Egypt",
+        "Tours"
+      ]
+    },
+    "pricing": {
+      "price_from": 0.0,
+      "currency": "USD",
+      "price_unit": "per person",
+      "discounted_rates_for_kids": true,
+      "lowest_price_guarantee": true
+    },
+    "overview": {
+      "description": "Experience Unknown Title.",
+      "duration": "Flexible",
+      "start_time": "Varies",
+      "languages": [
+        "English"
+      ]
+    },
+    "features": {
+      "pickup_offered": false,
+      "mobile_ticket": false,
+      "wheelchair_accessible": false,
+      "private_tour": false
+    },
+    "whats_included": [
+      "See website"
+    ],
+    "whats_not_included": [],
+    "meeting_and_pickup": {
+      "pickup_points": "Select a pickup point",
+      "pickup_details": "Check voucher for details.",
+      "start_time": "Varies"
+    },
+    "itinerary": [],
+    "additional_info": [],
+    "supplier": {
+      "name": "FTS Travels"
+    },
+    "cancellation_policy": {
+      "description": "Check website for policy.",
+      "free_cancellation": "Check details"
+    },
+    "booking_options": {
+      "reserve_now_pay_later": true,
+      "reserve_now_pay_later_description": "Secure your spot while staying flexible"
+    }
+  },
+  {
+    "tour_info": {
+      "platform": "Viator",
+      "url": "https://www.viator.com/tours/Hurghada/Hurghada-Cruise-to-Bianca-Island-Utopia-with-Transfer-and-Lunch/d800-14976P139",
+      "product_code": "14976P139",
+      "title": "Unknown Title",
+      "location": "Egypt",
+      "category": "Tours",
+      "breadcrumb": [
+        "Home",
+        "Egypt",
+        "Tours"
+      ]
+    },
+    "pricing": {
+      "price_from": 0.0,
+      "currency": "USD",
+      "price_unit": "per person",
+      "discounted_rates_for_kids": true,
+      "lowest_price_guarantee": true
+    },
+    "overview": {
+      "description": "Experience Unknown Title.",
+      "duration": "Flexible",
+      "start_time": "Varies",
+      "languages": [
+        "English"
+      ]
+    },
+    "features": {
+      "pickup_offered": false,
+      "mobile_ticket": false,
+      "wheelchair_accessible": false,
+      "private_tour": false
+    },
+    "whats_included": [
+      "See website"
+    ],
+    "whats_not_included": [],
+    "meeting_and_pickup": {
+      "pickup_points": "Select a pickup point",
+      "pickup_details": "Check voucher for details.",
+      "start_time": "Varies"
+    },
+    "itinerary": [],
+    "additional_info": [],
+    "supplier": {
+      "name": "FTS Travels"
+    },
+    "cancellation_policy": {
+      "description": "Check website for policy.",
+      "free_cancellation": "Check details"
+    },
+    "booking_options": {
+      "reserve_now_pay_later": true,
+      "reserve_now_pay_later_description": "Secure your spot while staying flexible"
+    }
+  }
+]

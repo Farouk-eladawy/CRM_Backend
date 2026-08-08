@@ -1,0 +1,1 @@
+import sqlite3; conn=sqlite3.connect('chat_history.db'); c=conn.cursor(); c.execute('SELECT sender_type, text, status FROM messages WHERE chat_id = \'fc863a55-6593-4de2-ab2c-0fb7e3f891f4\' ORDER BY timestamp DESC LIMIT 10'); print(c.fetchall())

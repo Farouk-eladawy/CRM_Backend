@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "active_goals": [
+    {
+      "goal_id": "goal_personal_assistant_mode",
+      "title": "Turn PI into a personal operational assistant",
+      "scope": "strategic",
+      "priority": "high",
+      "status": "active",
+      "success_signal": "PI tracks preferences, proposes next steps, and preserves execution safety."
+    },
+    {
+      "goal_id": "goal_general_booking_support",
+      "title": "Support main bookings operations safely",
+      "scope": "daily_operations",
+      "priority": "high",
+      "status": "active",
+      "success_signal": "PI helps with summaries, next steps, drafts, and watcher setup for main bookings."
+    },
+    {
+      "goal_id": "goal_religious_booking_support",
+      "title": "Support religious bookings operations safely",
+      "scope": "daily_operations",
+      "priority": "high",
+      "status": "active",
+      "success_signal": "PI helps with religious flows without leaking general-only capabilities."
+    }
+  ],
+  "updated_at": "2026-07-10T12:57:06.355098+00:00"
+}

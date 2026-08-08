@@ -1,0 +1,22 @@
+{
+  "understood_intent": "update_airtable",
+  "confidence": 0.73,
+  "workflow_phase": "case_active",
+  "workflow_awaiting": "followup",
+  "pending_action_type": "update_airtable",
+  "case_reference": "123456test",
+  "hard_case_reason": [
+    "short_followup_context_dependency"
+  ],
+  "ambiguities": [],
+  "risk_flags": [
+    "write_operation"
+  ],
+  "analysis_summary": {
+    "request": "نعم",
+    "reply_preview": "تم تحديث Airtable بنجاح.\nالعميل: Ahmady\nالحجز: 123456test",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-10T01:45:40.523650+00:00"
+}

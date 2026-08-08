@@ -1,0 +1,166 @@
+{
+  "source_records_count": 100,
+  "sample_raw_records": [
+    {
+      "id": "rec000MZTlGiBnQ8H",
+      "fields": {
+        "Date Trip": "2026-03-17T06:30:00.000Z",
+        "Created By": {
+          "id": "usr3u5inRqvXzhRui",
+          "email": "booking@ftstravels.com",
+          "name": "Booking Ftstravel"
+        },
+        "trip Name": "The Grand Egyptian Museum",
+        "Booking Nr.": "30527347",
+        "Total price USD ": 88,
+        "Create Date  ": "2026-03-16T16:42:58.000Z",
+        "Booking Status": "Confirmed",
+        "Net Rate": "$61.0"
+      }
+    },
+    {
+      "id": "rec00Dz27SBsWDDUq",
+      "fields": {
+        "Date Trip": "2026-06-13T21:00:00.000Z",
+        "Created By": {
+          "id": "usrmJM870C1dVJ2KO",
+          "email": "Alaa_Maher@Protonmail.com",
+          "name": "Alaa Maher"
+        },
+        "trip Name": "Cairo Pyramids day tour by plane Hurghada",
+        "Booking Nr.": "MR WAEL",
+        "Create Date  ": "2026-06-13T14:05:18.000Z"
+      }
+    },
+    {
+      "id": "rec00GDdxnZltRB5R",
+      "fields": {
+        "Date Trip": "2025-12-02T00:00:00.000Z",
+        "Created By": {
+          "id": "usr3u5inRqvXzhRui",
+          "email": "booking@ftstravels.com",
+          "name": "Booking Ftstravel"
+        },
+        "trip Name": "The Grand Egyptian Museum",
+        "Booking Nr.": "956052994",
+        "Create Date  ": "2025-12-02T14:06:22.000Z",
+        "Booking Status": "Active"
+      }
+    },
+    {
+      "id": "rec00GqLjk5ffjpBE",
+      "fields": {
+        "Date Trip": "2026-04-01T22:00:00.000Z",
+        "Created By": {
+          "id": "usr3u5inRqvXzhRui",
+          "email": "booking@ftstravels.com",
+          "name": "Booking Ftstravel"
+        },
+        "trip Name": "Luxor by Bus Hurghada",
+        "Booking Nr.": "GYG48ZBW7LAH",
+        "Total price EUR": 260,
+        "Create Date  ": "2025-05-18T17:39:49.000Z",
+        "Booking Status": "Active"
+      }
+    },
+    {
+      "id": "rec00OlylVAaXfVYM",
+      "fields": {
+        "Date Trip": "2026-05-27T01:30:00.000Z",
+        "Created By": {
+          "id": "usr3u5inRqvXzhRui",
+          "email": "booking@ftstravels.com",
+          "name": "Booking Ftstravel"
+        },
+        "trip Name": "Cairo by Bus Hurghada",
+        "Booking Nr.": "-",
+        "Total price USD ": 285,
+        "Create Date  ": "2026-04-15T14:59:12.000Z",
+        "Booking Status": "Canceled"
+      }
+    }
+  ],
+  "kpi_result": {
+    "summary": {
+      "total_bookings": 100,
+      "confirmed_bookings": 76,
+      "canceled_bookings": 9,
+      "pending_bookings": 0,
+      "cancellation_rate": 9.0,
+      "invoices": {
+        "paid_count": 0,
+        "pending_count": 0
+      },
+      "financials": {
+        "total_sales_by_currency": {
+          "UNKNOWN": 0.0,
+          "EUR": 1828.0,
+          "USD": 80.0
+        },
+        "paid_amount_by_currency": {},
+        "pending_amount_by_currency": {},
+        "outstanding_collection_by_currency": {
+          "EUR": 213.0
+        },
+        "total_net_rate_raw_by_currency": {
+          "UNKNOWN": 1619.1,
+          "USD": 80.0,
+          "EUR": 618.0
+        }
+      }
+    },
+    "breakdowns": {
+      "booking_status_raw": {
+        "Confirmed": 51,
+        "Unknown": 12,
+        "Active": 25,
+        "Canceled": 9,
+        "Changed": 2,
+        "Updated": 1
+      },
+      "invoice_status_breakdown": {
+        "Unknown": 93,
+        "succeeded": 2,
+        "pending": 5
+      },
+      "currency_breakdown": {
+        "UNKNOWN": 87,
+        "EUR": 12,
+        "USD": 1
+      },
+      "payment_method_amounts": {
+        "Unknown": {
+          "UNKNOWN": 0.0,
+          "EUR": 818.0
+        },
+        "Cash": {
+          "USD": 80.0
+        }
+      },
+      "top_trips": {
+        "The Grand Egyptian Museum": 23,
+        "Luxor by Bus Hurghada": 10,
+        "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab": 9,
+        "Giza Complex Skip-the-Line Tickets + Access inside the Great Pyramid": 8,
+        "Cairo by Bus Hurghada": 7,
+        "Combo (Save 5%) : Giza Complex Skip-the-Line Tickets + Access to Khufu Pyramid +": 5,
+        "Pyramids of Giza Plateau": 5,
+        "Cairo Pyramids day tour by plane Hurghada": 3,
+        "Sharm El-Sheikh: Ultimate ATV Quad, Stargazing & BBQ Dinner": 3,
+        "Egyptian Museum Cairo": 2
+      },
+      "top_countries": {
+        "Unknown": 80,
+        "United Kingdom": 5,
+        "Germany": 2,
+        "France": 2,
+        "german": 2,
+        "Egypt": 1,
+        "Belgium": 1,
+        "GB": 1,
+        "CH": 1,
+        "Russia": 1
+      }
+    }
+  }
+}

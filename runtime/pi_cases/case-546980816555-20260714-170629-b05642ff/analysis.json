@@ -1,0 +1,23 @@
+{
+  "understood_intent": "create_invoice",
+  "confidence": 0.84,
+  "is_clean": true,
+  "workflow_phase": "awaiting_approval",
+  "workflow_awaiting": "approval",
+  "pending_action_type": "create_invoice",
+  "case_reference": "546980816555",
+  "hard_case_reason": [],
+  "ambiguities": [],
+  "misclassification_flags": [],
+  "risk_flags": [
+    "approval_required",
+    "sensitive_operation"
+  ],
+  "analysis_summary": {
+    "request": "`أنشئ فاتورة جديدة بدل الحالية`",
+    "reply_preview": "تم تجهيز إنشاء فاتورة بشكل آمن:\n- العميل: Ahmed Elkhatib\n- رقم الحجز: 546980816555\n- المبلغ: 20.0 EUR\n- المزود المتوقع: wetravel\n- نوع الحجز: standard\n- حالة الفاتورة الحالية: pending\n- يوجد رابط فاتورة حالي: https://www.wetravel.com/trips/grand-egyptian-museum-fts-travels-9706856648\n- وضع التنفيذ: إنشاء فاتورة جديدة بدل الحالية\n\nنتيجة المحاكاة: الحالة جاهزة للتنفيذ الفعلي بعد موافقتك.\n\nتحذيرات:\n- existing_invoice_will_be_replaced\n\nأرسل `نعم` أو `موافق` لإنشاء الفاتورة الآن. بعد الإنشاء سأجهز لك",
+    "has_case_context": true,
+    "requires_approval": true
+  },
+  "analyzed_at": "2026-07-14T17:07:13.208715+00:00"
+}

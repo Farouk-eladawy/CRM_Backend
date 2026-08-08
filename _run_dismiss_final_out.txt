@@ -1,0 +1,5 @@
+Fresh targets (Religious, unread/needs_help, before 2026-08-03): 0
+Pending (not yet dismissed): 0
+
+Done. Success: 0 | Failed: 0
+Result -> backups/dismiss_execution_result.json

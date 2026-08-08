@@ -1,0 +1,1820 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<title>Webhooks &#8211; tawk.to Developer Portal</title>
+<meta name='robots' content='max-image-preview:large' />
+<link rel="alternate" hreflang="ar" href="https://developer.tawk.to/webhooks/?lang=ar" />
+<link rel="alternate" hreflang="en" href="https://developer.tawk.to/webhooks/" />
+<link rel="alternate" hreflang="es" href="https://developer.tawk.to/webhooks/?lang=es" />
+<link rel="alternate" hreflang="fr" href="https://developer.tawk.to/webhooks/?lang=fr" />
+<link rel="alternate" hreflang="it" href="https://developer.tawk.to/webhooks/?lang=it" />
+<link rel="alternate" hreflang="pt-br" href="https://developer.tawk.to/webhooks/?lang=pt-br" />
+<link rel="alternate" hreflang="ru" href="https://developer.tawk.to/webhooks/?lang=ru" />
+<link rel="alternate" hreflang="tr" href="https://developer.tawk.to/webhooks/?lang=tr" />
+<link rel="alternate" hreflang="x-default" href="https://developer.tawk.to/webhooks/" />
+<link rel="alternate" type="application/rss+xml" title="tawk.to Developer Portal &raquo; Feed" href="https://developer.tawk.to/feed/" />
+<link rel="alternate" type="application/rss+xml" title="tawk.to Developer Portal &raquo; Comments Feed" href="https://developer.tawk.to/comments/feed/" />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://developer.tawk.to/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdeveloper.tawk.to%2Fwebhooks%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://developer.tawk.to/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdeveloper.tawk.to%2Fwebhooks%2F&#038;format=xml" />
+<style id='wp-img-auto-sizes-contain-inline-css'>
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:root { --wp--style--global--content-size: 800px;--wp--style--global--wide-size: 1200px; }:where(body) { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.wp-site-blocks) > * { margin-block-start: 24px; margin-block-end: 0; }:where(.wp-site-blocks) > :first-child { margin-block-start: 0; }:where(.wp-site-blocks) > :last-child { margin-block-end: 0; }:root { --wp--style--block-gap: 24px; }:root :where(.is-layout-flow) > :first-child{margin-block-start: 0;}:root :where(.is-layout-flow) > :last-child{margin-block-end: 0;}:root :where(.is-layout-flow) > *{margin-block-start: 24px;margin-block-end: 0;}:root :where(.is-layout-constrained) > :first-child{margin-block-start: 0;}:root :where(.is-layout-constrained) > :last-child{margin-block-end: 0;}:root :where(.is-layout-constrained) > *{margin-block-start: 24px;margin-block-end: 0;}:root :where(.is-layout-flex){gap: 24px;}:root :where(.is-layout-grid){gap: 24px;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}a:where(:not(.wp-element-button)){text-decoration: underline;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+<link rel='stylesheet' id='woocommerce-layout-css' href='https://developer.tawk.to/wp-content/plugins/woocommerce/assets/css/woocommerce-layout.css?ver=10.4.3' media='all' />
+<link rel='stylesheet' id='woocommerce-smallscreen-css' href='https://developer.tawk.to/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen.css?ver=10.4.3' media='only screen and (max-width: 768px)' />
+<link rel='stylesheet' id='woocommerce-general-css' href='https://developer.tawk.to/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=10.4.3' media='all' />
+<style id='woocommerce-inline-inline-css'>
+.woocommerce form .form-row .required { visibility: visible; }
+/*# sourceURL=woocommerce-inline-inline-css */
+</style>
+<link rel='stylesheet' id='wpml-legacy-horizontal-list-0-css' href='https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/legacy-list-horizontal/style.min.css?ver=1' media='all' />
+<link rel='stylesheet' id='wpml-menu-item-0-css' href='https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/menu-item/style.min.css?ver=1' media='all' />
+<link rel='stylesheet' id='hello-elementor-css' href='https://developer.tawk.to/wp-content/themes/hello-elementor/assets/css/reset.css?ver=3.4.5' media='all' />
+<link rel='stylesheet' id='hello-elementor-theme-style-css' href='https://developer.tawk.to/wp-content/themes/hello-elementor/assets/css/theme.css?ver=3.4.5' media='all' />
+<link rel='stylesheet' id='hello-elementor-header-footer-css' href='https://developer.tawk.to/wp-content/themes/hello-elementor/assets/css/header-footer.css?ver=3.4.5' media='all' />
+<link rel='stylesheet' id='elementor-frontend-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.34.1' media='all' />
+<link rel='stylesheet' id='widget-image-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.34.1' media='all' />
+<link rel='stylesheet' id='widget-nav-menu-css' href='https://developer.tawk.to/wp-content/plugins/elementor-pro/assets/css/widget-nav-menu.min.css?ver=3.34.0' media='all' />
+<link rel='stylesheet' id='elementor-icons-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.45.0' media='all' />
+<link rel='stylesheet' id='elementor-post-812-css' href='https://developer.tawk.to/wp-content/uploads/elementor/css/post-812.css?ver=1768658391' media='all' />
+<link rel='stylesheet' id='widget-heading-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=3.34.1' media='all' />
+<link rel='stylesheet' id='widget-icon-list-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=3.34.1' media='all' />
+<link rel='stylesheet' id='widget-menu-anchor-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/css/widget-menu-anchor.min.css?ver=3.34.1' media='all' />
+<link rel='stylesheet' id='widget-divider-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/css/widget-divider.min.css?ver=3.34.1' media='all' />
+<link rel='stylesheet' id='elementor-post-176-css' href='https://developer.tawk.to/wp-content/uploads/elementor/css/post-176.css?ver=1768666327' media='all' />
+<link rel='stylesheet' id='elementor-post-1793-css' href='https://developer.tawk.to/wp-content/uploads/elementor/css/post-1793.css?ver=1768658392' media='all' />
+<link rel='stylesheet' id='elementor-post-3166-css' href='https://developer.tawk.to/wp-content/uploads/elementor/css/post-3166.css?ver=1768658392' media='all' />
+<link rel='stylesheet' id='elementor-gf-local-roboto-css' href='https://developer.tawk.to/wp-content/uploads/elementor/google-fonts/css/roboto.css?ver=1742428044' media='all' />
+<link rel='stylesheet' id='elementor-gf-local-robotoslab-css' href='https://developer.tawk.to/wp-content/uploads/elementor/google-fonts/css/robotoslab.css?ver=1742428045' media='all' />
+<link rel='stylesheet' id='elementor-gf-local-lato-css' href='https://developer.tawk.to/wp-content/uploads/elementor/google-fonts/css/lato.css?ver=1742428046' media='all' />
+<link rel='stylesheet' id='elementor-icons-shared-0-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css?ver=5.15.3' media='all' />
+<link rel='stylesheet' id='elementor-icons-fa-solid-css' href='https://developer.tawk.to/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css?ver=5.15.3' media='all' />
+<script src="https://developer.tawk.to/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script src="https://developer.tawk.to/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/woocommerce/assets/js/jquery-blockui/jquery.blockUI.min.js?ver=2.7.0-wc.10.4.3" id="wc-jquery-blockui-js" defer data-wp-strategy="defer"></script>
+<script id="wc-add-to-cart-js-extra">
+var wc_add_to_cart_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/?wc-ajax=%%endpoint%%","i18n_view_cart":"View cart","cart_url":"https://developer.tawk.to/cart/","is_cart":"","cart_redirect_after_add":"no"};
+//# sourceURL=wc-add-to-cart-js-extra
+</script>
+<script src="https://developer.tawk.to/wp-content/plugins/woocommerce/assets/js/frontend/add-to-cart.min.js?ver=10.4.3" id="wc-add-to-cart-js" defer data-wp-strategy="defer"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/woocommerce/assets/js/js-cookie/js.cookie.min.js?ver=2.1.4-wc.10.4.3" id="wc-js-cookie-js" defer data-wp-strategy="defer"></script>
+<script id="woocommerce-js-extra">
+var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/?wc-ajax=%%endpoint%%","i18n_password_show":"Show password","i18n_password_hide":"Hide password"};
+//# sourceURL=woocommerce-js-extra
+</script>
+<script src="https://developer.tawk.to/wp-content/plugins/woocommerce/assets/js/frontend/woocommerce.min.js?ver=10.4.3" id="woocommerce-js" defer data-wp-strategy="defer"></script>
+<link rel="https://api.w.org/" href="https://developer.tawk.to/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://developer.tawk.to/wp-json/wp/v2/pages/176" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://developer.tawk.to/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.9" />
+<meta name="generator" content="WooCommerce 10.4.3" />
+<link rel="canonical" href="https://developer.tawk.to/webhooks/" />
+<link rel='shortlink' href='https://developer.tawk.to/?p=176' />
+<meta name="generator" content="WPML ver:4.8.6 stt:5,1,4,27,42,45,2,53;" />
+<!-- start Simple Custom CSS and JS -->
+<style>
+/* Add your CSS code here.
+
+For example:
+.example {
+    color: red;
+}
+
+For brushing up on your CSS knowledge, check out http://www.w3schools.com/css/css_syntax.asp
+
+End of comment */ 
+
+
+ html[lang="tr-TR"] .elementor-column.elementor-col-33.elementor-top-column.elementor-element.elementor-element-0e965e9 {
+    width: 85.399%!important;
+  }
+
+html[lang="ar"] .elementor-column.elementor-col-33.elementor-top-column.elementor-element.elementor-element-0e965e9 {
+    width: 95.399%!important;
+  }
+</style>
+<!-- end Simple Custom CSS and JS -->
+<!-- start Simple Custom CSS and JS -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Arimo&display=swap" rel="stylesheet">
+
+<style>
+/* body.translatepress-tr_TR h1, body.translatepress-tr_TR p, body.translatepress-tr_TR h2, body.translatepress-tr_TR h3, body.translatepress-tr_TR h5, body.translatepress-tr_TR div, body.translatepress-tr_TR h6, body.translatepress-tr_TR a, body.translatepress-tr_TR span{
+	font-family: 'Libre Baskerville'!important;
+}
+   */
+html[lang="tr-TR"] body h2.elementor-heading-title.elementor-size-default, html[lang="tr-TR"] body h1.elementor-heading-title.elementor-size-default, html[lang="tr-TR"] body p,html[lang="tr-TR"] body h2,html[lang="tr-TR"] body h3,html[lang="tr-TR"] body h4,html[lang="tr-TR"] body h5,html[lang="tr-TR"] body div,html[lang="tr-TR"] body h6,html[lang="tr-TR"] body a,html[lang="tr-TR"] body span {
+font-family: 'Arimo', sans-serif!important;
+}
+  
+</style><!-- end Simple Custom CSS and JS -->
+<meta name="description" content="">
+	<noscript><style>.woocommerce-product-gallery{ opacity: 1 !important; }</style></noscript>
+	<meta name="generator" content="Elementor 3.34.1; features: additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-auto">
+			<style>
+				.e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload),
+				.e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload) * {
+					background-image: none !important;
+				}
+				@media screen and (max-height: 1024px) {
+					.e-con.e-parent:nth-of-type(n+3):not(.e-lazyloaded):not(.e-no-lazyload),
+					.e-con.e-parent:nth-of-type(n+3):not(.e-lazyloaded):not(.e-no-lazyload) * {
+						background-image: none !important;
+					}
+				}
+				@media screen and (max-height: 640px) {
+					.e-con.e-parent:nth-of-type(n+2):not(.e-lazyloaded):not(.e-no-lazyload),
+					.e-con.e-parent:nth-of-type(n+2):not(.e-lazyloaded):not(.e-no-lazyload) * {
+						background-image: none !important;
+					}
+				}
+			</style>
+			<link rel="icon" href="https://developer.tawk.to/wp-content/uploads/2019/08/tawky_big.png" sizes="32x32" />
+<link rel="icon" href="https://developer.tawk.to/wp-content/uploads/2019/08/tawky_big.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://developer.tawk.to/wp-content/uploads/2019/08/tawky_big.png" />
+<meta name="msapplication-TileImage" content="https://developer.tawk.to/wp-content/uploads/2019/08/tawky_big.png" />
+
+<!-- START - Open Graph and Twitter Card Tags 3.3.7 -->
+ <!-- Facebook Open Graph -->
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:site_name" content="tawk.to Developer Portal"/>
+  <meta property="og:title" content="Webhooks"/>
+  <meta property="og:url" content="https://developer.tawk.to/webhooks/"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:description" content="Webhooks allow you to send real-time notifications of events within tawk.to to external services. You can choose to send a webhook event when a chat begins, ends, when a ticket is created or all three."/>
+  <meta property="og:image" content="https://developer.tawk.to/wp-content/uploads/2019/10/Webhookswebhookstawkto.png"/>
+  <meta property="og:image:url" content="https://developer.tawk.to/wp-content/uploads/2019/10/Webhookswebhookstawkto.png"/>
+  <meta property="og:image:secure_url" content="https://developer.tawk.to/wp-content/uploads/2019/10/Webhookswebhookstawkto.png"/>
+  <meta property="article:publisher" content="https://www.facebook.com/tawkto/"/>
+ <!-- Google+ / Schema.org -->
+  <meta itemprop="name" content="Webhooks"/>
+  <meta itemprop="headline" content="Webhooks"/>
+  <meta itemprop="description" content="Webhooks allow you to send real-time notifications of events within tawk.to to external services. You can choose to send a webhook event when a chat begins, ends, when a ticket is created or all three."/>
+  <meta itemprop="image" content="https://developer.tawk.to/wp-content/uploads/2019/10/Webhookswebhookstawkto.png"/>
+  <meta itemprop="author" content="Noah"/>
+  <!--<meta itemprop="publisher" content="tawk.to Developer Portal"/>--> <!-- To solve: The attribute publisher.itemtype has an invalid value -->
+ <!-- Twitter Cards -->
+  <meta name="twitter:title" content="Webhooks"/>
+  <meta name="twitter:url" content="https://developer.tawk.to/webhooks/"/>
+  <meta name="twitter:description" content="Webhooks allow you to send real-time notifications of events within tawk.to to external services. You can choose to send a webhook event when a chat begins, ends, when a ticket is created or all three."/>
+  <meta name="twitter:image" content="https://developer.tawk.to/wp-content/uploads/2019/10/Webhookswebhookstawkto.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+ <!-- SEO -->
+ <!-- Misc. tags -->
+ <!-- is_singular -->
+<!-- END - Open Graph and Twitter Card Tags 3.3.7 -->
+	
+</head>
+<body class="wp-singular page-template page-template-elementor_header_footer page page-id-176 wp-custom-logo wp-embed-responsive wp-theme-hello-elementor theme-hello-elementor woocommerce-no-js hello-elementor-default elementor-default elementor-template-full-width elementor-kit-812 elementor-page elementor-page-176">
+
+
+<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header data-elementor-type="header" data-elementor-id="1793" class="elementor elementor-1793 elementor-location-header" data-elementor-post-type="elementor_library">
+					<section class="elementor-section elementor-top-section elementor-element elementor-element-835d942 elementor-section-content-middle elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="835d942" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-33 elementor-top-column elementor-element elementor-element-c7931a1" data-id="c7931a1" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-d4242f2 elementor-widget elementor-widget-image" data-id="d4242f2" data-element_type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://developer.tawk.to">
+							<img width="38" height="40" src="https://developer.tawk.to/wp-content/uploads/2019/10/logotawklogo.png" class="attachment-full size-full wp-image-536" alt="" />								</a>
+															</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-33 elementor-top-column elementor-element elementor-element-78d55cd" data-id="78d55cd" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-3ec0c92 elementor-widget elementor-widget-text-editor" data-id="3ec0c92" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><strong>Developer</strong> Platform</p>								</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-33 elementor-top-column elementor-element elementor-element-0e965e9" data-id="0e965e9" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-cec0e7f elementor-nav-menu__align-end elementor-nav-menu--stretch elementor-nav-menu--dropdown-tablet elementor-nav-menu__text-align-aside elementor-nav-menu--toggle elementor-nav-menu--burger elementor-widget elementor-widget-nav-menu" data-id="cec0e7f" data-element_type="widget" data-settings="{&quot;full_width&quot;:&quot;stretch&quot;,&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;fas fa-caret-down\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;\/i&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;},&quot;toggle&quot;:&quot;burger&quot;}" data-widget_type="nav-menu.default">
+				<div class="elementor-widget-container">
+								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-text e--animation-none">
+				<ul id="menu-1-cec0e7f" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-274"><a href="https://developer.tawk.to/" title="						" class="elementor-item">Home</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-273"><a href="https://developer.tawk.to/jsapi/" title="						" class="elementor-item">JavaScript API</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-176 current_page_item menu-item-272"><a href="https://developer.tawk.to/webhooks/" aria-current="page" title="						" class="elementor-item elementor-item-active">Webhooks</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-490"><a href="https://developer.tawk.to/zapier/" class="elementor-item">Zapier</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-275"><a target="_blank" href="https://community.tawk.to/c/developers" title="						" class="elementor-item">Community</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-819"><a href="http://status.tawk.to" class="elementor-item">Status</a></li>
+<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-en wpml-ls-current-language wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-has-children menu-item-wpml-ls-6-en"><a href="https://developer.tawk.to/webhooks/" role="menuitem" class="elementor-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="en">English</span></a>
+<ul class="sub-menu elementor-nav-menu--dropdown">
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ar wpml-ls-menu-item wpml-ls-first-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ar"><a href="https://developer.tawk.to/webhooks/?lang=ar" title="Switch to العربية" aria-label="Switch to العربية" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ar.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ar">العربية</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-es wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-es"><a href="https://developer.tawk.to/webhooks/?lang=es" title="Switch to Español" aria-label="Switch to Español" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/es.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="es">Español</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-fr wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-fr"><a href="https://developer.tawk.to/webhooks/?lang=fr" title="Switch to Français" aria-label="Switch to Français" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/fr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="fr">Français</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-it wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-it"><a href="https://developer.tawk.to/webhooks/?lang=it" title="Switch to Italiano" aria-label="Switch to Italiano" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/it.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="it">Italiano</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-pt-br wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-pt-br"><a href="https://developer.tawk.to/webhooks/?lang=pt-br" title="Switch to Português" aria-label="Switch to Português" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/pt-br.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="pt-br">Português</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ru wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ru"><a href="https://developer.tawk.to/webhooks/?lang=ru" title="Switch to Русский" aria-label="Switch to Русский" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ru.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ru">Русский</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-tr wpml-ls-menu-item wpml-ls-last-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-tr"><a href="https://developer.tawk.to/webhooks/?lang=tr" title="Switch to Türkçe" aria-label="Switch to Türkçe" role="menuitem" class="elementor-sub-item"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/tr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="tr">Türkçe</span></a></li>
+</ul>
+</li>
+</ul>			</nav>
+					<div class="elementor-menu-toggle" role="button" tabindex="0" aria-label="Menu Toggle" aria-expanded="false">
+			<i aria-hidden="true" role="presentation" class="elementor-menu-toggle__icon--open eicon-menu-bar"></i><i aria-hidden="true" role="presentation" class="elementor-menu-toggle__icon--close eicon-close"></i>		</div>
+					<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
+				<ul id="menu-2-cec0e7f" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-274"><a href="https://developer.tawk.to/" title="						" class="elementor-item" tabindex="-1">Home</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-273"><a href="https://developer.tawk.to/jsapi/" title="						" class="elementor-item" tabindex="-1">JavaScript API</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-176 current_page_item menu-item-272"><a href="https://developer.tawk.to/webhooks/" aria-current="page" title="						" class="elementor-item elementor-item-active" tabindex="-1">Webhooks</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-490"><a href="https://developer.tawk.to/zapier/" class="elementor-item" tabindex="-1">Zapier</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-275"><a target="_blank" href="https://community.tawk.to/c/developers" title="						" class="elementor-item" tabindex="-1">Community</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-819"><a href="http://status.tawk.to" class="elementor-item" tabindex="-1">Status</a></li>
+<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-en wpml-ls-current-language wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-has-children menu-item-wpml-ls-6-en"><a href="https://developer.tawk.to/webhooks/" role="menuitem" class="elementor-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="en">English</span></a>
+<ul class="sub-menu elementor-nav-menu--dropdown">
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ar wpml-ls-menu-item wpml-ls-first-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ar"><a href="https://developer.tawk.to/webhooks/?lang=ar" title="Switch to العربية" aria-label="Switch to العربية" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ar.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ar">العربية</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-es wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-es"><a href="https://developer.tawk.to/webhooks/?lang=es" title="Switch to Español" aria-label="Switch to Español" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/es.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="es">Español</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-fr wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-fr"><a href="https://developer.tawk.to/webhooks/?lang=fr" title="Switch to Français" aria-label="Switch to Français" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/fr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="fr">Français</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-it wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-it"><a href="https://developer.tawk.to/webhooks/?lang=it" title="Switch to Italiano" aria-label="Switch to Italiano" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/it.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="it">Italiano</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-pt-br wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-pt-br"><a href="https://developer.tawk.to/webhooks/?lang=pt-br" title="Switch to Português" aria-label="Switch to Português" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/pt-br.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="pt-br">Português</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ru wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ru"><a href="https://developer.tawk.to/webhooks/?lang=ru" title="Switch to Русский" aria-label="Switch to Русский" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ru.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ru">Русский</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-tr wpml-ls-menu-item wpml-ls-last-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-tr"><a href="https://developer.tawk.to/webhooks/?lang=tr" title="Switch to Türkçe" aria-label="Switch to Türkçe" role="menuitem" class="elementor-sub-item" tabindex="-1"><img
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/tr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="tr">Türkçe</span></a></li>
+</ul>
+</li>
+</ul>			</nav>
+						</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				</header>
+				<div data-elementor-type="wp-post" data-elementor-id="176" class="elementor elementor-176" data-elementor-post-type="page">
+						<section class="elementor-section elementor-top-section elementor-element elementor-element-783b594c elementor-section-content-middle elementor-hidden-desktop elementor-hidden-tablet elementor-hidden-phone elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="783b594c" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-33 elementor-top-column elementor-element elementor-element-47ec4937" data-id="47ec4937" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-766a59c1 elementor-widget elementor-widget-image" data-id="766a59c1" data-element_type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://developer.tawk.to">
+							<img decoding="async" width="38" height="40" src="https://developer.tawk.to/wp-content/uploads/2019/10/logotawklogo.png" class="attachment-full size-full wp-image-536" alt="" />								</a>
+															</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-33 elementor-top-column elementor-element elementor-element-7684644f" data-id="7684644f" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-652f5202 elementor-widget elementor-widget-text-editor" data-id="652f5202" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><strong>Developer</strong> Platform</p>								</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-33 elementor-top-column elementor-element elementor-element-5eff68cc" data-id="5eff68cc" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-d4f8355 elementor-nav-menu__align-end elementor-nav-menu--dropdown-tablet elementor-nav-menu__text-align-aside elementor-nav-menu--toggle elementor-nav-menu--burger elementor-widget elementor-widget-nav-menu" data-id="d4f8355" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;fas fa-caret-down\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;\/i&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;},&quot;toggle&quot;:&quot;burger&quot;}" data-widget_type="nav-menu.default">
+				<div class="elementor-widget-container">
+								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-text e--animation-none">
+				<ul id="menu-1-d4f8355" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-274"><a href="https://developer.tawk.to/" title="						" class="elementor-item">Home</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-273"><a href="https://developer.tawk.to/jsapi/" title="						" class="elementor-item">JavaScript API</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-176 current_page_item menu-item-272"><a href="https://developer.tawk.to/webhooks/" aria-current="page" title="						" class="elementor-item elementor-item-active">Webhooks</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-490"><a href="https://developer.tawk.to/zapier/" class="elementor-item">Zapier</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-275"><a target="_blank" href="https://community.tawk.to/c/developers" title="						" class="elementor-item">Community</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-819"><a href="http://status.tawk.to" class="elementor-item">Status</a></li>
+<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-en wpml-ls-current-language wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-has-children menu-item-wpml-ls-6-en"><a href="https://developer.tawk.to/webhooks/" role="menuitem" class="elementor-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="en">English</span></a>
+<ul class="sub-menu elementor-nav-menu--dropdown">
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ar wpml-ls-menu-item wpml-ls-first-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ar"><a href="https://developer.tawk.to/webhooks/?lang=ar" title="Switch to العربية" aria-label="Switch to العربية" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ar.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ar">العربية</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-es wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-es"><a href="https://developer.tawk.to/webhooks/?lang=es" title="Switch to Español" aria-label="Switch to Español" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/es.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="es">Español</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-fr wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-fr"><a href="https://developer.tawk.to/webhooks/?lang=fr" title="Switch to Français" aria-label="Switch to Français" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/fr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="fr">Français</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-it wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-it"><a href="https://developer.tawk.to/webhooks/?lang=it" title="Switch to Italiano" aria-label="Switch to Italiano" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/it.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="it">Italiano</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-pt-br wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-pt-br"><a href="https://developer.tawk.to/webhooks/?lang=pt-br" title="Switch to Português" aria-label="Switch to Português" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/pt-br.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="pt-br">Português</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ru wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ru"><a href="https://developer.tawk.to/webhooks/?lang=ru" title="Switch to Русский" aria-label="Switch to Русский" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ru.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ru">Русский</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-tr wpml-ls-menu-item wpml-ls-last-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-tr"><a href="https://developer.tawk.to/webhooks/?lang=tr" title="Switch to Türkçe" aria-label="Switch to Türkçe" role="menuitem" class="elementor-sub-item"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/tr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="tr">Türkçe</span></a></li>
+</ul>
+</li>
+</ul>			</nav>
+					<div class="elementor-menu-toggle" role="button" tabindex="0" aria-label="Menu Toggle" aria-expanded="false">
+			<i aria-hidden="true" role="presentation" class="elementor-menu-toggle__icon--open eicon-menu-bar"></i><i aria-hidden="true" role="presentation" class="elementor-menu-toggle__icon--close eicon-close"></i>		</div>
+					<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
+				<ul id="menu-2-d4f8355" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-274"><a href="https://developer.tawk.to/" title="						" class="elementor-item" tabindex="-1">Home</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-273"><a href="https://developer.tawk.to/jsapi/" title="						" class="elementor-item" tabindex="-1">JavaScript API</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-176 current_page_item menu-item-272"><a href="https://developer.tawk.to/webhooks/" aria-current="page" title="						" class="elementor-item elementor-item-active" tabindex="-1">Webhooks</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-490"><a href="https://developer.tawk.to/zapier/" class="elementor-item" tabindex="-1">Zapier</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-275"><a target="_blank" href="https://community.tawk.to/c/developers" title="						" class="elementor-item" tabindex="-1">Community</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-819"><a href="http://status.tawk.to" class="elementor-item" tabindex="-1">Status</a></li>
+<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-en wpml-ls-current-language wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-has-children menu-item-wpml-ls-6-en"><a href="https://developer.tawk.to/webhooks/" role="menuitem" class="elementor-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="en">English</span></a>
+<ul class="sub-menu elementor-nav-menu--dropdown">
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ar wpml-ls-menu-item wpml-ls-first-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ar"><a href="https://developer.tawk.to/webhooks/?lang=ar" title="Switch to العربية" aria-label="Switch to العربية" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ar.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ar">العربية</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-es wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-es"><a href="https://developer.tawk.to/webhooks/?lang=es" title="Switch to Español" aria-label="Switch to Español" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/es.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="es">Español</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-fr wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-fr"><a href="https://developer.tawk.to/webhooks/?lang=fr" title="Switch to Français" aria-label="Switch to Français" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/fr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="fr">Français</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-it wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-it"><a href="https://developer.tawk.to/webhooks/?lang=it" title="Switch to Italiano" aria-label="Switch to Italiano" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/it.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="it">Italiano</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-pt-br wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-pt-br"><a href="https://developer.tawk.to/webhooks/?lang=pt-br" title="Switch to Português" aria-label="Switch to Português" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/pt-br.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="pt-br">Português</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-ru wpml-ls-menu-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-ru"><a href="https://developer.tawk.to/webhooks/?lang=ru" title="Switch to Русский" aria-label="Switch to Русский" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/ru.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="ru">Русский</span></a></li>
+	<li class="menu-item wpml-ls-slot-6 wpml-ls-item wpml-ls-item-tr wpml-ls-menu-item wpml-ls-last-item menu-item-type-wpml_ls_menu_item menu-item-object-wpml_ls_menu_item menu-item-wpml-ls-6-tr"><a href="https://developer.tawk.to/webhooks/?lang=tr" title="Switch to Türkçe" aria-label="Switch to Türkçe" role="menuitem" class="elementor-sub-item" tabindex="-1"><img decoding="async"
+            class="wpml-ls-flag"
+            src="https://developer.tawk.to/wp-content/plugins/sitepress-multilingual-cms/res/flags/tr.png"
+            alt=""
+            
+            
+    /><span class="wpml-ls-native" lang="tr">Türkçe</span></a></li>
+</ul>
+</li>
+</ul>			</nav>
+						</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-e7da346 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="e7da346" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-681748d2" data-id="681748d2" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-772eb727 elementor-widget elementor-widget-heading" data-id="772eb727" data-element_type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h1 class="elementor-heading-title elementor-size-default">Webhooks</h1>				</div>
+				</div>
+				<div class="elementor-element elementor-element-51544e8c elementor-widget elementor-widget-text-editor" data-id="51544e8c" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Webhooks allow you to send real-time notifications of events within tawk.to to external services.</p><p>You can configure a webhook to be sent on the following events:</p><ul><li>Chat starts</li><li>Chat ends</li><li>New chat transcripts</li><li>New ticket is created</li></ul>								</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-2a9c6411" data-id="2a9c6411" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-375d0152 elementor-widget elementor-widget-image" data-id="375d0152" data-element_type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" decoding="async" width="458" height="446" src="https://developer.tawk.to/wp-content/uploads/2019/10/Group-77webhookstawktobig.png" class="attachment-full size-full wp-image-610" alt="" srcset="https://developer.tawk.to/wp-content/uploads/2019/10/Group-77webhookstawktobig.png 458w, https://developer.tawk.to/wp-content/uploads/2019/10/Group-77webhookstawktobig-300x292.png 300w" sizes="(max-width: 458px) 100vw, 458px" />															</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-9b78470 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="9b78470" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-6297a151" data-id="6297a151" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<section class="elementor-section elementor-inner-section elementor-element elementor-element-d691e0d elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="d691e0d" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-e3848cb" data-id="e3848cb" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-3361b99e elementor-widget elementor-widget-text-editor" data-id="3361b99e" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									A webhook consists of:								</div>
+				</div>
+				<div class="elementor-element elementor-element-1cd4df85 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-id="1cd4df85" data-element_type="widget" data-widget_type="icon-list.default">
+				<div class="elementor-widget-container">
+							<ul class="elementor-icon-list-items">
+							<li class="elementor-icon-list-item">
+											<span class="elementor-icon-list-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM15.4344 7.70711C15.8249 7.31658 15.8249 6.68342 15.4344 6.29289C15.0439 5.90237 14.4107 5.90237 14.0202 6.29289L8.72727 11.5858L6.70711 9.56562C6.31658 9.1751 5.68342 9.1751 5.29289 9.56562C4.90237 9.95614 4.90237 10.5893 5.29289 10.9798L8.02017 13.7071C8.41069 14.0976 9.04386 14.0976 9.43438 13.7071L15.4344 7.70711Z" fill="#03A84E"></path></svg>						</span>
+										<span class="elementor-icon-list-text">A URL you have configured, to which a webhook event will be posted</span>
+									</li>
+								<li class="elementor-icon-list-item">
+											<span class="elementor-icon-list-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM15.4344 7.70711C15.8249 7.31658 15.8249 6.68342 15.4344 6.29289C15.0439 5.90237 14.4107 5.90237 14.0202 6.29289L8.72727 11.5858L6.70711 9.56562C6.31658 9.1751 5.68342 9.1751 5.29289 9.56562C4.90237 9.95614 4.90237 10.5893 5.29289 10.9798L8.02017 13.7071C8.41069 14.0976 9.04386 14.0976 9.43438 13.7071L15.4344 7.70711Z" fill="#03A84E"></path></svg>						</span>
+										<span class="elementor-icon-list-text">One or more events, which will be posted to a specified URL</span>
+									</li>
+								<li class="elementor-icon-list-item">
+											<span class="elementor-icon-list-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM15.4344 7.70711C15.8249 7.31658 15.8249 6.68342 15.4344 6.29289C15.0439 5.90237 14.4107 5.90237 14.0202 6.29289L8.72727 11.5858L6.70711 9.56562C6.31658 9.1751 5.68342 9.1751 5.29289 9.56562C4.90237 9.95614 4.90237 10.5893 5.29289 10.9798L8.02017 13.7071C8.41069 14.0976 9.04386 14.0976 9.43438 13.7071L15.4344 7.70711Z" fill="#03A84E"></path></svg>						</span>
+										<span class="elementor-icon-list-text">A secret key, which can be used to verify a webhook payload was sent by tawk.to</span>
+									</li>
+						</ul>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-481c7df7 elementor-widget elementor-widget-text-editor" data-id="481c7df7" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>When a webhook is triggered, a POST request will be made to the URL configured along with a JSON payload specific for the event type.</p>								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-2df57e92" data-id="2df57e92" data-element_type="column">
+			<div class="elementor-widget-wrap">
+							</div>
+		</div>
+					</div>
+		</section>
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-3436ec00 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="3436ec00" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-7ca45c0e" data-id="7ca45c0e" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-2c357a0f elementor-widget elementor-widget-text-editor" data-id="2c357a0f" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Reference: </strong></h4>								</div>
+				</div>
+				<div class="elementor-element elementor-element-677aab2d elementor-nav-menu__align-start elementor-nav-menu--dropdown-tablet elementor-nav-menu__text-align-aside elementor-nav-menu--toggle elementor-nav-menu--burger elementor-widget elementor-widget-nav-menu" data-id="677aab2d" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;vertical&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;\/i&gt;&quot;,&quot;library&quot;:&quot;&quot;},&quot;toggle&quot;:&quot;burger&quot;}" data-widget_type="nav-menu.default">
+				<div class="elementor-widget-container">
+								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-background e--animation-fade">
+				<ul id="menu-1-677aab2d" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-256"><a href="#introduction" title="						" class="elementor-item elementor-item-anchor">Introduction</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-257"><a href="#ManagingWebhooks" title="						" class="elementor-item elementor-item-anchor">Managing webhooks</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-258"><a href="#supportedevents" title="						" class="elementor-item elementor-item-anchor">Supported events</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-259"><a href="#retrypolicy" title="						" class="elementor-item elementor-item-anchor">Retry policy</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-260"><a href="#verifyingwebhooksignature" title="						" class="elementor-item elementor-item-anchor">Verifying webhook signature</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-261"><a href="#examples" title="						" class="elementor-item elementor-item-anchor">Examples</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-268"><a href="#nodejs" title="						" class="elementor-item elementor-item-anchor">Node.js</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-262"><a href="#php" title="						" class="elementor-item elementor-item-anchor">PHP</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-263"><a href="#ruby" title="						" class="elementor-item elementor-item-anchor">Ruby</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-269"><a href="#chatstartevent" title="						" class="elementor-item elementor-item-anchor">Chat start event</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-270"><a href="#chatendevent" title="						" class="elementor-item elementor-item-anchor">Chat end event</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item menu-item-3448"><a href="https://developer.tawk.to/webhooks/#chattranscriptcreatedevent" aria-current="page" class="elementor-item elementor-item-anchor">Chat transcript created event</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-271"><a href="#ticketcreatedevent" title="						" class="elementor-item elementor-item-anchor">Ticket created event</a></li>
+</ul>			</nav>
+					<div class="elementor-menu-toggle" role="button" tabindex="0" aria-label="Menu Toggle" aria-expanded="false">
+			<i aria-hidden="true" role="presentation" class="elementor-menu-toggle__icon--open eicon-menu-bar"></i><i aria-hidden="true" role="presentation" class="elementor-menu-toggle__icon--close eicon-close"></i>		</div>
+					<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
+				<ul id="menu-2-677aab2d" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-256"><a href="#introduction" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Introduction</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-257"><a href="#ManagingWebhooks" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Managing webhooks</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-258"><a href="#supportedevents" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Supported events</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-259"><a href="#retrypolicy" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Retry policy</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-260"><a href="#verifyingwebhooksignature" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Verifying webhook signature</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-261"><a href="#examples" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Examples</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-268"><a href="#nodejs" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Node.js</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-262"><a href="#php" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">PHP</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-263"><a href="#ruby" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Ruby</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-269"><a href="#chatstartevent" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Chat start event</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-270"><a href="#chatendevent" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Chat end event</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item menu-item-3448"><a href="https://developer.tawk.to/webhooks/#chattranscriptcreatedevent" aria-current="page" class="elementor-item elementor-item-anchor" tabindex="-1">Chat transcript created event</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-271"><a href="#ticketcreatedevent" title="						" class="elementor-item elementor-item-anchor" tabindex="-1">Ticket created event</a></li>
+</ul>			</nav>
+						</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-c2034b7" data-id="c2034b7" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<section class="elementor-section elementor-inner-section elementor-element elementor-element-6e17f984 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="6e17f984" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-370bcc5c" data-id="370bcc5c" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-64be0fc3 elementor-widget elementor-widget-menu-anchor" data-id="64be0fc3" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="ManagingWebhooks"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-dd990a9 elementor-widget elementor-widget-text-editor" data-id="dd990a9" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Managing webhooks</strong></h4><p>Webhooks can be managed via the tawk.to dashboard in the `Admin` section.</p>								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-4e3a9886 elementor-widget-divider--view-line elementor-widget elementor-widget-global elementor-global-104 elementor-widget-divider" data-id="4e3a9886" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-6b90603 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="6b90603" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-1ba24e8e" data-id="1ba24e8e" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-42abd546 elementor-widget elementor-widget-menu-anchor" data-id="42abd546" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="supportedevents"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-69318a0 elementor-widget elementor-widget-text-editor" data-id="69318a0" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Currently supported events</strong></h4>
+Callback functions are invoked when the page status changes. The function will receive the changed status, which will be online, away or offline. This callback is not supported in pop out chat window.								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-85bdaa5 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="85bdaa5" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-50 elementor-inner-column elementor-element elementor-element-ac9d5f8" data-id="ac9d5f8" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-36e7142 elementor-widget elementor-widget-text-editor" data-id="36e7142" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><strong>Chat: </strong></p><ul><li>Start</li><li>End</li><li>Transcript</li></ul>								</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-inner-column elementor-element elementor-element-05c8485" data-id="05c8485" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-7baddac elementor-widget elementor-widget-text-editor" data-id="7baddac" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><strong>Ticket: </strong></p><ul><li>Create</li></ul>								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-4ad9bc5e elementor-widget-divider--view-line elementor-widget elementor-widget-global elementor-global-104 elementor-widget-divider" data-id="4ad9bc5e" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-48fb551e elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="48fb551e" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-26786280" data-id="26786280" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-5cca1580 elementor-widget elementor-widget-menu-anchor" data-id="5cca1580" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="retrypolicy"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-ff9625b elementor-widget elementor-widget-text-editor" data-id="ff9625b" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Retry policy</strong></h4>
+A webhook call will be retried for up to 12 hours if the http endpoint responds with anything but a success (2XX). If no response is received within 30 seconds, the call will be considered a failure and will also be reattempted. Each webhook event is assigned an event Id. The event Id is passed along with each request in the headers as X-Hook-Event-Id. The event Id will remain the same in case of retries.								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-6b99285a elementor-widget-divider--view-line elementor-widget elementor-widget-global elementor-global-104 elementor-widget-divider" data-id="6b99285a" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-5aa45ba9 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="5aa45ba9" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-317483bf" data-id="317483bf" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-5c58663a elementor-widget elementor-widget-menu-anchor" data-id="5c58663a" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="verifyingwebhooksignature"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-4f7e4e5 elementor-widget elementor-widget-text-editor" data-id="4f7e4e5" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Verifying webhook signature</strong></h4>
+Each webhook event is signed via a Hash-based Message Authentication Code (HMAC) using the webhooks secret key. The HMAC-SHA1 algorithm is used to generate the webhook payload signature. The signature is passed along with each request in the headers as ‘X-Tawk-Signature.’								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-351ba726 elementor-widget-divider--view-line elementor-widget elementor-widget-global elementor-global-104 elementor-widget-divider" data-id="351ba726" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-34e7c275 elementor-widget elementor-widget-menu-anchor" data-id="34e7c275" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="examples"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-4188d24 elementor-widget elementor-widget-text-editor" data-id="4188d24" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h3><strong>Examples:</strong></h3>								</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-204065c1 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="204065c1" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-295fb0f1" data-id="295fb0f1" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-9e84c75 elementor-widget elementor-widget-menu-anchor" data-id="9e84c75" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="nodejs"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-2c691f94 elementor-widget elementor-widget-text-editor" data-id="2c691f94" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><b>Node.js</b></h4>								</div>
+				</div>
+				<div class="elementor-element elementor-element-736f1f4f elementor-widget elementor-widget-html" data-id="736f1f4f" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;"><span class="hljs-keyword" style="color: rgb(85, 133, 155);">const</span> WEBHOOK_SECRET = <span class="hljs-string" style="color: rgb(72, 153, 99);">'webhook secret key'</span>;
+<span class="hljs-keyword" style="color: rgb(85, 133, 155);">const</span> crypto = <span class="hljs-keyword" style="color: rgb(85, 133, 155);">require</span>(<span class="hljs-string" style="color: rgb(72, 153, 99);">'crypto'</span>);
+<span class="hljs-keyword" style="color: rgb(85, 133, 155);">const</span> bodyParser = <span class="hljs-keyword" style="color: rgb(85, 133, 155);">require</span>(<span class="hljs-string" style="color: rgb(72, 153, 99);">'body-parser'</span>);
+
+<span class="hljs-function"><span class="hljs-keyword" style="color: rgb(85, 133, 155);">function</span> <span class="hljs-title" style="color: rgb(71, 140, 144);">verifySignature</span> <span class="hljs-params" style="color: rgb(159, 113, 60);">(body, signature)</span> </span>{
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">const</span> digest = crypto
+        .createHmac(<span class="hljs-string" style="color: rgb(72, 153, 99);">'sha1'</span>, WEBHOOK_SECRET)
+        .update(body)
+        .digest(<span class="hljs-string" style="color: rgb(72, 153, 99);">'hex'</span>);
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">return</span> signature === digest;
+};
+app.use(bodyParser.json({
+    type: <span class="hljs-string" style="color: rgb(72, 153, 99);">'application/json'</span>,
+    verify: <span class="hljs-function"><span class="hljs-keyword" style="color: rgb(85, 133, 155);">function</span> <span class="hljs-params" style="color: rgb(159, 113, 60);">(req, res, buf)</span> </span>{
+        req.rawBody = buf;
+    }
+});
+app.post(<span class="hljs-string" style="color: rgb(72, 153, 99);">'/webhooks'</span>, <span class="hljs-function"><span class="hljs-keyword" style="color: rgb(85, 133, 155);">function</span> <span class="hljs-params" style="color: rgb(159, 113, 60);">(req, res, next)</span> </span>{
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">if</span> (!verifySignature(req.rawBody, req.headers[<span class="hljs-string" style="color: rgb(72, 153, 99);">'x-tawk-signature'</span>])) {
+        <span class="hljs-comment" style="color: rgb(95, 109, 100);">// verification failed</span>
+    }
+    <span class="hljs-comment" style="color: rgb(95, 109, 100);">// verification success</span>
+});</pre>				</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-765d547f elementor-widget-divider--view-line elementor-widget elementor-widget-global elementor-global-104 elementor-widget-divider" data-id="765d547f" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-5570b660 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="5570b660" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-4f75f7b5" data-id="4f75f7b5" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-4ae49240 elementor-widget elementor-widget-menu-anchor" data-id="4ae49240" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="php"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-2123137d elementor-widget elementor-widget-text-editor" data-id="2123137d" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>PHP</strong></h4>								</div>
+				</div>
+				<div class="elementor-element elementor-element-4292bfa5 elementor-widget elementor-widget-html" data-id="4292bfa5" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;"><span class="hljs-keyword" style="color: rgb(85, 133, 155);">const</span> WEBHOOK_SECRET = <span class="hljs-string" style="color: rgb(72, 153, 99);">'webhook secret key'</span>;
+<span class="hljs-function"><span class="hljs-keyword" style="color: rgb(85, 133, 155);">function</span> <span class="hljs-title" style="color: rgb(71, 140, 144);">verifySignature</span> <span class="hljs-params" style="color: rgb(159, 113, 60);">($body, $signature)</span> </span>{
+    $digest = hash_hmac(<span class="hljs-string" style="color: rgb(72, 153, 99);">'sha1'</span>, $body, WEBHOOK_SECRET);
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">return</span> $signature === $digest ;
+}
+<span class="hljs-keyword" style="color: rgb(85, 133, 155);">if</span> (!verifySignature(file_get_contents(<span class="hljs-string" style="color: rgb(72, 153, 99);">'php://input'</span>), $_SERVER[<span class="hljs-string" style="color: rgb(72, 153, 99);">'HTTP_X_TAWK_SIGNATURE'</span>])) {
+    <span class="hljs-comment" style="color: rgb(95, 109, 100);">// verification failed</span>
+}
+<span class="hljs-comment" style="color: rgb(95, 109, 100);">// verification success</span></pre>				</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-274f77f1 elementor-widget-divider--view-line elementor-widget elementor-widget-global elementor-global-104 elementor-widget-divider" data-id="274f77f1" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-3054bcdf elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="3054bcdf" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-5d1cf6c3" data-id="5d1cf6c3" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-61d1399c elementor-widget elementor-widget-menu-anchor" data-id="61d1399c" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="ruby"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-44c70216 elementor-widget elementor-widget-text-editor" data-id="44c70216" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Ruby</strong></h4>								</div>
+				</div>
+				<div class="elementor-element elementor-element-59780e70 elementor-widget elementor-widget-html" data-id="59780e70" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;">WEBHOOK_SECRET = <span class="hljs-symbol" style="color: rgb(72, 153, 99);">'webhook</span> secret key';
+post '/payload' <span class="hljs-keyword" style="color: rgb(85, 133, 155);">do</span>
+    request.<span class="hljs-keyword" style="color: rgb(85, 133, 155);">body</span>.rewind
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">body</span> = request.<span class="hljs-keyword" style="color: rgb(85, 133, 155);">body</span>.read
+    signature = request.env[<span class="hljs-symbol" style="color: rgb(72, 153, 99);">'HTTP_X_TAWK_SIGNATURE</span>']
+    unless verifySignature(<span class="hljs-keyword" style="color: rgb(85, 133, 155);">body</span>, signature))
+        // verification failed
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">end</span>
+    // verification success
+<span class="hljs-keyword" style="color: rgb(85, 133, 155);">end</span>
+def verifySignature(<span class="hljs-keyword" style="color: rgb(85, 133, 155);">body</span>, signature)
+    digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.<span class="hljs-keyword" style="color: rgb(85, 133, 155);">new</span>(<span class="hljs-symbol" style="color: rgb(72, 153, 99);">'sha1</span>'), WEBHOOK_SECRET, <span class="hljs-keyword" style="color: rgb(85, 133, 155);">body</span>)
+    <span class="hljs-keyword" style="color: rgb(85, 133, 155);">return</span> digest == signature
+<span class="hljs-keyword" style="color: rgb(85, 133, 155);">end</span></pre>				</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-318c1fa5 elementor-widget-divider--view-line elementor-widget elementor-widget-divider" data-id="318c1fa5" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-5d820b95 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="5d820b95" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-2664a04" data-id="2664a04" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-a19fdf6 elementor-widget elementor-widget-menu-anchor" data-id="a19fdf6" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="chatstartevent"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-de12e8b elementor-widget elementor-widget-text-editor" data-id="de12e8b" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h3><strong>Webhook event payload</strong></h3>								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<div class="elementor-element elementor-element-9dd039c elementor-widget elementor-widget-text-editor" data-id="9dd039c" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Chat start event</strong></h4><p>Generated when the first message in a chat is sent by visitor or agent. Whispers and system notifications like triggers do not generate this event.</p><p><strong>Chat start event payload</strong></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-26c99526 elementor-widget elementor-widget-html" data-id="26c99526" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<a name="chatstartevent"></a>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">event</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Event name `chat:start`</td>
+</tr>
+<tr>
+<td style="width: 25%;">chatId</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Chat Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">time</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Event generation date time in JSON format</td>
+</tr>
+<tr>
+<td style="width: 25%;">message </td>
+<td style="width: 25%;">Object</td>
+<td style="width: 50%;">	Message object (See below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">visitor </td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Visitor object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">property</td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Property object (see below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Message object</strong>
+<br/> <br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">text</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Textual representation of message</td>
+</tr>
+<tr>
+<td style="width: 25%;">type</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Message type, enum value <strong>msg, file, webrtc-call</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">sender</td>
+<td style="width: 25%;">Object</td>
+<td style="width: 50%;">Sender info object (See below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Sender info object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">type</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Sender type, enum value <strong>agent, visitor, system</strong></td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Visitor object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor name</td>
+</tr>
+<tr>
+<td style="width: 25%;">email</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor email (Optional)</td>
+</tr>
+<tr>
+<td style="width: 25%;">city</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor city</td>
+</tr>
+<tr>
+<td style="width: 25%;">country</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor country in ISO 3166 format</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Property object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property name</td>
+</tr>
+</tbody>
+</table>
+<br/>
+<strong>Example</strong>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-69c24601 elementor-widget elementor-widget-html" data-id="69c24601" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;">{
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">event</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'chat:start'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">chatId</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'70fe3290-99ad-11e9-a30a-51567162179f'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2019-06-28T14:03:04.646Z'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">message </span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">text </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Sample message'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'msg'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">sender </span>: {
+            <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'visitor'</span>
+        }
+    },
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">visitor</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'V1561719148780935'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">email </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'hello@test.com'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">city</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'jelgava'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">country</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'LV'</span>
+    },
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">property</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'58ca8453b8a7e060cd3b1ecb'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Bobs Burgers'</span>
+    }
+}</pre>				</div>
+				</div>
+				<div class="elementor-element elementor-element-3d0e1a9 elementor-widget-divider--view-line elementor-widget elementor-widget-divider" data-id="3d0e1a9" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-d3f31aa elementor-widget elementor-widget-menu-anchor" data-id="d3f31aa" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="chatendevent"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-68e49d2 elementor-widget elementor-widget-text-editor" data-id="68e49d2" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Chat end event</strong></h4><p>Generated when a chat has ended</p><p><strong>Chat end event payload</strong></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-f7a08b3 elementor-widget elementor-widget-html" data-id="f7a08b3" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<a name="chatendevent"></a>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">event</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">	Event name `chat:end`</td>
+</tr>
+<tr>
+<td style="width: 25%;">chatId</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Chat Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">time</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Event generation date time in JSON format</td>
+</tr>
+<tr>
+<td style="width: 25%;">visitor </td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Visitor object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">property</td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Property object (see below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Visitor object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor name</td>
+</tr>
+<tr>
+<td style="width: 25%;">email</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor email (Optional)</td>
+</tr>
+<tr>
+<td style="width: 25%;">city</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor city</td>
+</tr>
+<tr>
+<td style="width: 25%;">country</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor country in ISO 3166 format</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Property object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property name</td>
+</tr>
+</tbody>
+</table>
+<br/>
+<strong>Example</strong>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-caec542 elementor-widget elementor-widget-html" data-id="caec542" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;">{
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">event</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'chat:end'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">chatId</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'70fe3290-99ad-11e9-a30a-51567162179f'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2019-06-28T14:04:08.718Z'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">visitor</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'V1561719148780935'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">email </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'hello@test.com'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">city</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'jelgava'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">country</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'LV'</span>
+    },
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">property</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'58ca8453b8a7e060cd3b1ecb'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Bobs Burgers'</span>
+    }
+}</pre>				</div>
+				</div>
+				<div class="elementor-element elementor-element-30028001 elementor-widget-divider--view-line elementor-widget elementor-widget-divider" data-id="30028001" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-a8e7f9e elementor-widget elementor-widget-menu-anchor" data-id="a8e7f9e" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="chattranscriptcreatedevent"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-6308225 elementor-widget elementor-widget-text-editor" data-id="6308225" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Chat transcript created event</strong></h4>
+<p>Generates full transcript of chats in a session after it has ended</p>
+<p><strong>Chat transcript event payload</strong></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-d621115 elementor-widget elementor-widget-html" data-id="d621115" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<a name="chatendevent"></a>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">event</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">	Event name `chat:transcript_created`</td>
+</tr>
+<tr>
+<td style="width: 25%;">time</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Event generation date time in JSON format</td>
+</tr>
+<tr>
+<td style="width: 25%;">property</td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Property object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">chat </td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Chat object (see below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Property object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property name</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Chat object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Chat Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">visitor </td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Visitor object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">messages </td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">List of messages (see below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Visitor object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor name</td>
+</tr>
+<tr>
+<td style="width: 25%;">email</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor email (Optional)</td>
+</tr>
+<tr>
+<td style="width: 25%;">city</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor city</td>
+</tr>
+<tr>
+<td style="width: 25%;">country</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor country in ISO 3166 format</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Message object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">sender </td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Sender object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">type</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Message type</td>
+</tr>
+<tr>
+<td style="width: 25%;">msg</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Text message</td>
+</tr>
+<tr>
+<td style="width: 25%;">time</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Message sent time</td>
+</tr>
+<tr>
+<td style="width: 25%;">attchs</td>
+<td style="width: 25%;">Object</td>
+<td style="width: 50%;">List of attachments (see below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Sender object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">t</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Sender type (a - agent, v - visitor, s - system)</td>
+</tr>
+<tr>
+<td style="width: 25%;">n</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Sender name (sender type 'agent' or 'system')</td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Sender ID (sender type 'agent')</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Attachment object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">type</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Message type</td>
+</tr>
+<tr>
+<td style="width: 25%;">content</td>
+<td style="width: 25%;">Object</td>
+<td style="width: 50%;">Attachment content</td>
+</tr>
+<tr>
+<td style="width: 25%;">content.file</td>
+<td style="width: 25%;">Object</td>
+<td style="width: 50%;">Attachment file</td>
+</tr>
+<tr>
+<td style="width: 25%;">content.file.url</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">File URL</td>
+</tr>
+<tr>
+<td style="width: 25%;">content.file.name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">File name</td>
+</tr>
+<tr>
+<td style="width: 25%;">content.file.mimeType</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">File MIME type</td>
+</tr>
+<tr>
+<td style="width: 25%;">content.file.size</td>
+<td style="width: 25%;">Number</td>
+<td style="width: 50%;">File size</td>
+</tr>
+<tr>
+<td style="width: 25%;">content.file.extension</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">File extension</td>
+</tr>
+</tbody>
+</table>
+<br/>
+<strong>Example</strong>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-631024d elementor-widget elementor-widget-html" data-id="631024d" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;">{
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">event</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'chat:transcript_created'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2024-07-03T01:02:37.780Z'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">chat</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'70fe3290-99ad-11e9-a30a-51567162179f'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">visitor</span>: {
+            <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'V1561719148780935'</span>,
+            <span class="hljs-attribute" style="color: rgb(177, 97, 57);">email </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'hello@test.com'</span>,
+            <span class="hljs-attribute" style="color: rgb(177, 97, 57);">city</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'jelgava'</span>,
+            <span class="hljs-attribute" style="color: rgb(177, 97, 57);">country</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'LV'</span>
+        },
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">messages</span>: [
+            {
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">sender</span>: {
+                    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">t</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'s'</span>,
+                    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">n </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Customer Support'</span>
+                },
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'msg'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">msg </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'👋 Hi! How can we help?\n[option]I have a question\n[option]Tell me more'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2024-07-03T01:02:37.780Z'</span>
+            },
+            {
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">sender</span>: {
+                    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">t</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'v'</span>
+                },
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'msg'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">msg </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Tell me more'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2024-07-03T01:02:48.176Z'</span>
+            },
+            {
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">sender</span>: {
+                    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">t</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'a'</span>,
+                    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">n </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Eugene'</span>,
+                    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'666668688fe587223fdf8685'</span>
+                },
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'msg'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">msg </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'msg'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2024-07-03T01:02:37.780Z'</span>,
+                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">attchs</span>: [
+                    {
+                        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'file'</span>,
+                        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">content</span>: {
+                            <span class="hljs-attribute" style="color: rgb(177, 97, 57);">file</span>: {
+                                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">url</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'https://tawkto.link/66666880e73507189f888c92/files/message/2qTwJwVVC8/tawky_big.png'</span>,
+                                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name </span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'tawky_big.png'</span>,
+                                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">mimeType</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'image/png'</span>,
+                                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">size</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">3797</span>,
+                                <span class="hljs-attribute" style="color: rgb(177, 97, 57);">extension</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'png'</span>,
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">property</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'58ca8453b8a7e060cd3b1ecb'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Bobs Burgers'</span>
+    }
+}</pre>				</div>
+				</div>
+				<div class="elementor-element elementor-element-7a5840f elementor-widget-divider--view-line elementor-widget elementor-widget-divider" data-id="7a5840f" data-element_type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-a28d10a elementor-widget elementor-widget-menu-anchor" data-id="a28d10a" data-element_type="widget" data-widget_type="menu-anchor.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-menu-anchor" id="ticketcreatedevent"></div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-0b959c4 elementor-widget elementor-widget-text-editor" data-id="0b959c4" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<h4><strong>Ticket created event</strong></h4><p>Generated when a new ticket is created.</p><p><strong>Ticket create event payload</strong></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7ce434e elementor-widget elementor-widget-html" data-id="7ce434e" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">event</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Event name `ticket:create`</td>
+</tr>
+<tr>
+<td style="width: 25%;">time</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Event generation date time in JSON format</td>
+</tr>
+<tr>
+<td style="width: 25%;">requester</td>
+<td style="width: 25%;">Object</td>
+<td style="width: 50%;">Ticket requester object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">property</td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Property object (see below)</td>
+</tr>
+<tr>
+<td style="width: 25%;">ticket</td>
+<td style="width: 25%;">Object </td>
+<td style="width: 50%;">Ticket object (see below)</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Ticket requester object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor name</td>
+</tr>
+<tr>
+<td style="width: 25%;">email</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Visitor email</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Property object</strong>
+<br/><br/>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">name</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Property name</td>
+</tr>
+</tbody>
+</table>
+
+<br/>
+<strong>Ticket object</strong>
+<br/></br>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td style="width: 25%;"><strong>Property</strong></td>
+<td style="width: 25%;"><strong>Type</strong></td>
+<td style="width: 50%;"><strong>Description</strong></td>
+</tr>
+<tr>
+<td style="width: 25%;">id</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Ticket Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">humanId</td>
+<td style="width: 25%;">Number</td>
+<td style="width: 50%;">Ticket human Id</td>
+</tr>
+<tr>
+<td style="width: 25%;">subject </td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Ticket subject</td>
+</tr>
+<tr>
+<td style="width: 25%;">message</td>
+<td style="width: 25%;">String</td>
+<td style="width: 50%;">Ticket message content</td>
+</tr>
+</tbody>
+</table>
+
+<br/><br/>
+<b>Example</b>				</div>
+				</div>
+				<div class="elementor-element elementor-element-f66d8b7 elementor-widget elementor-widget-html" data-id="f66d8b7" data-element_type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<pre class="hljs" style="display: block; overflow-x: auto; background: rgb(236, 244, 238); color: rgb(82, 96, 87); padding: 0.5em;">{
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">event</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'ticket:create'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">time</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'2019-06-28T14:07:13.512Z'</span>,
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">property</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'58ca8453b8a7e060cd3b1ecb'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Bobs Burgers'</span>
+    },
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">requester</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">name</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Martins'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">email</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'martins@tawk.to'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">type</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'agent'</span>
+    },
+    <span class="hljs-attribute" style="color: rgb(177, 97, 57);">ticket</span>: {
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">id</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'02598050-99ae-11e9-8887-97564881b95b'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">humanId</span>: <span class="hljs-number" style="color: rgb(159, 113, 60);">3</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">subject</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Testing'</span>,
+        <span class="hljs-attribute" style="color: rgb(177, 97, 57);">message</span>: <span class="hljs-string" style="color: rgb(72, 153, 99);">'Once more through the breach'</span>
+    }
+}</pre>				</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				</div>
+				<footer data-elementor-type="footer" data-elementor-id="3166" class="elementor elementor-3166 elementor-location-footer" data-elementor-post-type="elementor_library">
+					<section class="elementor-section elementor-top-section elementor-element elementor-element-1ccd817 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="1ccd817" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-default">
+					<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-b70a54e" data-id="b70a54e" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-13db8d7 elementor-widget elementor-widget-text-editor" data-id="13db8d7" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									© 2026 tawk.to inc. All Rights Reserved.								</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-d03914e" data-id="d03914e" data-element_type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-2c725fd elementor-widget elementor-widget-text-editor" data-id="2c725fd" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="color: #03a84e;"><a style="color: #03a84e; text-decoration: underline;" href="https://www.tawk.to/" target="_blank" rel="noopener">Visit tawk.to</a></span></p>								</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				</footer>
+		
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/hello-elementor/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+			<script>
+				const lazyloadRunObserver = () => {
+					const lazyloadBackgrounds = document.querySelectorAll( `.e-con.e-parent:not(.e-lazyloaded)` );
+					const lazyloadBackgroundObserver = new IntersectionObserver( ( entries ) => {
+						entries.forEach( ( entry ) => {
+							if ( entry.isIntersecting ) {
+								let lazyloadBackground = entry.target;
+								if( lazyloadBackground ) {
+									lazyloadBackground.classList.add( 'e-lazyloaded' );
+								}
+								lazyloadBackgroundObserver.unobserve( entry.target );
+							}
+						});
+					}, { rootMargin: '200px 0px 200px 0px' } );
+					lazyloadBackgrounds.forEach( ( lazyloadBackground ) => {
+						lazyloadBackgroundObserver.observe( lazyloadBackground );
+					} );
+				};
+				const events = [
+					'DOMContentLoaded',
+					'elementor/lazyload/observe',
+				];
+				events.forEach( ( event ) => {
+					document.addEventListener( event, lazyloadRunObserver );
+				} );
+			</script>
+				<script>
+		(function () {
+			var c = document.body.className;
+			c = c.replace(/woocommerce-no-js/, 'woocommerce-js');
+			document.body.className = c;
+		})();
+	</script>
+	<link rel='stylesheet' id='wc-blocks-style-css' href='https://developer.tawk.to/wp-content/plugins/woocommerce/assets/client/blocks/wc-blocks.css?ver=wc-10.4.3' media='all' />
+<script src="https://developer.tawk.to/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.34.1" id="elementor-webpack-runtime-js"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.34.1" id="elementor-frontend-modules-js"></script>
+<script src="https://developer.tawk.to/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3" id="jquery-ui-core-js"></script>
+<script id="elementor-frontend-js-before">
+var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Share on Facebook","shareOnTwitter":"Share on Twitter","pinIt":"Pin it","download":"Download","downloadImage":"Download image","fullscreen":"Fullscreen","zoom":"Zoom","share":"Share","playVideo":"Play Video","previous":"Previous","next":"Next","close":"Close","a11yCarouselPrevSlideMessage":"Previous slide","a11yCarouselNextSlideMessage":"Next slide","a11yCarouselFirstSlideMessage":"This is the first slide","a11yCarouselLastSlideMessage":"This is the last slide","a11yCarouselPaginationBulletMessage":"Go to slide"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile Portrait","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Mobile Landscape","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet Portrait","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet Landscape","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":false}},"hasCustomBreakpoints":false},"version":"3.34.1","is_static":false,"experimentalFeatures":{"additional_custom_breakpoints":true,"theme_builder_v2":true,"home_screen":true,"global_classes_should_enforce_capabilities":true,"e_variables":true,"cloud-library":true,"e_opt_in_v4_page":true,"e_interactions":true,"import-export-customization":true,"e_pro_variables":true},"urls":{"assets":"https:\/\/developer.tawk.to\/wp-content\/plugins\/elementor\/assets\/","ajaxurl":"https:\/\/developer.tawk.to\/wp-admin\/admin-ajax.php","uploadUrl":"https:\/\/developer.tawk.to\/wp-content\/uploads"},"nonces":{"floatingButtonsClickTracking":"85498e2f05"},"swiperClass":"swiper","settings":{"page":[],"editorPreferences":[]},"kit":{"global_image_lightbox":"yes","active_breakpoints":["viewport_mobile","viewport_tablet"],"lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description","woocommerce_notices_elements":[]},"post":{"id":176,"title":"Webhooks%20%E2%80%93%20tawk.to%20Developer%20Portal","excerpt":"\n\t\t\t\t\t\t","featuredImage":false}};
+//# sourceURL=elementor-frontend-js-before
+</script>
+<script src="https://developer.tawk.to/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.34.1" id="elementor-frontend-js"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js?ver=1.2.1" id="smartmenus-js"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/woocommerce/assets/js/sourcebuster/sourcebuster.min.js?ver=10.4.3" id="sourcebuster-js-js"></script>
+<script id="wc-order-attribution-js-extra">
+var wc_order_attribution = {"params":{"lifetime":1.0e-5,"session":30,"base64":false,"ajaxurl":"https://developer.tawk.to/wp-admin/admin-ajax.php","prefix":"wc_order_attribution_","allowTracking":true},"fields":{"source_type":"current.typ","referrer":"current_add.rf","utm_campaign":"current.cmp","utm_source":"current.src","utm_medium":"current.mdm","utm_content":"current.cnt","utm_id":"current.id","utm_term":"current.trm","utm_source_platform":"current.plt","utm_creative_format":"current.fmt","utm_marketing_tactic":"current.tct","session_entry":"current_add.ep","session_start_time":"current_add.fd","session_pages":"session.pgs","session_count":"udata.vst","user_agent":"udata.uag"}};
+//# sourceURL=wc-order-attribution-js-extra
+</script>
+<script src="https://developer.tawk.to/wp-content/plugins/woocommerce/assets/js/frontend/order-attribution.min.js?ver=10.4.3" id="wc-order-attribution-js"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js?ver=3.34.0" id="elementor-pro-webpack-runtime-js"></script>
+<script src="https://developer.tawk.to/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1" id="wp-hooks-js"></script>
+<script src="https://developer.tawk.to/wp-includes/js/dist/i18n.min.js?ver=c26c3dc7bed366793375" id="wp-i18n-js"></script>
+<script id="wp-i18n-js-after">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+//# sourceURL=wp-i18n-js-after
+</script>
+<script id="elementor-pro-frontend-js-before">
+var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/developer.tawk.to\/wp-admin\/admin-ajax.php","nonce":"da7142e97e","urls":{"assets":"https:\/\/developer.tawk.to\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/developer.tawk.to\/wp-json\/"},"settings":{"lazy_load_background_images":true},"popup":{"hasPopUps":false},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"},"x-twitter":{"title":"X"},"threads":{"title":"Threads"}},"woocommerce":{"menu_cart":{"cart_page_url":"https:\/\/developer.tawk.to\/cart\/","checkout_page_url":"https:\/\/developer.tawk.to\/checkout\/","fragments_nonce":"94e996f121"}},"facebook_sdk":{"lang":"en_US","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/developer.tawk.to\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
+//# sourceURL=elementor-pro-frontend-js-before
+</script>
+<script src="https://developer.tawk.to/wp-content/plugins/elementor-pro/assets/js/frontend.min.js?ver=3.34.0" id="elementor-pro-frontend-js"></script>
+<script src="https://developer.tawk.to/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js?ver=3.34.0" id="pro-elements-handlers-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"https://developer.tawk.to/wp-includes/js/wp-emoji-release.min.js?ver=6.9"}}
+</script>
+<script type="module">
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=https://developer.tawk.to/wp-includes/js/wp-emoji-loader.min.js
+</script>
+
+</body>
+</html>

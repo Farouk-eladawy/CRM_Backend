@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "case_id": "case-546980816555-20260714-130001-59c87d71",
+  "intent": "update_airtable",
+  "request_source": "internal_whatsapp_assistant",
+  "captured_at": "2026-07-14T13:00:04.087280+00:00"
+}

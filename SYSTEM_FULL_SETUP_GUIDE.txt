@@ -1,0 +1,754 @@
+FTS TRAVELS CRM / OPENCLAW
+الدليل الكامل لتشغيل النظام ونقله واستعادته
+
+تنبيه مهم:
+1) هذا الملف يشرح كل ما يلزم لتشغيل النظام بالكامل.
+2) هذا الملف لا يجب أن يحتوي على مفاتيح سرية حقيقية أو كلمات مرور أو Tokens مباشرة.
+3) احتفظ بالمفاتيح الحقيقية في مكان آمن ومشفّر، واستخدم هذا الملف كمرجع تشغيلي فقط.
+
+==================================================
+1. نظرة عامة على النظام الحالي
+==================================================
+
+المشروع الحالي يعمل أساسا من خلال:
+
+1) Teacher Backend
+   الملف الرئيسي:
+   ai_agent.py
+
+   الوظائف الأساسية:
+   - استقبال Webhook الواتساب
+   - معالجة رسائل العملاء
+   - التكامل مع Airtable
+   - إرسال واتساب
+   - إرسال إيميل
+   - تشغيل Workflows والـ Automations
+   - API للداشبورد
+
+2) Frontend Dashboard
+   المسار:
+   frontend_dashboard\new_frontend_dashboard
+
+   الوظائف:
+   - عرض المحادثات
+   - إدارة الإعدادات
+   - تشغيل Workflows
+   - عرض حالة النظام
+   - إعادة تشغيل Teacher من داخل الداشبورد
+
+3) Optional Components
+   توجد مكونات إضافية في التشغيل الكامل عبر:
+   - OpenClaw_Core.py
+   - OpenClaw_Observer.py
+   - dashboard.py
+
+   وهي تظهر في:
+   START_INTELLIGENT_SYSTEM.bat
+
+4) Windows Service
+   الخدمة الأساسية المطلوبة للإنتاج حاليا:
+   - اسم الخدمة: FTS Teacher
+
+5) Ports المهمة
+   - Backend / WhatsApp Webhook / API:
+     5001
+   - Frontend Vite dev server:
+     3000
+
+6) Endpoints مهمة للفحص
+   - Health / Status:
+     http://127.0.0.1:5001/api/system/status
+   - Restart:
+     http://127.0.0.1:5001/api/system/restart
+   - WhatsApp Webhook:
+     http://127.0.0.1:5001/webhook
+
+==================================================
+2. الملفات الأساسية التي يجب فهمها
+==================================================
+
+ملفات التشغيل الأساسية:
+- ai_agent.py
+- automation_engine.py
+- chat_db.py
+- config.json
+- run_teacher_service.bat
+- START_INTELLIGENT_SYSTEM.bat
+
+ملفات البيانات المهمة:
+- chat_history.db
+- airtable_mirror.db
+- learned_corrections.json
+- observer_cache.json
+- conversations.json
+- agent_log.txt
+
+ملفات الاعتماد الحساسة غالبا:
+- config.json
+- credentials.json
+- credentials_sales.json
+- token.json
+- token_sales.json
+
+ملفات الواجهة:
+- frontend_dashboard\new_frontend_dashboard\package.json
+- frontend_dashboard\new_frontend_dashboard\src\...
+
+==================================================
+3. الحسابات والخدمات المطلوبة
+==================================================
+
+A) حسابات مطلوبة لتشغيل النظام الأساسي
+
+1) Windows Server / RDP
+   مطلوب:
+   - حساب Administrator أو حساب بصلاحيات عالية
+   - صلاحية تثبيت خدمات Windows
+   - صلاحية فتح Firewall وتثبيت برامج
+
+2) Airtable
+   مطلوب:
+   - Airtable account
+   - API token / personal access token
+   - Base ID
+   - أسماء الجداول المهمة
+   - صلاحية القراءة والكتابة على الـ Base
+
+   يستخدم في:
+   - قراءة الحجوزات
+   - تحديث السجلات
+   - تنفيذ سيناريوهات الدفع والمراجعة والتجميع والمصور
+
+3) WhatsApp Cloud API / Meta
+   مطلوب:
+   - Meta Developer account
+   - Meta App
+   - WhatsApp Business Account
+   - Webhook Verify Token
+   - Access token
+   - Phone Number IDs
+   - WABA IDs
+   - Templates approved
+
+   يستخدم في:
+   - استقبال رسائل العملاء
+   - إرسال الرسائل والقوالب
+   - الربط مع أكثر من Location / Number
+
+4) بريد إلكتروني
+   مطلوب:
+   - حساب البريد الرئيسي
+   - إعدادات IMAP/SMTP
+   - أو Google OAuth credentials
+   - App password أو OAuth token
+
+   يستخدم في:
+   - قراءة الرسائل
+   - إرسال الردود
+   - إنشاء Drafts أو إرسال فعلي
+
+5) مزود AI
+   النظام الحالي يعتمد على مزودات AI حسب config.json:
+   - DeepSeek
+   - OpenAI
+   - وقد تحتاج Gemini إذا كنت تستخدم Vision أو مسارات بديلة
+
+   المطلوب:
+   - API key لكل مزود مستخدم
+   - التأكد من صلاحية الاستخدام وحدود الرصيد
+
+B) حسابات اختيارية حسب المزايا المستخدمة
+
+6) Cloudflare Tunnel أو بديل Public Tunnel
+   مطلوب إذا كنت تريد:
+   - Webhook URL ثابت
+   - وصول خارجي آمن للسيرفر
+
+   المطلوب:
+   - Cloudflare account
+   - Zero Trust / Tunnel access
+   - Tunnel token أو config.yml
+   - DNS record أو domain/subdomain
+
+7) Cloudinary
+   مطلوب فقط إذا كانت بعض خصائص الصور أو التخزين تستخدمه.
+
+8) Stripe
+   مطلوب فقط إذا كانت خاصية الدفع الإلكتروني الفعلي مفعلة.
+
+9) WeTravel
+   مطلوب فقط إذا كانت هناك تكاملات WeTravel مستخدمة.
+
+10) Google Cloud Project
+   مطلوب غالبا إذا كنت تستخدم Gmail OAuth:
+   - OAuth client credentials
+   - ملفات credentials.json
+
+11) Backup Storage
+   يوصى به بشدة:
+   - OneDrive
+   - Google Drive
+   - S3
+   - أي تخزين خارجي موثوق
+
+==================================================
+4. الإعدادات الموجودة حاليا داخل config.json
+==================================================
+
+الملف:
+config.json
+
+الأقسام المهمة التي يجب أن تكون مكتملة:
+- company_info
+- assistant
+- airtable
+- ai
+- email
+- system
+- cloudinary
+- stripe
+- wetravel
+- whatsapp
+
+ملاحظات:
+1) لا تضع القيم السرية داخل هذا الدليل النصي.
+2) احتفظ بنسخة مشفرة وآمنة من config.json الأصلي.
+3) عند النقل لسيرفر جديد يجب مراجعة المسارات المحلية مثل:
+   - nssm_path
+   - أي مسارات لملفات credentials أو tokens
+
+الإعدادات التشغيلية المؤكدة حاليا:
+- service name:
+  FTS Teacher
+- nssm path:
+  C:\Tools\nssm\win64\nssm.exe
+- whatsapp port:
+  5001
+
+==================================================
+5. متطلبات النظام على السيرفر الجديد
+==================================================
+
+ينصح أن يكون السيرفر:
+- Windows Server 2019 أو 2022
+- RDP Access
+- Administrator privileges
+- يعمل 24/7
+- ذاكرة 4GB كحد أدنى
+- يفضل 8GB RAM إذا كان الضغط متوسط أو مرتفع
+- يفضل 2 vCPU على الأقل
+- قرص SSD
+
+البرامج الواجب تثبيتها:
+1) Python 3.11 أو 3.12
+2) Node.js LTS
+3) Git
+4) NSSM
+5) cloudflared إذا ستستخدم Cloudflare Tunnel
+6) Microsoft Visual C++ Redistributable إذا تطلبت بعض الحزم ذلك
+
+تحقق بعد التثبيت:
+- python --version
+- node --version
+- npm --version
+- git --version
+
+==================================================
+6. تثبيت المشروع من الصفر على سيرفر جديد
+==================================================
+
+الطريقة الأفضل:
+1) انسخ المشروع كاملا من السيرفر الحالي
+   أو
+2) استخدم Git clone إذا كان المشروع محفوظا في repository
+
+ثم ضع المشروع في مسار ثابت مثل:
+C:\Apps\OpenClaw_Version
+
+مهم:
+إذا تغير المسار عن السيرفر الحالي، راجع أي ملف يحتوي على مسارات ثابتة.
+
+==================================================
+7. إنشاء البيئة الافتراضية وتثبيت Python packages
+==================================================
+
+داخل مجلد المشروع:
+
+أوامر PowerShell:
+
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip wheel
+
+مهم جدا:
+الملف requirements.txt الموجود حاليا في الجذر غير كاف وحده، لأنه يحتوي فقط على:
+wheel==0.45.1
+
+لذلك المرجع العملي الصحيح للمكتبات على السيرفر العامل حاليا هو قائمة pip freeze التالية:
+
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.12.1
+blinker==1.9.0
+certifi==2026.1.4
+cffi==2.0.0
+charset-normalizer==3.4.4
+click==8.3.1
+colorama==0.4.6
+cryptography==46.0.5
+distro==1.9.0
+fastapi==0.129.0
+Flask==3.1.3
+flask-cors==6.0.2
+google-api-core==2.29.0
+google-api-python-client==2.190.0
+google-auth==2.48.0
+google-auth-httplib2==0.3.0
+google-auth-oauthlib==1.2.4
+googleapis-common-protos==1.72.0
+h11==0.16.0
+httpcore==1.0.9
+httplib2==0.31.2
+httpx==0.28.1
+idna==3.11
+inflection==0.5.1
+itsdangerous==2.2.0
+Jinja2==3.1.6
+jiter==0.13.0
+MarkupSafe==3.0.3
+oauthlib==3.3.1
+openai==2.21.0
+proto-plus==1.27.1
+protobuf==6.33.5
+pyairtable==3.3.0
+pyasn1==0.6.2
+pyasn1_modules==0.4.2
+pycparser==3.0
+pydantic==2.12.5
+pydantic-settings==2.13.0
+pydantic_core==2.41.5
+pyparsing==3.3.2
+python-dotenv==1.2.1
+pytz==2025.2
+requests==2.32.5
+requests-oauthlib==2.0.0
+rsa==4.9.1
+sniffio==1.3.1
+starlette==0.52.1
+tqdm==4.67.3
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+uritemplate==4.2.0
+urllib3==2.6.3
+uvicorn==0.41.0
+Werkzeug==3.1.6
+
+الطريقة الموصى بها:
+1) أنشئ ملف جديد باسم requirements_runtime_freeze.txt من هذه القائمة
+2) ثم نفذ:
+   pip install -r requirements_runtime_freeze.txt
+
+ملاحظة:
+إذا ظهرت مكتبات ناقصة أثناء التشغيل، أعد تنفيذ:
+pip freeze > requirements_runtime_freeze.txt
+من السيرفر العامل الصحيح واحتفظ بالملف في المشروع.
+
+==================================================
+8. تثبيت مكتبات الواجهة Frontend
+==================================================
+
+المجلد الأساسي:
+frontend_dashboard\new_frontend_dashboard
+
+الخطوات:
+1) افتح PowerShell داخل هذا المجلد
+2) نفذ:
+
+npm install
+
+للعمل أثناء التطوير:
+npm run dev
+
+للبناء:
+npm run build
+
+معلومات مهمة من package.json:
+- dev server port:
+  3000
+- build command:
+  npm run build
+
+أهم الحزم المستخدمة في الواجهة:
+- react
+- react-dom
+- vite
+- typescript
+- lucide-react
+- motion
+- tailwindcss
+- @vitejs/plugin-react
+
+==================================================
+9. تشغيل Teacher يدويا
+==================================================
+
+لتجربة سريعة يدوية:
+
+1) افتح PowerShell داخل مجلد المشروع
+2) فعّل البيئة:
+   .venv\Scripts\Activate.ps1
+3) شغّل:
+   python ai_agent.py
+
+اختبار الحالة:
+http://127.0.0.1:5001/api/system/status
+
+لكن للإنتاج لا يوصى بالتشغيل اليدوي من نافذة cmd.
+
+==================================================
+10. تشغيل Teacher كخدمة Windows
+==================================================
+
+هذا هو الوضع الموصى به للإنتاج.
+
+الملف المستخدم لتشغيل الخدمة:
+run_teacher_service.bat
+
+محتواه الحالي يفعّل البيئة ثم يشغّل:
+python ai_agent.py
+
+إعداد خدمة NSSM المقترح:
+
+Service Name:
+FTS Teacher
+
+Path:
+C:\Windows\System32\cmd.exe
+
+Arguments:
+/c "C:\Users\Aloosh2020\Downloads\New Project's\AIAgentProject\OpenClaw_Version\run_teacher_service.bat"
+
+Startup directory:
+C:\Users\Aloosh2020\Downloads\New Project's\AIAgentProject\OpenClaw_Version
+
+بعد التثبيت:
+1) اجعل Startup Type = Automatic
+2) فعّل Restart on failure
+3) اختبر:
+   Get-Service "FTS Teacher"
+4) اختبر:
+   http://127.0.0.1:5001/api/system/status
+
+==================================================
+11. التشغيل الكامل القديم / التطويري
+==================================================
+
+الملف:
+START_INTELLIGENT_SYSTEM.bat
+
+هذا الملف يشغّل:
+1) Teacher
+2) Student
+3) Observer
+4) Dashboard
+
+مهم:
+هذا مناسب للتشغيل اليدوي أو التطوير أو الفحص.
+أما في الإنتاج فالأفضل على الأقل تشغيل Teacher كخدمة منفصلة دائمة.
+
+==================================================
+12. تشغيل الداشبورد
+==================================================
+
+هناك نوعان يجب التمييز بينهما:
+
+1) Backend API
+   موجود داخل ai_agent.py على port 5001
+
+2) Frontend Dashboard
+   موجود داخل:
+   frontend_dashboard\new_frontend_dashboard
+
+أثناء التطوير:
+- npm run dev
+
+في الإنتاج:
+- npm run build
+- ثم تخدم ملفات dist من خلال خادم ثابت أو بيئة الاستضافة المناسبة
+
+إذا كنت تعتمد حاليا على واجهة موجودة ومربوطة على نفس السيرفر، احفظ طريقة التشغيل المستخدمة فعليا ضمن ملف داخلي خاص بك.
+
+==================================================
+13. إعداد واتساب Webhook
+==================================================
+
+نقطة الاستقبال الحالية:
+/webhook
+
+أي أن الـ Callback URL يكون بالشكل:
+https://YOUR_DOMAIN_OR_TUNNEL/webhook
+
+المطلوب من Meta:
+1) Verify Token
+2) Public HTTPS URL ثابت
+3) App / WABA / Phone Number IDs
+4) Access Token صالح
+
+إذا تغير السيرفر:
+1) انقل config.json
+2) تأكد أن الـ webhook endpoint يعمل
+3) حدث الرابط في Meta إذا تغير الدومين أو الـ tunnel
+4) اختبر GET verification
+5) اختبر استقبال رسالة WhatsApp فعلية
+
+==================================================
+14. Cloudflare Tunnel / Public URL
+==================================================
+
+الوضع الحالي في المشروع يظهر وجود:
+1) ملف ngrok قديم:
+   start_ngrok_tunnel.py
+2) ملف Cloudflare خاص بمسار آخر:
+   Operation_AI_System\backend\START_OPERATIONS_TUNNEL.bat
+
+للاستخدام الإنتاجي يفضل:
+- Cloudflare Tunnel ثابت
+أو
+- Domain مباشر مع Reverse Proxy
+
+إذا كنت ستستخدم cloudflared:
+1) ثبت cloudflared
+2) احفظ Tunnel Token أو config.yml في مكان آمن
+3) شغّل cloudflared كخدمة
+
+مثال شائع:
+cloudflared service install YOUR_TUNNEL_TOKEN
+
+ثم اختبر أن الرابط العام يوجه إلى:
+http://127.0.0.1:5001
+
+مهم:
+إذا كان WhatsApp يعتمد على هذا الرابط، فأي تغيير في الرابط يجب تحديثه في Meta Developer Dashboard.
+
+==================================================
+15. البريد الإلكتروني
+==================================================
+
+يعتمد النظام على:
+- IMAP
+- SMTP
+- Gmail / Google OAuth
+
+احفظ الملفات التالية:
+- credentials.json
+- credentials_sales.json
+- token.json
+- token_sales.json
+
+إذا انتقلت إلى سيرفر جديد:
+1) انقل ملفات credentials و token
+2) أو أعد إنشاء OAuth authorization
+3) اختبر قراءة البريد
+4) اختبر إرسال Draft أو إرسال فعلي
+
+مهم:
+إذا كنت تستخدم Gmail App Password:
+- فعّل 2FA
+- أنشئ App Password
+- احفظه في مكان آمن
+
+==================================================
+16. الحسابات المطلوبة حسب الميزة
+==================================================
+
+مطلوب لتشغيل النظام الأساسي:
+- Windows Server Admin
+- Airtable
+- Meta WhatsApp Cloud API
+- Email account / Gmail OAuth
+- DeepSeek أو مزود AI أساسي
+
+مطلوب حسب الاستخدام:
+- OpenAI
+- Gemini
+- Cloudflare
+- Cloudinary
+- Stripe
+- WeTravel
+
+إذا توقفت إحدى الميزات:
+- راجع أولا هل الحساب/المفتاح الخاص بها ما زال صالحا
+
+==================================================
+17. ملفات يجب نسخها احتياطيا دائما
+==================================================
+
+ملفات لا يجب فقدانها:
+- config.json
+- chat_history.db
+- airtable_mirror.db
+- learned_corrections.json
+- observer_cache.json
+- conversations.json
+- credentials.json
+- credentials_sales.json
+- token.json
+- token_sales.json
+- agent_log.txt
+- أي ملفات .env مستخدمة
+- أي ملفات Tunnel config أو tokens
+
+مجلدات مهمة:
+- frontend_dashboard\new_frontend_dashboard
+- make.com
+- .trae\documents
+
+سياسة Backup موصى بها:
+1) Backup يومي محلي
+2) Backup يومي خارجي
+3) Weekly zip full snapshot
+4) الاحتفاظ بنسخة قبل كل تحديث كبير
+
+==================================================
+18. فحص ما بعد التشغيل
+==================================================
+
+بعد التشغيل على أي سيرفر:
+
+1) تأكد أن الخدمة تعمل:
+   Get-Service "FTS Teacher"
+
+2) تأكد أن الـ API تعمل:
+   http://127.0.0.1:5001/api/system/status
+
+3) تأكد أن المنفذ 5001 يستمع:
+   netstat -ano | findstr :5001
+
+4) اختبر واتساب:
+   - تحقق من webhook verification
+   - أرسل رسالة اختبار
+
+5) اختبر الإيميل:
+   - قراءة رسالة
+   - Draft أو إرسال
+
+6) اختبر Workflow:
+   - payments bulk_create
+   - photographer bulk_send_link
+   - review bulk_send
+   - collect bulk_send
+
+7) اختبر الداشبورد:
+   - فتح الصفحة
+   - إظهار المحادثات
+   - زر Restart Teacher
+
+==================================================
+19. النقل إلى سيرفر جديد
+==================================================
+
+الخطوات الصحيحة:
+
+1) جهّز السيرفر الجديد
+2) ثبّت:
+   - Python
+   - Node.js
+   - Git
+   - NSSM
+   - cloudflared إن لزم
+
+3) انسخ المشروع
+4) أنشئ .venv
+5) ثبّت Python packages
+6) ثبّت npm packages
+7) انقل config.json
+8) انقل DB والملفات الحساسة
+9) ثبّت خدمة FTS Teacher
+10) ثبّت cloudflared كخدمة إذا كنت تستخدمه
+11) اختبر status endpoint
+12) اختبر webhook وemail
+13) حدّث Meta / Cloudflare / DNS إذا تغير الرابط العام
+
+==================================================
+20. ماذا أفعل إذا تعطل السيرفر الحالي
+==================================================
+
+خطة استعادة سريعة:
+
+1) جهّز سيرفر Windows جديد
+2) انسخ المشروع من backup
+3) استرجع config.json
+4) استرجع chat_history.db
+5) استرجع credentials وtokens
+6) ثبّت Python وNode وNSSM
+7) ثبّت المكتبات
+8) أنشئ الخدمة FTS Teacher
+9) شغّل الخدمة
+10) اختبر:
+    - status
+    - webhook
+    - email
+    - workflows
+
+==================================================
+21. أوامر مفيدة
+==================================================
+
+تشغيل Teacher يدويا:
+python ai_agent.py
+
+تشغيل الواجهة أثناء التطوير:
+npm run dev
+
+بناء الواجهة:
+npm run build
+
+التحقق من الخدمة:
+Get-Service "FTS Teacher"
+
+إعادة تشغيل الخدمة:
+C:\Tools\nssm\win64\nssm.exe restart "FTS Teacher"
+
+فحص المنفذ:
+netstat -ano | findstr :5001
+
+تصدير المكتبات من السيرفر العامل:
+pip freeze > requirements_runtime_freeze.txt
+
+==================================================
+22. توصيات نهائية مهمة
+==================================================
+
+1) لا تعتمد على الذاكرة البشرية لتشغيل النظام
+2) احفظ هذا الملف مع المشروع
+3) احفظ نسخة منفصلة من الأسرار في مكان آمن
+4) احتفظ بملف requirements_runtime_freeze.txt فعلي داخل المشروع
+5) استخدم خدمة Windows لـ Teacher دائما
+6) اجعل Cloudflare Tunnel أيضا خدمة إذا كان webhook يعتمد عليه
+7) اختبر النظام بالكامل بعد أي Restart أو نقل
+8) لا تضع API keys أو tokens الحقيقية في ملفات يتم مشاركتها أو رفعها
+
+==================================================
+23. ملخص التشغيل السريع
+==================================================
+
+إذا أردت تشغيل النظام الأساسي بسرعة على السيرفر الحالي:
+
+1) افتح المشروع
+2) فعّل البيئة الافتراضية
+3) تأكد من صحة config.json
+4) شغّل خدمة FTS Teacher
+5) تأكد من:
+   http://127.0.0.1:5001/api/system/status
+6) شغّل الواجهة أو افتحها حسب طريقة النشر عندك
+7) تأكد أن Public URL / Cloudflare / Webhook شغال
+
+==================================================
+24. مكان هذا الملف
+==================================================
+
+اسم الملف:
+SYSTEM_FULL_SETUP_GUIDE.txt
+
+الغرض منه:
+مرجع شامل لتشغيل النظام، إعادة تركيبه، نقله إلى سيرفر جديد، ومعرفة كل الحسابات والخدمات المطلوبة.

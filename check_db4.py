@@ -1,0 +1,1 @@
+import sys; sys.path.append('c:/Users/Aloosh2020/Downloads/New Project\'s/AIAgentProject/OpenClaw_Version'); import chat_db; res = chat_db.get_conversations_page(chat_id='fc863a55-6593-4de2-ab2c-0fb7e3f891f4'); print(res.get('items', [{}])[0].get('is_unread_computed'))

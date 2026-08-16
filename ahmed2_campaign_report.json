@@ -1,0 +1,570 @@
+[
+  {
+    "phone": "201004411417",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDA0NDExNDE3FQIAERgSNTI5REQ3QjQzNDBFOTJEQjA4AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "a75c16e2-01d0-46f4-a524-a0bab3051fc2",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:26.647083"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201112755213",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTEyNzU1MjEzFQIAERgSMzFGRTg1OERDQjM2OUIzQzk3AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "27e1277c-91f1-4090-977d-516c57c79a56",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:30.541595"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201019304511",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDE5MzA0NTExFQIAERgSOENBNzM3N0M5NjRBN0VBRDM1AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "dbc3ee4f-b55a-4c96-8d1d-6e9734e3e912",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:34.559268"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201157066670",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTU3MDY2NjcwFQIAERgSNTcxOENBNkNGRTY3MDFCNEM3AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "634ca08e-d4e0-426f-bb8f-ef16bbf3460e",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:38.524875"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201229681131",
+    "status": "failed",
+    "code": 400,
+    "error": {
+      "message": "(#2) Service temporarily unavailable",
+      "code": 2,
+      "type": "OAuthException",
+      "error_data": {
+        "messaging_product": "whatsapp",
+        "details": "Something went wrong."
+      },
+      "is_transient": true,
+      "fbtrace_id": "APjRb-LdJI-FDHFaOB63VaC"
+    }
+  },
+  {
+    "phone": "201004671506",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDA0NjcxNTA2FQIAERgSNzA2NkJDMTgwNTMwN0U5N0YyAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "47e1a057-9eec-4500-8b7a-52eb22ded33b",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.668994"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:47.413761"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201156795434",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTU2Nzk1NDM0FQIAERgSQjEwMTE2MUI0NUE4MTY1MEEyAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "49bff694-82f0-47df-974c-5b807e68667e",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.792594"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:51.183728"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201002030435",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDAyMDMwNDM1FQIAERgSQjc0M0Q2RTlCNTU2NkMwOUM3AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "886ad4cd-8d3c-4fd0-a1c9-231943b50bc9",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:55.320949"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201226908389",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMjI2OTA4Mzg5FQIAERgSMDFEMUVGN0VFOUIxOTM3NzJEAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "a6ef96b0-9113-4285-80bb-24a9f4fe4786",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.785453"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:09:59.550297"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201001987004",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDAxOTg3MDA0FQIAERgSQTQ1NTJFNjgxRUEwMzlGMUIzAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "b6525420-1d56-4fb1-bb62-8fc9c07658ff",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:03.633580"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201001628232",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDAxNjI4MjMyFQIAERgSN0QzOTBCRjA4ODJGNEYyOEUxAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "5433f726-3ed8-482e-baaf-44640a142b73",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.711583"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:07.735233"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201112349131",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTEyMzQ5MTMxFQIAERgSODFEMUMxNERCMkUwQTE5RDM3AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "2d1b2557-8bc3-48ad-aa7f-44ea712479ad",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.904917"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:11.798498"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201001691643",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDAxNjkxNjQzFQIAERgSRjJDMjg1N0ZCMEUxNjQ3MEI4AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "81fe77b7-c17b-4a96-815d-4c55f6c721d2",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.246844"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:15.728483"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201004386096",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDA0Mzg2MDk2FQIAERgSMzg0MkNCRTRBNkEyNjA4RTA4AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "e3f6d25b-575f-47d8-be4b-d6af481acb8d",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.211352"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:19.735954"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201277757942",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMjc3NzU3OTQyFQIAERgSRUQzMDhDMTNGMkFDQzZBRDcxAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "37b660eb-27a1-4c9b-9034-cd137fef184d",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.703795"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:23.801565"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201155333483",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTU1MzMzNDgzFQIAERgSRDQ2RUY5ODAxQUMyNzVDRTFDAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "00688fa7-0de3-4463-91ee-8f3625200da5",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:27.553516"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201097954056",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDk3OTU0MDU2FQIAERgSMjBGMzJCRDIzN0Q0OUM2MjUyAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "4235c4f9-1a1f-44ef-91f4-7a9012fc2ecb",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "1783096007121",
+          "lead_owner_name": "ملك ماهر",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.328876"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:31.314377"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201150065696",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTUwMDY1Njk2FQIAERgSMjk4Njc0M0VGNERCRUQ4RDQyAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "877f25ef-d617-44ff-8d3a-db7886f2a1a9",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:35.126483"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201064475109",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDY0NDc1MTA5FQIAERgSMDcxNjY1RUFEQjg4QUFGNjZFAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "777d0305-1516-4806-812a-b2314adf8904",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.762057"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:39.203934"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201224404458",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMjI0NDA0NDU4FQIAERgSMUQ3NTFGMENDNzkzQTZGQ0Q1AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "44dc8127-f132-435f-a0d7-cd27461b519e",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.632316"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:42.991237"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201272700897",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMjcyNzAwODk3FQIAERgSREJCRUQyMDI3RDAwQzVDNzg5AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "6f17b36e-367c-4025-ab03-53266b970b7c",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:47.010895"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201014875549",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDE0ODc1NTQ5FQIAERgSNEI1MjFGQzVBNDRBOTRGMDExAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "a131eb7e-e2c9-4a9f-96b0-0a40338b1a31",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "أحمد خليل",
+          "lead_owner_assigned_at": "2026-08-07T22:45:05.690501"
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:50.991762"
+        }
+      },
+      "reused_existing": true
+    }
+  },
+  {
+    "phone": "201094546724",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDk0NTQ2NzI0FQIAERgSMUI3N0I1NjI5QUREMDQyMEJEAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "fe22913b-0675-40a1-ae2f-344038b6d2df",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:54.860046"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201120055770",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMTIwMDU1NzcwFQIAERgSNDhBRjgzMUFGRTI4RkMyRTk0AA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "e0914399-93f4-46d5-8f5b-07710387b33b",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:10:58.638231"
+        }
+      },
+      "reused_existing": false
+    }
+  },
+  {
+    "phone": "201023246311",
+    "status": "sent",
+    "message_id": "wamid.HBgMMjAxMDIzMjQ2MzExFQIAERgSMjRFNTU0MEE3OTJFQ0RCMzgxAA==",
+    "assign": {
+      "ok": true,
+      "chat_id": "9ed0044d-08e7-42a3-9c43-f73db949a127",
+      "assign": {
+        "ok": true,
+        "previous_owner": {
+          "lead_owner_user_id": null,
+          "lead_owner_name": null,
+          "lead_owner_assigned_at": null
+        },
+        "new_owner": {
+          "lead_owner_user_id": "17",
+          "lead_owner_name": "Ahmed Khalil",
+          "lead_owner_assigned_at": "2026-08-11T19:11:02.571706"
+        }
+      },
+      "reused_existing": false
+    }
+  }
+]

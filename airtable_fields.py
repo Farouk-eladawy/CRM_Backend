@@ -158,6 +158,10 @@ class LeadFieldIds:
     LAST_INTERACTION = "Last Interaction"
     SOURCE = "Source"
     INTERESTED_TRIP = "Interested Trip"
+    FOLLOW_UP_NOTES = "Follow-up Notes"
+    TRAVEL_DATE = "Travel Date"
+    PAX_COUNT = "Pax Count"
+    BUDGET = "Budget"
 
 class ReligiousLeadFieldIds:
     CUSTOMER_NAME = "الاسم"
@@ -188,7 +192,7 @@ ID_TO_READABLE_NAME = {
     FieldIds.ADD_ONS: "Add - Ons",
     FieldIds.HOTEL_NAME: "Hotel Name",
     FieldIds.ROOM_NUMBER: "Room number",
-    FieldIds.PICKUP_TIME: "Pickup Time",
+    FieldIds.PICKUP_TIME: "pickup time",
     FieldIds.ISSUE_TICKETS: "Issue Tickets ", # Space at end
     FieldIds.FROM_LOC: "From",
     FieldIds.TO_LOC: "to", # Lowercase t

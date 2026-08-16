@@ -13,6 +13,7 @@ gyg_browser_data/
 chat_history_staging_copy.db
 *_railway_snapshot.db
 railway_staging_upload/
+hourly_data_backup/
 
 # Secrets and Credentials
 token*.json
@@ -20,6 +21,9 @@ credentials*.json
 client_secret_*.json
 railway_vars.json
 google_reviews_token.json
+.env
+.env.*
+.hourly_github_backup.lock
 
 # Virtual Environments
 venv/
@@ -77,3 +81,4 @@ make.com/
 Send Report For Guide/
 docker_prep/
 Bukon_Server/
+frontend_dashboard/new_frontend_dashboard/.git/

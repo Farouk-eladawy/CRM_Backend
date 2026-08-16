@@ -2687,7 +2687,7 @@ def get_message_id_by_external_id(chat_id, external_message_id):
         except sqlite3.OperationalError:
             return None
 
-def add_message(chat_id, sender_type, text, status='sent', increment_unread=True, source=None, external_message_id=None, reaction_to_external_message_id=None, reaction_emoji=None):
+def add_message(chat_id, sender_type, text, status='sent', increment_unread=True, source=None, external_message_id=None, reaction_to_external_message_id=None, reaction_emoji=None, error_message=None):
     with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
         c = conn.cursor()
         msg_id = str(uuid.uuid4())
@@ -2709,6 +2709,10 @@ def add_message(chat_id, sender_type, text, status='sent', increment_unread=True
         if 'reaction_emoji' not in msg_columns:
             c.execute("ALTER TABLE messages ADD COLUMN reaction_emoji TEXT")
             conn.commit()
+        if 'error_message' not in msg_columns:
+            c.execute("ALTER TABLE messages ADD COLUMN error_message TEXT")
+            conn.commit()
+            msg_columns.append('error_message')
             
         if external_message_id:
             c.execute("SELECT msg_id FROM messages WHERE external_message_id = ?", (str(external_message_id),))
@@ -2750,28 +2754,31 @@ def add_message(chat_id, sender_type, text, status='sent', increment_unread=True
                 if c.fetchone():
                     return None
         
+        err_s = str(error_message).strip() if error_message is not None and str(error_message).strip() else None
         c.execute("""
             INSERT INTO messages (
                 msg_id, chat_id, sender_type, text, timestamp, status, source,
-                external_message_id, reaction_to_external_message_id, reaction_emoji
+                external_message_id, reaction_to_external_message_id, reaction_emoji, error_message
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             msg_id, chat_id, sender_type, text_s, now, status, str(source) if source is not None else None,
             str(external_message_id) if external_message_id is not None else None,
             str(reaction_to_external_message_id) if reaction_to_external_message_id is not None else None,
-            str(reaction_emoji) if reaction_emoji is not None else None
+            str(reaction_emoji) if reaction_emoji is not None else None,
+            err_s,
         ))
         
         # Update conversation last message time
         # Proposed drafts must not reshuffle inbox ordering after a live workflow/agent reply.
-        if not is_proposed_draft:
+        # Failed sends stay visible in-thread but should not look like a successful outbound.
+        if (not is_proposed_draft) and str(status or '').strip().lower() != 'error':
             c.execute("""
                 UPDATE conversations 
                 SET last_message_time = ?
                 WHERE chat_id = ?
             """, (now, chat_id))
-        else:
+        elif is_proposed_draft:
             # Keep draft timestamp for message ordering in-thread, but only bump
             # conversation last_message_time when no real agent reply covers this turn.
             c.execute(

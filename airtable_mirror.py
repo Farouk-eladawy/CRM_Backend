@@ -1,3 +1,4 @@
+import calendar
 import json
 import logging
 import os
@@ -218,6 +219,14 @@ class AirtableMirror:
                     c.execute("CREATE VIRTUAL TABLE IF NOT EXISTS mirror_list_fts USING fts5(airtable_id UNINDEXED, content)")
                 except Exception:
                     pass
+                c.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS mirror_meta (
+                        key TEXT PRIMARY KEY,
+                        value TEXT
+                    )
+                    """
+                )
                 conn.commit()
 
     def _meta_tables(self, base_id):
@@ -243,12 +252,14 @@ class AirtableMirror:
             with self._write_lock:
                 with self._get_conn() as conn:
                     c = conn.cursor()
+                    seen_keys = set()
                     for t in (tables or []):
                         t_name = str(t.get("name") or "").strip()
                         t_id = str(t.get("id") or "").strip()
                         if not t_id or not t_name:
                             continue
                         table_key = _safe_table_key(base_id, t_id)
+                        seen_keys.add(table_key)
                         ignored = 1 if t_name in self.ignored_table_names else 0
                         fields = t.get("fields", []) or []
                         lmt_fields = [f.get("name") for f in fields if f.get("type") == "lastModifiedTime" and f.get("name")]
@@ -289,6 +300,27 @@ class AirtableMirror:
                                 """,
                                 (table_key, f_id, f_name, f_type),
                             )
+                    # Tables removed from Airtable stay in mirror_tables forever unless ignored.
+                    # Mark any base table not returned by Meta API as ignored so sync stops.
+                    c.execute(
+                        "SELECT table_key, table_name FROM mirror_tables WHERE base_id=? AND ignored=0",
+                        (base_id,),
+                    )
+                    stale_rows = c.fetchall() or []
+                    for row in stale_rows:
+                        stale_key = row["table_key"] if isinstance(row, sqlite3.Row) else row[0]
+                        stale_name = row["table_name"] if isinstance(row, sqlite3.Row) else row[1]
+                        if stale_key in seen_keys:
+                            continue
+                        c.execute(
+                            "UPDATE mirror_tables SET ignored=1, sync_interval_seconds=NULL WHERE table_key=?",
+                            (stale_key,),
+                        )
+                        logging.warning(
+                            "Mirror marked deleted/missing table as ignored: %s (%s)",
+                            stale_name,
+                            stale_key,
+                        )
                     conn.commit()
 
         self._ensure_intervals()
@@ -328,8 +360,10 @@ class AirtableMirror:
                         interval = None
                     else:
                         has_lmt = int(r["has_lmt"] or 0) == 1
+                        is_main_list = str(r["base_label"] or "") == "main" and str(r["table_name"] or "") == "List"
                         if has_lmt:
-                            interval = 60
+                            # FTS AI Operation reads List from the mirror; keep it near-real-time.
+                            interval = 15 if is_main_list else 60
                         else:
                             rc = r["record_count"]
                             interval = self._interval_from_count(rc)
@@ -338,6 +372,82 @@ class AirtableMirror:
                         (interval, r["table_key"]),
                     )
                 conn.commit()
+
+    def _get_meta(self, key, default=None):
+        try:
+            with self._get_conn() as conn:
+                c = conn.cursor()
+                c.execute("SELECT value FROM mirror_meta WHERE key=?", (str(key),))
+                row = c.fetchone()
+                if not row:
+                    return default
+                return row["value"] if isinstance(row, sqlite3.Row) else row[0]
+        except Exception:
+            return default
+
+    def _set_meta(self, key, value):
+        with self._write_lock:
+            with self._get_conn() as conn:
+                c = conn.cursor()
+                c.execute(
+                    """
+                    INSERT INTO mirror_meta (key, value) VALUES (?, ?)
+                    ON CONFLICT(key) DO UPDATE SET value=excluded.value
+                    """,
+                    (str(key), None if value is None else str(value)),
+                )
+                conn.commit()
+
+    def _get_meta_int(self, key, default=0):
+        raw = self._get_meta(key, None)
+        try:
+            return int(raw) if raw is not None else int(default or 0)
+        except Exception:
+            return int(default or 0)
+
+    def bump_list_data_version(self):
+        """Increment List mirror version so AI Operation clients can detect changes cheaply."""
+        with self._write_lock:
+            with self._get_conn() as conn:
+                c = conn.cursor()
+                c.execute(
+                    """
+                    INSERT INTO mirror_meta (key, value) VALUES ('list_data_version', '1')
+                    ON CONFLICT(key) DO UPDATE SET value=CAST(CAST(COALESCE(mirror_meta.value, '0') AS INTEGER) + 1 AS TEXT)
+                    """
+                )
+                c.execute(
+                    """
+                    INSERT INTO mirror_meta (key, value) VALUES ('list_data_version_ts', ?)
+                    ON CONFLICT(key) DO UPDATE SET value=excluded.value
+                    """,
+                    (str(_now_ts()),),
+                )
+                conn.commit()
+        return self._get_meta_int("list_data_version", 0)
+
+    def get_list_data_version(self):
+        table_key = None
+        try:
+            table_key = self._get_table_key_for_main_list()
+        except Exception:
+            table_key = None
+        max_synced = None
+        if table_key:
+            try:
+                with self._get_conn() as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT MAX(synced_ts) AS mx FROM mirror_records WHERE table_key=?", (table_key,))
+                    row = c.fetchone()
+                    if row:
+                        max_synced = row["mx"] if isinstance(row, sqlite3.Row) else row[0]
+            except Exception:
+                max_synced = None
+        return {
+            "version": self._get_meta_int("list_data_version", 0),
+            "version_ts": self._get_meta_int("list_data_version_ts", 0),
+            "max_synced_ts": int(max_synced or 0),
+        }
 
     def _get_table_key_for_main_list(self, is_religious=False, table_name=None):
         with self._get_conn() as conn:
@@ -416,57 +526,176 @@ class AirtableMirror:
                 )
                 conn.commit()
 
-    def _delete_missing(self, table_key, keep_ids, cleanup_main_list=False):
+    def _delete_missing(self, table_key, keep_ids, cleanup_main_list=False, only_synced_before=None):
+        """
+        Remove mirror rows whose Airtable IDs are not in keep_ids.
+        only_synced_before: when set (unix ts), only delete rows synced before that time.
+        Protects records inserted by concurrent delta sync during a long full sync.
+        """
         keep_ids = set(keep_ids or [])
+        deleted = 0
+        age_clause = ""
+        age_params = []
+        try:
+            if only_synced_before is not None:
+                age_clause = " AND synced_ts < ?"
+                age_params = [int(only_synced_before)]
+        except Exception:
+            age_clause = ""
+            age_params = []
+
         with self._write_lock:
             with self._get_conn() as conn:
                 c = conn.cursor()
                 if not keep_ids:
-                    c.execute("DELETE FROM mirror_records WHERE table_key=?", (table_key,))
-                    if cleanup_main_list:
+                    c.execute(
+                        f"SELECT COUNT(*) AS cnt FROM mirror_records WHERE table_key=?{age_clause}",
+                        [table_key] + age_params,
+                    )
+                    row = c.fetchone()
+                    deleted = int((row["cnt"] if isinstance(row, sqlite3.Row) else row[0]) or 0)
+                    c.execute(
+                        f"DELETE FROM mirror_records WHERE table_key=?{age_clause}",
+                        [table_key] + age_params,
+                    )
+                    if cleanup_main_list and not age_clause:
                         c.execute("DELETE FROM mirror_list_projection")
                         try:
                             c.execute("DELETE FROM mirror_list_fts")
                         except Exception:
                             pass
-                    conn.commit()
-                    return
-
-                if len(keep_ids) <= 900:
-                    placeholders = ",".join(["?"] * len(keep_ids))
-                    c.execute(
-                        f"DELETE FROM mirror_records WHERE table_key=? AND airtable_id NOT IN ({placeholders})",
-                        [table_key] + list(keep_ids),
-                    )
-                    if cleanup_main_list:
+                    elif cleanup_main_list and age_clause:
+                        # Only drop projection rows for records we just deleted (pre-full-sync).
                         c.execute(
-                            f"DELETE FROM mirror_list_projection WHERE airtable_id NOT IN ({placeholders})",
-                            list(keep_ids),
+                            f"""
+                            DELETE FROM mirror_list_projection
+                            WHERE airtable_id NOT IN (
+                                SELECT airtable_id FROM mirror_records WHERE table_key=?
+                            )
+                            """,
+                            (table_key,),
                         )
                         try:
                             c.execute(
-                                f"DELETE FROM mirror_list_fts WHERE airtable_id NOT IN ({placeholders})",
-                                list(keep_ids),
+                                f"""
+                                DELETE FROM mirror_list_fts
+                                WHERE airtable_id NOT IN (
+                                    SELECT airtable_id FROM mirror_records WHERE table_key=?
+                                )
+                                """,
+                                (table_key,),
                             )
                         except Exception:
                             pass
                     conn.commit()
-                    return
+                    return deleted
+
+                if len(keep_ids) <= 900:
+                    placeholders = ",".join(["?"] * len(keep_ids))
+                    c.execute(
+                        f"SELECT COUNT(*) AS cnt FROM mirror_records WHERE table_key=? AND airtable_id NOT IN ({placeholders}){age_clause}",
+                        [table_key] + list(keep_ids) + age_params,
+                    )
+                    row = c.fetchone()
+                    deleted = int((row["cnt"] if isinstance(row, sqlite3.Row) else row[0]) or 0)
+                    c.execute(
+                        f"DELETE FROM mirror_records WHERE table_key=? AND airtable_id NOT IN ({placeholders}){age_clause}",
+                        [table_key] + list(keep_ids) + age_params,
+                    )
+                    if cleanup_main_list:
+                        if age_clause:
+                            c.execute(
+                                f"""
+                                DELETE FROM mirror_list_projection
+                                WHERE airtable_id NOT IN (
+                                    SELECT airtable_id FROM mirror_records WHERE table_key=?
+                                )
+                                """,
+                                (table_key,),
+                            )
+                            try:
+                                c.execute(
+                                    f"""
+                                    DELETE FROM mirror_list_fts
+                                    WHERE airtable_id NOT IN (
+                                        SELECT airtable_id FROM mirror_records WHERE table_key=?
+                                    )
+                                    """,
+                                    (table_key,),
+                                )
+                            except Exception:
+                                pass
+                        else:
+                            c.execute(
+                                f"DELETE FROM mirror_list_projection WHERE airtable_id NOT IN ({placeholders})",
+                                list(keep_ids),
+                            )
+                            try:
+                                c.execute(
+                                    f"DELETE FROM mirror_list_fts WHERE airtable_id NOT IN ({placeholders})",
+                                    list(keep_ids),
+                                )
+                            except Exception:
+                                pass
+                    conn.commit()
+                    return deleted
 
                 c.execute("CREATE TEMP TABLE IF NOT EXISTS tmp_keep_ids (airtable_id TEXT PRIMARY KEY)")
                 c.execute("DELETE FROM tmp_keep_ids")
                 c.executemany("INSERT OR IGNORE INTO tmp_keep_ids (airtable_id) VALUES (?)", [(x,) for x in keep_ids])
                 c.execute(
-                    "DELETE FROM mirror_records WHERE table_key=? AND airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids)",
-                    (table_key,),
+                    f"SELECT COUNT(*) AS cnt FROM mirror_records WHERE table_key=? AND airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids){age_clause}",
+                    [table_key] + age_params,
+                )
+                row = c.fetchone()
+                deleted = int((row["cnt"] if isinstance(row, sqlite3.Row) else row[0]) or 0)
+                c.execute(
+                    f"DELETE FROM mirror_records WHERE table_key=? AND airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids){age_clause}",
+                    [table_key] + age_params,
                 )
                 if cleanup_main_list:
-                    c.execute("DELETE FROM mirror_list_projection WHERE airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids)")
-                    try:
-                        c.execute("DELETE FROM mirror_list_fts WHERE airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids)")
-                    except Exception:
-                        pass
+                    if age_clause:
+                        c.execute(
+                            """
+                            DELETE FROM mirror_list_projection
+                            WHERE airtable_id NOT IN (
+                                SELECT airtable_id FROM mirror_records WHERE table_key=?
+                            )
+                            """,
+                            (table_key,),
+                        )
+                        try:
+                            c.execute(
+                                """
+                                DELETE FROM mirror_list_fts
+                                WHERE airtable_id NOT IN (
+                                    SELECT airtable_id FROM mirror_records WHERE table_key=?
+                                )
+                                """,
+                                (table_key,),
+                            )
+                        except Exception:
+                            pass
+                    else:
+                        c.execute("DELETE FROM mirror_list_projection WHERE airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids)")
+                        try:
+                            c.execute("DELETE FROM mirror_list_fts WHERE airtable_id NOT IN (SELECT airtable_id FROM tmp_keep_ids)")
+                        except Exception:
+                            pass
                 conn.commit()
+        return deleted
+
+    def _advance_last_sync_iso(self, table_key, candidate_dt_or_iso):
+        """Advance watermark only forward (safe when delta + full run concurrently)."""
+        if not table_key or candidate_dt_or_iso is None:
+            return
+        cand = candidate_dt_or_iso if hasattr(candidate_dt_or_iso, "timestamp") else _iso_to_dt(candidate_dt_or_iso)
+        if not cand:
+            return
+        state = self._get_sync_state(table_key)
+        current = _iso_to_dt(state.get("last_sync_iso"))
+        if current is None or cand > current:
+            self._set_sync_state(table_key, last_sync_iso=_dt_to_iso(cand))
 
     def _update_list_projection(self, airtable_id, fields):
         date_trip_raw = fields.get("Date Trip")
@@ -639,6 +868,7 @@ class AirtableMirror:
             try:
                 if table_key == self._get_table_key_for_main_list():
                     self._update_list_projection(str(airtable_id), fields or {})
+                    self.bump_list_data_version()
             except Exception:
                 pass
             return True
@@ -711,6 +941,10 @@ class AirtableMirror:
         self._ensure_record_count(info)
         has_lmt = int(info.get("has_lmt") or 0) == 1
         interval = info.get("sync_interval_seconds")
+        is_main_list = info.get("base_label") == "main" and table_name == "List"
+        if is_main_list and has_lmt:
+            interval = 15
+            info["sync_interval_seconds"] = 15
         if (not has_lmt) and info.get("record_count") is not None:
             try:
                 interval = self._interval_from_count(int(info.get("record_count") or 0))
@@ -727,8 +961,31 @@ class AirtableMirror:
                 pass
         if interval is None:
             return
+
         state = self._get_sync_state(table_key)
-        is_main_list = info.get("base_label") == "main" and table_name == "List"
+        lmt_field = info.get("lmt_field")
+
+        # Main List: never block the 15s delta behind a multi-hour full sync.
+        # Schedule full sync in a background thread; always run delta on this tick when possible.
+        if is_main_list and has_lmt and lmt_field:
+            if force_full or self._should_run_scheduled_full_sync(
+                table_key, state, interval_hours=6, tz_offset_hours=3, jitter_max_minutes=15
+            ):
+                self._maybe_start_main_list_full_sync(info)
+
+            if state.get("last_sync_iso"):
+                next_sync_ts = state.get("next_sync_ts")
+                if next_sync_ts and _now_ts() < int(next_sync_ts):
+                    return
+                self._sync_table_delta(info, interval=interval)
+                return
+
+            # No watermark yet: kick full sync (if not already running) and exit;
+            # delta will start on later ticks once full/delta establishes last_sync_iso.
+            self._maybe_start_main_list_full_sync(info)
+            return
+
+        # Non-List tables (or List without LMT): keep previous blocking behavior.
         if is_main_list and not force_full:
             if self._should_run_scheduled_full_sync(table_key, state, interval_hours=6, tz_offset_hours=3, jitter_max_minutes=15):
                 force_full = True
@@ -737,89 +994,212 @@ class AirtableMirror:
         if not force_full and next_sync_ts and _now_ts() < int(next_sync_ts):
             return
 
-        lmt_field = info.get("lmt_field")
-        tbl = self._api.table(base_id, table_name)
+        if has_lmt and lmt_field and not force_full and state.get("last_sync_iso"):
+            self._sync_table_delta(info, interval=interval)
+            return
 
-        if has_lmt and lmt_field and not force_full:
-            last_sync_iso = state.get("last_sync_iso")
-            last_dt = _iso_to_dt(last_sync_iso)
-            stop_dt = last_dt
-            newest_dt = last_dt
-            updated = 0
-            stop = False
+        if has_lmt and lmt_field and not force_full and not state.get("last_sync_iso"):
+            force_full = True
+        self._sync_table_full(info, interval=interval, blocking_lock=is_main_list)
+
+    def _maybe_start_main_list_full_sync(self, info):
+        """Start List full sync on a daemon thread if one is not already running."""
+        if not self._full_sync_lock.acquire(blocking=False):
+            return False
+
+        def _runner():
             try:
-                for page in tbl.iterate(page_size=50):
-                    if stop:
-                        break
-                    batch_records = []
-                    for rec in (page or []):
-                        rid = rec.get("id")
-                        fields = rec.get("fields", {}) or {}
-                        ts_val = fields.get(lmt_field)
-                        dt_val = _iso_to_dt(ts_val) or None
-                        if stop_dt and dt_val and dt_val <= stop_dt:
-                            stop = True
-                            break
-                        batch_records.append((rid, fields))
-                        updated += 1
+                logging.info("Mirror full sync started for main List (background; delta keeps running)")
+                self._sync_table_full(info, interval=None, blocking_lock=False, already_locked=True)
+            except Exception as e:
+                logging.error(f"Mirror background full sync failed for List: {e}", exc_info=True)
+            finally:
+                try:
+                    self._full_sync_lock.release()
+                except Exception:
+                    pass
+
+        threading.Thread(target=_runner, name="mirror-list-full-sync", daemon=True).start()
+        return True
+
+    def _sync_table_delta(self, info, interval=15):
+        table_key = info.get("table_key")
+        base_id = info.get("base_id")
+        table_name = info.get("table_name")
+        lmt_field = info.get("lmt_field")
+        is_main_list = info.get("base_label") == "main" and table_name == "List"
+        if not (table_key and base_id and table_name and lmt_field):
+            return
+        state = self._get_sync_state(table_key)
+        last_sync_iso = state.get("last_sync_iso")
+        if not last_sync_iso:
+            return
+        newest_dt = _iso_to_dt(last_sync_iso)
+        updated = 0
+        try:
+            tbl = self._api.table(base_id, table_name)
+            safe_iso = str(last_sync_iso).replace("'", "\\'")
+            iterate_kwargs = {
+                "page_size": 50,
+                "formula": f"IS_AFTER({{{lmt_field}}}, '{safe_iso}')",
+                "sort": [f"-{lmt_field}"],
+            }
+            for page in tbl.iterate(**iterate_kwargs):
+                batch_records = []
+                for rec in (page or []):
+                    rid = rec.get("id")
+                    fields = rec.get("fields", {}) or {}
+                    ts_val = fields.get(lmt_field)
+                    dt_val = _iso_to_dt(ts_val) or None
+                    batch_records.append((rid, fields))
+                    updated += 1
+                    if dt_val and (newest_dt is None or dt_val > newest_dt):
+                        newest_dt = dt_val
+                if batch_records:
+                    self._upsert_records_batch(table_key, batch_records)
+                    if is_main_list:
+                        self._update_list_projection_batch(batch_records)
+            if updated > 0 and newest_dt:
+                self._advance_last_sync_iso(table_key, newest_dt)
+                if is_main_list:
+                    self.bump_list_data_version()
+        except Exception as e:
+            logging.error(f"Mirror delta sync failed for {table_name}: {e}")
+        finally:
+            if interval is not None:
+                self._set_sync_state(table_key, next_sync_ts=_now_ts() + int(interval or 60))
+
+    def _sync_table_full(self, info, interval=None, blocking_lock=False, already_locked=False):
+        table_key = info.get("table_key")
+        base_id = info.get("base_id")
+        table_name = info.get("table_name")
+        lmt_field = info.get("lmt_field")
+        has_lmt = int(info.get("has_lmt") or 0) == 1
+        is_main_list = info.get("base_label") == "main" and table_name == "List"
+        if not (table_key and base_id and table_name):
+            return
+
+        lock_acquired = False
+        if is_main_list and blocking_lock and not already_locked:
+            lock_acquired = self._full_sync_lock.acquire(blocking=False)
+            if not lock_acquired:
+                return
+        elif already_locked:
+            lock_acquired = False  # caller owns the lock / will release
+
+        keep_ids = set()
+        newest_dt = None
+        updated = 0
+        full_started_ts = _now_ts()
+        try:
+            if is_main_list and not already_locked:
+                logging.info("Mirror full sync started for main List (scheduled)")
+            tbl = self._api.table(base_id, table_name)
+            for page in tbl.iterate(page_size=50):
+                batch_records = []
+                for rec in (page or []):
+                    rid = rec.get("id")
+                    keep_ids.add(rid)
+                    fields = rec.get("fields", {}) or {}
+                    batch_records.append((rid, fields))
+                    updated += 1
+                    if has_lmt and lmt_field:
+                        dt_val = _iso_to_dt(fields.get(lmt_field))
                         if dt_val and (newest_dt is None or dt_val > newest_dt):
                             newest_dt = dt_val
-                    self._upsert_records_batch(table_key, batch_records)
-                    if info.get("base_label") == "main" and table_name == "List":
-                        self._update_list_projection_batch(batch_records)
-                if updated > 0 and newest_dt:
-                    self._set_sync_state(table_key, last_sync_iso=_dt_to_iso(newest_dt))
-            except Exception as e:
-                logging.error(f"Mirror delta sync failed for {table_name}: {e}")
-        else:
-            lock_acquired = False
-            if is_main_list:
-                lock_acquired = self._full_sync_lock.acquire(blocking=False)
-                if not lock_acquired:
-                    return
-            keep_ids = set()
-            newest_dt = None
-            updated = 0
-            try:
+                self._upsert_records_batch(table_key, batch_records)
                 if is_main_list:
-                    logging.info("Mirror full sync started for main List (scheduled)")
-                for page in tbl.iterate(page_size=50):
-                    batch_records = []
-                    for rec in (page or []):
-                        rid = rec.get("id")
-                        keep_ids.add(rid)
-                        fields = rec.get("fields", {}) or {}
-                        batch_records.append((rid, fields))
-                        updated += 1
-                        if has_lmt and lmt_field:
-                            dt_val = _iso_to_dt(fields.get(lmt_field))
-                            if dt_val and (newest_dt is None or dt_val > newest_dt):
-                                newest_dt = dt_val
-                    self._upsert_records_batch(table_key, batch_records)
-                    if info.get("base_label") == "main" and table_name == "List":
-                        self._update_list_projection_batch(batch_records)
-                self._delete_missing(table_key, keep_ids, cleanup_main_list=is_main_list)
-                now_ts = _now_ts()
-                self._set_sync_state(table_key, last_full_sync_ts=now_ts)
-                if newest_dt:
-                    self._set_sync_state(table_key, last_sync_iso=_dt_to_iso(newest_dt))
-            except Exception as e:
-                logging.error(f"Mirror full sync failed for {table_name}: {e}")
-            finally:
-                if lock_acquired:
-                    self._full_sync_lock.release()
+                    self._update_list_projection_batch(batch_records)
+            # Only remove rows that existed before this full sync started — never delete
+            # bookings inserted by concurrent delta while the full pass was still running.
+            deleted = self._delete_missing(
+                table_key,
+                keep_ids,
+                cleanup_main_list=is_main_list,
+                only_synced_before=full_started_ts if is_main_list else None,
+            )
+            now_ts = _now_ts()
+            self._set_sync_state(table_key, last_full_sync_ts=now_ts)
+            if newest_dt:
+                self._advance_last_sync_iso(table_key, newest_dt)
+            if is_main_list and (updated > 0 or int(deleted or 0) > 0):
+                self.bump_list_data_version()
+            if is_main_list:
+                logging.info(
+                    "Mirror full sync finished for main List (updated=%s deleted=%s)",
+                    updated,
+                    int(deleted or 0),
+                )
+        except Exception as e:
+            logging.error(f"Mirror full sync failed for {table_name}: {e}")
+        finally:
+            if lock_acquired:
+                self._full_sync_lock.release()
+            if interval is not None:
+                self._set_sync_state(table_key, next_sync_ts=_now_ts() + int(interval or 60))
 
-        next_ts = _now_ts() + int(interval or 60)
-        self._set_sync_state(table_key, next_sync_ts=next_ts)
+    def reconcile_main_list_ids(self, min_interval_seconds=60):
+        """Lightweight delete detection for List: compare Airtable IDs vs mirror."""
+        table_key = self._get_table_key_for_main_list()
+        if not table_key or not self.base_id:
+            return 0
+        last_ts = self._get_meta_int("list_last_reconcile_ts", 0)
+        now = _now_ts()
+        if last_ts and (now - int(last_ts)) < int(min_interval_seconds or 60):
+            return 0
+        if not self._full_sync_lock.acquire(blocking=False):
+            return 0
+        deleted = 0
+        try:
+            tbl = self._api.table(self.base_id, "List")
+            keep_ids = set()
+            # One cheap field keeps payload small while still returning record IDs.
+            for page in tbl.iterate(page_size=100, fields=["Booking Nr."]):
+                for rec in (page or []):
+                    rid = rec.get("id")
+                    if rid:
+                        keep_ids.add(rid)
+            deleted = int(self._delete_missing(table_key, keep_ids, cleanup_main_list=True) or 0)
+            self._set_meta("list_last_reconcile_ts", str(now))
+            if deleted > 0:
+                self.bump_list_data_version()
+                logging.info("Mirror List ID reconcile removed %s deleted record(s)", deleted)
+        except Exception as e:
+            logging.error(f"Mirror List ID reconcile failed: {e}")
+        finally:
+            self._full_sync_lock.release()
+        return deleted
+
+    def tick_main_list(self):
+        """
+        Fast path for List delta (~15s). Safe to call from a dedicated loop while
+        tick() processes other tables. Schedules List full sync in the background when due.
+        """
+        tables = self._list_table_info()
+        for info in tables:
+            if info.get("base_label") == "main" and str(info.get("table_name") or "") == "List":
+                try:
+                    self.sync_table(info)
+                except Exception as e:
+                    logging.error(f"Mirror main List tick failed: {e}")
+                return
 
     def tick(self):
         self.refresh_schema()
         tables = self._list_table_info()
+        # List is handled by tick_main_list() on a dedicated fast loop so other
+        # tables' long syncs cannot starve new-booking deltas.
         for info in tables:
+            if info.get("base_label") == "main" and str(info.get("table_name") or "") == "List":
+                continue
             try:
                 self.sync_table(info)
             except Exception:
                 continue
+        try:
+            self.reconcile_main_list_ids(min_interval_seconds=60)
+        except Exception:
+            pass
 
     def status(self):
         out = []
@@ -835,7 +1215,10 @@ class AirtableMirror:
                 """
             )
             for r in (c.fetchall() or []):
-                out.append(dict(r))
+                row = dict(r)
+                if row.get("base_label") == "main" and row.get("table_name") == "List":
+                    row["full_sync_running"] = self._full_sync_lock.locked()
+                out.append(row)
         return out
 
     def list_schema_for_main_list(self, is_religious=False, table_name=None):
@@ -867,6 +1250,22 @@ class AirtableMirror:
                     """
                 )
                 return [dict(r) for r in (c.fetchall() or [])]
+
+            target_name = str(table_name or "").strip()
+            if target_name and target_name.lower() != "list":
+                c.execute(
+                    """
+                    SELECT mf.field_name, mf.field_type
+                    FROM mirror_fields mf
+                    JOIN mirror_tables mt ON mt.table_key = mf.table_key
+                    WHERE mt.base_label='main' AND mt.table_name=?
+                    ORDER BY mf.field_name
+                    """,
+                    (target_name,),
+                )
+                rows = [dict(r) for r in (c.fetchall() or [])]
+                if rows:
+                    return rows
 
             table_key = self._get_table_key_for_main_list()
             if not table_key:
@@ -1135,49 +1534,241 @@ class AirtableMirror:
                 return True
             val_raw = (fields or {}).get(field)
             val = _to_lower_str(val_raw)
-            cond_val = _to_lower_str(cond.get("value"))
+            cond_val_raw = cond.get("value")
+            cond_val = _to_lower_str(cond_val_raw)
             ftype = schema_types.get(field) or "text"
+            op_l = str(op or "").strip().lower()
 
-            if ftype == "date" and val and op in ("is today", "is tomorrow", "is yesterday"):
-                d_field = _parse_date(val_raw)
-                if not d_field:
+            def _decode_multi(raw):
+                if raw is None:
+                    return []
+                if isinstance(raw, list):
+                    return [str(x).strip().lower() for x in raw if str(x).strip()]
+                s = str(raw).strip()
+                if not s:
+                    return []
+                if s.startswith("["):
+                    try:
+                        arr = json.loads(s)
+                        if isinstance(arr, list):
+                            return [str(x).strip().lower() for x in arr if str(x).strip()]
+                    except Exception:
+                        pass
+                if "|||" in s:
+                    return [p.strip().lower() for p in s.split("|||") if p.strip()]
+                if "," in s:
+                    return [p.strip().lower() for p in s.split(",") if p.strip()]
+                return [s.lower()]
+
+            def _as_list_lower(raw):
+                if raw is None or raw == "":
+                    return []
+                if isinstance(raw, list):
+                    out_list = []
+                    for x in raw:
+                        if x is None:
+                            continue
+                        if isinstance(x, dict):
+                            label = (
+                                x.get("name")
+                                or x.get("label")
+                                or x.get("title")
+                                or x.get("filename")
+                                or x.get("url")
+                                or x.get("id")
+                                or ""
+                            )
+                            label = str(label).strip().lower()
+                            if label:
+                                out_list.append(label)
+                        else:
+                            sx = str(x).strip().lower()
+                            if sx:
+                                out_list.append(sx)
+                    return out_list
+                if isinstance(raw, dict):
+                    label = raw.get("name") or raw.get("label") or raw.get("title") or raw.get("filename") or ""
+                    label = str(label).strip().lower()
+                    return [label] if label else []
+                s = str(raw).strip().lower()
+                return [s] if s else []
+
+            def _is_empty(raw):
+                if raw is None or raw == "":
+                    return True
+                if isinstance(raw, list):
+                    return len(raw) == 0
+                if isinstance(raw, bool):
                     return False
-                target = today
-                if op == "is tomorrow":
-                    target = today + timedelta(days=1)
-                elif op == "is yesterday":
-                    target = today - timedelta(days=1)
-                return d_field == target
+                if isinstance(raw, dict):
+                    if raw.get("state") == "empty":
+                        return True
+                    return len(raw) == 0
+                return str(raw).strip() == ""
 
-            if op == "contains":
-                return cond_val in val
-            if op == "does not contain":
-                return cond_val not in val
-            if op == "is":
-                if ftype == "date" and val_raw is not None and cond.get("value"):
+            def _to_number(raw):
+                if raw is None or raw == "":
+                    return None
+                if isinstance(raw, (int, float)) and not isinstance(raw, bool):
+                    return float(raw)
+                try:
+                    import re as _re
+                    s = str(raw).replace(",", "")
+                    s = _re.sub(r"[^0-9.\-]", "", s)
+                    if not s or s in (".", "-", "-."):
+                        return None
+                    return float(s)
+                except Exception:
+                    return None
+
+            def _checkbox_true(raw):
+                if raw is True or raw == 1 or raw == "1":
+                    return True
+                s = str(raw or "").strip().lower()
+                return s in ("true", "checked", "yes")
+
+            if op_l in ("is empty",):
+                return _is_empty(val_raw)
+            if op_l in ("is not empty",):
+                return not _is_empty(val_raw)
+
+            if op_l == "is checked":
+                return _checkbox_true(val_raw)
+            if op_l == "is unchecked":
+                return not _checkbox_true(val_raw)
+
+            if op_l == "has any":
+                return isinstance(val_raw, list) and len(val_raw) > 0
+            if op_l == "filename contains":
+                if not isinstance(val_raw, list):
+                    return False
+                needle = cond_val
+                for att in val_raw:
+                    if not isinstance(att, dict):
+                        continue
+                    fn = str(att.get("filename") or att.get("name") or "").strip().lower()
+                    if needle and needle in fn:
+                        return True
+                return False
+
+            if ftype == "date" or op_l in (
+                "is today", "is tomorrow", "is yesterday",
+                "is within next 7 days", "is within past 7 days",
+                "is before", "is after", "is on or before", "is on or after",
+            ):
+                d_field = _parse_date(val_raw)
+                if op_l == "is today":
+                    return bool(d_field and d_field == today)
+                if op_l == "is tomorrow":
+                    return bool(d_field and d_field == (today + timedelta(days=1)))
+                if op_l == "is yesterday":
+                    return bool(d_field and d_field == (today - timedelta(days=1)))
+                if op_l == "is within next 7 days":
+                    if not d_field:
+                        return False
+                    return today <= d_field <= (today + timedelta(days=7))
+                if op_l == "is within past 7 days":
+                    if not d_field:
+                        return False
+                    return (today - timedelta(days=7)) <= d_field <= today
+
+                # Airtable-style date mode in value: @today / @tomorrow / YYYY-MM-DD / …
+                def _resolve_date_mode(raw_mode_val):
+                    s = str(raw_mode_val or "").strip()
+                    if not s or s == "@exact":
+                        return None
+                    if len(s) >= 10 and s[0:4].isdigit() and s[4] == "-" and s[7] == "-":
+                        return _parse_date(s[:10])
+                    token = s[1:] if s.startswith("@") else s
+                    token = token.lower().replace("-", "_").replace(" ", "_")
+                    if token == "today":
+                        return today
+                    if token == "tomorrow":
+                        return today + timedelta(days=1)
+                    if token == "yesterday":
+                        return today - timedelta(days=1)
+                    if token == "one_week_ago":
+                        return today - timedelta(days=7)
+                    if token == "one_week_from_now":
+                        return today + timedelta(days=7)
+                    if token == "one_month_ago":
+                        y, m = today.year, today.month - 1
+                        if m < 1:
+                            y, m = y - 1, 12
+                        d = min(today.day, calendar.monthrange(y, m)[1])
+                        return today.replace(year=y, month=m, day=d)
+                    if token == "one_month_from_now":
+                        y, m = today.year, today.month + 1
+                        if m > 12:
+                            y, m = y + 1, 1
+                        d = min(today.day, calendar.monthrange(y, m)[1])
+                        return today.replace(year=y, month=m, day=d)
+                    return _parse_date(s)
+
+                if op_l in ("is", "is before", "is after", "is on or before", "is on or after"):
+                    d_cond = _resolve_date_mode(cond_val_raw)
+                    if not d_field or not d_cond:
+                        return False
+                    if op_l == "is":
+                        return d_field == d_cond
+                    if op_l == "is before":
+                        return d_field < d_cond
+                    if op_l == "is after":
+                        return d_field > d_cond
+                    if op_l == "is on or before":
+                        return d_field <= d_cond
+                    if op_l == "is on or after":
+                        return d_field >= d_cond
+
+            if op_l in ("greater than", "less than", "greater or equal", "less or equal") or ftype == "number":
+                n_val = _to_number(val_raw)
+                n_cond = _to_number(cond_val_raw)
+                if op_l == "is" and ftype == "number":
+                    return n_val is not None and n_cond is not None and n_val == n_cond
+                if op_l == "is not" and ftype == "number":
+                    return not (n_val is not None and n_cond is not None and n_val == n_cond)
+                if op_l == "greater than":
+                    return n_val is not None and n_cond is not None and n_val > n_cond
+                if op_l == "less than":
+                    return n_val is not None and n_cond is not None and n_val < n_cond
+                if op_l == "greater or equal":
+                    return n_val is not None and n_cond is not None and n_val >= n_cond
+                if op_l == "less or equal":
+                    return n_val is not None and n_cond is not None and n_val <= n_cond
+
+            wanted = _decode_multi(cond_val_raw)
+            have = _as_list_lower(val_raw)
+
+            if op_l == "is any of":
+                return bool(wanted) and any(x in wanted for x in have)
+            if op_l == "is none of":
+                return (not wanted) or all(x not in wanted for x in have)
+            if op_l == "has any of":
+                return bool(wanted) and any(x in have for x in wanted)
+            if op_l == "has all of":
+                return bool(wanted) and all(x in have for x in wanted)
+            if op_l == "has none of":
+                return all(x not in have for x in wanted)
+            if op_l == "is exactly":
+                return set(have) == set(wanted)
+
+            if op_l == "contains":
+                return cond_val in val if cond_val else False
+            if op_l == "does not contain":
+                return cond_val not in val if cond_val else True
+            if op_l == "is":
+                if ftype == "date" and val_raw is not None and cond_val_raw:
                     d1 = _parse_date(val_raw)
-                    d2 = _parse_date(cond.get("value"))
+                    d2 = _parse_date(cond_val_raw)
                     if d1 and d2:
                         return d1 == d2
                 if isinstance(val_raw, list):
                     return any(_to_lower_str(x) == cond_val for x in val_raw)
                 return val == cond_val
-            if op == "is not":
+            if op_l == "is not":
                 if isinstance(val_raw, list):
                     return all(_to_lower_str(x) != cond_val for x in val_raw)
                 return val != cond_val
-            if op == "is empty":
-                return val == ""
-            if op == "is not empty":
-                return val != ""
-            if op == "is before":
-                d1 = _parse_date(val_raw)
-                d2 = _parse_date(cond.get("value"))
-                return bool(d1 and d2 and d1 < d2)
-            if op == "is after":
-                d1 = _parse_date(val_raw)
-                d2 = _parse_date(cond.get("value"))
-                return bool(d1 and d2 and d1 > d2)
             return True
 
         def _matches_filters(fields):
@@ -1408,20 +1999,61 @@ class AirtableMirror:
             records = next_records
 
         if ss:
+            CREATE_DATE_ALIASES = (
+                "Create Date  ",
+                "Create Date ",
+                "Create Date",
+                "Created Date",
+            )
+
+            def _resolve_field_key(fields, field_name):
+                if not isinstance(fields, dict):
+                    return field_name
+                wanted = str(field_name or "")
+                if wanted in fields:
+                    return wanted
+                trimmed = wanted.strip()
+                if trimmed in fields:
+                    return trimmed
+                for k in fields.keys():
+                    ks = str(k)
+                    if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
+                        return k
+                if trimmed.lower() in ("create date", "created date"):
+                    for alias in CREATE_DATE_ALIASES:
+                        if alias in fields:
+                            return alias
+                return trimmed or wanted
+
+            def _resolve_ftype(field_name):
+                wanted = str(field_name or "").strip()
+                if wanted in schema_types:
+                    return schema_types[wanted]
+                for k, v in (schema_types or {}).items():
+                    ks = str(k).strip()
+                    if ks == wanted or ks.lower() == wanted.lower():
+                        return v
+                low = wanted.lower()
+                if "date" in low or low.endswith(" time") or "created" in low or "modified" in low:
+                    return "date"
+                return "text"
+
             for s in reversed(ss):
                 field = str(s.get("field") or "").strip()
                 direction = str(s.get("direction") or "asc").lower()
                 if not field:
                     continue
-                ftype = schema_types.get(field) or "text"
+                ftype = _resolve_ftype(field)
 
-                def _key(rec):
-                    vraw = (rec.get("fields") or {}).get(field)
+                def _key(rec, _field=field, _ftype=ftype):
+                    fields = rec.get("fields") or {}
+                    key = _resolve_field_key(fields, _field)
+                    vraw = fields.get(key)
                     if vraw is None or vraw == "":
                         return (1, "")
-                    if ftype == "date":
+                    if _ftype == "date":
                         d = _parse_date(vraw)
-                        return (0, d or datetime(1900, 1, 1).date())
+                        return (0, d.toordinal() if d else 0)
                     s_val = _to_lower_str(vraw)
                     return (0, s_val)
 
@@ -1599,15 +2231,47 @@ class AirtableMirror:
             if not field:
                 continue
             ftype = schema_types.get(field) or "text"
+            if ftype == "text":
+                low = field.lower()
+                if "date" in low or low.endswith(" time") or "created" in low or "modified" in low:
+                    ftype = "date"
 
-            def _key(rec):
-                vraw = (rec.get("fields") or {}).get(field)
+            CREATE_DATE_ALIASES = (
+                "Create Date  ",
+                "Create Date ",
+                "Create Date",
+                "Created Date",
+            )
+
+            def _resolve_field_key(fields, field_name):
+                if not isinstance(fields, dict):
+                    return field_name
+                wanted = str(field_name or "")
+                if wanted in fields:
+                    return wanted
+                trimmed = wanted.strip()
+                if trimmed in fields:
+                    return trimmed
+                for k in fields.keys():
+                    ks = str(k)
+                    if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
+                        return k
+                if trimmed.lower() in ("create date", "created date"):
+                    for alias in CREATE_DATE_ALIASES:
+                        if alias in fields:
+                            return alias
+                return trimmed or wanted
+
+            def _key(rec, _field=field, _ftype=ftype):
+                fields = rec.get("fields") or {}
+                key = _resolve_field_key(fields, _field)
+                vraw = fields.get(key)
                 if vraw is None or vraw == "":
                     return (1, "")
-                if ftype == "date":
+                if _ftype == "date":
                     d = _parse_date(vraw)
-                    return (0, d or datetime(1900, 1, 1).date())
-                if ftype == "number":
+                    return (0, d.toordinal() if d else 0)
+                if _ftype == "number":
                     try:
                         return (0, float(vraw))
                     except Exception:

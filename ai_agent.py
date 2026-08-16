@@ -423,10 +423,20 @@ def _should_suppress_internal_error_alert(record):
             "bad http/0.9 request type",
             "bad request version",
             "bad request syntax",
+            "invalid http version",
+            "code 505",
+            "pri * http/2.0",
             "you're speaking plain http to an ssl-enabled server port",
         )
         if any(pattern in message_text for pattern in noisy_http_patterns):
             return True
+    # Meta recipient/policy failures are expected business outcomes, not backend crashes.
+    if (
+        "this person isn't available right now" in message_text
+        or "(#551)" in message_text
+        or "more than 24 hours have passed" in message_text
+    ):
+        return True
     return False
 
 
@@ -1589,11 +1599,24 @@ class AIAgent:
                 })
     
             offer_send_fts_wid = "offer_send_fts_v1"
-            if not automation_db.get_workflow(offer_send_fts_wid):
+            offer_send_fts_body = {
+                "view": "Offer Get Your Guide",
+                "max_records": 10,
+                "dry_run": True,
+                "template_language": "en",
+                "template_name": "gift_bounce",
+                "redirect_base": "https://redirect.ftstravels.com/",
+                "offer_status_field": "Offer Send Status",
+                "follow_sales_field": "Follow sales",
+                "clear_follow_sales": True,
+                "retry_cooldown_minutes": 180,
+            }
+            offer_send_fts_existing = automation_db.get_workflow(offer_send_fts_wid)
+            if not offer_send_fts_existing:
                 automation_db.upsert_workflow({
                     "id": offer_send_fts_wid,
                     "name": "Offer Send FTS",
-                    "description": "Server-side replacement for Make Offer Send FTS flow. Sends WhatsApp only and logs to dashboard.",
+                    "description": "Sends gift_bounce WhatsApp cross-sell by Product ID mapping (Hurghada/Sharm) via redirect.ftstravels.com and logs to dashboard.",
                     "enabled": False,
                     "trigger_type": "schedule",
                     "trigger_config": {"every_minutes": 15},
@@ -1604,21 +1627,260 @@ class AIAgent:
                             "url": f"http://127.0.0.1:{port}/api/offer_send_fts/run",
                             "headers": {"content-type": "application/json"},
                             "timeout_seconds": 60,
-                            "body": {
-                                "view": "Offer Get Your Guide",
-                                "max_records": 10,
-                                "dry_run": True,
-                                "template_language": "en",
-                                "offer_status_field": "Offer Send Status",
-                                "follow_sales_field": "Follow sales",
-                                "clear_follow_sales": True,
-                                "retry_cooldown_minutes": 180,
-                                "template_gift1": "gift1",
-                                "template_gift2": "gift2"
-                            }
+                            "body": dict(offer_send_fts_body),
                         }
                     ]
                 })
+            else:
+                # Migrate legacy gift1/gift2 workflow body to gift_bounce without
+                # changing enabled/dry_run from the operator's current settings.
+                try:
+                    steps = list(offer_send_fts_existing.get("steps") or [])
+                    changed = False
+                    for step in steps:
+                        if not isinstance(step, dict):
+                            continue
+                        body = step.get("body")
+                        if not isinstance(body, dict):
+                            continue
+                        legacy = (
+                            body.get("template_gift1")
+                            or body.get("template_gift2")
+                            or body.get("gift1_button_0")
+                            or body.get("gift2_button_0")
+                            or (str(body.get("template_name") or "").strip() in ("", "gift1", "gift2"))
+                        )
+                        if not legacy and str(body.get("template_name") or "").strip() == "gift_bounce":
+                            if str(body.get("redirect_base") or "").strip():
+                                continue
+                        # Preserve operator dry_run if already set
+                        preserved_dry_run = body.get("dry_run", offer_send_fts_body["dry_run"])
+                        new_body = dict(offer_send_fts_body)
+                        new_body["dry_run"] = bool(preserved_dry_run)
+                        # Keep any custom view / max_records / cooldown overrides
+                        for keep_key in ("view", "max_records", "retry_cooldown_minutes", "template_language",
+                                         "offer_status_field", "follow_sales_field", "clear_follow_sales"):
+                            if keep_key in body and body.get(keep_key) is not None and str(body.get(keep_key)).strip() != "":
+                                new_body[keep_key] = body.get(keep_key)
+                        step["body"] = new_body
+                        # Drop legacy keys that confuse operators
+                        for legacy_key in (
+                            "template_gift1", "template_gift2",
+                            "gift1_button_0", "gift1_button_1",
+                            "gift2_button_0", "gift2_button_1",
+                            "gift1_product_0", "gift1_product_1",
+                            "gift2_product_0", "gift2_product_1",
+                        ):
+                            step["body"].pop(legacy_key, None)
+                        changed = True
+                    if changed:
+                        offer_send_fts_existing["steps"] = steps
+                        offer_send_fts_existing["description"] = (
+                            "Sends gift_bounce WhatsApp cross-sell by Product ID mapping "
+                            "(Hurghada/Sharm) via redirect.ftstravels.com and logs to dashboard."
+                        )
+                        automation_db.upsert_workflow(offer_send_fts_existing)
+                        logging.info("Migrated offer_send_fts_v1 workflow body to gift_bounce")
+                except Exception as mig_err:
+                    logging.warning(f"offer_send_fts_v1 gift_bounce migration skipped: {mig_err}")
+
+            offer_bonus_fts_wid = "offer_bonus_fts_v1"
+            if not automation_db.get_workflow(offer_bonus_fts_wid):
+                automation_db.upsert_workflow({
+                    "id": offer_bonus_fts_wid,
+                    "name": "Offer Bonus FTS",
+                    "description": (
+                        "When a customer books the cross-sell offer trip (matched by phone to a prior "
+                        "mapped booking), create a complimentary bonus List record without Date Trip."
+                    ),
+                    "enabled": False,
+                    "trigger_type": "schedule",
+                    "trigger_config": {"every_minutes": 15},
+                    "steps": [
+                        {
+                            "type": "http_request",
+                            "method": "POST",
+                            "url": f"http://127.0.0.1:{port}/api/offer_bonus_fts/run",
+                            "headers": {"content-type": "application/json"},
+                            "timeout_seconds": 90,
+                            "body": {
+                                "view": "Offer Get Your Guide2",
+                                "max_records": 25,
+                                "dry_run": True,
+                            },
+                        }
+                    ],
+                })
+
+            cancelled_recovery_send_wid = "cancelled_recovery_send_v1"
+            cancelled_recovery_send_body = {
+                "mode": "send",
+                "view": "Cancelled Recovery Offer",
+                "max_records": 15,
+                "dry_run": True,
+                "template_language": "en",
+                "template_name": "cancel_recovery",
+                "template_name_sharm": "cancel_recovery_sharm",
+                "redirect_base": "https://redirect.ftstravels.com/",
+                "retry_cooldown_minutes": 180,
+                "recovery_status_field": "Recovery Offer Status",
+            }
+            cancelled_recovery_send_existing = automation_db.get_workflow(cancelled_recovery_send_wid)
+            if not cancelled_recovery_send_existing:
+                automation_db.upsert_workflow({
+                    "id": cancelled_recovery_send_wid,
+                    "name": "Cancelled Recovery Offer",
+                    "description": (
+                        "For high-value Cancelled bookings: WhatsApp offer to rebook the same Product ID "
+                        "via redirect.ftstravels.com (Hurghada City Tour / Sharm Signature bonus promise). "
+                        "Sets Recovery Offer Status checkbox after each send attempt."
+                    ),
+                    "enabled": False,
+                    "trigger_type": "schedule",
+                    "trigger_config": {"every_minutes": 15},
+                    "steps": [
+                        {
+                            "type": "http_request",
+                            "method": "POST",
+                            "url": f"http://127.0.0.1:{port}/api/cancelled_recovery_fts/run",
+                            "headers": {"content-type": "application/json"},
+                            "timeout_seconds": 90,
+                            "body": dict(cancelled_recovery_send_body),
+                        }
+                    ],
+                })
+            else:
+                # Ensure recovery_status_field is present on existing workflow bodies
+                try:
+                    steps = list(cancelled_recovery_send_existing.get("steps") or [])
+                    changed = False
+                    for step in steps:
+                        if not isinstance(step, dict):
+                            continue
+                        body = step.get("body")
+                        if not isinstance(body, dict):
+                            continue
+                        if str(body.get("recovery_status_field") or "").strip():
+                            continue
+                        body["recovery_status_field"] = "Recovery Offer Status"
+                        step["body"] = body
+                        changed = True
+                    if changed:
+                        cancelled_recovery_send_existing["steps"] = steps
+                        automation_db.upsert_workflow(cancelled_recovery_send_existing)
+                        logging.info("Migrated cancelled_recovery_send_v1: added recovery_status_field")
+                except Exception as mig_err:
+                    logging.warning(f"cancelled_recovery_send_v1 recovery_status migration skipped: {mig_err}")
+
+            cancelled_recovery_bonus_wid = "cancelled_recovery_bonus_v1"
+            if not automation_db.get_workflow(cancelled_recovery_bonus_wid):
+                automation_db.upsert_workflow({
+                    "id": cancelled_recovery_bonus_wid,
+                    "name": "Cancelled Recovery Bonus",
+                    "description": (
+                        "When customer rebooks the same Product ID after a Cancelled eligible booking "
+                        "(match by phone), create complimentary bonus List record without Date Trip."
+                    ),
+                    "enabled": False,
+                    "trigger_type": "schedule",
+                    "trigger_config": {"every_minutes": 15},
+                    "steps": [
+                        {
+                            "type": "http_request",
+                            "method": "POST",
+                            "url": f"http://127.0.0.1:{port}/api/cancelled_recovery_bonus_fts/run",
+                            "headers": {"content-type": "application/json"},
+                            "timeout_seconds": 90,
+                            "body": {
+                                "mode": "bonus",
+                                "view": "Cancelled Recovery Rebook",
+                                "max_records": 25,
+                                "dry_run": True,
+                            },
+                        }
+                    ],
+                })
+
+            # Seed Make.com Internal Notification blueprints → Automation / Internal Notifications
+            try:
+                scenarios_path = os.path.join(get_data_path("workflows"), "internal_notification_scenarios.json")
+                scenarios = []
+                if os.path.exists(scenarios_path):
+                    with open(scenarios_path, "r", encoding="utf-8") as sf:
+                        scenarios = list((json.load(sf) or {}).get("scenarios") or [])
+                for sc in scenarios:
+                    if not isinstance(sc, dict):
+                        continue
+                    wid = str(sc.get("id") or "").strip()
+                    if not wid or automation_db.get_workflow(wid):
+                        continue
+                    name = str(sc.get("name") or wid).strip()
+                    source_file = str(sc.get("source_file") or "").strip()
+                    trigger_kind = str(sc.get("trigger") or "").strip().lower()
+                    mode = str(sc.get("mode") or "last_minute").strip()
+                    desc = (
+                        f"Imported from Make Internal Notification blueprint: {source_file}. "
+                        f"Enable only after disabling the Make scenario to avoid duplicate WhatsApp alerts."
+                    )
+                    if trigger_kind == "webhook":
+                        slug = str(sc.get("webhook_slug") or "").strip()
+                        automation_db.upsert_workflow({
+                            "id": wid,
+                            "name": name,
+                            "description": desc + (f" Webhook: /api/internal_notifications/webhook/{slug}" if slug else ""),
+                            "enabled": False,
+                            "category": "internal",
+                            "trigger_type": "manual",
+                            "trigger_config": {"webhook_slug": slug},
+                            "steps": [
+                                {
+                                    "type": "http_request",
+                                    "method": "POST",
+                                    "url": f"http://127.0.0.1:{port}/api/automation/run_script",
+                                    "headers": {"content-type": "application/json"},
+                                    "timeout_seconds": 60,
+                                    "body": {
+                                        "script_name": "internal_webhook_notify.py",
+                                        "webhook_slug": slug,
+                                        "dry_run": True,
+                                    },
+                                }
+                            ],
+                        })
+                    else:
+                        automation_db.upsert_workflow({
+                            "id": wid,
+                            "name": name,
+                            "description": desc,
+                            "enabled": False,
+                            "category": "internal",
+                            "trigger_type": "schedule",
+                            "trigger_config": {"every_minutes": 1},
+                            "steps": [
+                                {
+                                    "type": "http_request",
+                                    "method": "POST",
+                                    "url": f"http://127.0.0.1:{port}/api/automation/run_script",
+                                    "headers": {"content-type": "application/json"},
+                                    "timeout_seconds": 90,
+                                    "body": {
+                                        "script_name": "internal_view_notify.py",
+                                        "scenario_id": wid,
+                                        "view": sc.get("view_label"),
+                                        "view_id": sc.get("view_id"),
+                                        "table_id": sc.get("table_id"),
+                                        "base_id": sc.get("base_id"),
+                                        "mode": mode,
+                                        "phones": sc.get("phones") or [],
+                                        "include_customer_phone": bool(sc.get("include_customer_phone", True)),
+                                        "max_records": 25,
+                                        "dry_run": True,
+                                    },
+                                }
+                            ],
+                        })
+            except Exception as seed_int_err:
+                logging.warning(f"Internal notification workflow seed skipped: {seed_int_err}")
         except Exception:
             pass
         
@@ -2540,6 +2802,61 @@ class AIAgent:
         table_name = str(table_name or "").strip()
         return bool(table_name == LEADS_TABLE_NAME or self._is_religious_leads_table(table_name))
 
+    def _classify_airtable_record_table(self, rec):
+        """
+        Infer the real owning table from record fields.
+
+        Airtable's Records API can return a record by ID even when the URL table
+        name is wrong. Relying on which .get() succeeded therefore mis-labels
+        Leads CRM rows as List and then List-only fields (Inquiry Type, Remarks)
+        fail with UNKNOWN_FIELD_NAME.
+        """
+        if not isinstance(rec, dict):
+            return None
+        fields = rec.get("fields") or {}
+        if not isinstance(fields, dict):
+            fields = {}
+
+        if LeadFieldIds.LEAD_STATUS in fields:
+            return LEADS_TABLE_NAME
+
+        religious_markers = (
+            ReligiousLeadFieldIds.CUSTOMER_NAME,  # "الاسم"
+            ReligiousLeadFieldIds.GENDER_OR_TYPE,
+            ReligiousLeadFieldIds.INQUIRY_DETAILS,
+            ReligiousLeadFieldIds.INQUIRY_DATE,
+        )
+        if any(marker in fields for marker in religious_markers):
+            return self._religious_leads_table_name()
+
+        existing = str(rec.get("table_name") or "").strip()
+        if self._is_lead_like_table(existing):
+            return existing
+
+        main_list = self.config.get("airtable", {}).get("tables", {}).get("main_list") or "List"
+        list_markers = (
+            "Booking Nr.",
+            "Date Trip",
+            "Inquiry Type",
+            "Remarks",
+            "des",
+            "trip Name",
+        )
+        if any(marker in fields for marker in list_markers):
+            return main_list
+        if self.get_field_value(fields, FieldIds.BOOKING_NR):
+            return main_list
+
+        return existing or main_list
+
+    def _is_lead_like_record(self, record):
+        if not isinstance(record, dict):
+            return False
+        if self._is_lead_like_table(record.get("table_name")):
+            return True
+        classified = self._classify_airtable_record_table(record)
+        return self._is_lead_like_table(classified)
+
     def _contact_field_keys_for_table(self, table_name):
         table_name = str(table_name or "").strip()
         if table_name == LEADS_TABLE_NAME:
@@ -2574,6 +2891,16 @@ class AIAgent:
                 "Note": ReligiousLeadFieldIds.NOTES,
             }
             return religious_map.get(json_key)
+        # Leads CRM has a small schema — never map List-only fields like Traveler name.
+        if table_name == LEADS_TABLE_NAME:
+            leads_map = {
+                "Customer Name": LeadFieldIds.CUSTOMER_NAME,
+                "Customer personal email": LeadFieldIds.CUSTOMER_EMAIL,
+                "Customer Email": LeadFieldIds.CUSTOMER_EMAIL,
+                "Customer Phone": LeadFieldIds.CUSTOMER_PHONE,
+                "Note": LeadFieldIds.FOLLOW_UP_NOTES,
+            }
+            return leads_map.get(json_key)
         return JSON_KEY_TO_ID.get(json_key)
 
     def _get_contact_field_value(self, fields, table_name, field_kind):
@@ -2587,6 +2914,128 @@ class AIAgent:
             if val is not None:
                 return val
         return self.get_field_value(fields, field_key)
+
+    def _coerce_single_line_text_value(self, value):
+        """Coerce AI/API values into a single-line text Airtable value, or None to skip."""
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            return None
+        if isinstance(value, (int, float)):
+            try:
+                if isinstance(value, float) and value.is_integer():
+                    return str(int(value))
+                return str(value)
+            except Exception:
+                return None
+        if isinstance(value, list):
+            parts = []
+            for item in value:
+                coerced = self._coerce_single_line_text_value(item)
+                if coerced:
+                    parts.append(coerced)
+            return ", ".join(parts) if parts else None
+        if isinstance(value, dict):
+            return None
+        text = str(value).strip()
+        if not text:
+            return None
+        # Common extraction leftovers that are not real ages.
+        if text.lower() in {"years", "year", "age", "ages", "n/a", "na", "none", "null", "unknown", "-", "--"}:
+            return None
+        return text
+
+    def _sanitize_booking_field_updates(self, updates):
+        """
+        Normalize field values that Airtable rejects when the type is wrong.
+        CHD Age is singleLineText — numbers/lists from AI extraction must become strings.
+        pickup time is singleSelect (HH:MM) — empty/date-like values must be cleaned.
+        """
+        if not isinstance(updates, dict) or not updates:
+            return updates
+
+        chd_age_keys = {FieldIds.CHD_AGE, "CHD Age", "chd age", "Child Age", "child age"}
+        pickup_keys = {
+            FieldIds.PICKUP_TIME,
+            "pickup time",
+            "Pickup Time",
+            "Pickup time",
+        }
+
+        def _normalize_pickup_time_value(value):
+            # Clear select
+            if value is None:
+                return None
+            if isinstance(value, (list, tuple)):
+                if not value:
+                    return None
+                value = value[0]
+            if isinstance(value, dict):
+                value = value.get("name") or value.get("value") or value.get("id")
+            s = str(value or "").strip()
+            if not s:
+                return None
+            # Reject ISO dates / datetimes accidentally sent as pickup time
+            if re.match(r"^\d{4}-\d{2}-\d{2}", s):
+                logging.warning("Rejecting date-like pickup time value=%r", value)
+                return "__SKIP__"
+            # Normalize H:MM / HH:MM / HH:MM:SS → HH:MM
+            m = re.match(r"^(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])?$", s)
+            if m:
+                hh = int(m.group(1))
+                mm = int(m.group(2))
+                ampm = m.group(3)
+                if ampm:
+                    ap = ampm.upper()
+                    if ap == "AM":
+                        if hh == 12:
+                            hh = 0
+                    else:
+                        if hh != 12:
+                            hh += 12
+                if (0 <= hh <= 23 and 0 <= mm <= 59):
+                    # Snap to nearest 5 minutes (Airtable choices are :00/:05/…)
+                    snapped = int(round(mm / 5.0) * 5)
+                    if snapped == 60:
+                        hh = (hh + 1) % 24
+                        snapped = 0
+                    return f"{hh:02d}:{snapped:02d}"
+            # Keep known free-text legacy options that already exist in Airtable
+            return s
+
+        sanitized = {}
+        for key, value in updates.items():
+            key_str = str(key or "").strip()
+            is_chd_age = (
+                key == FieldIds.CHD_AGE
+                or key_str in chd_age_keys
+                or key_str.lower() in {"chd age", "child age"}
+                or ID_TO_READABLE_NAME.get(key_str) == "CHD Age"
+            )
+            is_pickup = (
+                key in pickup_keys
+                or key_str in pickup_keys
+                or key_str.lower() == "pickup time"
+                or ID_TO_READABLE_NAME.get(key_str) in {"pickup time", "Pickup Time"}
+            )
+            if is_chd_age:
+                coerced = self._coerce_single_line_text_value(value)
+                if coerced is None:
+                    logging.warning(
+                        "Skipping invalid CHD Age update value=%r (must be single-line text)",
+                        value,
+                    )
+                    continue
+                sanitized[key] = coerced
+            elif is_pickup:
+                coerced = _normalize_pickup_time_value(value)
+                if coerced == "__SKIP__":
+                    continue
+                # Airtable singleSelect clear must be null, not ""
+                sanitized[key] = coerced
+            else:
+                sanitized[key] = value
+        return sanitized
 
     def _normalize_airtable_update_keys(self, updates):
         """Convert internal field IDs to Airtable field names before update()."""
@@ -2615,19 +3064,132 @@ class AIAgent:
         normalized_updates = self._normalize_airtable_update_keys(updates)
         return table.update(record_id, normalized_updates, typecast=typecast)
 
+    def _filter_updates_for_leads_crm(self, updates):
+        """Keep only fields that exist on Leads CRM; drop List-only keys."""
+        if not isinstance(updates, dict) or not updates:
+            return updates
+        allowed = {
+            LeadFieldIds.LEAD_STATUS,
+            LeadFieldIds.CUSTOMER_NAME,
+            LeadFieldIds.CUSTOMER_EMAIL,
+            LeadFieldIds.CUSTOMER_PHONE,
+            LeadFieldIds.AI_CHAT_LOG,
+            LeadFieldIds.LAST_INTERACTION,
+            LeadFieldIds.SOURCE,
+            LeadFieldIds.INTERESTED_TRIP,
+            LeadFieldIds.FOLLOW_UP_NOTES,
+            LeadFieldIds.TRAVEL_DATE,
+            LeadFieldIds.PAX_COUNT,
+            LeadFieldIds.BUDGET,
+            "AI Lead Quality Score",
+            "Owner",
+            "AI Arabic Translation",
+        }
+        # Remap common List field IDs/names that AI extraction may still emit.
+        remap = {
+            FieldIds.CUSTOMER_NAME: LeadFieldIds.CUSTOMER_NAME,
+            FieldIds.CUSTOMER_PHONE: LeadFieldIds.CUSTOMER_PHONE,
+            FieldIds.CUSTOMER_EMAIL: LeadFieldIds.CUSTOMER_EMAIL,
+            FieldIds.CUSTOMER_PERSONAL_EMAIL: LeadFieldIds.CUSTOMER_EMAIL,
+            FieldIds.NOTE: LeadFieldIds.FOLLOW_UP_NOTES,
+            "Note": LeadFieldIds.FOLLOW_UP_NOTES,
+            FieldIds.AI_CHAT_LOG: LeadFieldIds.AI_CHAT_LOG,
+            "AI Chat Log": LeadFieldIds.AI_CHAT_LOG,
+        }
+        filtered = {}
+        dropped = []
+        for key, value in updates.items():
+            mapped = remap.get(key, key)
+            if mapped in allowed:
+                # Prefer first value; do not overwrite with empty.
+                if mapped not in filtered or (value and not filtered.get(mapped)):
+                    filtered[mapped] = value
+            else:
+                dropped.append(str(key))
+        if dropped:
+            logging.info(
+                "Dropped Leads-CRM-unsupported Airtable fields from update: %s",
+                sorted(set(dropped)),
+            )
+        return filtered
+
     def update_booking_record(self, record_id, updates, table_name=None):
         """Update a record in the correct table (Main or Leads)."""
         try:
             target_table = self.table # Default
+            effective_table_name = table_name
+            if updates and isinstance(updates, dict):
+                updates = self._sanitize_booking_field_updates(updates)
+                if not updates:
+                    logging.info(
+                        "No valid fields left to update for record %s after sanitization; skipping.",
+                        record_id,
+                    )
+                    return None
+
+            # Correct mislabeled Leads that were resolved via the List endpoint.
+            if updates and isinstance(updates, dict):
+                list_only_keys = {
+                    FieldIds.INQUIRY_TYPE,
+                    "Inquiry Type",
+                    FieldIds.REMARKS,
+                    "Remarks",
+                    FieldIds.AI_CHAT_STATUS,
+                    "AI Chat Status",
+                    FieldIds.TRAVELER_NAME,
+                    "Traveler name",
+                    FieldIds.HOTEL_NAME,
+                    "Hotel Name",
+                    FieldIds.ROOM_NUMBER,
+                    "Room number",
+                    "Room Number",
+                    FieldIds.CHD_AGE,
+                    "CHD Age",
+                    FieldIds.BOOKING_NR,
+                    "Booking Nr.",
+                }
+                touches_list_only = any(k in list_only_keys for k in updates.keys())
+                if touches_list_only and not self._is_lead_like_table(effective_table_name):
+                    try:
+                        existing = self._get_record_from_any_table(record_id)
+                    except Exception:
+                        existing = None
+                    if self._is_lead_like_record(existing):
+                        classified = (
+                            (existing or {}).get("table_name")
+                            or self._classify_airtable_record_table(existing)
+                        )
+                        if classified == LEADS_TABLE_NAME:
+                            # Re-route to Leads CRM; unsupported List fields are filtered below.
+                            effective_table_name = LEADS_TABLE_NAME
+                        else:
+                            logging.info(
+                                "Skipping List-only field update on lead-like record %s (table=%s, fields=%s)",
+                                record_id,
+                                classified,
+                                sorted(str(k) for k in updates.keys()),
+                            )
+                            return None
+                    elif isinstance(existing, dict) and existing.get("table_name"):
+                        effective_table_name = existing.get("table_name")
             
-            if table_name == LEADS_TABLE_NAME and self.leads_table:
+            if effective_table_name == LEADS_TABLE_NAME and self.leads_table:
                 target_table = self.leads_table
-            elif self._is_religious_leads_table(table_name) and self.religious_leads_table:
+            elif self._is_religious_leads_table(effective_table_name) and self.religious_leads_table:
                 target_table = self.religious_leads_table
+
+            if effective_table_name == LEADS_TABLE_NAME or target_table is self.leads_table:
+                updates = self._filter_updates_for_leads_crm(updates)
+                if not updates:
+                    logging.info(
+                        "No Leads-CRM-compatible fields left to update for record %s; skipping.",
+                        record_id,
+                    )
+                    return None
             
             # Use typecast=True to allow creating new Select options if needed
             self._update_airtable_table_record(target_table, record_id, updates, typecast=True)
-            logging.info(f"Updated record {record_id} in {table_name or 'Main List'}")
+            logging.info(f"Updated record {record_id} in {effective_table_name or 'Main List'}")
         except Exception as e:
             logging.error(f"Failed to update record {record_id} in {table_name}: {e}")
             raise e
@@ -2908,62 +3470,43 @@ class AIAgent:
         """Fetch a record by ID from any of the known tables (Main, Religious, Leads)."""
         if not record_id:
             return None
-        
-        # Try main table
-        try:
-            rec = self.table.get(record_id)
-            if isinstance(rec, dict) and not rec.get('table_name'):
-                rec['table_name'] = self.config['airtable']['tables']['main_list']
-            return rec
-        except Exception:
-            pass
-            
-        # Try religious table
-        try:
-            if hasattr(self, 'religious_leads_table') and self.religious_leads_table:
-                rec = self.religious_leads_table.get(record_id)
-                if isinstance(rec, dict) and not rec.get('table_name'):
-                    rec['table_name'] = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
-                return rec
-        except Exception:
-            pass
-            
-        # Try leads table
-        try:
-            if hasattr(self, 'leads_table') and self.leads_table:
-                rec = self.leads_table.get(record_id)
-                if isinstance(rec, dict) and not rec.get('table_name'):
-                    rec['table_name'] = LEADS_TABLE_NAME
-                return rec
-        except Exception:
-            pass
-            
-        return None
+
+        # Airtable may return the same record ID from the wrong table URL.
+        # Fetch from the first endpoint that responds, then classify by fields.
+        fetchers = [lambda: self.table.get(record_id)]
+        if getattr(self, "leads_table", None):
+            fetchers.append(lambda: self.leads_table.get(record_id))
+        if getattr(self, "religious_leads_table", None):
+            fetchers.append(lambda: self.religious_leads_table.get(record_id))
+
+        rec = None
+        for fetch in fetchers:
+            try:
+                candidate = fetch()
+                if isinstance(candidate, dict) and candidate.get("id"):
+                    rec = candidate
+                    break
+            except Exception:
+                continue
+
+        if not isinstance(rec, dict):
+            return None
+
+        classified = self._classify_airtable_record_table(rec)
+        if classified:
+            rec["table_name"] = classified
+        elif not rec.get("table_name"):
+            rec["table_name"] = self.config["airtable"]["tables"]["main_list"]
+        return rec
 
     def _get_record_table_name(self, record_id):
         """Resolve which Airtable table owns this record ID."""
         if not record_id:
             return None
 
-        try:
-            self.table.get(record_id)
-            return self.config['airtable']['tables']['main_list']
-        except Exception:
-            pass
-
-        try:
-            if hasattr(self, 'religious_leads_table') and self.religious_leads_table:
-                self.religious_leads_table.get(record_id)
-                return self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
-        except Exception:
-            pass
-
-        try:
-            if hasattr(self, 'leads_table') and self.leads_table:
-                self.leads_table.get(record_id)
-                return LEADS_TABLE_NAME
-        except Exception:
-            pass
+        rec = self._get_record_from_any_table(record_id)
+        if isinstance(rec, dict) and rec.get("table_name"):
+            return rec.get("table_name")
 
         return None
 
@@ -4080,7 +4623,6 @@ class AIAgent:
                         new_s = "مسؤول المبيعات"
                     return t + "\n\nمع خالص التحية،\n" + new_s
             except Exception as e:
-                import logging
                 logging.error(f"Error checking first message for signature: {e}")
                 
         if self._signature_present(t, s):
@@ -4739,11 +5281,390 @@ class AIAgent:
             extracted_data = self._extract_first_json_object(extracted_data_json.strip())
             if not isinstance(extracted_data, dict):
                 return {}
+            # Normalize CHD Age early so downstream Airtable updates never get int/list.
+            if "CHD Age" in extracted_data:
+                coerced = self._coerce_single_line_text_value(extracted_data.get("CHD Age"))
+                if coerced is None:
+                    extracted_data.pop("CHD Age", None)
+                else:
+                    extracted_data["CHD Age"] = coerced
             return extracted_data
             
         except Exception as e:
             logging.error(f"Error during AI data extraction: {e}")
             return {}
+
+    def parse_operations_booking_draft(self, text):
+        """
+        Parse free-text / OTA booking details into List field draft values.
+        Agency is intentionally left empty for manual selection before create.
+        """
+        raw = str(text or "").strip()
+        if not raw:
+            return {}
+
+        allowed_keys = [
+            "Booking Nr.",
+            "Booking Status",
+            "Date Trip",
+            "trip Name",
+            "Real Product Name",
+            "Option",
+            "Customer Name",
+            "Traveler name",
+            "Customer Phone",
+            "Customer personal email",
+            "Customer Email",
+            "Hotel Name",
+            "Room number",
+            "pickup time",
+            "des",
+            "Guide",
+            "ADT",
+            "CHD",
+            "CHD Age",
+            "Inf",
+            "Youth",
+            "Currency",
+            "Amount",
+            "Net Rate",
+            "Note",
+            "Add - Ons",
+            "Add-Ons ((MultiSelect))",
+        ]
+        keys_block = ", ".join(f'"{k}"' for k in allowed_keys)
+        prompt = f"""
+You are a booking data extractor for FTS Travels operations (Airtable List table).
+Analyze the booking details below (may be mixed Arabic/English, email paste, OTA confirmation, WhatsApp text).
+
+CRITICAL RULES:
+1. Output ONLY valid JSON object. No markdown. No commentary.
+2. Use ONLY these exact keys when present: {keys_block}
+3. NEVER include "Agency" — the human operator must choose Agency manually.
+4. Do NOT invent missing values. Omit keys you cannot confidently extract.
+5. Date Trip must be YYYY-MM-DD when a clear trip/travel date exists.
+6. pickup time prefer HH:MM 24h when clear.
+7. ADT/CHD/Inf/Youth/Amount/Net Rate should be numbers when possible.
+8. Booking Status: only set if clearly stated (e.g. Confirmed, Cancelled); otherwise omit.
+9. Customer personal email: prefer personal email; skip OTA proxy emails (@reply.getyourguide.com, @expmessaging.tripadvisor.com, noreply@, do-not-reply@).
+10. If Booking Nr. / confirmation / order / reference code is present, put it in "Booking Nr.".
+11. trip Name = product/tour title; Real Product Name if a distinct internal product name appears.
+12. des = destination city when clear (e.g. Hurghada, Sharm El-Sheikh, Cairo, Luxor).
+13. Guide = tour language when clear (e.g. English, German, French, Italian, Spanish).
+
+Booking details:
+{raw}
+"""
+        try:
+            ai_out = self.query_ai(prompt, system_role="analyzer")
+            cleaned = str(ai_out or "").strip()
+            if not cleaned or "[ESCALATE]" in cleaned or "All AI providers failed" in cleaned:
+                return {}
+            if "```json" in cleaned:
+                cleaned = cleaned.split("```json")[1].split("```")[0]
+            elif "```" in cleaned:
+                cleaned = cleaned.split("```")[1].split("```")[0]
+            parsed = self._extract_first_json_object(cleaned.strip())
+            if not isinstance(parsed, dict):
+                return {}
+
+            allowed_set = {k.lower(): k for k in allowed_keys}
+            out = {}
+            for k, v in parsed.items():
+                key_raw = str(k or "").strip()
+                if not key_raw:
+                    continue
+                if key_raw.lower() in ("agency", "الوكالة", "وكاله", "وكالة"):
+                    continue
+                canon = allowed_set.get(key_raw.lower())
+                if not canon:
+                    continue
+                if v is None:
+                    continue
+                if isinstance(v, str):
+                    val = v.strip()
+                    if not val:
+                        continue
+                    out[canon] = val
+                elif isinstance(v, (int, float, bool)):
+                    out[canon] = v
+                elif isinstance(v, list):
+                    parts = [str(x).strip() for x in v if str(x).strip()]
+                    if parts:
+                        out[canon] = ", ".join(parts)
+                else:
+                    val = str(v).strip()
+                    if val:
+                        out[canon] = val
+
+            # Never allow Agency through this path.
+            out.pop("Agency", None)
+            if "CHD Age" in out:
+                coerced = self._coerce_single_line_text_value(out.get("CHD Age"))
+                if coerced is None:
+                    out.pop("CHD Age", None)
+                else:
+                    out["CHD Age"] = coerced
+            return out
+        except Exception as e:
+            logging.error(f"Error parsing operations booking draft: {e}", exc_info=True)
+            return {}
+
+    def parse_operations_filter_prompt(self, text, fields_meta=None, scope="main"):
+        """
+        Convert a natural-language filter description into FilterCondition JSON
+        compatible with the operations dashboard filter builder.
+        """
+        raw = str(text or "").strip()
+        if not raw:
+            return []
+
+        fields_meta = fields_meta if isinstance(fields_meta, list) else []
+        field_lines = []
+        allowed_fields = {}
+        allowed_ops_by_type = {
+            "text": ["contains", "does not contain", "is", "is not", "is empty", "is not empty"],
+            "select": ["is", "is not", "is any of", "is none of", "is empty", "is not empty"],
+            "multiSelect": ["has any of", "has all of", "is exactly", "has none of", "is empty", "is not empty"],
+            "checkbox": ["is checked", "is unchecked"],
+            "number": [
+                "is", "is not", "greater than", "less than", "greater or equal", "less or equal",
+                "is empty", "is not empty",
+            ],
+            "date": [
+                "is", "is before", "is after", "is on or before", "is on or after",
+                "is within next 7 days", "is within past 7 days",
+                "is empty", "is not empty",
+            ],
+            "attachment": ["has any", "is empty", "filename contains"],
+            "linked": ["is", "is not", "contains", "is empty", "is not empty"],
+        }
+        multi_value_ops = {
+            "is any of", "is none of", "has any of", "has all of", "is exactly", "has none of",
+        }
+        no_value_ops = {
+            "is empty", "is not empty",
+            "is within next 7 days", "is within past 7 days", "is checked", "is unchecked", "has any",
+        }
+        date_mode_ops = {"is", "is before", "is after", "is on or before", "is on or after"}
+        # Legacy relative operators → Airtable-style mode values
+        legacy_date_op_to_mode = {
+            "is today": ("is", "@today"),
+            "is tomorrow": ("is", "@tomorrow"),
+            "is yesterday": ("is", "@yesterday"),
+        }
+
+        for item in fields_meta[:120]:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or "").strip()
+            if not name:
+                continue
+            ftype = str(item.get("type") or "text").strip() or "text"
+            if ftype not in allowed_ops_by_type:
+                ftype = "text"
+            allowed_fields[name.lower()] = {"name": name, "type": ftype}
+            opts = item.get("options") if isinstance(item.get("options"), list) else []
+            opt_preview = ", ".join(str(o).strip() for o in opts[:25] if str(o).strip())
+            line = f'- "{name}" (type={ftype})'
+            if opt_preview:
+                line += f" options=[{opt_preview}]"
+            field_lines.append(line)
+
+        fields_block = "\n".join(field_lines) if field_lines else "(no field catalog provided — use common booking fields carefully)"
+        all_ops = sorted({op for ops in allowed_ops_by_type.values() for op in ops})
+        ops_block = ", ".join(f'"{o}"' for o in all_ops)
+
+        prompt = f"""
+You are a filter builder for FTS Travels operations Airtable views (scope={scope}).
+Convert the user's request into filter conditions JSON.
+
+OUTPUT RULES:
+1. Output ONLY valid JSON. Prefer a JSON array of condition objects. No markdown. No commentary.
+2. Each condition object shape:
+   {{
+     "connector": "and" | "or",
+     "field": "<exact field name>",
+     "operator": "<exact operator>",
+     "value": "<string or JSON-array-string for multi-value operators>",
+     "isGroup": false
+   }}
+   OR a group:
+   {{
+     "connector": "and" | "or",
+     "isGroup": true,
+     "groupLogic": "and" | "or",
+     "conditions": [ ...nested single conditions... ]
+   }}
+3. First top-level item connector should be "and".
+4. Use ONLY these field names when catalog is provided:
+{fields_block}
+5. Use ONLY these operators: {ops_block}
+6. Match operator to field type.
+7. For date fields with operators is / is before / is after / is on or before / is on or after:
+   - value must be a date mode token: "@today", "@tomorrow", "@yesterday", "@one_week_ago", "@one_week_from_now", "@one_month_ago", "@one_month_from_now"
+   - OR an exact ISO date "YYYY-MM-DD" (Airtable "exact date")
+   - Prefer "@today" / "@tomorrow" when the user says today/tomorrow (do NOT use operators named "is today").
+8. For multi-value operators ({", ".join(sorted(multi_value_ops))}), set value to a JSON array string like ["Confirmed","Pending"].
+9. For operators that need no value ({", ".join(sorted(no_value_ops))}), omit value or use "".
+10. Do not invent fields. If unclear, return [].
+11. Arabic or English user text is OK.
+
+User request:
+{raw}
+"""
+        try:
+            ai_out = self.query_ai(prompt, system_role="analyzer")
+            cleaned = str(ai_out or "").strip()
+            if not cleaned or "[ESCALATE]" in cleaned or "All AI providers failed" in cleaned:
+                return []
+            if "```json" in cleaned:
+                cleaned = cleaned.split("```json")[1].split("```")[0]
+            elif "```" in cleaned:
+                cleaned = cleaned.split("```")[1].split("```")[0]
+            cleaned = cleaned.strip()
+
+            parsed = None
+            try:
+                parsed = json.loads(cleaned)
+            except Exception:
+                parsed = self._extract_first_json_object(cleaned)
+                if isinstance(parsed, dict) and isinstance(parsed.get("filters"), list):
+                    parsed = parsed.get("filters")
+                elif isinstance(parsed, dict) and isinstance(parsed.get("conditions"), list) and not parsed.get("isGroup"):
+                    # Maybe wrapped as { conditions: [...] } top-level list intent
+                    if any(k in parsed for k in ("filters", "data")):
+                        parsed = parsed.get("filters") or parsed.get("data")
+                    else:
+                        # Single condition object
+                        parsed = [parsed]
+
+            if isinstance(parsed, dict):
+                if parsed.get("isGroup") or parsed.get("field"):
+                    parsed = [parsed]
+                else:
+                    parsed = parsed.get("filters") or parsed.get("conditions") or []
+
+            if not isinstance(parsed, list):
+                return []
+
+            def _normalize_value(op, value, ftype):
+                if op in no_value_ops:
+                    return ""
+                if op in multi_value_ops:
+                    if isinstance(value, list):
+                        parts = [str(x).strip() for x in value if str(x).strip()]
+                        return json.dumps(parts, ensure_ascii=False)
+                    s = str(value or "").strip()
+                    if not s:
+                        return "[]"
+                    if s.startswith("["):
+                        try:
+                            arr = json.loads(s)
+                            if isinstance(arr, list):
+                                parts = [str(x).strip() for x in arr if str(x).strip()]
+                                return json.dumps(parts, ensure_ascii=False)
+                        except Exception:
+                            pass
+                    parts = [p.strip() for p in s.split(",") if p.strip()]
+                    return json.dumps(parts, ensure_ascii=False)
+                if isinstance(value, list):
+                    return ", ".join(str(x).strip() for x in value if str(x).strip())
+                if isinstance(value, (int, float, bool)):
+                    return str(value)
+                return str(value or "").strip()
+
+            def _sanitize_node(node, idx=0):
+                if not isinstance(node, dict):
+                    return None
+                connector = str(node.get("connector") or "and").strip().lower()
+                if connector not in ("and", "or"):
+                    connector = "and"
+                if node.get("isGroup"):
+                    kids_raw = node.get("conditions") if isinstance(node.get("conditions"), list) else []
+                    kids = []
+                    for i, kid in enumerate(kids_raw):
+                        s = _sanitize_node(kid, i)
+                        if s and not s.get("isGroup"):
+                            kids.append(s)
+                    if not kids:
+                        return None
+                    glogic = str(node.get("groupLogic") or "or").strip().lower()
+                    if glogic not in ("and", "or"):
+                        glogic = "or"
+                    return {
+                        "id": f"ai_{idx}_{int(time.time()*1000)}",
+                        "connector": connector,
+                        "isGroup": True,
+                        "groupLogic": glogic,
+                        "conditions": kids,
+                    }
+
+                field_raw = str(node.get("field") or "").strip()
+                if not field_raw:
+                    return None
+                meta = allowed_fields.get(field_raw.lower()) if allowed_fields else None
+                if allowed_fields and not meta:
+                    # fuzzy: ignore case / trim only
+                    return None
+                field_name = meta["name"] if meta else field_raw
+                ftype = meta["type"] if meta else str(node.get("type") or "text")
+                if ftype not in allowed_ops_by_type:
+                    ftype = "text"
+                op = str(node.get("operator") or "").strip()
+                # Convert legacy "is today" style ops into Airtable mode values
+                legacy = legacy_date_op_to_mode.get(op.lower())
+                raw_value = node.get("value")
+                if legacy and ftype == "date":
+                    op, raw_value = legacy[0], legacy[1]
+                allowed_ops = allowed_ops_by_type.get(ftype) or allowed_ops_by_type["text"]
+                if op not in allowed_ops:
+                    # try case-insensitive match
+                    op_map = {o.lower(): o for o in allowed_ops}
+                    op = op_map.get(op.lower())
+                    if not op:
+                        op = allowed_ops[0]
+                value = _normalize_value(op, raw_value, ftype)
+                if ftype == "date" and op in date_mode_ops:
+                    vs = str(value or "").strip()
+                    if not vs:
+                        value = "@exact"
+                    elif vs.lower() in (
+                        "today", "tomorrow", "yesterday",
+                        "one_week_ago", "one_week_from_now",
+                        "one_month_ago", "one_month_from_now",
+                    ):
+                        value = f"@{vs.lower()}"
+                    elif vs.lower().startswith("@") or (len(vs) >= 10 and vs[4] == "-" and vs[7] == "-"):
+                        value = vs
+                    else:
+                        # leave as-is (may be ISO-ish or relative word)
+                        low = vs.lower().replace(" ", "_")
+                        if low in (
+                            "today", "tomorrow", "yesterday",
+                            "one_week_ago", "one_week_from_now",
+                            "one_month_ago", "one_month_from_now",
+                        ):
+                            value = f"@{low}"
+                return {
+                    "id": f"ai_{idx}_{int(time.time()*1000)}_{field_name}",
+                    "connector": connector,
+                    "field": field_name,
+                    "operator": op,
+                    "value": value,
+                }
+
+            out = []
+            for i, node in enumerate(parsed[:40]):
+                s = _sanitize_node(node, i)
+                if s:
+                    out.append(s)
+            if out:
+                out[0]["connector"] = "and"
+            return out
+        except Exception as e:
+            logging.error(f"Error parsing operations filter prompt: {e}", exc_info=True)
+            return []
 
     def update_booking_from_extracted_data(self, record, extracted_data):
         """Update a booking record with data extracted by AI."""
@@ -4771,6 +5692,18 @@ class AIAgent:
                     if field_id == phone_field_key:
                         v = self.clean_phone_for_whatsapp(v)
                     
+                    # CHD Age is singleLineText — coerce numbers/lists from AI to string.
+                    if field_id == FieldIds.CHD_AGE or str(json_key).strip().lower() in {"chd age", "child age"}:
+                        coerced = self._coerce_single_line_text_value(v)
+                        if coerced is None:
+                            logging.warning(
+                                "Skipping extracted CHD Age value=%r for record %s",
+                                v,
+                                record.get("id"),
+                            )
+                            continue
+                        v = coerced
+
                     # Check if value is different? (Optional optimization)
                     # ONLY Update if the current value is EMPTY or different
                     # BUT for Hotel/Room/Passport, usually we want to update/overwrite if user provides it.
@@ -4812,7 +5745,12 @@ class AIAgent:
                             continue
                             
                     # Special Case: Notes should be appended, not overwritten
-                    note_field_key = ReligiousLeadFieldIds.NOTES if is_religious_lead else FieldIds.NOTE
+                    if is_religious_lead:
+                        note_field_key = ReligiousLeadFieldIds.NOTES
+                    elif table_name == LEADS_TABLE_NAME:
+                        note_field_key = LeadFieldIds.FOLLOW_UP_NOTES
+                    else:
+                        note_field_key = FieldIds.NOTE
                     if field_id == note_field_key:
                         if current_val and str(v).lower().strip() not in str(current_val).lower().strip():
                             # Append new note to existing note
@@ -6902,7 +7840,6 @@ class AIAgent:
         if rec:
             import json
             import copy
-            import re
             
             fields_copy = copy.deepcopy(rec.get('fields', {}))
             agency_name = str(self.get_field_value(fields_copy, FieldIds.AGENCY) or "").strip().lower()
@@ -6916,7 +7853,7 @@ class AIAgent:
                 # For FTS Travels, ensure the voucher link uses the correct subdomain
                 for k, v in fields_copy.items():
                     if isinstance(v, str) and "dynamic_voucher.html" in v:
-                        fields_copy[k] = re.sub(r'(?:https?://[^/]+/)?dynamic_voucher\.html', 'https://voucher.ftstravels.net/dynamic_voucher.html', v)
+                        fields_copy[k] = re.sub(r'(?:https?://[^/]+/)?dynamic_voucher\.html', 'https://voucher.ftstravels.com/dynamic_voucher.html', v)
                         
             # Use JSON dump for booking details
             booking_details_str = json.dumps(fields_copy, indent=2, default=str)
@@ -6935,7 +7872,7 @@ class AIAgent:
                     else:
                         for k, v in ob_fields.items():
                             if isinstance(v, str) and "dynamic_voucher.html" in v:
-                                ob_fields[k] = re.sub(r'(?:https?://[^/]+/)?dynamic_voucher\.html', 'https://voucher.ftstravels.net/dynamic_voucher.html', v)
+                                ob_fields[k] = re.sub(r'(?:https?://[^/]+/)?dynamic_voucher\.html', 'https://voucher.ftstravels.com/dynamic_voucher.html', v)
                     
                     booking_details_str += f"\n-- Booking #{i+2} --\n"
                     booking_details_str += json.dumps(ob_fields, indent=2, default=str)
@@ -8802,9 +9739,12 @@ Conversation:
 
         # 4. Update with AI extracted data
         if booking_record:
+            classified = self._classify_airtable_record_table(booking_record)
+            if classified:
+                booking_record['table_name'] = classified
             table_name = booking_record.get('table_name')
             is_leads_table = (table_name == LEADS_TABLE_NAME)
-            is_lead_like_table = self._is_lead_like_table(table_name)
+            is_lead_like_table = self._is_lead_like_record(booking_record)
 
             if source == "WhatsApp" and not is_lead_like_table:
                 mb_raw = str(message_body or "")
@@ -8961,6 +9901,11 @@ Conversation:
                                         rec = None
                                 if rec:
                                     booking_record = rec
+                                    classified = self._classify_airtable_record_table(booking_record)
+                                    if classified:
+                                        booking_record['table_name'] = classified
+                                    is_leads_table = (booking_record.get('table_name') == LEADS_TABLE_NAME)
+                                    is_lead_like_table = self._is_lead_like_record(booking_record)
                             except Exception as e:
                                 logging.warning(f"Could not re-fetch existing Airtable record {record_id_to_save}: {e}")
                     else:
@@ -9382,7 +10327,6 @@ Conversation:
         """
 
         # --- NEW: Extract Image ID and Download for Vision ---
-        import re
         image_url_for_vision = None
         # Look for [Customer sent an image. Image ID: xyz]
         img_match = re.search(r'\[Customer sent an image\. Image ID: (\d+)\]', message_body)
@@ -9779,7 +10723,6 @@ Conversation:
             import requests, tempfile, os
             import soundfile as sf
             import speech_recognition as sr
-            import logging
             
             access_token = self._get_whatsapp_access_token()
             if not access_token:
@@ -9836,6 +10779,196 @@ Conversation:
             logging.error(f"Error in download_and_transcribe_audio for {media_id}: {e}")
             return None, f"[Audio Error: {str(e)}]"
 
+    _WEEKDAY_NAMES = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+    _WEEKDAY_KEYS = ("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday")
+
+    def _sanitize_hhmm(self, value):
+        raw = str(value or "").strip()
+        match = re.match(r"^(\d{1,2}):(\d{2})", raw)
+        if not match:
+            return ""
+        hour, minute = int(match.group(1)), int(match.group(2))
+        if hour > 23 or minute > 59:
+            return ""
+        return f"{hour:02d}:{minute:02d}"
+
+    def _default_weekly_schedule(self):
+        return {
+            key: {"enabled": False, "shifts": [{"start": "10:00", "end": "18:00"}]}
+            for key in self._WEEKDAY_KEYS
+        }
+
+    def _complete_shift_windows(self, shifts):
+        cleaned = []
+        for item in shifts or []:
+            if not isinstance(item, dict):
+                continue
+            start = self._sanitize_hhmm(item.get("start"))
+            end = self._sanitize_hhmm(item.get("end"))
+            if start and end and start != end:
+                cleaned.append({"start": start, "end": end})
+        return cleaned or [{"start": "10:00", "end": "18:00"}]
+
+    def _user_has_weekly_schedule(self, user_obj):
+        raw = (user_obj or {}).get("weeklySchedule") if isinstance(user_obj, dict) else None
+        if not isinstance(raw, dict):
+            return False
+        return any(
+            raw.get(key) is not None or raw.get(name) is not None
+            for key, name in zip(self._WEEKDAY_KEYS, self._WEEKDAY_NAMES)
+        )
+
+    def _coerce_weekly_schedule(self, user_obj):
+        user_obj = user_obj if isinstance(user_obj, dict) else {}
+        raw = user_obj.get("weeklySchedule")
+        schedule = self._default_weekly_schedule()
+        if self._user_has_weekly_schedule(user_obj) and isinstance(raw, dict):
+            for key, name in zip(self._WEEKDAY_KEYS, self._WEEKDAY_NAMES):
+                day_raw = raw.get(key)
+                if day_raw is None:
+                    day_raw = raw.get(name)
+                if not isinstance(day_raw, dict):
+                    day_raw = {}
+                schedule[key] = {
+                    "enabled": bool(day_raw.get("enabled")),
+                    "shifts": self._complete_shift_windows(day_raw.get("shifts")),
+                }
+            return schedule
+
+        working_days = user_obj.get("workingDays")
+        enabled = set()
+        if isinstance(working_days, list):
+            for item in working_days:
+                name = str(item or "").strip()
+                if name in self._WEEKDAY_NAMES:
+                    enabled.add(name)
+        primary = {
+            "start": self._sanitize_hhmm(user_obj.get("shiftStart")) or "10:00",
+            "end": self._sanitize_hhmm(user_obj.get("shiftEnd")) or "18:00",
+        }
+        additional = [item for item in (user_obj.get("additionalShifts") or []) if isinstance(item, dict)]
+        shifts = self._complete_shift_windows([primary, *additional])
+        for key, name in zip(self._WEEKDAY_KEYS, self._WEEKDAY_NAMES):
+            schedule[key] = {
+                "enabled": name in enabled,
+                "shifts": [dict(shift) for shift in shifts],
+            }
+        return schedule
+
+    def _derive_legacy_shift_fields(self, schedule):
+        working_days = []
+        first_shifts = []
+        for key, name in zip(self._WEEKDAY_KEYS, self._WEEKDAY_NAMES):
+            day = (schedule or {}).get(key) or {}
+            if day.get("enabled"):
+                working_days.append(name)
+                if not first_shifts:
+                    first_shifts = list(day.get("shifts") or [])
+        primary = first_shifts[0] if first_shifts else {}
+        additional = first_shifts[1:] if len(first_shifts) > 1 else []
+        return {
+            "workingDays": working_days,
+            "shiftStart": str(primary.get("start") or ""),
+            "shiftEnd": str(primary.get("end") or ""),
+            "additionalShifts": additional,
+        }
+
+    def _sanitize_user_shift_fields(self, user_obj):
+        user_obj = user_obj if isinstance(user_obj, dict) else {}
+        has_legacy = bool(
+            user_obj.get("workingDays")
+            or user_obj.get("shiftStart")
+            or user_obj.get("shiftEnd")
+            or user_obj.get("additionalShifts")
+        )
+        if self._user_has_weekly_schedule(user_obj) or has_legacy:
+            schedule = self._coerce_weekly_schedule(user_obj)
+            legacy = self._derive_legacy_shift_fields(schedule)
+            return {
+                "weeklySchedule": schedule,
+                "workingDays": legacy["workingDays"],
+                "shiftStart": legacy["shiftStart"],
+                "shiftEnd": legacy["shiftEnd"],
+                "additionalShifts": legacy["additionalShifts"],
+            }
+        return {
+            "weeklySchedule": user_obj.get("weeklySchedule"),
+            "workingDays": user_obj.get("workingDays"),
+            "shiftStart": user_obj.get("shiftStart"),
+            "shiftEnd": user_obj.get("shiftEnd"),
+            "additionalShifts": user_obj.get("additionalShifts"),
+        }
+
+    def _is_time_in_shift(self, curr, start, end):
+        if not start or not end:
+            return False
+        if start == end:
+            return False
+        if start < end:
+            return start <= curr <= end
+        return curr >= start or curr <= end
+
+    def _is_dashboard_user_on_shift(self, user_obj, now=None):
+        import pytz
+        from datetime import datetime
+        egypt_tz = pytz.timezone("Africa/Cairo")
+        if now is None:
+            now = datetime.now(egypt_tz)
+        current_day = now.strftime("%A")
+        current_time = now.strftime("%H:%M")
+        user_obj = user_obj if isinstance(user_obj, dict) else {}
+
+        if self._user_has_weekly_schedule(user_obj):
+            schedule = self._coerce_weekly_schedule(user_obj)
+            today = schedule.get(current_day.lower()) or {}
+            if today.get("enabled"):
+                for shift in today.get("shifts") or []:
+                    if self._is_time_in_shift(current_time, shift.get("start"), shift.get("end")):
+                        return True
+            try:
+                idx = self._WEEKDAY_NAMES.index(current_day)
+            except ValueError:
+                return False
+            prev = schedule.get(self._WEEKDAY_KEYS[(idx - 1) % 7]) or {}
+            if prev.get("enabled"):
+                for shift in prev.get("shifts") or []:
+                    start = shift.get("start") or ""
+                    end = shift.get("end") or ""
+                    if start and end and start > end and current_time <= end:
+                        return True
+            return False
+
+        working_days = user_obj.get("workingDays") or list(self._WEEKDAY_NAMES)
+        shift_start = user_obj.get("shiftStart") or "00:00"
+        shift_end = user_obj.get("shiftEnd") or "23:59"
+        additional_shifts = user_obj.get("additionalShifts") or []
+
+        def _legacy_overnight_from_prev():
+            try:
+                idx = self._WEEKDAY_NAMES.index(current_day)
+            except ValueError:
+                return False
+            prev_name = self._WEEKDAY_NAMES[(idx - 1) % 7]
+            if prev_name not in working_days:
+                return False
+            if shift_start and shift_end and shift_start > shift_end and current_time <= shift_end:
+                return True
+            for shift in additional_shifts:
+                if not isinstance(shift, dict):
+                    continue
+                start = shift.get("start") or ""
+                end = shift.get("end") or ""
+                if start and end and start > end and current_time <= end:
+                    return True
+            return False
+
+        if current_day in working_days:
+            if self._is_time_in_shift(current_time, shift_start, shift_end):
+                return True
+            for shift in additional_shifts:
+                if isinstance(shift, dict) and self._is_time_in_shift(current_time, shift.get("start"), shift.get("end")):
+                    return True
+        return _legacy_overnight_from_prev()
 
     def route_religious_message_to_agent(self, chat_id):
         import chat_db
@@ -9907,39 +11040,13 @@ Conversation:
             import pytz
             egypt_tz = pytz.timezone('Africa/Cairo')
             now = datetime.now(egypt_tz)
-            current_day = now.strftime('%A')
-            current_time = now.strftime('%H:%M')
-            
-            def is_time_in_shift(curr, start, end):
-                if not start or not end:
-                    return False
-                if start <= end:
-                    return start <= curr <= end
-                else:
-                    return curr >= start or curr <= end
 
             eligible_agents = []
             for u in users:
                 if not _is_religious_agent(u):
                     continue
-                # Check shifts
-                working_days = u.get('workingDays') or ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-                shift_start = u.get('shiftStart') or "00:00"
-                shift_end = u.get('shiftEnd') or "23:59"
-                additional_shifts = u.get('additionalShifts') or []
-                
-                if current_day in working_days:
-                    is_in_shift = False
-                    if is_time_in_shift(current_time, shift_start, shift_end):
-                        is_in_shift = True
-                    else:
-                        for shift in additional_shifts:
-                            if shift.get('start') and shift.get('end'):
-                                if is_time_in_shift(current_time, shift['start'], shift['end']):
-                                    is_in_shift = True
-                                    break
-                    if is_in_shift:
-                        eligible_agents.append(u)
+                if self._is_dashboard_user_on_shift(u, now):
+                    eligible_agents.append(u)
             
             if not eligible_agents:
                 logging.info("No eligible agents found for Religious routing at this time.")
@@ -10028,16 +11135,6 @@ Conversation:
             import pytz
             egypt_tz = pytz.timezone('Africa/Cairo')
             now = datetime.now(egypt_tz)
-            current_day = now.strftime('%A')
-            current_time = now.strftime('%H:%M')
-            
-            def is_time_in_shift(curr, start, end):
-                if not start or not end:
-                    return False
-                if start <= end:
-                    return start <= curr <= end
-                else:
-                    return curr >= start or curr <= end
 
             eligible_agents = []
             for u in users:
@@ -10045,23 +11142,8 @@ Conversation:
                 role = str(u.get('role') or 'Agent').strip().lower()
                 if 'Religious' not in locs or role not in ('agent', ''):
                     continue
-                working_days = u.get('workingDays') or ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-                shift_start = u.get('shiftStart') or "00:00"
-                shift_end = u.get('shiftEnd') or "23:59"
-                additional_shifts = u.get('additionalShifts') or []
-                
-                if current_day in working_days:
-                    is_in_shift = False
-                    if is_time_in_shift(current_time, shift_start, shift_end):
-                        is_in_shift = True
-                    else:
-                        for shift in additional_shifts:
-                            if shift.get('start') and shift.get('end'):
-                                if is_time_in_shift(current_time, shift['start'], shift['end']):
-                                    is_in_shift = True
-                                    break
-                    if is_in_shift:
-                        eligible_agents.append(u)
+                if self._is_dashboard_user_on_shift(u, now):
+                    eligible_agents.append(u)
                             
             if len(eligible_agents) <= 1:
                 # No other agent to reassign to
@@ -10692,7 +11774,7 @@ Conversation:
                 inquiry_intent = result['inquiry_intent']
                 
                 is_leads_table = (booking_record.get('table_name') == LEADS_TABLE_NAME)
-                if not self._is_lead_like_table(booking_record.get('table_name')):
+                if not self._is_lead_like_record(booking_record):
                     try:
                         self.update_booking_record(
                             booking_record['id'], 
@@ -10850,6 +11932,188 @@ Conversation:
         
         # Priority 4: default fallback
         return str(phone_number_ids.get('default') or "")
+
+    def _whatsapp_location_for_phone_id(self, phone_number_id, location_hint=None):
+        phone_id_locations = (self.config.get('whatsapp', {}) or {}).get('phone_id_locations', {}) or {}
+        pid = str(phone_number_id or "").strip()
+        if pid and phone_id_locations.get(pid):
+            return str(phone_id_locations.get(pid) or "").strip()
+        hint = str(location_hint or "").strip()
+        return hint or "Unknown"
+
+    def _whatsapp_waba_id_for_phone(self, phone_number_id, location_hint=None):
+        waba_ids = (self.config.get('whatsapp', {}) or {}).get('waba_ids', {}) or {}
+        loc = self._whatsapp_location_for_phone_id(phone_number_id, location_hint)
+        return (
+            str(waba_ids.get(loc) or waba_ids.get('default') or "").strip(),
+            loc,
+        )
+
+    def _iter_whatsapp_template_phone_candidates(self, location="Unknown", receiving_phone_id=None):
+        """Ordered phone_number_id candidates for template fallback (primary first)."""
+        phone_number_ids = (self.config.get('whatsapp', {}) or {}).get('phone_number_ids', {}) or {}
+        primary = str(self._resolve_phone_number_id(location, receiving_phone_id) or "").strip()
+        preferred_keys = ["default", "Hurghada/Cairo", "Sharm", "Sales", "Religious"]
+        ordered = []
+        seen = set()
+
+        def _add(pid):
+            pid_s = str(pid or "").strip()
+            if not pid_s or pid_s in seen:
+                return
+            seen.add(pid_s)
+            ordered.append(pid_s)
+
+        _add(primary)
+        for key in preferred_keys:
+            _add(phone_number_ids.get(key))
+        for key, val in (phone_number_ids.items() if isinstance(phone_number_ids, dict) else []):
+            if str(key) == "default":
+                continue
+            _add(val)
+        return ordered
+
+    def _phone_id_has_whatsapp_template(self, phone_number_id, template_name, template_language="en", access_token=None, location_hint=None):
+        """
+        Returns (status, template_dict, location)
+        status: True=found, False=confirmed missing, None=lookup unknown/failed
+        """
+        waba_id, loc = self._whatsapp_waba_id_for_phone(phone_number_id, location_hint)
+        if not waba_id:
+            return False, None, loc
+        import requests
+        name = str(template_name or "").strip()
+        lang = str(template_language or "en").strip() or "en"
+        token = str(access_token or self._get_whatsapp_access_token() or "").strip()
+        if not name or not token:
+            return None, None, loc
+        url = (
+            f"https://graph.facebook.com/{META_GRAPH_VERSION}/{waba_id}/message_templates"
+            f"?name={name}&access_token={token}"
+        )
+        try:
+            res = requests.get(url, timeout=8)
+        except Exception as e:
+            logging.warning(f"Template lookup failed for WABA {waba_id} / {name}: {e}")
+            return None, None, loc
+        if getattr(res, "status_code", None) != 200:
+            return None, None, loc
+        try:
+            data = (res.json() or {}).get("data") or []
+        except Exception:
+            return None, None, loc
+        if not isinstance(data, list) or not data:
+            return False, None, loc
+        same_name = [t for t in data if str((t or {}).get("name") or "").strip() == name]
+        pool = same_name or []
+        if not pool:
+            return False, None, loc
+        target = next((t for t in pool if t.get("status") == "APPROVED" and str(t.get("language") or "") == lang), None)
+        if not target:
+            target = next((t for t in pool if str(t.get("language") or "") == lang), None)
+        if not target:
+            target = next((t for t in pool if t.get("status") == "APPROVED"), None)
+        if not target:
+            target = pool[0]
+        return True, (target if isinstance(target, dict) else None), loc
+
+    def _lookup_whatsapp_template_on_waba(self, waba_id, template_name, template_language="en", access_token=None):
+        """
+        Return a matching template dict from a WABA if present, else None.
+        Prefers APPROVED + requested language, then APPROVED any language, then any language.
+        """
+        # Kept for callers; reuse phone-level helper when possible.
+        import requests
+        waba = str(waba_id or "").strip()
+        name = str(template_name or "").strip()
+        lang = str(template_language or "en").strip() or "en"
+        token = str(access_token or self._get_whatsapp_access_token() or "").strip()
+        if not waba or not name or not token:
+            return None
+        url = (
+            f"https://graph.facebook.com/{META_GRAPH_VERSION}/{waba}/message_templates"
+            f"?name={name}&access_token={token}"
+        )
+        try:
+            res = requests.get(url, timeout=8)
+        except Exception as e:
+            logging.warning(f"Template lookup failed for WABA {waba} / {name}: {e}")
+            return None
+        if getattr(res, "status_code", None) != 200:
+            return None
+        try:
+            data = (res.json() or {}).get("data") or []
+        except Exception:
+            data = []
+        if not isinstance(data, list) or not data:
+            return None
+        same_name = [t for t in data if str((t or {}).get("name") or "").strip() == name]
+        pool = same_name or list(data)
+        target = next((t for t in pool if t.get("status") == "APPROVED" and str(t.get("language") or "") == lang), None)
+        if not target:
+            target = next((t for t in pool if str(t.get("language") or "") == lang), None)
+        if not target:
+            target = next((t for t in pool if t.get("status") == "APPROVED"), None)
+        if not target:
+            target = pool[0] if pool else None
+        return target if isinstance(target, dict) else None
+
+    def _is_whatsapp_template_missing_error(self, status_code=None, err=None, body=None):
+        code = None
+        message = ""
+        details = ""
+        if isinstance(err, dict):
+            code = err.get("code")
+            message = str(err.get("message") or "")
+            details = str(((err.get("error_data") or {}) if isinstance(err.get("error_data"), dict) else {}).get("details") or "")
+        raw = str(body or "")
+        if code is None:
+            try:
+                import re as _re
+                m = _re.search(r'"code"\s*:\s*(\d+)', raw)
+                if m:
+                    code = int(m.group(1))
+            except Exception:
+                pass
+        if not message:
+            message = raw
+        code_s = str(code or "")
+        if code_s in {"132000", "132001", "132012"}:
+            return True
+        blob = f"{message} {details}".lower()
+        return (
+            "template name does not exist" in blob
+            or "does not exist in the translation" in blob
+            or "template does not exist" in blob
+        )
+
+    def _select_whatsapp_phone_for_template(
+        self,
+        template_name,
+        template_language="en",
+        location="Unknown",
+        receiving_phone_id=None,
+        access_token=None,
+        exclude_phone_ids=None,
+    ):
+        """
+        Pick the best phone_number_id that already has the template approved.
+        Returns (phone_number_id, location, language, template_dict) or None.
+        """
+        exclude = {str(x).strip() for x in (exclude_phone_ids or []) if str(x or "").strip()}
+        candidates = self._iter_whatsapp_template_phone_candidates(location, receiving_phone_id)
+        token = access_token or self._get_whatsapp_access_token()
+        for pid in candidates:
+            if pid in exclude:
+                continue
+            ok, tmpl, loc = self._phone_id_has_whatsapp_template(
+                pid, template_name, template_language, token, location_hint=location
+            )
+            if ok is not True or not tmpl:
+                continue
+            lang = str(tmpl.get("language") or template_language or "en").strip() or str(template_language or "en")
+            return pid, loc, lang, tmpl
+        return None
 
     def _get_whatsapp_access_token(self):
         """Get WhatsApp access token with fallback support."""
@@ -11098,12 +12362,250 @@ Conversation:
             logging.error(f"Failed running unread WhatsApp auto-replies loop: {e}", exc_info=True)
             return 0
 
-    def send_whatsapp_message(self, recipient_phone, text=None, location="Unknown", media_url=None, media_type=None, template_name=None, template_language="en", booking_data=None, template_variables=None, receiving_phone_id=None, template_header_media_url=None, template_header_media_type=None):
+    def _cloudinary_url_candidates(self, url):
+        """Prefer original Cloudinary assets when transforms like e_trim return 500."""
+        raw = str(url or "").strip()
+        if not raw:
+            return []
+        out = [raw]
+        m = re.match(
+            r"^(https://res\.cloudinary\.com/[^/]+/(?:image|video|raw)/upload/)(.+)$",
+            raw,
+            flags=re.IGNORECASE,
+        )
+        if not m:
+            return out
+        prefix, rest = m.group(1), m.group(2)
+        no_trim = re.sub(r"(^|/)e_trim(?:,[^/]+)?(?=/)", r"\1", rest).lstrip("/")
+        if no_trim and no_trim != rest:
+            cand = prefix + no_trim
+            if cand not in out:
+                out.append(cand)
+        vm = re.search(r"(v\d+/.*)$", rest)
+        if vm:
+            original = prefix + vm.group(1)
+            if original not in out:
+                out.append(original)
+        return out
+
+    def _filename_from_media_url(self, url, media_type="file"):
+        name = str(url or "").split("?")[0].rstrip("/").split("/")[-1].strip()
+        if name:
+            return name
+        ext = {"image": "jpg", "video": "mp4", "audio": "m4a", "document": "pdf"}.get(str(media_type or "").lower(), "bin")
+        return f"media.{ext}"
+
+    def _mime_for_outbound_media(self, media_type, mime_type=None, filename=None, url=None):
+        mime = str(mime_type or "").split(";")[0].strip().lower()
+        if mime and mime not in ("application/octet-stream", "binary/octet-stream"):
+            return mime
+        name = str(filename or self._filename_from_media_url(url, media_type) or "").lower()
+        if name.endswith(".png"):
+            return "image/png"
+        if name.endswith(".webp"):
+            return "image/webp"
+        if name.endswith(".gif"):
+            return "image/gif"
+        if name.endswith(".jpg") or name.endswith(".jpeg"):
+            return "image/jpeg"
+        if name.endswith(".mp4"):
+            return "video/mp4"
+        if name.endswith(".mov"):
+            return "video/quicktime"
+        if name.endswith(".pdf"):
+            return "application/pdf"
+        if name.endswith(".mp3"):
+            return "audio/mpeg"
+        if name.endswith(".ogg") or name.endswith(".opus"):
+            return "audio/ogg"
+        if name.endswith(".m4a"):
+            return "audio/mp4"
+        mt = str(media_type or "").strip().lower()
+        return {
+            "image": "image/jpeg",
+            "video": "video/mp4",
+            "audio": "audio/mpeg",
+            "document": "application/pdf",
+            "file": "application/octet-stream",
+        }.get(mt, "application/octet-stream")
+
+    def _download_media_bytes(self, url, timeout=30):
+        last_err = None
+        for candidate in self._cloudinary_url_candidates(url):
+            try:
+                res = requests.get(candidate, timeout=timeout)
+                if res.status_code == 200 and res.content:
+                    ctype = str(res.headers.get("Content-Type") or "").split(";")[0].strip()
+                    return res.content, ctype, candidate
+                last_err = f"HTTP {res.status_code} for {candidate}"
+            except Exception as e:
+                last_err = e
+        logging.warning(f"Failed to download media weblink: {last_err}")
+        return None, None, None
+
+    def _upload_whatsapp_media_bytes(self, phone_number_id, access_token, file_bytes, mime_type, filename):
+        if not file_bytes or not phone_number_id or not access_token:
+            return None
+        try:
+            url = f"https://graph.facebook.com/{META_GRAPH_VERSION}/{phone_number_id}/media"
+            files = {
+                "file": (str(filename or "file.bin"), file_bytes, str(mime_type or "application/octet-stream")),
+            }
+            data = {
+                "messaging_product": "whatsapp",
+                "type": str(mime_type or "application/octet-stream"),
+            }
+            res = requests.post(
+                url,
+                headers={"Authorization": f"Bearer {access_token}"},
+                data=data,
+                files=files,
+                timeout=60,
+            )
+            if res.status_code in (200, 201):
+                mid = str((res.json() or {}).get("id") or "").strip()
+                if mid:
+                    return mid
+            logging.warning(f"WhatsApp media upload failed: {res.status_code} {(res.text or '')[:400]}")
+        except Exception as e:
+            logging.warning(f"WhatsApp media upload exception: {e}")
+        return None
+
+    def _whatsapp_media_object(self, media_url, media_type, phone_number_id, access_token, file_bytes=None, mime_type=None, filename=None):
+        """Send by Meta media_id so WhatsApp does not fetch Cloudinary itself."""
+        mt = str(media_type or "image").strip().lower() or "image"
+        source_url = str(media_url or "").strip()
+        name = str(filename or "").strip() or self._filename_from_media_url(source_url, mt)
+        mime = self._mime_for_outbound_media(mt, mime_type, name, source_url)
+        data = file_bytes
+        cache = getattr(self, "_wa_media_id_cache", None)
+        if cache is None:
+            cache = {}
+            self._wa_media_id_cache = cache
+        cache_key = (str(phone_number_id), source_url, int(len(data or b"")), name)
+        cached = cache.get(cache_key)
+        if cached:
+            return {"id": cached}
+        if not data and source_url:
+            data, got_mime, used = self._download_media_bytes(source_url)
+            if got_mime:
+                mime = self._mime_for_outbound_media(mt, got_mime, name, used or source_url)
+            if used:
+                source_url = used
+        if data:
+            mid = self._upload_whatsapp_media_bytes(phone_number_id, access_token, data, mime, name)
+            if mid:
+                cache[cache_key] = mid
+                logging.info(f"Using WhatsApp media_id={mid} instead of Cloudinary weblink")
+                return {"id": mid}
+        link = source_url or str(media_url or "").strip()
+        cands = self._cloudinary_url_candidates(link)
+        if len(cands) > 1:
+            link = cands[-1]
+        return {"link": link} if link else {}
+
+    def _upload_facebook_attachment_bytes(self, access_token, attachment_type, file_bytes, mime_type, filename):
+        if not file_bytes or not access_token:
+            return None
+        try:
+            api = f"https://graph.facebook.com/{META_GRAPH_VERSION}/me/message_attachments"
+            message = json.dumps({
+                "attachment": {
+                    "type": str(attachment_type or "file"),
+                    "payload": {"is_reusable": True},
+                }
+            })
+            files = {
+                "filedata": (str(filename or "file.bin"), file_bytes, str(mime_type or "application/octet-stream")),
+            }
+            res = requests.post(
+                api,
+                params={"access_token": access_token},
+                data={"message": message},
+                files=files,
+                timeout=90,
+            )
+            if res.status_code in (200, 201):
+                aid = str((res.json() or {}).get("attachment_id") or "").strip()
+                if aid:
+                    return aid
+            logging.warning(f"Facebook attachment upload failed: {res.status_code} {(res.text or '')[:400]}")
+        except Exception as e:
+            logging.warning(f"Facebook attachment upload exception: {e}")
+        return None
+
+    def send_whatsapp_message(self, recipient_phone, text=None, location="Unknown", media_url=None, media_type=None, template_name=None, template_language="en", booking_data=None, template_variables=None, receiving_phone_id=None, template_header_media_url=None, template_header_media_type=None, media_bytes=None, media_mime=None, media_filename=None, _template_phone_fallback=True, _tried_phone_number_ids=None, _fallback_from_phone_number_id=None):
         """Send a WhatsApp message via Meta Cloud API"""
         try:
             import json
             # Resolve the correct phone_number_id using the centralized helper
             phone_number_id = self._resolve_phone_number_id(location, receiving_phone_id)
+            tried_phone_ids = set()
+            for x in (_tried_phone_number_ids or []):
+                s = str(x or "").strip()
+                if s:
+                    tried_phone_ids.add(s)
+            if phone_number_id:
+                tried_phone_ids.add(str(phone_number_id))
+
+            # If the requested template is missing on the primary number/WABA, switch
+            # early to another configured number that already has the same template.
+            if template_name and _template_phone_fallback and phone_number_id:
+                try:
+                    access_token_pre = self._get_whatsapp_access_token()
+                    has_tmpl, _, _ = self._phone_id_has_whatsapp_template(
+                        phone_number_id,
+                        template_name,
+                        template_language,
+                        access_token_pre,
+                        location_hint=location,
+                    )
+                    if has_tmpl is False:
+                        selected = self._select_whatsapp_phone_for_template(
+                            template_name=template_name,
+                            template_language=template_language,
+                            location=location,
+                            receiving_phone_id=receiving_phone_id,
+                            access_token=access_token_pre,
+                            exclude_phone_ids=[phone_number_id],
+                        )
+                        if selected:
+                            alt_pid, alt_loc, alt_lang, _alt_tmpl = selected
+                            logging.warning(
+                                "Template '%s' (%s) not found on phone_number_id %s (%s). "
+                                "Falling back to phone_number_id %s (%s) before send.",
+                                template_name,
+                                template_language,
+                                phone_number_id,
+                                location,
+                                alt_pid,
+                                alt_loc,
+                            )
+                            return self.send_whatsapp_message(
+                                recipient_phone,
+                                text=text,
+                                location=alt_loc or location,
+                                media_url=media_url,
+                                media_type=media_type,
+                                template_name=template_name,
+                                template_language=alt_lang or template_language,
+                                booking_data=booking_data,
+                                template_variables=template_variables,
+                                receiving_phone_id=alt_pid,
+                                template_header_media_url=template_header_media_url,
+                                template_header_media_type=template_header_media_type,
+                                media_bytes=media_bytes,
+                                media_mime=media_mime,
+                                media_filename=media_filename,
+                                _template_phone_fallback=True,
+                                _tried_phone_number_ids=list(tried_phone_ids | {str(alt_pid)}),
+                                _fallback_from_phone_number_id=str(
+                                    _fallback_from_phone_number_id or phone_number_id
+                                ),
+                            )
+                except Exception as pre_fb_err:
+                    logging.warning(f"Template phone pre-fallback check failed: {pre_fb_err}")
+
             if not phone_number_id:
                 logging.error(f"Could not resolve phone_number_id for location='{location}', receiving_phone_id='{receiving_phone_id}'")
                 return False, {
@@ -11338,11 +12840,19 @@ Conversation:
                                         "phone_number_id": phone_number_id,
                                     }
 
+                                header_media = self._whatsapp_media_object(
+                                    header_link,
+                                    header_type,
+                                    phone_number_id,
+                                    access_token,
+                                )
+                                if not header_media:
+                                    header_media = {"link": header_link}
                                 components.append({
                                     "type": "header",
                                     "parameters": [{
                                         "type": header_type,
-                                        header_type: {"link": header_link}
+                                        header_type: header_media
                                     }]
                                 })
                                 continue
@@ -11478,11 +12988,20 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 
                 if components:
                     payload["template"]["components"] = components
-            elif media_url:
+            elif media_url or media_bytes:
                 payload["type"] = media_type or "image"
-                payload[payload["type"]] = {
-                    "link": media_url
-                }
+                media_obj = self._whatsapp_media_object(
+                    media_url,
+                    payload["type"],
+                    phone_number_id,
+                    access_token,
+                    file_bytes=media_bytes,
+                    mime_type=media_mime,
+                    filename=media_filename,
+                )
+                if not media_obj:
+                    media_obj = {"link": str(media_url or "").strip()}
+                payload[payload["type"]] = media_obj
                 if payload["type"] not in ["audio"] and text:
                     payload[payload["type"]]["caption"] = text
             else:
@@ -11495,6 +13014,35 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             import requests
             logging.info(f"Sending WhatsApp template payload: {json.dumps(payload, indent=2)}")
 
+            # Guard: Offer Send FTS uses gift_bounce. If Meta body was accidentally
+            # published with Cancel Recovery copy, refuse to send so customers don't
+            # get the wrong campaign (evidence: chat 201090005205 / GYGTESTTEST).
+            try:
+                tmpl_l = str(template_name or "").strip().lower()
+                preview_l = str(actual_template_text or "").strip().lower()
+                if tmpl_l in ("gift_bounce", "gift1", "gift2") and preview_l:
+                    cancel_markers = (
+                        "was cancelled",
+                        "booking was cancelled",
+                        "rebook the same experience",
+                        "special return offer",
+                    )
+                    if any(m in preview_l for m in cancel_markers):
+                        logging.error(
+                            "Refusing WhatsApp send: template '%s' body looks like Cancel Recovery "
+                            "(preview markers found). Fix the Meta template content for gift_bounce.",
+                            template_name,
+                        )
+                        return False, {
+                            "status_code": 400,
+                            "body": "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY",
+                            "template_name": template_name,
+                            "template_text": actual_template_text,
+                            "phone_number_id": phone_number_id,
+                        }
+            except Exception:
+                pass
+
             # #region debug-point A:meta-request
             try:
                 import json as _dbg_json, urllib.request as _dbg_urlreq; _p='.dbg/whatsapp-send-failure.env'; _u,_s='http://127.0.0.1:7777/event','whatsapp-send-failure'; exec("try:\n with open(_p,'r',encoding='utf-8') as f: c=f.read(); _u=next((l.split('=',1)[1] for l in c.split('\\n') if l.startswith('DEBUG_SERVER_URL=')),_u); _s=next((l.split('=',1)[1] for l in c.split('\\n') if l.startswith('DEBUG_SESSION_ID=')),_s)\nexcept: pass"); _dbg_urlreq.urlopen(_dbg_urlreq.Request(_u, data=_dbg_json.dumps({"sessionId":_s,"runId":"pre-fix","hypothesisId":"A","location":"ai_agent.py:send_whatsapp_message:request","msg":"[DEBUG] send_whatsapp_message prepared Meta request","data":{"recipient_phone":str(recipient_phone or ""),"location":str(location or ""),"phone_number_id":str(phone_number_id or ""),"has_media":bool(media_url),"media_type":str(media_type or ""),"template_name":str(template_name or ""),"template_language":str(template_language or ""),"payload_type":str(payload.get('type') or ""),"component_count":len((payload.get('template') or {}).get('components') or []) if isinstance(payload.get('template'), dict) else 0}}).encode(), headers={"Content-Type":"application/json"}), timeout=2).read()
@@ -11504,7 +13052,17 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
 
             max_attempts = 3
             for attempt in range(1, max_attempts + 1):
-                response = requests.post(url, headers=headers, json=payload, timeout=10)
+                try:
+                    response = requests.post(url, headers=headers, json=payload, timeout=20)
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                    logging.warning(
+                        f"WhatsApp send attempt {attempt}/{max_attempts} timed out for {recipient_phone}: {e}"
+                    )
+                    if attempt < max_attempts:
+                        time.sleep(min(6.0, 1.5 * attempt))
+                        continue
+                    logging.error(f"Exception sending WhatsApp message: {e}")
+                    return False, {"status_code": 500, "body": str(e), "phone_number_id": phone_number_id}
                 if response.status_code in [200, 201]:
                     # #region debug-point C:meta-success
                     try:
@@ -11526,14 +13084,27 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                 msg_id = (msgs[0] or {}).get("id")
                     except Exception:
                         msg_id = None
-                    return True, {
+                    success_meta = {
                         "message_id": msg_id,
                         "phone_number_id": phone_number_id,
                         "template_text": actual_template_text if template_name else None,
                         "text": text,
                         "json": parsed_ok,
                         "raw": response.text,
+                        "location": self._whatsapp_location_for_phone_id(phone_number_id, location),
                     }
+                    if _fallback_from_phone_number_id and str(_fallback_from_phone_number_id) != str(phone_number_id):
+                        success_meta["fallback_used"] = True
+                        success_meta["fallback_from_phone_number_id"] = str(_fallback_from_phone_number_id)
+                        logging.info(
+                            "WhatsApp template '%s' delivered via fallback phone_number_id %s "
+                            "(original %s) to %s",
+                            template_name,
+                            phone_number_id,
+                            _fallback_from_phone_number_id,
+                            recipient_phone,
+                        )
+                    return True, success_meta
 
                 parsed = None
                 try:
@@ -11547,6 +13118,14 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     or (isinstance(err, dict) and err.get("is_transient"))
                     or (isinstance(err, dict) and str(err.get("code")) == "2")
                 )
+                is_template_missing = bool(
+                    template_name
+                    and self._is_whatsapp_template_missing_error(
+                        status_code=response.status_code,
+                        err=err if isinstance(err, dict) else None,
+                        body=response.text,
+                    )
+                )
 
                 # #region debug-point D:meta-failure
                 try:
@@ -11555,7 +13134,15 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     pass
                 # #endregion
 
-                logging.error(
+                # Keep ERROR alerts for final failures only. Template-missing with
+                # remaining fallback phones is expected and should not page the team.
+                can_try_template_fallback = bool(
+                    is_template_missing
+                    and _template_phone_fallback
+                    and template_name
+                )
+                log_fn = logging.warning if can_try_template_fallback else logging.error
+                log_fn(
                     f"Failed to send WhatsApp message. Status: {response.status_code}, "
                     f"Attempt: {attempt}/{max_attempts}, Response: {response.text}"
                 )
@@ -11569,12 +13156,56 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     time.sleep(retry_delay)
                     continue
 
-                return False, {
+                failure_meta = {
                     "status_code": response.status_code,
                     "body": response.text,
                     "json": parsed,
                     "phone_number_id": phone_number_id,
                 }
+
+                if can_try_template_fallback:
+                    selected = self._select_whatsapp_phone_for_template(
+                        template_name=template_name,
+                        template_language=template_language,
+                        location=location,
+                        receiving_phone_id=receiving_phone_id,
+                        access_token=access_token,
+                        exclude_phone_ids=list(tried_phone_ids),
+                    )
+                    if selected:
+                        alt_pid, alt_loc, alt_lang, _alt_tmpl = selected
+                        logging.warning(
+                            "Template '%s' missing/rejected on phone_number_id %s. "
+                            "Retrying via fallback phone_number_id %s (%s).",
+                            template_name,
+                            phone_number_id,
+                            alt_pid,
+                            alt_loc,
+                        )
+                        return self.send_whatsapp_message(
+                            recipient_phone,
+                            text=text,
+                            location=alt_loc or location,
+                            media_url=media_url,
+                            media_type=media_type,
+                            template_name=template_name,
+                            template_language=alt_lang or template_language,
+                            booking_data=booking_data,
+                            template_variables=template_variables,
+                            receiving_phone_id=alt_pid,
+                            template_header_media_url=template_header_media_url,
+                            template_header_media_type=template_header_media_type,
+                            media_bytes=media_bytes,
+                            media_mime=media_mime,
+                            media_filename=media_filename,
+                            _template_phone_fallback=True,
+                            _tried_phone_number_ids=list(tried_phone_ids | {str(alt_pid)}),
+                            _fallback_from_phone_number_id=str(
+                                _fallback_from_phone_number_id or phone_number_id
+                            ),
+                        )
+
+                return False, failure_meta
         except Exception as e:
             logging.error(f"Exception sending WhatsApp message: {e}")
             return False, {"status_code": 500, "body": str(e)}
@@ -11628,7 +13259,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
         except Exception as e:
             return False, {"status_code": 500, "body": str(e)}
 
-    def send_facebook_message(self, recipient_psid, text=None, media_url=None, media_type=None):
+    def send_facebook_message(self, recipient_psid, text=None, media_url=None, media_type=None, media_bytes=None, media_mime=None, media_filename=None):
         """Send a Facebook Messenger message using the connected page access token."""
         try:
             facebook_cfg = (self.config.get('facebook') or {}) if isinstance(self.config, dict) else {}
@@ -11659,7 +13290,8 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 "messaging_type": "RESPONSE",
             }
 
-            if media_url:
+            has_media = bool(media_url or media_bytes)
+            if has_media:
                 mt = str(media_type or '').strip().lower()
                 if mt == "image":
                     attachment_type = "image"
@@ -11669,36 +13301,79 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     attachment_type = "video"
                 else:
                     attachment_type = "file"
-                payload["message"] = {
-                    "attachment": {
-                        "type": attachment_type,
-                        "payload": {
-                            "url": str(media_url),
-                            "is_reusable": False
+                source_url = str(media_url or "").strip()
+                name = str(media_filename or "").strip() or self._filename_from_media_url(source_url, attachment_type)
+                mime = self._mime_for_outbound_media(attachment_type, media_mime, name, source_url)
+                data = media_bytes
+                if not data and source_url:
+                    data, got_mime, used = self._download_media_bytes(source_url)
+                    if got_mime:
+                        mime = self._mime_for_outbound_media(attachment_type, got_mime, name, used or source_url)
+                    if used:
+                        source_url = used
+                attachment_id = None
+                if data:
+                    attachment_id = self._upload_facebook_attachment_bytes(
+                        access_token, attachment_type, data, mime, name
+                    )
+                if attachment_id:
+                    logging.info(f"Using Facebook attachment_id={attachment_id} instead of Cloudinary weblink")
+                    payload["message"] = {
+                        "attachment": {
+                            "type": attachment_type,
+                            "payload": {"attachment_id": attachment_id},
                         }
                     }
-                }
+                else:
+                    link = source_url or str(media_url or "").strip()
+                    cands = self._cloudinary_url_candidates(link)
+                    if len(cands) > 1:
+                        link = cands[-1]
+                    payload["message"] = {
+                        "attachment": {
+                            "type": attachment_type,
+                            "payload": {
+                                "url": link,
+                                "is_reusable": True,
+                            }
+                        }
+                    }
             else:
                 clean_text = str(text or '').strip()
                 if not clean_text:
                     return False, {"status_code": 400, "body": "EMPTY_FACEBOOK_MESSAGE"}
                 payload["message"] = {"text": clean_text}
 
-            # Messenger Send API is bound to the connected page token and is more reliable via /me/messages
-            # than hard-binding the request to a stored page_id that may differ from webhook-facing identity.
-            url = "https://graph.facebook.com/v19.0/me/messages"
+            url = f"https://graph.facebook.com/{META_GRAPH_VERSION}/me/messages"
             headers = {
                 "Content-Type": "application/json"
             }
-
-            response = requests.post(
-                url,
-                headers=headers,
-                params={"access_token": access_token},
-                json=payload,
-                timeout=15
-            )
+            timeout_s = 60 if has_media else 15
+            last_error = None
             parsed = None
+            response = None
+            for attempt in range(1, 4):
+                try:
+                    response = requests.post(
+                        url,
+                        headers=headers,
+                        params={"access_token": access_token},
+                        json=payload,
+                        timeout=timeout_s,
+                    )
+                    last_error = None
+                    break
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                    last_error = e
+                    logging.warning(
+                        f"Facebook send attempt {attempt}/3 timed out for {recipient_id}: {e}"
+                    )
+                    if attempt < 3:
+                        time.sleep(1.5 * attempt)
+            if last_error is not None:
+                logging.error(f"Exception sending Facebook message: {last_error}")
+                return False, {"status_code": 500, "body": str(last_error)}
+
             try:
                 parsed = response.json()
             except Exception:
@@ -11708,7 +13383,11 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 logging.info(f"Successfully sent Facebook message to {recipient_id}")
                 return True, parsed or {"status_code": response.status_code, "body": response.text}
 
-            logging.error(f"Failed to send Facebook message. Meta API Error: {response.text}")
+            err = (parsed or {}).get("error") if isinstance(parsed, dict) else {}
+            err_code = str((err or {}).get("code") or "").strip()
+            # 551 = recipient blocked/deleted/unavailable; 10 = 24h messaging window closed.
+            log_fn = logging.warning if err_code in {"551", "10"} else logging.error
+            log_fn(f"Failed to send Facebook message. Meta API Error: {response.text}")
             return False, {
                 "status_code": response.status_code,
                 "body": response.text,
@@ -11753,6 +13432,488 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             if keyword in lowered_name:
                 return "Guest"
         return cleaned_name
+
+    def _sanitize_table_name_list(self, value, max_items=200):
+        if not isinstance(value, list):
+            return None
+        out = []
+        seen = set()
+        for item in value:
+            name = str(item or "").strip()
+            if not name or len(name) > 160:
+                continue
+            key = name.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(name)
+            if len(out) >= max_items:
+                break
+        return out or None
+
+    def _sanitize_religious_operation_acl(self, value):
+        if not isinstance(value, dict):
+            return None
+        out = {}
+        allowed = self._sanitize_table_name_list(value.get("allowedTables"))
+        denied = self._sanitize_table_name_list(value.get("deniedTables"))
+        if allowed:
+            out["allowedTables"] = allowed
+        if denied:
+            out["deniedTables"] = denied
+        return out or None
+
+    def _user_can_access_airtable_table(self, user_obj, table_name, scope="main"):
+        """Admin = all tables. Else apply allowedTables / deniedTables ACL."""
+        if not isinstance(user_obj, dict):
+            return False
+        role = str(user_obj.get("role") or "").strip().lower()
+        if role == "admin":
+            return True
+        name = str(table_name or "").strip()
+        if not name:
+            return False
+        scope_l = str(scope or "main").strip().lower()
+        if scope_l in ("religious", "religion", "rel", "hajj"):
+            acl = user_obj.get("religiousOperationAcl") if isinstance(user_obj.get("religiousOperationAcl"), dict) else {}
+        else:
+            acl = user_obj.get("aiOperationAcl") if isinstance(user_obj.get("aiOperationAcl"), dict) else {}
+        denied = acl.get("deniedTables") if isinstance(acl.get("deniedTables"), list) else []
+        for item in denied:
+            if str(item or "").strip().lower() == name.lower():
+                return False
+        allowed = acl.get("allowedTables") if isinstance(acl.get("allowedTables"), list) else []
+        if allowed:
+            return any(str(item or "").strip().lower() == name.lower() for item in allowed)
+        return True
+
+    def _sanitize_ai_operation_acl(self, value):
+        if not isinstance(value, dict):
+            return None
+        out = {}
+        if "canCreateRecord" in value:
+            out["canCreateRecord"] = bool(value.get("canCreateRecord"))
+        if "canExport" in value:
+            out["canExport"] = bool(value.get("canExport"))
+        if "canDismissForcedRecordFilters" in value:
+            out["canDismissForcedRecordFilters"] = bool(value.get("canDismissForcedRecordFilters"))
+        if "recordFiltersVersion" in value:
+            ver = value.get("recordFiltersVersion")
+            if isinstance(ver, (int, float)) and not isinstance(ver, bool):
+                out["recordFiltersVersion"] = int(ver) if float(ver).is_integer() else ver
+            elif isinstance(ver, str) and ver.strip():
+                out["recordFiltersVersion"] = ver.strip()[:64]
+        raw_fields = value.get("fields")
+        fields = {}
+        if isinstance(raw_fields, dict):
+            for key, caps in raw_fields.items():
+                field_name = str(key or "").strip()
+                if not field_name or len(field_name) > 120:
+                    continue
+                if not isinstance(caps, dict):
+                    continue
+                view = bool(caps["view"]) if "view" in caps else True
+                edit = bool(caps["edit"]) if "edit" in caps else True
+                create = bool(caps["create"]) if "create" in caps else True
+                if not view:
+                    edit = False
+                    create = False
+                if view and edit and create:
+                    continue
+                entry = {}
+                if not view:
+                    entry["view"] = False
+                if not edit:
+                    entry["edit"] = False
+                if not create:
+                    entry["create"] = False
+                fields[field_name] = entry
+                if len(fields) >= 400:
+                    break
+        if fields:
+            out["fields"] = fields
+        raw_filters = value.get("recordFilters")
+        cleaned_filters = self._sanitize_ai_operation_record_filters(raw_filters)
+        if cleaned_filters:
+            out["recordFilters"] = cleaned_filters
+        else:
+            # Legacy simple scope only when Filter builder conditions are absent.
+            raw_scope = value.get("recordScope")
+            if isinstance(raw_scope, dict):
+                scope = {}
+                def _clean_date(v):
+                    s = str(v or "").strip()
+                    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
+                        return None
+                    try:
+                        datetime.fromisoformat(s)
+                        return s
+                    except Exception:
+                        return None
+
+                def _clean_list(v, max_items=80, max_len=160):
+                    if not isinstance(v, list):
+                        return None
+                    seen = set()
+                    out_list = []
+                    for item in v:
+                        s = str(item or "").strip()
+                        if not s or len(s) > max_len:
+                            continue
+                        key = s.lower()
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                        out_list.append(s)
+                        if len(out_list) >= max_items:
+                            break
+                    return out_list or None
+
+                d_from = _clean_date(raw_scope.get("dateTripFrom"))
+                d_to = _clean_date(raw_scope.get("dateTripTo"))
+                if d_from:
+                    scope["dateTripFrom"] = d_from
+                if d_to:
+                    scope["dateTripTo"] = d_to
+                for key in ("tripNames", "agencies", "destinations", "bookingStatuses"):
+                    cleaned = _clean_list(raw_scope.get(key))
+                    if cleaned:
+                        scope[key] = cleaned
+                if scope:
+                    out["recordScope"] = scope
+        allowed_tables = self._sanitize_table_name_list(value.get("allowedTables"))
+        if allowed_tables:
+            out["allowedTables"] = allowed_tables
+        denied_tables = self._sanitize_table_name_list(value.get("deniedTables"))
+        if denied_tables:
+            out["deniedTables"] = denied_tables
+        fixed_ids = {
+            "All Booking",
+            "Operation Today",
+            "Operation Tomorrow",
+            "Operation Weekly",
+        }
+        denied_fixed = self._sanitize_table_name_list(value.get("deniedFixedViews"), max_items=20)
+        if denied_fixed:
+            cleaned_fixed = [x for x in denied_fixed if x in fixed_ids]
+            if cleaned_fixed:
+                out["deniedFixedViews"] = cleaned_fixed
+        if out.get("canCreateRecord") is True:
+            out.pop("canCreateRecord", None)
+        if out.get("canExport") is True:
+            out.pop("canExport", None)
+        if out.get("canDismissForcedRecordFilters") is False:
+            out.pop("canDismissForcedRecordFilters", None)
+        if not out.get("recordFilters") and not out.get("recordScope"):
+            out.pop("recordFiltersVersion", None)
+        if not out:
+            return None
+        return out
+
+    def _sanitize_ai_operation_record_filters(self, value, depth=0):
+        """Sanitize Filter-builder conditions (same shape as AI Operation tab)."""
+        if not isinstance(value, list) or depth > 2:
+            return None
+        allowed_ops = {
+            "contains", "does not contain", "is", "is not", "is empty", "is not empty",
+            "is before", "is after", "is today", "is tomorrow", "is yesterday",
+            "greater than", "less than", "greater or equal", "less or equal",
+        }
+        out = []
+        for item in value:
+            if not isinstance(item, dict):
+                continue
+            node_id = str(item.get("id") or "").strip() or f"f_{len(out)+1}"
+            connector = "or" if str(item.get("connector") or "").strip().lower() == "or" else "and"
+            is_group = bool(item.get("isGroup")) or isinstance(item.get("conditions"), list)
+            if is_group:
+                children_raw = item.get("conditions") if isinstance(item.get("conditions"), list) else []
+                children = self._sanitize_ai_operation_record_filters(children_raw, depth + 1) or []
+                if not children:
+                    continue
+                out.append({
+                    "id": node_id[:80],
+                    "connector": connector,
+                    "isGroup": True,
+                    "groupLogic": "and" if str(item.get("groupLogic") or "").strip().lower() == "and" else "or",
+                    "conditions": children[:20],
+                })
+            else:
+                field = str(item.get("field") or "").strip()
+                operator = str(item.get("operator") or "").strip()
+                if not field or len(field) > 120 or operator not in allowed_ops:
+                    continue
+                val = str(item.get("value") or "").strip()
+                if len(val) > 500:
+                    val = val[:500]
+                out.append({
+                    "id": node_id[:80],
+                    "connector": connector,
+                    "field": field,
+                    "operator": operator,
+                    "value": val,
+                })
+            if len(out) >= 40:
+                break
+        return out or None
+
+    def _ai_operation_record_scope_to_filters(self, scope):
+        """Convert admin recordScope into AND filter nodes for mirror query."""
+        if not isinstance(scope, dict) or not scope:
+            return []
+        filters = []
+        uid = 0
+
+        def _nid():
+            nonlocal uid
+            uid += 1
+            return f"scope_{uid}"
+
+        def _shift_iso(iso_day, days):
+            try:
+                d = datetime.fromisoformat(str(iso_day)).date()
+                return (d + timedelta(days=int(days))).isoformat()
+            except Exception:
+                return None
+
+        d_from = str(scope.get("dateTripFrom") or "").strip()
+        d_to = str(scope.get("dateTripTo") or "").strip()
+        if d_from:
+            before = _shift_iso(d_from, -1)
+            if before:
+                filters.append({
+                    "id": _nid(),
+                    "field": "Date Trip",
+                    "operator": "is after",
+                    "value": before,
+                    "connector": "and",
+                })
+        if d_to:
+            after = _shift_iso(d_to, 1)
+            if after:
+                filters.append({
+                    "id": _nid(),
+                    "field": "Date Trip",
+                    "operator": "is before",
+                    "value": after,
+                    "connector": "and",
+                })
+
+        trip_names = [str(x).strip() for x in (scope.get("tripNames") or []) if str(x).strip()]
+        if trip_names:
+            trip_groups = []
+            for name in trip_names:
+                trip_groups.append({
+                    "id": _nid(),
+                    "isGroup": True,
+                    "groupLogic": "or",
+                    "connector": "or",
+                    "conditions": [
+                        {"id": _nid(), "field": "trip Name", "operator": "contains", "value": name, "connector": "or"},
+                        {"id": _nid(), "field": "Real Product Name", "operator": "contains", "value": name, "connector": "or"},
+                    ],
+                })
+            filters.append({
+                "id": _nid(),
+                "isGroup": True,
+                "groupLogic": "or",
+                "connector": "and",
+                "conditions": trip_groups,
+            })
+
+        def _or_field(field_name, values):
+            vals = [str(x).strip() for x in (values or []) if str(x).strip()]
+            if not vals:
+                return None
+            if len(vals) == 1:
+                return {
+                    "id": _nid(),
+                    "field": field_name,
+                    "operator": "is",
+                    "value": vals[0],
+                    "connector": "and",
+                }
+            return {
+                "id": _nid(),
+                "isGroup": True,
+                "groupLogic": "or",
+                "connector": "and",
+                "conditions": [
+                    {"id": _nid(), "field": field_name, "operator": "is", "value": v, "connector": "or"}
+                    for v in vals
+                ],
+            }
+
+        for field_name, key in (
+            ("Agency", "agencies"),
+            ("des", "destinations"),
+            ("Booking Status", "bookingStatuses"),
+        ):
+            node = _or_field(field_name, scope.get(key))
+            if node:
+                filters.append(node)
+        return filters
+
+    def _merge_ai_operation_record_scope_filters(
+        self,
+        filters,
+        actor_username=None,
+        actor=None,
+        skip_forced_record_filters=False,
+        dismissed_forced_filters_version=None,
+    ):
+        actor_obj = actor if isinstance(actor, dict) else {}
+        if actor_username and not actor_obj.get("username"):
+            actor_obj = {**actor_obj, "username": str(actor_username).strip()}
+        user_obj = self._load_dashboard_user_by_actor(actor_obj)
+        if self._ai_operation_actor_is_admin(user_obj, actor=actor_obj):
+            return filters if isinstance(filters, list) else []
+        acl = (user_obj or {}).get("aiOperationAcl") if isinstance(user_obj, dict) else None
+        base = filters if isinstance(filters, list) else []
+        # User may dismiss forced scope only when ACL grants it.
+        if skip_forced_record_filters and isinstance(acl, dict) and bool(acl.get("canDismissForcedRecordFilters")):
+            current_version = acl.get("recordFiltersVersion")
+            if current_version is None:
+                # Legacy ACL without version: honor dismiss when client sends any skip.
+                return base
+            client_ver = str(dismissed_forced_filters_version or "").strip()
+            server_ver = str(current_version).strip()
+            if client_ver and server_ver and client_ver == server_ver:
+                return base
+            # Version mismatch → admin re-applied filters; keep merging.
+        scope_filters = []
+        if isinstance(acl, dict):
+            cleaned = self._sanitize_ai_operation_record_filters(acl.get("recordFilters"))
+            if cleaned:
+                scope_filters = cleaned
+            else:
+                scope_filters = self._ai_operation_record_scope_to_filters(acl.get("recordScope"))
+        if not scope_filters:
+            return base
+        merged = list(base)
+        for node in scope_filters:
+            item = dict(node)
+            item["connector"] = "and"
+            merged.append(item)
+        return merged
+
+    def _load_dashboard_user_by_actor(self, actor=None):
+        try:
+            import chat_db
+            username = ""
+            role_hint = ""
+            if isinstance(actor, dict):
+                username = str(
+                    actor.get("username")
+                    or actor.get("user_id")
+                    or actor.get("id")
+                    or ""
+                ).strip()
+                role_hint = str(actor.get("role") or "").strip()
+            if not username:
+                return None
+            raw = chat_db.get_setting("dashboard_users")
+            parsed = json.loads(raw) if isinstance(raw, str) and raw.strip() else raw
+            if not isinstance(parsed, list):
+                return None
+            uname_l = username.lower()
+            for item in parsed:
+                if not isinstance(item, dict):
+                    continue
+                item_username = str(item.get("username") or item.get("id") or "").strip()
+                if item_username.lower() == uname_l:
+                    if role_hint and not item.get("role"):
+                        item = dict(item)
+                        item["role"] = role_hint
+                    return item
+            return {
+                "username": username,
+                "role": role_hint or "Agent",
+                "aiOperationAcl": None,
+            }
+        except Exception:
+            return None
+
+    def _ai_operation_actor_is_admin(self, user_obj, actor=None):
+        role = ""
+        username = ""
+        if isinstance(user_obj, dict):
+            role = str(user_obj.get("role") or "").strip().lower()
+            username = str(user_obj.get("username") or "").strip().lower()
+        if isinstance(actor, dict):
+            if not role:
+                role = str(actor.get("role") or "").strip().lower()
+            if not username:
+                username = str(
+                    actor.get("username") or actor.get("user_id") or actor.get("id") or ""
+                ).strip().lower()
+        return role == "admin"
+
+    def _ai_operation_field_allowed(self, user_obj, field_name, action="edit", actor=None):
+        """Allow-by-default field ACL. action: view|edit|create"""
+        if self._ai_operation_actor_is_admin(user_obj, actor=actor):
+            return True
+        name = str(field_name or "").strip()
+        if not name:
+            return True
+        acl = None
+        if isinstance(user_obj, dict):
+            acl = user_obj.get("aiOperationAcl")
+        if not isinstance(acl, dict):
+            return True
+        fields = acl.get("fields")
+        if not isinstance(fields, dict):
+            return True
+        caps = fields.get(name)
+        if not isinstance(caps, dict):
+            # Case-insensitive / trim fallback for UI field labels vs ACL keys.
+            name_l = name.lower()
+            for k, v in fields.items():
+                if str(k or "").strip().lower() == name_l and isinstance(v, dict):
+                    caps = v
+                    break
+        if not isinstance(caps, dict):
+            return True
+        view = caps.get("view", True) is not False
+        if not view:
+            return False
+        if action == "view":
+            return True
+        if action == "edit":
+            return caps.get("edit", True) is not False
+        if action == "create":
+            return caps.get("create", True) is not False
+        return True
+
+    def _ai_operation_can_create_record(self, user_obj, actor=None):
+        if self._ai_operation_actor_is_admin(user_obj, actor=actor):
+            return True
+        acl = None
+        if isinstance(user_obj, dict):
+            acl = user_obj.get("aiOperationAcl")
+        if not isinstance(acl, dict):
+            return True
+        if "canCreateRecord" not in acl:
+            return True
+        return bool(acl.get("canCreateRecord"))
+
+    def _filter_ai_operation_fields_by_acl(self, fields, user_obj, action="edit", actor=None):
+        """Returns (allowed_fields, denied_field_names)."""
+        if not isinstance(fields, dict):
+            return {}, []
+        if self._ai_operation_actor_is_admin(user_obj, actor=actor):
+            return dict(fields), []
+        allowed = {}
+        denied = []
+        for key, value in fields.items():
+            name = str(key or "").strip()
+            if not name:
+                continue
+            if self._ai_operation_field_allowed(user_obj, name, action=action, actor=actor):
+                allowed[name] = value
+            else:
+                denied.append(name)
+        return allowed, denied
 
     def _get_dashboard_user_name_candidates(self):
         cached = getattr(self, "_dashboard_user_name_candidates_cache", None)
@@ -12275,9 +14436,152 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             return f"p:{phone}"
         return ""
 
+    def _sanitize_allowed_base_ids(self, value, max_items=40):
+        if not isinstance(value, list):
+            return None
+        out = []
+        seen = set()
+        for item in value:
+            base_id = str(item or "").strip().replace(" ", "")
+            if not base_id or len(base_id) < 3 or len(base_id) > 64:
+                continue
+            key = base_id.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(base_id)
+            if len(out) >= max_items:
+                break
+        return out or None
+
+    def _configured_airtable_bases(self):
+        airtable_cfg = (self.config.get("airtable", {}) or {})
+        bases = []
+        for label, name_en, name_ar, key in (
+            ("main", "Main / External", "الرئيسي / الخارجي", "base_id"),
+            ("religious", "Religious", "الديني", "religious_base_id"),
+            ("trips", "Trips / Website", "الرحلات / الموقع", "trips_base_id"),
+        ):
+            base_id = str(airtable_cfg.get(key) or "").strip()
+            if not base_id:
+                continue
+            bases.append({
+                "label": label,
+                "nameEn": name_en,
+                "nameAr": name_ar,
+                "baseId": base_id,
+            })
+        return bases
+
+    def _user_allowed_base_ids(self, user_obj):
+        """Return explicit list, or None for unrestricted (admin). Empty list = none."""
+        if not isinstance(user_obj, dict):
+            return []
+        role = str(user_obj.get("role") or "").strip().lower()
+        if role == "admin":
+            return None
+        configured = self._configured_airtable_bases()
+        known_ids = {
+            str(b.get("baseId") or "").strip().lower()
+            for b in configured
+            if str(b.get("baseId") or "").strip()
+        }
+
+        def _inherit_from_locations():
+            locs = [str(x or "").strip().lower() for x in (user_obj.get("allowedLocations") or []) if str(x or "").strip()]
+            by_label = {str(b.get("label") or "").lower(): str(b.get("baseId") or "").strip() for b in configured}
+            if (not locs) or ("all" in locs):
+                return [b["baseId"] for b in configured if b.get("baseId")]
+            out = []
+            def _push(label):
+                bid = by_label.get(label)
+                if bid and bid.lower() not in {x.lower() for x in out}:
+                    out.append(bid)
+            if "religious" in locs:
+                _push("religious")
+            if any(l not in ("religious", "needhelp") for l in locs):
+                _push("main")
+                _push("trips")
+            return out
+
+        explicit = self._sanitize_allowed_base_ids(user_obj.get("allowedBaseIds"))
+        if explicit:
+            has_known = any(str(x or "").strip().lower() in known_ids for x in explicit)
+            # Custom-only allowlist: keep extras + inherit known bases from Locations
+            # so adding a typed app… does not strip Main and hide FTS AI Operation.
+            if (not has_known) and known_ids:
+                merged = list(_inherit_from_locations())
+                seen = {x.lower() for x in merged}
+                for bid in explicit:
+                    key = str(bid or "").strip().lower()
+                    if key and key not in seen:
+                        merged.append(bid)
+                        seen.add(key)
+                return merged
+            return explicit
+        return _inherit_from_locations()
+
+    def _user_can_access_base_id(self, user_obj, base_id):
+        allowed = self._user_allowed_base_ids(user_obj)
+        if allowed is None:
+            return True
+        bid = str(base_id or "").strip()
+        if not bid:
+            return False
+        return any(str(x or "").strip().lower() == bid.lower() for x in allowed)
+
+    def _user_can_access_base_scope(self, user_obj, scope="main"):
+        scope_l = str(scope or "main").strip().lower()
+        if scope_l in ("religious", "religion", "rel", "hajj"):
+            label = "religious"
+        elif scope_l in ("trips", "trip", "website"):
+            label = "trips"
+        else:
+            label = "main"
+        configured = self._configured_airtable_bases()
+        match = next((b for b in configured if str(b.get("label") or "").lower() == label), None)
+        if match and self._user_can_access_base_id(user_obj, match.get("baseId")):
+            return True
+        # Custom Base IDs unlock main/operations scope (same intent as checking Main).
+        if label == "main" and isinstance(user_obj, dict):
+            explicit = self._sanitize_allowed_base_ids(user_obj.get("allowedBaseIds")) or []
+            known_ids = {
+                str(b.get("baseId") or "").strip().lower()
+                for b in configured
+                if str(b.get("baseId") or "").strip()
+            }
+            if any(str(x or "").strip().lower() not in known_ids for x in explicit):
+                return True
+        if not match:
+            return True
+        return False
+
     def _actor_allowed_base_labels(self, actor):
         actor = actor or {}
-        allowed_locations = [str(x).strip() for x in (actor.get("allowed_locations") or []) if str(x).strip()]
+        # Prefer dashboard user record when username present
+        try:
+            user_obj = self._load_dashboard_user_by_actor(actor) if isinstance(actor, dict) else None
+        except Exception:
+            user_obj = None
+        if isinstance(user_obj, dict):
+            allowed_ids = self._user_allowed_base_ids(user_obj)
+            if allowed_ids is None:
+                return ["general", "religious"]
+            configured = self._configured_airtable_bases()
+            labels = []
+            for b in configured:
+                bid = str(b.get("baseId") or "").strip()
+                label = str(b.get("label") or "").strip().lower()
+                if not bid or not any(str(x).strip().lower() == bid.lower() for x in allowed_ids):
+                    continue
+                if label == "religious":
+                    labels.append("religious")
+                elif label in ("main", "trips"):
+                    if "general" not in labels:
+                        labels.append("general")
+            return labels or []
+
+        allowed_locations = [str(x).strip() for x in (actor.get("allowed_locations") or actor.get("allowedLocations") or []) if str(x).strip()]
         lowered = [item.lower() for item in allowed_locations]
         if "all" in lowered:
             return ["general", "religious"]
@@ -13165,24 +15469,87 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             add_ons,
         ]
 
-    def _fetch_approved_whatsapp_templates(self, location=None):
+    def _fetch_whatsapp_templates_from_meta(self, location=None, statuses=None, max_pages=25):
+        """
+        Fetch WhatsApp message templates for the WABA linked to `location`.
+        Follows Meta pagination cursors (important: accounts often have >100 templates).
+        `statuses`: None = return all statuses; or iterable like {"APPROVED"}.
+        """
         location = str(location or "default").strip() or "default"
+        token = self._get_whatsapp_access_token()
+        waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {}) or {}
+        waba_id = waba_ids.get(location, waba_ids.get('default'))
+        if not token or not waba_id:
+            return {
+                "templates": [],
+                "waba_id": waba_id,
+                "location": location,
+                "pages_fetched": 0,
+                "error": "missing_token_or_waba_id",
+            }
+
+        status_filter = None
+        if statuses is not None:
+            status_filter = {str(s or "").strip().upper() for s in statuses if str(s or "").strip()}
+
+        collected = []
+        pages_fetched = 0
+        after = None
+        last_error = None
         try:
-            token = self._get_whatsapp_access_token()
-            waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {}) or {}
-            waba_id = waba_ids.get(location, waba_ids.get('default'))
-            if not token or not waba_id:
-                return []
-            url = f"https://graph.facebook.com/v19.0/{waba_id}/message_templates?access_token={token}&limit=100"
-            res = requests.get(url, timeout=10)
-            if res.status_code != 200:
-                logging.warning(f"Failed to fetch approved WhatsApp templates for {location}: {res.text}")
-                return []
-            data = res.json() or {}
-            return [t for t in (data.get("data") or []) if str(t.get("status") or "").strip().upper() == "APPROVED"]
+            while pages_fetched < max(1, int(max_pages or 25)):
+                params = {
+                    "access_token": token,
+                    "limit": 100,
+                    "fields": "name,status,category,language,components,id",
+                }
+                if after:
+                    params["after"] = after
+                url = f"https://graph.facebook.com/{META_GRAPH_VERSION}/{waba_id}/message_templates"
+                res = requests.get(url, params=params, timeout=20)
+                pages_fetched += 1
+                if res.status_code != 200:
+                    last_error = res.text
+                    logging.warning(
+                        "Failed to fetch WhatsApp templates page %s for %s (WABA %s): %s",
+                        pages_fetched,
+                        location,
+                        waba_id,
+                        res.text,
+                    )
+                    break
+                payload = res.json() or {}
+                batch = payload.get("data") or []
+                if isinstance(batch, list):
+                    for t in batch:
+                        if not isinstance(t, dict):
+                            continue
+                        st = str(t.get("status") or "").strip().upper()
+                        if status_filter is not None and st not in status_filter:
+                            continue
+                        collected.append(t)
+                paging = payload.get("paging") if isinstance(payload.get("paging"), dict) else {}
+                cursors = paging.get("cursors") if isinstance(paging.get("cursors"), dict) else {}
+                next_after = str(cursors.get("after") or "").strip()
+                has_next = bool(paging.get("next")) and bool(next_after)
+                if not has_next:
+                    break
+                after = next_after
         except Exception as e:
-            logging.warning(f"Error fetching approved WhatsApp templates for {location}: {e}")
-            return []
+            last_error = str(e)
+            logging.warning(f"Error fetching WhatsApp templates for {location}: {e}", exc_info=True)
+
+        return {
+            "templates": collected,
+            "waba_id": waba_id,
+            "location": location,
+            "pages_fetched": pages_fetched,
+            "error": last_error,
+        }
+
+    def _fetch_approved_whatsapp_templates(self, location=None):
+        result = self._fetch_whatsapp_templates_from_meta(location=location, statuses={"APPROVED"})
+        return list(result.get("templates") or [])
 
     def _extract_whatsapp_template_body_preview(self, template_obj):
         template_obj = template_obj if isinstance(template_obj, dict) else {}
@@ -13902,6 +16269,398 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
         out["summary"]["table_count"] = sum(len(base.get("tables") or []) for base in out["bases"])
         out["summary"]["field_count"] = sum(len(table.get("fields") or []) for base in out["bases"] for table in (base.get("tables") or []))
         return out
+
+    def resolve_airtable_list_view_layout(self, view_ref, base_scope="main", table_name=None):
+        """
+        Import field visibility + order from an Airtable grid view (by name or view id).
+        Filter conditions are NOT available via Airtable Metadata API.
+
+        base_scope: "main" | "religious" — which Base ID to use
+        table_name: optional preferred table hint (defaults to List for main)
+
+        Resolution rules:
+        - By view ID (viw…): always load from the owning table (correct table).
+        - By view name: if the same name exists on multiple tables, prefer List (main)
+          or the religious default table; otherwise use the first match found.
+        """
+        import requests
+
+        view_ref = str(view_ref or "").strip()
+        if not view_ref:
+            return {"status": "error", "message": "Missing view name or id"}
+
+        airtable_cfg = (self.config.get("airtable", {}) or {})
+        api_key = str(airtable_cfg.get("api_key") or "").strip()
+        scope = str(base_scope or "main").strip().lower()
+        if scope in ("religious", "religion"):
+            base_id = str(airtable_cfg.get("religious_base_id") or "").strip()
+            default_table = "استفسارات جديدة"
+        else:
+            scope = "main"
+            base_id = str(airtable_cfg.get("base_id") or "").strip()
+            default_table = str(((airtable_cfg.get("tables") or {}) or {}).get("main_list") or "List").strip() or "List"
+        table_name = str(table_name or "").strip() or default_table
+        if not api_key or not base_id:
+            return {
+                "status": "error",
+                "message": (
+                    "Airtable API key / religious_base_id not configured"
+                    if scope == "religious"
+                    else "Airtable API key / base_id not configured"
+                ),
+            }
+
+        headers = {"Authorization": f"Bearer {api_key}"}
+        try:
+            # include=visibleFieldIds so nested table.views carry ordered visible fields (grid views).
+            tables_resp = requests.get(
+                f"https://api.airtable.com/v0/meta/bases/{base_id}/tables",
+                headers=headers,
+                params=[("include", "visibleFieldIds")],
+                timeout=30,
+            )
+            if tables_resp.status_code != 200:
+                # Retry without include for older tokens / plans.
+                tables_resp = requests.get(
+                    f"https://api.airtable.com/v0/meta/bases/{base_id}/tables",
+                    headers=headers,
+                    timeout=30,
+                )
+            if tables_resp.status_code != 200:
+                return {
+                    "status": "error",
+                    "message": f"Failed to load Airtable schema ({tables_resp.status_code})",
+                    "detail": (tables_resp.text or "")[:400],
+                }
+            tables = (tables_resp.json() or {}).get("tables") or []
+        except Exception as exc:
+            return {"status": "error", "message": f"Airtable schema request failed: {exc}"}
+
+        list_table = None
+        for table in tables:
+            if str(table.get("name") or "").strip() == table_name:
+                list_table = table
+                break
+        if not list_table:
+            # fallback: case-insensitive
+            for table in tables:
+                if str(table.get("name") or "").strip().lower() == table_name.lower():
+                    list_table = table
+                    break
+        if not list_table:
+            available = [str(t.get("name") or "").strip() for t in tables if str(t.get("name") or "").strip()]
+            return {
+                "status": "error",
+                "message": f"Table '{table_name}' not found in Airtable base",
+                "available_tables_sample": available[:20],
+            }
+
+        tables_by_id = {}
+        for table in tables:
+            tid = str(table.get("id") or "").strip()
+            if tid:
+                tables_by_id[tid] = table
+
+        def _field_map_for_table(table_obj):
+            mapping = {}
+            for field in ((table_obj or {}).get("fields") or []):
+                fid = str(field.get("id") or "").strip()
+                fname = str(field.get("name") or "").strip()
+                if fid and fname:
+                    mapping[fid] = fname
+            return mapping
+
+        list_table_id = str(list_table.get("id") or "").strip()
+
+        # Primary candidates: views nested under tables (often include ordered visibleFieldIds).
+        candidates = []
+        nested_by_id = {}
+        for table in tables:
+            tid = str(table.get("id") or "").strip()
+            for view in (table.get("views") or []):
+                if not isinstance(view, dict):
+                    continue
+                stamped = dict(view)
+                if tid and not stamped.get("tableId"):
+                    stamped["tableId"] = tid
+                candidates.append(stamped)
+                vid = str(stamped.get("id") or "").strip()
+                if vid:
+                    nested_by_id[vid] = stamped
+
+        views_resp = None
+        try:
+            # Also query dedicated views endpoint (Enterprise) and merge richer payloads.
+            views_resp = requests.get(
+                f"https://api.airtable.com/v0/meta/bases/{base_id}/views",
+                headers=headers,
+                params=[("include", "visibleFieldIds")],
+                timeout=30,
+            )
+        except Exception:
+            views_resp = None
+
+        if views_resp is not None and views_resp.status_code == 200:
+            for view in ((views_resp.json() or {}).get("views") or []):
+                if not isinstance(view, dict):
+                    continue
+                vid = str(view.get("id") or "").strip()
+                existing = nested_by_id.get(vid)
+                if existing:
+                    # Prefer whichever payload has visibleFieldIds; keep tableId from nested.
+                    merged = {**existing, **view}
+                    if existing.get("tableId") and not merged.get("tableId"):
+                        merged["tableId"] = existing.get("tableId")
+                    if not isinstance(merged.get("visibleFieldIds"), list) and isinstance(existing.get("visibleFieldIds"), list):
+                        merged["visibleFieldIds"] = existing.get("visibleFieldIds")
+                    # Replace candidate entry
+                    for i, c in enumerate(candidates):
+                        if str(c.get("id") or "").strip() == vid:
+                            candidates[i] = merged
+                            break
+                    nested_by_id[vid] = merged
+                else:
+                    candidates.append(view)
+                    if vid:
+                        nested_by_id[vid] = view
+
+        # Prefer matches on the requested table first (do not silently pick another table).
+        def _view_table_id(view_obj):
+            return str((view_obj or {}).get("tableId") or (view_obj or {}).get("table_id") or "").strip()
+
+        # Canonical "List" (main) / default religious table — preferred when resolving by NAME.
+        priority_table_name = default_table
+        if scope == "main":
+            priority_table_name = "List"
+        priority_table = None
+        for table in tables:
+            if str(table.get("name") or "").strip() == priority_table_name:
+                priority_table = table
+                break
+        if not priority_table:
+            for table in tables:
+                if str(table.get("name") or "").strip().lower() == priority_table_name.lower():
+                    priority_table = table
+                    break
+        priority_table_id = str((priority_table or {}).get("id") or "").strip()
+
+        list_candidates = [v for v in candidates if (not list_table_id) or _view_table_id(v) in ("", list_table_id)]
+        priority_candidates = [
+            v for v in candidates
+            if priority_table_id and _view_table_id(v) == priority_table_id
+        ]
+        other_candidates = [v for v in candidates if v not in list_candidates]
+
+        ref_l = view_ref.lower()
+        is_view_id = view_ref.startswith("viw")
+        matched = None
+
+        if is_view_id:
+            # ID → always resolve to the owning table (ignore selected-table collisions).
+            for view in candidates:
+                if str(view.get("id") or "").strip() == view_ref:
+                    matched = view
+                    break
+            if not matched:
+                try:
+                    one = requests.get(
+                        f"https://api.airtable.com/v0/meta/bases/{base_id}/views/{view_ref}",
+                        headers=headers,
+                        params=[("include", "visibleFieldIds")],
+                        timeout=30,
+                    )
+                    if one.status_code == 200 and isinstance(one.json(), dict):
+                        matched = one.json()
+                        nested = nested_by_id.get(str(matched.get("id") or view_ref).strip())
+                        if nested:
+                            matched = {**nested, **matched}
+                            if not isinstance(matched.get("visibleFieldIds"), list) and isinstance(nested.get("visibleFieldIds"), list):
+                                matched["visibleFieldIds"] = nested.get("visibleFieldIds")
+                    elif one.status_code != 200:
+                        matched = nested_by_id.get(view_ref)
+                        if matched is None:
+                            return {
+                                "status": "error",
+                                "message": f"Airtable view lookup failed ({one.status_code})",
+                                "detail": (one.text or "")[:400],
+                            }
+                except Exception as exc:
+                    matched = nested_by_id.get(view_ref)
+                    if matched is None:
+                        return {"status": "error", "message": f"Airtable view lookup failed: {exc}"}
+        else:
+            # NAME → if the same name exists on multiple tables, prefer List (main) / default table.
+            def _name_matches(view_obj):
+                vname = str((view_obj or {}).get("name") or "").strip()
+                return vname == view_ref or vname.lower() == ref_l
+
+            for view in priority_candidates:
+                if _name_matches(view):
+                    matched = view
+                    break
+            if not matched:
+                for view in list_candidates:
+                    if _name_matches(view):
+                        matched = view
+                        break
+            if not matched:
+                for view in other_candidates:
+                    if _name_matches(view):
+                        matched = view
+                        break
+
+        if not matched:
+            sample_src = priority_candidates or list_candidates
+            sample = [str(v.get("name") or "").strip() for v in sample_src[:12] if str(v.get("name") or "").strip()]
+            return {
+                "status": "error",
+                "message": (
+                    f"View not found: {view_ref}"
+                    if is_view_id
+                    else f"View not found (searched '{priority_table_name}' first): {view_ref}"
+                ),
+                "available_views_sample": sample,
+            }
+
+        # Resolve owning table from the matched view.
+        # - By ID: always retarget to the correct owning table.
+        # - By name: List (main) / default table wins when the same name exists elsewhere.
+        matched_table_id = _view_table_id(matched) or list_table_id or priority_table_id
+
+        visible_ids = matched.get("visibleFieldIds")
+        if not isinstance(visible_ids, list) or not visible_ids:
+            # Some tokens/scopes omit visibleFieldIds — try one more fetch by id.
+            vid = str(matched.get("id") or "").strip()
+            if vid:
+                nested = nested_by_id.get(vid)
+                if nested and isinstance(nested.get("visibleFieldIds"), list) and nested.get("visibleFieldIds"):
+                    visible_ids = nested.get("visibleFieldIds")
+                    matched = {**matched, **nested}
+                else:
+                    try:
+                        one = requests.get(
+                            f"https://api.airtable.com/v0/meta/bases/{base_id}/views/{vid}",
+                            headers=headers,
+                            params=[("include", "visibleFieldIds")],
+                            timeout=30,
+                        )
+                        if one.status_code == 200:
+                            payload = one.json() or {}
+                            if isinstance(payload.get("visibleFieldIds"), list):
+                                visible_ids = payload.get("visibleFieldIds")
+                                matched = {**matched, **payload}
+                    except Exception:
+                        pass
+
+        matched_table_id = _view_table_id(matched) or list_table_id or priority_table_id
+        matched_table = tables_by_id.get(matched_table_id) or list_table or priority_table or {}
+        field_id_to_name = _field_map_for_table(matched_table)
+        # Soft fallback: if field id not on matched table, search all tables (rare cross-map).
+        if len(field_id_to_name) < 5:
+            for table in tables:
+                field_id_to_name.update(_field_map_for_table(table))
+        resolved_table_name = str(matched_table.get("name") or table_name).strip() or table_name
+
+        if not isinstance(visible_ids, list) or not visible_ids:
+            # Fallback: import all fields from the view's table (order = schema order).
+            # Non-grid views / limited tokens often omit visibleFieldIds.
+            visible_fields = [
+                str(f.get("name") or "").strip()
+                for f in (matched_table.get("fields") or [])
+                if str(f.get("name") or "").strip()
+            ]
+            if not visible_fields:
+                return {
+                    "status": "error",
+                    "message": (
+                        "Airtable did not return visible fields for this view. "
+                        "Ensure the API token has workspacesAndBases:read and the view is a Grid view."
+                    ),
+                    "view": {
+                        "id": str(matched.get("id") or ""),
+                        "name": str(matched.get("name") or ""),
+                        "type": str(matched.get("type") or ""),
+                        "table": resolved_table_name,
+                    },
+                }
+            return {
+                "status": "success",
+                "data": {
+                    "airtableViewId": str(matched.get("id") or ""),
+                    "airtableViewName": str(matched.get("name") or view_ref),
+                    "viewType": str(matched.get("type") or ""),
+                    "baseScope": scope,
+                    "tableName": resolved_table_name,
+                    "visibleFields": visible_fields,
+                    "columnOrder": list(visible_fields),
+                    "unknownFieldIds": [],
+                    "filters": [],
+                    "sorts": [],
+                    "linkAirtableView": True,
+                    "note": (
+                        "visibleFieldIds unavailable; imported all table fields. "
+                        "Airtable filter/sort still apply via linked view name."
+                    ),
+                },
+            }
+
+        visible_fields = []
+        unknown_ids = []
+        for fid in visible_ids:
+            fid_s = str(fid or "").strip()
+            if not fid_s:
+                continue
+            name = field_id_to_name.get(fid_s)
+            if not name:
+                # Search other tables if List map missed the id.
+                for table in tables:
+                    name = _field_map_for_table(table).get(fid_s)
+                    if name:
+                        break
+            if name:
+                if name not in visible_fields:
+                    visible_fields.append(name)
+            else:
+                unknown_ids.append(fid_s)
+
+        if not visible_fields:
+            return {
+                "status": "error",
+                "message": (
+                    f"No mappable visible fields found for this view on table '{resolved_table_name}'."
+                ),
+                "view": {
+                    "id": str(matched.get("id") or ""),
+                    "name": str(matched.get("name") or ""),
+                    "type": str(matched.get("type") or ""),
+                    "table": resolved_table_name,
+                },
+            }
+
+        return {
+            "status": "success",
+            "data": {
+                "airtableViewId": str(matched.get("id") or ""),
+                "airtableViewName": str(matched.get("name") or view_ref),
+                "viewType": str(matched.get("type") or ""),
+                "baseScope": scope,
+                "tableName": resolved_table_name,
+                "visibleFields": visible_fields,
+                "columnOrder": list(visible_fields),
+                "unknownFieldIds": unknown_ids[:40],
+                # Official Metadata API does not expose filter/sort AST.
+                # Linking baseView keeps Airtable filter+sort applied on fetch;
+                # app filters remain empty so the user can rebuild editable copies.
+                "filters": [],
+                "sorts": [],
+                "linkAirtableView": True,
+                "note": (
+                    "Airtable does not expose filter/sort rules via API. "
+                    "This import links the Airtable view (so records arrive filtered/sorted like Airtable) "
+                    "and copies visible fields/order. Rebuild filters once in-app if you need to edit them."
+                ),
+            },
+        }
 
     def _get_airtable_schema_context(self, actor=None, refresh=False, max_age_seconds=3600):
         cache_file = self._airtable_schema_context_file(actor=actor)
@@ -14991,14 +17750,44 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
         }
 
     def send_internal_notifications_whatsapp_text(self, recipient_phone, text):
+        """
+        Staff/ops alerts MUST send only via the dedicated Internal Notifications
+        Evolution instance. No load-balancing / fallback to other user numbers.
+
+        Returns True/False for backward compatibility.
+        Detailed result is also stored on self._last_internal_notify_send_meta.
+        """
+        ok, meta = self.send_internal_notifications_whatsapp_text_detailed(recipient_phone, text)
+        self._last_internal_notify_send_meta = meta
+        return ok
+
+    def send_internal_notifications_whatsapp_text_detailed(self, recipient_phone, text):
+        """
+        Same as send_internal_notifications_whatsapp_text but returns (ok, meta_dict).
+        """
         cfg = self._internal_evolution_cfg_for_notifications()
-        to_phone = re.sub(r"\D", "", str(recipient_phone or ""))
+        raw_recipient = str(recipient_phone or "").strip()
+        is_group = "@g.us" in raw_recipient.lower()
+        if is_group:
+            to_phone = raw_recipient
+        else:
+            to_phone = re.sub(r"\D", "", raw_recipient)
         message_text = str(text or "").strip()
+        # Strip ASCII control chars (except \\n \\r \\t) — Make payloads sometimes embed them
+        message_text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", message_text)
         if not cfg or not to_phone or not message_text:
-            return False
+            meta = {
+                "ok": False,
+                "error": "missing_cfg_phone_or_text",
+                "has_cfg": bool(cfg),
+                "phone": to_phone,
+                "is_group": is_group,
+            }
+            return False, meta
+
+        import requests
+        url = f"{cfg['providerBaseUrl']}/message/sendText/{quote(cfg['instanceName'])}"
         try:
-            import requests
-            url = f"{cfg['providerBaseUrl']}/message/sendText/{quote(cfg['instanceName'])}"
             resp = requests.post(
                 url,
                 headers={
@@ -15011,9 +17800,178 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 },
                 timeout=25,
             )
-            return int(resp.status_code or 0) < 400
+            status_code = int(resp.status_code or 0)
+            body_text = (resp.text or "")[:800]
+            body_json = None
+            try:
+                body_json = resp.json() if resp.content else None
+            except Exception:
+                body_json = None
+            ok = status_code < 400
+            meta = {
+                "ok": ok,
+                "status_code": status_code,
+                "instance_name": cfg.get("instanceName"),
+                "phone": to_phone,
+                "is_group": is_group,
+                "body": body_text,
+                "json": body_json,
+            }
+            if not ok:
+                # Evolution often returns message:["[object Object]"] for group/membership failures
+                hint = None
+                if is_group:
+                    hint = (
+                        "Target is a WhatsApp GROUP. Ensure the Internal Notifications number "
+                        f"({cfg.get('instanceName')}) is still a member of this group, and that "
+                        "the group JID is current (old phone-timestamp@g.us IDs often break after WhatsApp migrates groups)."
+                    )
+                else:
+                    hint = (
+                        "Evolution rejected the send. Check that the Internal Notifications "
+                        "WhatsApp session is open and the recipient number is valid."
+                    )
+                meta["hint"] = hint
+                logging.warning(
+                    "Internal notifications send failed via %s (%s) to %s: %s",
+                    cfg.get("instanceName"),
+                    status_code,
+                    to_phone,
+                    body_text[:400],
+                )
+            return ok, meta
+        except Exception as e:
+            logging.warning("Internal notifications send exception via %s: %s", cfg.get("instanceName"), e)
+            return False, {
+                "ok": False,
+                "error": "exception",
+                "message": str(e),
+                "phone": to_phone,
+                "is_group": is_group,
+                "instance_name": (cfg or {}).get("instanceName"),
+            }
+
+    def resolve_user_evolution_connection(self, username, connection_id=None):
+        """Return the first enabled+connected Evolution WhatsApp for a dashboard user."""
+        uname = str(username or "").strip()
+        if not uname:
+            return None
+        try:
+            import chat_db
+            raw = chat_db.get_setting("dashboard_user_whatsapp_connections")
+            data = json.loads(raw) if raw else {}
         except Exception:
-            return False
+            data = {}
+        if not isinstance(data, dict):
+            return None
+        items = data.get(uname) or []
+        if not isinstance(items, list):
+            return None
+        want_id = str(connection_id or "").strip()
+        connected = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            if not bool(item.get("enabled", True)):
+                continue
+            status = str(item.get("connectionStatus") or "").strip().lower()
+            if status not in {"connected", "open"}:
+                continue
+            instance_name = str(item.get("instanceName") or "").strip()
+            if not instance_name:
+                continue
+            if want_id and str(item.get("id") or "").strip() != want_id:
+                continue
+            connected.append(item)
+        if not connected:
+            return None
+        return connected[0]
+
+    def send_user_evolution_whatsapp(
+        self,
+        username,
+        recipient_phone,
+        text=None,
+        media_url=None,
+        media_type=None,
+        connection_id=None,
+    ):
+        """
+        Send a customer message using the logged-in user's personal Evolution WhatsApp.
+        Used when reply_channel=whatsapp_internal (hard Meta / ignored-customer cases).
+        """
+        conn = self.resolve_user_evolution_connection(username, connection_id=connection_id)
+        if not conn:
+            return False, {
+                "error": "no_connected_user_whatsapp",
+                "message": "No connected personal WhatsApp number found for this user.",
+            }
+
+        to_phone = re.sub(r"\D", "", str(recipient_phone or ""))
+        message_text = str(text or "").strip()
+        media_url_s = str(media_url or "").strip()
+        if not to_phone:
+            return False, {"error": "missing_phone", "message": "Missing recipient phone."}
+        if not message_text and not media_url_s:
+            return False, {"error": "missing_text", "message": "Message text is required."}
+
+        base_cfg = self._internal_evolution_cfg_for_notifications() or {}
+        provider_base_url = str(base_cfg.get("providerBaseUrl") or "http://127.0.0.1:8080").rstrip("/")
+        api_key = str(base_cfg.get("apiKey") or "").strip()
+        instance_name = str(conn.get("instanceName") or "").strip()
+        if not api_key or not instance_name:
+            return False, {
+                "error": "missing_evolution_config",
+                "message": "Evolution API config missing for personal WhatsApp send.",
+            }
+
+        import requests
+        headers = {"Content-Type": "application/json", "apikey": api_key}
+        try:
+            if media_url_s:
+                mt = str(media_type or "document").strip().lower()
+                if mt.startswith("image"):
+                    evo_type = "image"
+                elif mt.startswith("audio"):
+                    evo_type = "audio"
+                elif mt.startswith("video"):
+                    evo_type = "video"
+                else:
+                    evo_type = "document"
+                url = f"{provider_base_url}/message/sendMedia/{quote(instance_name)}"
+                body = {
+                    "number": to_phone,
+                    "mediatype": evo_type,
+                    "media": media_url_s,
+                    "caption": message_text or "",
+                }
+            else:
+                url = f"{provider_base_url}/message/sendText/{quote(instance_name)}"
+                body = {"number": to_phone, "text": message_text}
+            resp = requests.post(url, headers=headers, json=body, timeout=30)
+            if int(resp.status_code or 0) >= 400:
+                return False, {
+                    "error": "evolution_send_failed",
+                    "status_code": int(resp.status_code or 0),
+                    "body": (resp.text or "")[:800],
+                    "instance_name": instance_name,
+                }
+            payload = {}
+            try:
+                payload = resp.json() if resp.content else {}
+            except Exception:
+                payload = {}
+            return True, {
+                "instance_name": instance_name,
+                "whatsapp_number": str(conn.get("whatsappNumber") or ""),
+                "connection_label": str(conn.get("connectionLabel") or ""),
+                "connection_id": str(conn.get("id") or ""),
+                "evolution_response": payload,
+                "text": message_text,
+            }
+        except Exception as e:
+            logging.error("User Evolution WhatsApp send failed: %s", e, exc_info=True)
+            return False, {"error": "exception", "message": str(e)}
 
     def _build_trip_booking_alert_message(self, record):
         from airtable_fields import FieldIds
@@ -15022,7 +17980,13 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
         booking_nr = self.get_field_value(fields, FieldIds.BOOKING_NR) or ""
         trip_name = self.get_field_value(fields, FieldIds.TRIP_NAME) or ""
         option = self.get_field_value(fields, FieldIds.OPTION) or ""
-        date_trip = self.get_field_value(fields, FieldIds.DATE_TRIP) or ""
+        date_trip_raw = self.get_field_value(fields, FieldIds.DATE_TRIP) or ""
+        try:
+            _, date_trip = self.get_corrected_trip_date(str(date_trip_raw or ""))
+            if not date_trip or str(date_trip).strip().lower() == "unknown date":
+                date_trip = str(date_trip_raw or "")
+        except Exception:
+            date_trip = str(date_trip_raw or "")
         adt = self.get_field_value(fields, FieldIds.ADT) or ""
         chd = self.get_field_value(fields, FieldIds.CHD) or ""
         std = self.get_field_value(fields, FieldIds.STD) or ""
@@ -15268,6 +18232,45 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
         @app.after_request
         def _ensure_api_cors_headers(response):
             return _apply_api_cors_headers(response)
+
+        def _public_legal_html_response(filename):
+            from flask import Response, send_file
+            html_path = os.path.join(SCRIPT_DIR, "static", filename)
+            if os.path.isfile(html_path):
+                resp = send_file(html_path, mimetype="text/html; charset=utf-8")
+                resp.headers["Cache-Control"] = "public, max-age=300"
+                resp.headers["X-Robots-Tag"] = "index, follow"
+                return resp
+            return Response("Page unavailable", status=500, mimetype="text/plain; charset=utf-8")
+
+        @app.route("/privacy-policy", methods=["GET"], strict_slashes=False)
+        @app.route("/privacy", methods=["GET"], strict_slashes=False)
+        @app.route("/privacy-policy.html", methods=["GET"])
+        def public_privacy_policy():
+            return _public_legal_html_response("privacy-policy.html")
+
+        @app.route("/terms", methods=["GET"], strict_slashes=False)
+        @app.route("/terms-of-service", methods=["GET"], strict_slashes=False)
+        @app.route("/terms.html", methods=["GET"])
+        def public_terms_of_service():
+            return _public_legal_html_response("terms.html")
+
+        @app.route("/robots.txt", methods=["GET"])
+        def public_robots_txt():
+            from flask import Response
+            body = (
+                "User-agent: facebookexternalhit\nAllow: /\n\n"
+                "User-agent: Facebot\nAllow: /\n\n"
+                "User-agent: meta-externalagent\nAllow: /\n\n"
+                "User-agent: *\n"
+                "Allow: /privacy-policy\n"
+                "Allow: /privacy\n"
+                "Allow: /privacy-policy.html\n"
+                "Allow: /terms\n"
+                "Allow: /terms.html\n"
+                "Allow: /robots.txt\n"
+            )
+            return Response(body, mimetype="text/plain; charset=utf-8")
 
         # #region debug-point slow-chat-load-backend
         _dbg_url = None
@@ -16257,7 +19260,6 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                             # to be sent to getBase64FromMediaMessage endpoint
                             return f"__AUDIO_EVOLUTION_MSG__:{json.dumps(data, ensure_ascii=False)}"
                         except Exception as e:
-                            import logging
                             logging.error(f"Error handling internal audio message: {e}")
                             return "[Audio Message: Failed to process]"
 
@@ -22021,8 +25023,14 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     if not raw:
                         return ""
                     if raw.startswith("dynamic_voucher.html"):
-                        return "https://voucher.ftstravels.net/" + raw
-                    if "voucher.ftstravels.net" in raw.lower():
+                        return "https://voucher.ftstravels.com/" + raw
+                    raw = re.sub(
+                        r"https?://voucher\.ftstravels\.net\b",
+                        "https://voucher.ftstravels.com",
+                        raw,
+                        flags=re.IGNORECASE,
+                    )
+                    if "voucher.ftstravels.com" in raw.lower():
                         return raw
                     return ""
 
@@ -29347,8 +32355,10 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 logging.error(f"Error in /api/payments/create: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
-        @app.route('/api/operations/select_field_options', methods=['GET'])
+        @app.route('/api/operations/select_field_options', methods=['GET', 'OPTIONS'])
         def api_operations_select_field_options():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
             try:
                 field_name = str(request.args.get('field') or '').strip()
                 if not field_name:
@@ -29376,23 +32386,90 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 if not main_table:
                     return jsonify({"status": "error", "message": "Main table not found"}), 500
 
-                target_field = next((f for f in (main_table.get("fields") or []) if str(f.get("name") or "").strip() == field_name), None)
+                target_field = next(
+                    (
+                        f for f in (main_table.get("fields") or [])
+                        if str(f.get("name") or "").strip().lower() == field_name.lower()
+                    ),
+                    None,
+                )
                 if not target_field:
                     return jsonify({"status": "error", "message": f"Field not found in main table: {field_name}"}), 404
 
                 field_type = str(target_field.get("type") or "").strip()
-                if field_type not in ("multipleSelects", "singleSelect"):
-                    return jsonify({"status": "error", "message": f"Field is not select/multiselect: {field_name}"}), 400
+                data = []
+                if field_type in ("multipleSelects", "singleSelect"):
+                    choices = (((target_field.get("options") or {}).get("choices")) or [])
+                    data = [
+                        {
+                            "name": str(choice.get("name") or "").strip(),
+                            "color": str(choice.get("color") or "").strip() or None,
+                        }
+                        for choice in choices
+                        if str(choice.get("name") or "").strip()
+                    ]
+                else:
+                    # Agency (and similar) may be plain text in Airtable — collect distinct values from mirror.
+                    exact_name = str(target_field.get("name") or field_name).strip()
+                    seen = set()
+                    try:
+                        if getattr(self, "airtable_mirror", None):
+                            with self.airtable_mirror._connect() as conn:
+                                c = conn.cursor()
+                                table_key = None
+                                try:
+                                    table_key = self.airtable_mirror._get_table_key_for_main_list()
+                                except Exception:
+                                    table_key = None
+                                if table_key:
+                                    c.execute(
+                                        "SELECT fields_json FROM mirror_records WHERE table_key=? LIMIT 2500",
+                                        (table_key,),
+                                    )
+                                    for row in c.fetchall() or []:
+                                        try:
+                                            fields_obj = json.loads(row["fields_json"] or "{}")
+                                        except Exception:
+                                            continue
+                                        raw = fields_obj.get(exact_name)
+                                        if raw is None:
+                                            for k, v in (fields_obj or {}).items():
+                                                if str(k).strip().lower() == exact_name.lower():
+                                                    raw = v
+                                                    break
+                                        vals = raw if isinstance(raw, list) else [raw]
+                                        for item in vals:
+                                            name = ""
+                                            if isinstance(item, dict):
+                                                name = str(item.get("name") or item.get("label") or "").strip()
+                                            else:
+                                                name = str(item or "").strip()
+                                            if not name or name in seen:
+                                                continue
+                                            seen.add(name)
+                                            data.append({"name": name, "color": None})
+                                            if len(data) >= 200:
+                                                break
+                                        if len(data) >= 200:
+                                            break
+                    except Exception as mirror_err:
+                        logging.warning(f"select_field_options mirror fallback failed for {field_name}: {mirror_err}")
 
-                choices = (((target_field.get("options") or {}).get("choices")) or [])
-                data = [
-                    {
-                        "name": str(choice.get("name") or "").strip(),
-                        "color": str(choice.get("color") or "").strip() or None,
-                    }
-                    for choice in choices
-                    if str(choice.get("name") or "").strip()
-                ]
+                    # Sensible defaults for Agency when mirror is empty.
+                    if not data and exact_name.lower() == "agency":
+                        for name in (
+                            "GetYourGuide",
+                            "Headout",
+                            "Viator",
+                            "Expedia",
+                            "Tiqets",
+                            "FTS Travels",
+                            "Direct",
+                            "Civitatis",
+                            "Musement",
+                        ):
+                            data.append({"name": name, "color": None})
+
                 cache[field_name] = data
                 return jsonify({"status": "success", "data": data}), 200
             except Exception as e:
@@ -30847,7 +33924,14 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                             )
                             notify_meta["whatsapp"] = {"ok": bool(wa_ok), "to": to_phone, "template": wa_template_name}
                             if isinstance(wa_meta, dict):
-                                notify_meta["whatsapp"]["meta"] = {"status_code": wa_meta.get("status_code"), "phone_number_id": wa_meta.get("phone_number_id"), "message_id": wa_meta.get("message_id")}
+                                notify_meta["whatsapp"]["meta"] = {
+                                    "status_code": wa_meta.get("status_code"),
+                                    "phone_number_id": wa_meta.get("phone_number_id"),
+                                    "message_id": wa_meta.get("message_id"),
+                                    "fallback_used": bool(wa_meta.get("fallback_used")),
+                                    "fallback_from_phone_number_id": wa_meta.get("fallback_from_phone_number_id"),
+                                    "location": wa_meta.get("location"),
+                                }
                             if wa_ok:
                                 sent_whatsapp += 1
                             else:
@@ -30858,17 +33942,20 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                 phone_number_id = None
                                 message_id = None
                                 template_text = None
+                                used_location = location or "Unknown"
                                 if isinstance(wa_meta, dict):
                                     phone_number_id = wa_meta.get("phone_number_id")
                                     message_id = wa_meta.get("message_id")
                                     template_text = wa_meta.get("template_text")
+                                    if wa_meta.get("location"):
+                                        used_location = str(wa_meta.get("location") or used_location)
                                 if not chat_id:
                                     conv = chat_db.get_or_create_conversation(
                                         source="WhatsApp",
                                         sender_identifier=to_phone,
                                         contact_name=customer_name_short,
                                         airtable_record_id=rid,
-                                        location=location or "Unknown",
+                                        location=used_location,
                                         thread_id="",
                                         receiving_phone_id=str(phone_number_id or receiving_phone_id or ""),
                                     )
@@ -30878,12 +33965,29 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                         chat_db.update_conversation_info(chat_id, booking_number=booking_nr)
                                     except Exception:
                                         pass
+                                    if wa_ok and phone_number_id:
+                                        try:
+                                            chat_db.update_conversation_routing(
+                                                chat_id,
+                                                location=used_location,
+                                                receiving_phone_id=str(phone_number_id),
+                                            )
+                                        except Exception:
+                                            pass
                                     shown = str(template_text or "").strip()
                                     txt = _format_template_chat_text(
                                         wa_template_name,
                                         shown=shown,
                                         fallback_text="WhatsApp template sent successfully.",
                                     )
+                                    if isinstance(wa_meta, dict) and wa_meta.get("fallback_used"):
+                                        txt = (
+                                            f"{txt}\n"
+                                            f"[Sent via fallback WhatsApp number "
+                                            f"{wa_meta.get('phone_number_id')} "
+                                            f"because template missing on "
+                                            f"{wa_meta.get('fallback_from_phone_number_id')}]"
+                                        )
                                     chat_db.add_message(
                                         chat_id=chat_id,
                                         sender_type="agent",
@@ -30892,6 +33996,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                         increment_unread=False,
                                         source="WhatsApp",
                                         external_message_id=message_id,
+                                        error_message=(None if wa_ok else str((wa_meta or {}).get("body") or "whatsapp_send_failed")),
                                     )
                             except Exception:
                                 pass
@@ -30986,6 +34091,41 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 return jsonify(result), 200
             except Exception as e:
                 logging.error(f"Error in /api/offer_send_fts/run: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/offer_bonus_fts/run', methods=['POST'])
+        def api_offer_bonus_fts_run():
+            try:
+                payload = request.get_json(silent=True) or {}
+                from offer_bonus_fts import run as run_offer_bonus_fts
+                result = run_offer_bonus_fts(self, payload)
+                return jsonify(result), 200
+            except Exception as e:
+                logging.error(f"Error in /api/offer_bonus_fts/run: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/cancelled_recovery_fts/run', methods=['POST'])
+        def api_cancelled_recovery_fts_run():
+            try:
+                payload = request.get_json(silent=True) or {}
+                from cancelled_recovery_fts import run as run_cancelled_recovery_fts
+                result = run_cancelled_recovery_fts(self, payload)
+                return jsonify(result), 200
+            except Exception as e:
+                logging.error(f"Error in /api/cancelled_recovery_fts/run: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/cancelled_recovery_bonus_fts/run', methods=['POST'])
+        def api_cancelled_recovery_bonus_fts_run():
+            try:
+                payload = request.get_json(silent=True) or {}
+                payload = dict(payload)
+                payload["mode"] = "bonus"
+                from cancelled_recovery_fts import run as run_cancelled_recovery_fts
+                result = run_cancelled_recovery_fts(self, payload)
+                return jsonify(result), 200
+            except Exception as e:
+                logging.error(f"Error in /api/cancelled_recovery_bonus_fts/run: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/version', methods=['GET'])
@@ -31285,21 +34425,26 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             try:
                 import requests
                 location = request.args.get('location', 'default')
+                include_pending = str(request.args.get('include_pending') or '').strip().lower() in ('1', 'true', 'yes')
                 token = self._get_whatsapp_access_token()
-                
+
                 waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {})
                 waba_id = waba_ids.get(location, waba_ids.get('default'))
-                
+
                 if not waba_id:
                     return jsonify({"status": "error", "message": "WABA_ID is missing in config.json under whatsapp object."}), 400
-                
+
                 phone_number_ids = self.config.get('whatsapp', {}).get('phone_number_ids', {}) or {}
                 phone_number_id = phone_number_ids.get(location, phone_number_ids.get('default'))
                 from_info = {"location": location, "phone_number_id": phone_number_id, "waba_id": waba_id}
                 if phone_number_id:
                     try:
-                        info_url = f"https://graph.facebook.com/v19.0/{phone_number_id}?fields=display_phone_number,verified_name&access_token={token}"
-                        info_res = requests.get(info_url, timeout=10)
+                        info_url = f"https://graph.facebook.com/{META_GRAPH_VERSION}/{phone_number_id}"
+                        info_res = requests.get(
+                            info_url,
+                            params={"fields": "display_phone_number,verified_name", "access_token": token},
+                            timeout=10,
+                        )
                         if info_res.status_code == 200:
                             meta = info_res.json() or {}
                             from_info.update({
@@ -31309,16 +34454,46 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     except Exception:
                         pass
 
-                url = f"https://graph.facebook.com/v19.0/{waba_id}/message_templates?access_token={token}&limit=100"
-                res = requests.get(url, timeout=10)
-                if res.status_code == 200:
-                    data = res.json()
-                    templates = [t for t in data.get('data', []) if t.get('status') == 'APPROVED']
-                    return jsonify({"status": "success", "data": templates, "from": from_info}), 200
-                else:
-                    err_msg = res.json() if res.text else "Unknown Meta Error"
-                    logging.error(f"Failed to fetch templates from Meta for WABA {waba_id}: {err_msg}")
-                    return jsonify({"status": "error", "message": f"Failed to fetch templates from Meta. Details: {err_msg}"}), res.status_code
+                # Fetch ALL statuses (with pagination), then expose APPROVED for sending.
+                fetched = self._fetch_whatsapp_templates_from_meta(location=location, statuses=None)
+                all_templates = list(fetched.get("templates") or [])
+                if fetched.get("error") and not all_templates:
+                    return jsonify({
+                        "status": "error",
+                        "message": f"Failed to fetch templates from Meta. Details: {fetched.get('error')}",
+                        "from": from_info,
+                    }), 502
+
+                approved = []
+                pending = []
+                other = []
+                for t in all_templates:
+                    st = str((t or {}).get("status") or "").strip().upper()
+                    if st == "APPROVED":
+                        approved.append(t)
+                    elif st in ("PENDING", "IN_APPEAL", "IN APPEAL"):
+                        pending.append(t)
+                    else:
+                        other.append(t)
+
+                data_out = list(approved)
+                if include_pending:
+                    # Keep approved first; append pending for visibility in picker search.
+                    data_out = list(approved) + list(pending)
+
+                return jsonify({
+                    "status": "success",
+                    "data": data_out,
+                    "from": from_info,
+                    "meta": {
+                        "approved_count": len(approved),
+                        "pending_count": len(pending),
+                        "other_count": len(other),
+                        "pages_fetched": int(fetched.get("pages_fetched") or 0),
+                        "graph_version": META_GRAPH_VERSION,
+                        "include_pending": bool(include_pending),
+                    },
+                }), 200
             except Exception as e:
                 return jsonify({"status": "error", "message": str(e)}), 500
 
@@ -31424,7 +34599,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 customer_phone = conv_dict.get('customer_phone')
 
                 rc = str(reply_channel or 'auto').strip().lower()
-                if rc not in ('auto', 'email', 'whatsapp', 'facebook'):
+                if rc not in ('auto', 'email', 'whatsapp', 'whatsapp_internal', 'facebook'):
                     rc = 'auto'
                 if rc == 'auto':
                     last_chan = str(conv_dict.get('last_customer_channel') or source or '').strip().lower()
@@ -31438,6 +34613,13 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     desired_channel = rc
 
                 if template_name:
+                    # Meta templates are Cloud API only
+                    if desired_channel == 'whatsapp_internal':
+                        return jsonify({
+                            "status": "error",
+                            "message": "WhatsApp templates require Meta Cloud API. Use Reply Channel = WhatsApp (Meta), or send plain text via Internal WhatsApp.",
+                            "code": "TEMPLATE_REQUIRES_META",
+                        }), 400
                     desired_channel = 'whatsapp'
 
                 # #region debug-point E:api-send-routing
@@ -31447,9 +34629,13 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     pass
                 # #endregion
 
-                _enabled, _routing, _cfg = _get_channel_config(desired_channel)
-                if not _enabled:
-                    return jsonify({"status": "error", "message": f"Channel '{desired_channel}' is disabled by admin settings."}), 403
+                if desired_channel != 'whatsapp_internal':
+                    _enabled, _routing, _cfg = _get_channel_config(desired_channel)
+                    if not _enabled:
+                        return jsonify({"status": "error", "message": f"Channel '{desired_channel}' is disabled by admin settings."}), 403
+                else:
+                    # Personal Evolution WhatsApp is always allowed when user has a connected number
+                    _enabled, _routing, _cfg = True, "", {}
                 
                 media_url = None
                 media_type = None
@@ -31464,15 +34650,21 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     filename = file.filename
                     mime_type = file.mimetype
                     file_content = file.read()
+                    if str(mime_type or "").startswith("image/"):
+                        media_type = "image"
+                    elif str(mime_type or "").startswith("audio/"):
+                        media_type = "audio"
+                    elif str(mime_type or "").startswith("video/"):
+                        media_type = "video"
+                    else:
+                        media_type = "document"
                     
-                    if desired_channel in ('whatsapp', 'facebook'):
-                        # Reset pointer
+                    if desired_channel in ('whatsapp', 'whatsapp_internal', 'facebook'):
                         file.seek(0)
                         try:
                             import cloudinary
                             import cloudinary.uploader
                             
-                            # Initialize Cloudinary from config.json if CLOUDINARY_URL env var is not set
                             if not cloudinary.config().cloud_name and 'cloudinary' in self.config:
                                 c_conf = self.config['cloudinary']
                                 cloudinary.config(
@@ -31481,49 +34673,34 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                     api_secret=c_conf.get('api_secret')
                                 )
                                 
-                            # Make sure Cloudinary is configured
-                            if not cloudinary.config().cloud_name:
-                                logging.warning("Cloudinary not configured. Cannot upload media.")
-                                return jsonify({"status": "error", "message": "Cloudinary configuration missing on server (missing CLOUDINARY_URL or config.json entry)"}), 500
+                            if cloudinary.config().cloud_name:
+                                r_type = 'raw' if mime_type == 'application/pdf' else 'auto'
+                                clean_filename = filename.split('.')[0] if '.' in filename else filename
+                                import re
+                                clean_filename = re.sub(r'[^a-zA-Z0-9_-]', '_', clean_filename)
+                                clean_filename = clean_filename.strip('_')
+                                import uuid
+                                unique_public_id = f"{clean_filename}_{chat_id}_{int(time.time())}_{uuid.uuid4().hex[:10]}"
                                 
-                            r_type = 'raw' if mime_type == 'application/pdf' else 'auto'
-                            # Pass filename to Cloudinary so it keeps the .pdf extension
-                            # Clean the filename to ensure it's valid for public_id
-                            clean_filename = filename.split('.')[0] if '.' in filename else filename
-                            import re
-                            # Remove spaces and special characters that Cloudinary rejects
-                            clean_filename = re.sub(r'[^a-zA-Z0-9_-]', '_', clean_filename)
-                            clean_filename = clean_filename.strip('_')
-                            import uuid
-                            import time
-                            unique_public_id = f"{clean_filename}_{chat_id}_{int(time.time())}_{uuid.uuid4().hex[:10]}"
-                            
-                            res = cloudinary.uploader.upload(
-                                file, 
-                                resource_type=r_type,
-                                public_id=unique_public_id,
-                                format='pdf' if mime_type == 'application/pdf' else None
-                            )
-                            media_url = res.get('secure_url') or res.get('url')
-                            if mime_type.startswith('image/'):
-                                media_type = 'image'
-                            elif mime_type.startswith('audio/'):
-                                media_type = 'audio'
-                                # Convert .webm to .m4a (audio/mp4) so WhatsApp/Messenger treats it as a playable audio/voice note, not a document
-                                if media_url and media_url.endswith('.webm'):
+                                res = cloudinary.uploader.upload(
+                                    file, 
+                                    resource_type=r_type,
+                                    public_id=unique_public_id,
+                                    format='pdf' if mime_type == 'application/pdf' else None
+                                )
+                                media_url = res.get('secure_url') or res.get('url')
+                                if media_type == 'audio' and media_url and media_url.endswith('.webm'):
                                     media_url = media_url.rsplit('.webm', 1)[0] + '.m4a'
-                            elif mime_type.startswith('video/'):
-                                media_type = 'video'
+                                logging.info(f"Uploaded file to Cloudinary: {media_url}")
                             else:
-                                media_type = 'document'
-                            logging.info(f"Uploaded file to Cloudinary: {media_url}")
+                                logging.warning("Cloudinary not configured. Sending media via Meta upload instead.")
                         except Exception as e:
-                            logging.error(f"Error uploading to Cloudinary: {e}")
-                            return jsonify({"status": "error", "message": f"Failed to upload media: {str(e)}"}), 500
+                            logging.warning(f"Cloudinary upload failed, sending media via Meta upload instead: {e}")
+                            media_url = None
                 
                 # Logic to actually send the message based on desired channel
                 texts_to_save = []
-                if desired_channel == 'whatsapp':
+                if desired_channel in ('whatsapp', 'whatsapp_internal'):
                     import re
 
                     def _country_code_from_country(country_val):
@@ -31731,7 +34908,56 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                         ):
                             text = self._strip_sales_rep_title(text)
 
-                    if not template_name:
+                    # Personal Evolution WhatsApp (bypass Meta Cloud API / 24h window)
+                    if desired_channel == 'whatsapp_internal':
+                        actor_username = str(
+                            actor.get('username')
+                            or actor.get('user_name')
+                            or actor.get('id')
+                            or actor.get('user_id')
+                            or ''
+                        ).strip()
+                        if not actor_username:
+                            return jsonify({
+                                "status": "error",
+                                "message": "Actor username is required to send via personal Internal WhatsApp.",
+                                "code": "MISSING_ACTOR",
+                            }), 400
+                        success, evo_meta = self.send_user_evolution_whatsapp(
+                            username=actor_username,
+                            recipient_phone=recipient_phone,
+                            text=text,
+                            media_url=media_url,
+                            media_type=media_type,
+                        )
+                        if not success:
+                            err_msg = ""
+                            if isinstance(evo_meta, dict):
+                                err_msg = str(evo_meta.get("message") or evo_meta.get("error") or evo_meta.get("body") or "")
+                            return jsonify({
+                                "status": "error",
+                                "message": err_msg or "Failed to send via personal Internal WhatsApp. Connect your WhatsApp number in Settings → Internal WhatsApp.",
+                                "code": (evo_meta or {}).get("error") if isinstance(evo_meta, dict) else "EVOLUTION_SEND_FAILED",
+                                "meta": evo_meta if isinstance(evo_meta, dict) else None,
+                            }), 502
+
+                        label = ""
+                        wa_num = ""
+                        if isinstance(evo_meta, dict):
+                            label = str(evo_meta.get("connection_label") or "").strip()
+                            wa_num = str(evo_meta.get("whatsapp_number") or "").strip()
+                        prefix = "[Internal WhatsApp"
+                        if label:
+                            prefix += f" · {label}"
+                        elif wa_num:
+                            prefix += f" · {wa_num}"
+                        prefix += "]"
+                        if media_url:
+                            texts_to_save.append(f"{prefix} [Sent {str(media_type or 'attachment').capitalize()}] {media_url}\n{text or ''}".strip())
+                        else:
+                            texts_to_save.append(f"{prefix}\n{text}".strip())
+                        # Skip Meta send path below
+                    elif not template_name:
                         try:
                             from datetime import datetime, timedelta
                             last_ts = None
@@ -31749,213 +34975,268 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                     diff_hours = (cairo_now - last_dt).total_seconds() / 3600.0
                                     day_changed = cairo_now.date() != last_dt.date()
                                     if diff_hours >= 23 or day_changed:
+                                        window_err = (
+                                            "Message failed to send because more than 24 hours have passed "
+                                            "since the customer last replied to this number."
+                                        )
+                                        saved_msg_id = None
+                                        try:
+                                            saved_msg_id = chat_db.add_message(
+                                                chat_id,
+                                                'agent',
+                                                text or '',
+                                                status='error',
+                                                source='WhatsApp',
+                                                error_message=window_err,
+                                            )
+                                        except Exception:
+                                            saved_msg_id = None
                                         return jsonify({
                                             "status": "error",
-                                            "message": "WhatsApp 24h window closed. Please send a Template to reopen the chat.",
+                                            "message": window_err,
+                                            "error_message": window_err,
                                             "code": "WHATSAPP_WINDOW_CLOSED",
+                                            "saved_msg_id": saved_msg_id,
                                             "meta": {"diff_hours": diff_hours, "day_changed": day_changed, "location": location}
                                         }), 400
                         except Exception:
                             pass
 
-                    success, actual_text = self.send_whatsapp_message(
-                        recipient_phone, 
-                        text, 
-                        location=location, 
-                        media_url=media_url, 
-                        media_type=media_type,
-                        template_name=template_name,
-                        template_language=template_language,
-                        booking_data=booking_data,
-                        template_variables=template_variables,
-                        receiving_phone_id=receiving_phone_id,
-                        template_header_media_url=template_header_media_url,
-                        template_header_media_type=template_header_media_type
-                    )
-                    sent_meta = actual_text if isinstance(actual_text, dict) else None
-                    sent_message_id = None
-                    sent_phone_number_id = None
-                    display_text = None
-                    try:
-                        if sent_meta:
-                            sent_message_id = sent_meta.get("message_id")
-                            sent_phone_number_id = sent_meta.get("phone_number_id")
-                            if template_name:
-                                display_text = sent_meta.get("template_text") or sent_meta.get("text")
-                            else:
-                                display_text = sent_meta.get("text")
-                    except Exception:
-                        sent_meta = None
-
-                    if not success:
-                        meta_status = 502
-                        meta_code = None
-                        meta_type = None
-                        meta_message = None
-                        meta_details = None
-                        meta_phone_number_id = None
-                        meta_is_transient = False
-                        raw_body = None
-
-                        try:
-                            if isinstance(actual_text, dict):
-                                meta_phone_number_id = actual_text.get("phone_number_id")
-                                raw_body = actual_text.get("body")
-                                sc = actual_text.get("status_code")
-                                if isinstance(sc, int):
-                                    if 400 <= sc < 500:
-                                        meta_status = sc
-                                    else:
-                                        meta_status = 502
-
-                                err_json = actual_text.get("json")
-                                if not isinstance(err_json, dict) and raw_body:
-                                    import json as _json
-                                    try:
-                                        err_json = _json.loads(raw_body)
-                                    except Exception:
-                                        err_json = None
-                                if isinstance(err_json, dict):
-                                    err = err_json.get("error") or {}
-                                    meta_code = err.get("code")
-                                    meta_type = err.get("type")
-                                    meta_message = err.get("message")
-                                    meta_is_transient = bool(err.get("is_transient"))
-                                    meta_details = (err.get("error_data") or {}).get("details")
-                            else:
-                                raw_body = actual_text
-                        except Exception:
-                            pass
-
-                        user_message = "Failed to send WhatsApp message via Meta API."
-                        if str(meta_code) == "LOCAL_TEMPLATE_MEDIA_REQUIRED":
-                            user_message = "Template requires a valid attachment link in Airtable Attachments, or you must paste a URL."
-                        if meta_code == 133010:
-                            user_message = "Meta error: the sending WhatsApp business number (Phone Number ID) is not registered/active on Cloud API."
-                        elif meta_code in (132000, 132001, 132012):
-                            user_message = "Meta rejected the message request. Please verify the WhatsApp template and parameters."
-                        elif meta_is_transient or (meta_type == "OAuthException" and meta_status >= 500):
-                            user_message = "Meta Cloud API is temporarily unavailable. Please retry in a minute."
-                        elif meta_type == "OAuthException" and meta_message:
-                            user_message = f"Meta OAuth error: {meta_message}"
-                        elif meta_message:
-                            user_message = f"Meta error: {meta_message}"
-
-                        return jsonify({
-                            "status": "error",
-                            "message": user_message,
-                            "meta": {
-                                "meta_code": meta_code,
-                                "meta_type": meta_type,
-                                "is_transient": meta_is_transient,
-                                "details": meta_details,
-                                "phone_number_id": meta_phone_number_id,
-                                "raw": raw_body,
-                            }
-                        }), meta_status
-
-                    try:
-                        is_sales = str(location or "").strip().lower() == "sales"
-                        if not is_sales:
-                            phone_id_locations = (self.config.get('whatsapp', {}) or {}).get('phone_id_locations', {}) or {}
-                            pinned_loc = phone_id_locations.get(str(receiving_phone_id)) if receiving_phone_id is not None else None
-                            is_sales = str(pinned_loc or "").strip().lower() == "sales"
-                        if is_sales:
-                            actor_user_id = actor.get('id') or actor.get('user_id') or actor.get('username')
-                            actor_name = actor.get('name') or actor.get('username') or actor.get('user_name') or actor_user_id
-                            chat_db.log_sales_activity(
-                                chat_id=chat_id,
-                                event_type="reply_sent",
-                                actor_user_id=str(actor_user_id) if actor_user_id is not None else None,
-                                actor_name=str(actor_name or "") if actor_name is not None else None,
-                                meta={"template_name": template_name, "has_media": bool(media_url)},
-                            )
-                    except Exception:
-                        pass
-                    
-                    if template_name:
-                        # Use the actual text fetched from Meta with replaced variables
-                        shown = display_text if display_text else ""
-                        text = _format_template_chat_text(
-                            template_name,
-                            shown=shown,
-                            fallback_text=text,
+                    if desired_channel != 'whatsapp_internal':
+                        success, actual_text = self.send_whatsapp_message(
+                            recipient_phone, 
+                            text, 
+                            location=location, 
+                            media_url=media_url, 
+                            media_type=media_type,
+                            template_name=template_name,
+                            template_language=template_language,
+                            booking_data=booking_data,
+                            template_variables=template_variables,
+                            receiving_phone_id=receiving_phone_id,
+                            template_header_media_url=template_header_media_url,
+                            template_header_media_type=template_header_media_type,
+                            media_bytes=file_content,
+                            media_mime=mime_type,
+                            media_filename=filename,
                         )
+                        sent_meta = actual_text if isinstance(actual_text, dict) else None
+                        sent_message_id = None
+                        sent_phone_number_id = None
+                        display_text = None
                         try:
-                            if template_header_media_url:
-                                header_type = str(template_header_media_type or "").strip().lower()
-                                if header_type == "document":
-                                    texts_to_save.append(f"[Sent Document] {template_header_media_url}")
+                            if sent_meta:
+                                sent_message_id = sent_meta.get("message_id")
+                                sent_phone_number_id = sent_meta.get("phone_number_id")
+                                if template_name:
+                                    display_text = sent_meta.get("template_text") or sent_meta.get("text")
                                 else:
-                                    texts_to_save.append(f"[Sent Image] {template_header_media_url}")
+                                    display_text = sent_meta.get("text")
                         except Exception:
-                            pass
-                        texts_to_save.append(text)
+                            sent_meta = None
+
+                        if not success:
+                            meta_status = 502
+                            meta_code = None
+                            meta_type = None
+                            meta_message = None
+                            meta_details = None
+                            meta_phone_number_id = None
+                            meta_is_transient = False
+                            raw_body = None
+
+                            try:
+                                if isinstance(actual_text, dict):
+                                    meta_phone_number_id = actual_text.get("phone_number_id")
+                                    raw_body = actual_text.get("body")
+                                    sc = actual_text.get("status_code")
+                                    if isinstance(sc, int):
+                                        if 400 <= sc < 500:
+                                            meta_status = sc
+                                        else:
+                                            meta_status = 502
+
+                                    err_json = actual_text.get("json")
+                                    if not isinstance(err_json, dict) and raw_body:
+                                        import json as _json
+                                        try:
+                                            err_json = _json.loads(raw_body)
+                                        except Exception:
+                                            err_json = None
+                                    if isinstance(err_json, dict):
+                                        err = err_json.get("error") or {}
+                                        meta_code = err.get("code")
+                                        meta_type = err.get("type")
+                                        meta_message = err.get("message")
+                                        meta_is_transient = bool(err.get("is_transient"))
+                                        meta_details = (err.get("error_data") or {}).get("details")
+                                else:
+                                    raw_body = actual_text
+                            except Exception:
+                                pass
+
+                            user_message = "Failed to send WhatsApp message via Meta API."
+                            error_code = "WHATSAPP_SEND_FAILED"
+                            if str(meta_code) == "LOCAL_TEMPLATE_MEDIA_REQUIRED":
+                                user_message = "Template requires a valid attachment link in Airtable Attachments, or you must paste a URL."
+                                error_code = "LOCAL_TEMPLATE_MEDIA_REQUIRED"
+                            if meta_code == 133010:
+                                user_message = "Meta error: the sending WhatsApp business number (Phone Number ID) is not registered/active on Cloud API."
+                            elif meta_code in (132000, 132001, 132012):
+                                user_message = "Meta rejected the message request. Please verify the WhatsApp template and parameters."
+                            elif meta_code == 131047 or (
+                                isinstance(meta_message, str)
+                                and "more than 24 hours have passed" in meta_message.lower()
+                            ):
+                                user_message = (
+                                    "Message failed to send because more than 24 hours have passed "
+                                    "since the customer last replied to this number."
+                                )
+                                error_code = "WHATSAPP_WINDOW_CLOSED"
+                            elif meta_is_transient or (meta_type == "OAuthException" and meta_status >= 500):
+                                user_message = "Meta Cloud API is temporarily unavailable. Please retry in a minute."
+                            elif meta_type == "OAuthException" and meta_message:
+                                user_message = f"Meta OAuth error: {meta_message}"
+                            elif meta_message:
+                                user_message = f"Meta error: {meta_message}"
+
+                            saved_msg_id = None
+                            try:
+                                save_text = text or ""
+                                if media_url and save_text:
+                                    save_text = f"[Sent {str(media_type or 'attachment').capitalize()}] {media_url}\n{save_text}".strip()
+                                elif media_url:
+                                    save_text = f"[Sent {str(media_type or 'attachment').capitalize()}] {media_url}"
+                                if save_text:
+                                    saved_msg_id = chat_db.add_message(
+                                        chat_id,
+                                        'agent',
+                                        save_text,
+                                        status='error',
+                                        source='WhatsApp',
+                                        error_message=user_message,
+                                    )
+                            except Exception:
+                                saved_msg_id = None
+
+                            return jsonify({
+                                "status": "error",
+                                "message": user_message,
+                                "error_message": user_message,
+                                "code": error_code,
+                                "saved_msg_id": saved_msg_id,
+                                "meta": {
+                                    "meta_code": meta_code,
+                                    "meta_type": meta_type,
+                                    "is_transient": meta_is_transient,
+                                    "details": meta_details,
+                                    "phone_number_id": meta_phone_number_id,
+                                    "raw": raw_body,
+                                }
+                            }), meta_status
 
                         try:
-                            access_token = self._get_whatsapp_access_token()
-                            waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {})
-                            waba_id = waba_ids.get(location, waba_ids.get('default'))
-                            header_media_type = None
-                            if booking_data and access_token and waba_id:
-                                import requests as _requests
-                                details_url = f"https://graph.facebook.com/v19.0/{waba_id}/message_templates?name={template_name}&access_token={access_token}"
-                                details_res = _requests.get(details_url, timeout=5)
-                                if details_res.status_code == 200:
-                                    details_data = (details_res.json() or {}).get('data', []) or []
-                                    if details_data:
-                                        details_tmpl = next((t for t in details_data if t.get('language') == template_language and t.get('name') == template_name), None)
-                                        if not details_tmpl:
-                                            details_tmpl = next((t for t in details_data if t.get('language') == template_language), details_data[0])
-                                        for comp in (details_tmpl.get('components') or []):
-                                            if str(comp.get('type') or '').lower() == 'header':
-                                                fmt = str(comp.get('format') or '').lower().strip()
-                                                if fmt in ('image', 'document', 'video'):
-                                                    header_media_type = fmt
-                                                    break
-
-                            if header_media_type:
-                                atts = self._extract_attachments_from_booking_data(booking_data)
-                                atts = self._filter_attachments_for_whatsapp_media_type(atts, header_media_type)
-                                if len(atts) > 1:
-                                    for att in atts[1:]:
-                                        att_url = str((att or {}).get('url') or '').strip()
-                                        if not att_url:
-                                            continue
-                                        extra_success, extra_text = self.send_whatsapp_message(
-                                            recipient_phone,
-                                            None,
-                                            location=location,
-                                            template_name="attachment_pickup",
-                                            template_language=template_language,
-                                            booking_data=None,
-                                            template_variables=None,
-                                            receiving_phone_id=receiving_phone_id,
-                                            template_header_media_url=att_url,
-                                            template_header_media_type=header_media_type
-                                        )
-                                        if extra_success:
-                                            extra_meta = extra_text if isinstance(extra_text, dict) else None
-                                            extra_shown = (extra_meta.get("template_text") or extra_meta.get("text")) if isinstance(extra_meta, dict) else None
-                                            extra_log = _format_template_chat_text(
-                                                "attachment_pickup",
-                                                shown=extra_shown,
-                                                fallback_text="Attachment sent via WhatsApp template.",
-                                                extra_link=att_url,
-                                            )
-                                            texts_to_save.append(extra_log)
+                            is_sales = str(location or "").strip().lower() == "sales"
+                            if not is_sales:
+                                phone_id_locations = (self.config.get('whatsapp', {}) or {}).get('phone_id_locations', {}) or {}
+                                pinned_loc = phone_id_locations.get(str(receiving_phone_id)) if receiving_phone_id is not None else None
+                                is_sales = str(pinned_loc or "").strip().lower() == "sales"
+                            if is_sales:
+                                actor_user_id = actor.get('id') or actor.get('user_id') or actor.get('username')
+                                actor_name = actor.get('name') or actor.get('username') or actor.get('user_name') or actor_user_id
+                                chat_db.log_sales_activity(
+                                    chat_id=chat_id,
+                                    event_type="reply_sent",
+                                    actor_user_id=str(actor_user_id) if actor_user_id is not None else None,
+                                    actor_name=str(actor_name or "") if actor_name is not None else None,
+                                    meta={"template_name": template_name, "has_media": bool(media_url)},
+                                )
                         except Exception:
                             pass
-                    elif media_url:
-                        text = f"[Sent {media_type.capitalize()}] {media_url}\n{text}"
-                        texts_to_save.append(text)
-                    else:
-                        texts_to_save.append(text)
+                        
+                        if template_name:
+                            # Use the actual text fetched from Meta with replaced variables
+                            shown = display_text if display_text else ""
+                            text = _format_template_chat_text(
+                                template_name,
+                                shown=shown,
+                                fallback_text=text,
+                            )
+                            try:
+                                if template_header_media_url:
+                                    header_type = str(template_header_media_type or "").strip().lower()
+                                    if header_type == "document":
+                                        texts_to_save.append(f"[Sent Document] {template_header_media_url}")
+                                    else:
+                                        texts_to_save.append(f"[Sent Image] {template_header_media_url}")
+                            except Exception:
+                                pass
+                            texts_to_save.append(text)
+
+                            try:
+                                access_token = self._get_whatsapp_access_token()
+                                waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {})
+                                waba_id = waba_ids.get(location, waba_ids.get('default'))
+                                header_media_type = None
+                                if booking_data and access_token and waba_id:
+                                    import requests as _requests
+                                    details_url = f"https://graph.facebook.com/v19.0/{waba_id}/message_templates?name={template_name}&access_token={access_token}"
+                                    details_res = _requests.get(details_url, timeout=5)
+                                    if details_res.status_code == 200:
+                                        details_data = (details_res.json() or {}).get('data', []) or []
+                                        if details_data:
+                                            details_tmpl = next((t for t in details_data if t.get('language') == template_language and t.get('name') == template_name), None)
+                                            if not details_tmpl:
+                                                details_tmpl = next((t for t in details_data if t.get('language') == template_language), details_data[0])
+                                            for comp in (details_tmpl.get('components') or []):
+                                                if str(comp.get('type') or '').lower() == 'header':
+                                                    fmt = str(comp.get('format') or '').lower().strip()
+                                                    if fmt in ('image', 'document', 'video'):
+                                                        header_media_type = fmt
+                                                        break
+
+                                if header_media_type:
+                                    atts = self._extract_attachments_from_booking_data(booking_data)
+                                    atts = self._filter_attachments_for_whatsapp_media_type(atts, header_media_type)
+                                    if len(atts) > 1:
+                                        for att in atts[1:]:
+                                            att_url = str((att or {}).get('url') or '').strip()
+                                            if not att_url:
+                                                continue
+                                            extra_success, extra_text = self.send_whatsapp_message(
+                                                recipient_phone,
+                                                None,
+                                                location=location,
+                                                template_name="attachment_pickup",
+                                                template_language=template_language,
+                                                booking_data=None,
+                                                template_variables=None,
+                                                receiving_phone_id=receiving_phone_id,
+                                                template_header_media_url=att_url,
+                                                template_header_media_type=header_media_type
+                                            )
+                                            if extra_success:
+                                                extra_meta = extra_text if isinstance(extra_text, dict) else None
+                                                extra_shown = (extra_meta.get("template_text") or extra_meta.get("text")) if isinstance(extra_meta, dict) else None
+                                                extra_log = _format_template_chat_text(
+                                                    "attachment_pickup",
+                                                    shown=extra_shown,
+                                                    fallback_text="Attachment sent via WhatsApp template.",
+                                                    extra_link=att_url,
+                                                )
+                                                texts_to_save.append(extra_log)
+                            except Exception:
+                                pass
+                        elif media_url:
+                            text = f"[Sent {media_type.capitalize()}] {media_url}\n{text}"
+                            texts_to_save.append(text)
+                        else:
+                            texts_to_save.append(text)
                         
                 elif desired_channel == 'email':
                     # Send via Gmail
                     logging.info(f"UI Agent sending Email to {identifier}: {text}")
-                    
+
                     # Extract email address if it contains name e.g., "Name <email@example.com>"
                     email_address = identifier
                     if '<' in identifier and '>' in identifier:
@@ -32083,20 +35364,22 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     texts_to_save.append(text)
                 elif desired_channel == 'facebook':
                     logging.info(f"UI Agent sending Facebook message to {identifier}: {text}")
-                    if file_content and not media_url:
-                        return jsonify({"status": "error", "message": f"Failed to prepare Facebook attachment. File present but media_url is empty."}), 500
+                    if file_content and not media_url and not media_type:
+                        return jsonify({"status": "error", "message": "Failed to prepare Facebook attachment."}), 500
 
-                    # If both text and media are present, we must send two separate messages to Facebook API
                     sent_message_ids = []
                     fb_meta = None
                     success = True
 
-                    if media_url:
+                    if media_url or file_content:
                         success, fb_meta = self.send_facebook_message(
                             recipient_psid=identifier,
                             text=None,
                             media_url=media_url,
-                            media_type=media_type
+                            media_type=media_type,
+                            media_bytes=file_content,
+                            media_mime=mime_type,
+                            media_filename=filename,
                         )
                         if success and isinstance(fb_meta, dict):
                             mid = str(fb_meta.get('message_id') or fb_meta.get('mid') or '').strip()
@@ -32216,7 +35499,14 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                             elif i == 0 and sent_message_ids_list:
                                 ext_id = sent_message_ids_list[0]
                                 
-                        chat_db.add_message(chat_id, 'agent', _t, status='sent', source=desired_channel, external_message_id=ext_id)
+                        chat_db.add_message(
+                            chat_id,
+                            'agent',
+                            _t,
+                            status='sent',
+                            source=('WhatsApp' if str(desired_channel or '').strip().lower() in {'whatsapp', 'whatsapp_internal'} else desired_channel),
+                            external_message_id=ext_id,
+                        )
                 
                 # Hide AI proposed draft from UI after sending
                 chat_db.delete_proposed_drafts(chat_id)
@@ -33505,6 +36795,12 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 filters = data.get("filters")
                 sorts = data.get("sorts")
                 actor_username = data.get("actor_username")
+                airtable_view = str(
+                    data.get("airtable_view")
+                    or data.get("view")
+                    or data.get("airtable_view_name")
+                    or ""
+                ).strip()
 
                 # Verify user is Religious
                 is_religious = False
@@ -33528,6 +36824,18 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
 
                 if not table_name:
                     return jsonify({"status": "error", "message": "Missing table_name"}), 400
+
+                # Table ACL (religious base)
+                if actor_user and not self._user_can_access_base_scope(actor_user, "religious"):
+                    return jsonify({
+                        "status": "error",
+                        "message": "You do not have permission to access the religious Airtable base",
+                    }), 403
+                if actor_user and not self._user_can_access_airtable_table(actor_user, table_name, "religious"):
+                    return jsonify({
+                        "status": "error",
+                        "message": f"You do not have permission to access table '{table_name}'",
+                    }), 403
 
                 mirror_offset = 0
                 try:
@@ -33593,6 +36901,48 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                 return True
                     return False
 
+                # Linked Airtable view (filter/sort from Airtable) — live fetch when no in-app filters.
+                has_app_filters = isinstance(filters, list) and len(filters) > 0
+                if airtable_view and not has_app_filters:
+                    from urllib.parse import quote
+                    import requests as _req
+                    base_id = str((self.config.get("airtable") or {}).get("religious_base_id") or "").strip()
+                    api_key = str((self.config.get("airtable") or {}).get("api_key") or "").strip()
+                    if not base_id or not api_key:
+                        return jsonify({"status": "error", "message": "Religious Airtable not configured"}), 400
+                    url = f"https://api.airtable.com/v0/{base_id}/{quote(str(table_name), safe='')}"
+                    params = {"pageSize": min(100, mirror_limit), "view": airtable_view}
+                    if offset_param and not str(offset_param).isdigit():
+                        params["offset"] = str(offset_param)
+                    resp = _req.get(
+                        url,
+                        headers={"Authorization": f"Bearer {api_key}"},
+                        params=params,
+                        timeout=45,
+                    )
+                    if resp.status_code != 200:
+                        detail = ""
+                        try:
+                            detail = str((resp.json() or {}).get("error", {}).get("message") or "")
+                        except Exception:
+                            detail = (resp.text or "")[:200]
+                        return jsonify({
+                            "status": "error",
+                            "message": f"Failed to query Airtable view on '{table_name}'" + (f": {detail}" if detail else ""),
+                        }), 500
+                    payload = resp.json() or {}
+                    records = payload.get("records") or []
+                    if not is_admin_actor:
+                        records = [rec for rec in records if _record_owned_by_actor(rec)]
+                    return jsonify({
+                        "status": "success",
+                        "data": records,
+                        "offset": payload.get("offset"),
+                        "server_filtered": False,
+                        "airtable_view_applied": True,
+                        "table_name": table_name,
+                    })
+
                 if is_admin_actor:
                     records, next_offset = self.airtable_mirror.query_table_records(
                         table_name=table_name,
@@ -33636,6 +36986,19 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 logging.error(f"Error querying religious table: {traceback.format_exc()}")
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        @app.route('/api/operations/mirror_version', methods=['GET', 'OPTIONS'])
+        def api_operations_mirror_version():
+            try:
+                if request.method == 'OPTIONS':
+                    return jsonify({"status": "success"}), 200
+                if not getattr(self, "airtable_mirror", None):
+                    return jsonify({"status": "error", "message": "Mirror unavailable"}), 503
+                data = self.airtable_mirror.get_list_data_version() or {}
+                return jsonify({"status": "success", "data": data})
+            except Exception as e:
+                logging.error(f"Error in /api/operations/mirror_version: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
         @app.route('/api/operations/bookings_query', methods=['POST'])
         def api_operations_bookings_query():
             try:
@@ -33647,18 +37010,62 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 filters = data.get('filters')
                 sorts = data.get('sorts')
                 actor_username = data.get('actor_username')
+                from airtable_fields import TABLE_NAME as _LIST_TABLE_NAME
+                table_name = str(data.get("table_name") or data.get("table") or _LIST_TABLE_NAME).strip() or _LIST_TABLE_NAME
+                is_list_table = table_name.lower() == str(_LIST_TABLE_NAME).strip().lower()
+
+                # Table ACL (external / main base)
+                try:
+                    user_obj = self._load_dashboard_user_by_actor(
+                        {"username": actor_username} if actor_username else {}
+                    )
+                    if user_obj and not self._user_can_access_base_scope(user_obj, "main"):
+                        return jsonify({
+                            "status": "error",
+                            "message": "You do not have permission to access the main Airtable base",
+                        }), 403
+                    if user_obj and not self._user_can_access_airtable_table(user_obj, table_name, "main"):
+                        return jsonify({
+                            "status": "error",
+                            "message": f"You do not have permission to access table '{table_name}'",
+                        }), 403
+                except Exception as table_acl_err:
+                    logging.warning(f"Table ACL check failed: {table_acl_err}")
 
                 # For external queries, we strictly query the external tables.
                 # Do NOT set is_religious = True even if the user has 'All', 
                 # because this endpoint is specifically for external operations.
                 is_religious = False
 
+                # Forced admin record scope (AND with user filters).
                 try:
-                    if getattr(self, "airtable_mirror", None) and view_name in [
-                        'Booking_today', 'Booking_tomorrow', 'Booking_Weekly',
-                        'Operation Today', 'Operation Tomorrow', 'Operation Weekly',
-                        'All Booking'
-                    ] and (self.airtable_mirror.is_main_list_ready(1) or is_religious):
+                    skip_forced = bool(
+                        data.get("skip_forced_record_filters")
+                        or data.get("dismiss_forced_record_filters")
+                    )
+                    dismissed_ver = data.get("dismissed_forced_filters_version")
+                    filters = self._merge_ai_operation_record_scope_filters(
+                        filters,
+                        actor_username=actor_username,
+                        actor={"username": actor_username} if actor_username else {},
+                        skip_forced_record_filters=skip_forced,
+                        dismissed_forced_filters_version=dismissed_ver,
+                    )
+                except Exception as scope_err:
+                    logging.warning(f"Failed merging AI Operation record scope: {scope_err}")
+
+                # Mirror path only for List table + known operation views.
+                try:
+                    if (
+                        is_list_table
+                        and getattr(self, "airtable_mirror", None)
+                        and view_name in [
+                            'Booking_today', 'Booking_tomorrow', 'Booking_Weekly',
+                            'Operation Today', 'Operation Tomorrow', 'Operation Weekly',
+                            'All Booking'
+                        ]
+                        and (self.airtable_mirror.is_main_list_ready(1) or is_religious)
+                    ):
                         mirror_offset = 0
                         try:
                             mirror_offset = int(str(offset_param or "0").strip() or "0")
@@ -33686,57 +37093,81 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                             "status": "success",
                             "data": records,
                             "offset": next_offset,
-                            "server_filtered": True
+                            "server_filtered": True,
+                            "table_name": table_name,
                         })
                 except Exception:
                     pass
 
-                if str(view_name or "").strip() == "All Booking":
+                if is_list_table and str(view_name or "").strip() == "All Booking":
                     return jsonify({"status": "error", "message": "All Booking is available only after Mirror is ready. Please wait for initial sync."}), 400
 
                 view_name = str(view_name or "").strip() or None
                 offset_param = str(offset_param or "").strip() or None
-                if not view_name:
+                if not view_name and is_list_table:
                     return jsonify({"status": "error", "message": "Missing view"}), 400
-                allowed_views = [
+                allowed_views = {
                     'Booking_today', 'Booking_tomorrow', 'Booking_Weekly',
                     'Operation Today', 'Operation Tomorrow', 'Operation Weekly',
                     'All Booking',
                     'bassant_Khaled', 'nadeen_Hossam', 'ahmedsaad_sales'
-                ]
+                }
                 
                 # If it's religious, don't restrict the view names as much, or add religious views to allowed
-                religious_views = [
+                religious_views = {
                     'حجاج حج مباشر', 'حجاج حج مباشر باقات', 'حجاج حج قرعة', 
                     'حجاج تحسين', 'حجاج بري', 'حجاج كوكتيل', 'إحصائيات البرامج', 'استفسارات جديدة'
-                ]
+                }
                 
+                # Allow imported / custom Airtable view names (viw… or any non-empty label).
+                # Invalid names will fail at Airtable and return a clear error.
+                allow_live_view = (
+                    (not view_name and not is_list_table)
+                    or (view_name and (
+                        view_name in allowed_views
+                        or view_name in religious_views
+                        or view_name.startswith("viw")
+                        or (2 <= len(view_name) <= 120)
+                    ))
+                )
                 if is_religious and view_name in religious_views:
                     # We should have handled this via mirror query, but if fallback is needed:
                     pass
-                elif view_name not in allowed_views:
+                elif not allow_live_view:
                     return jsonify({"status": "error", "message": f"Invalid view name: {view_name}"}), 400
 
                 from urllib.parse import quote
                 import requests
-                from airtable_fields import TABLE_NAME
 
-                url = f"https://api.airtable.com/v0/{self.config['airtable']['base_id']}/{quote(TABLE_NAME)}"
-                params = [f"view={quote(view_name)}"]
+                url = f"https://api.airtable.com/v0/{self.config['airtable']['base_id']}/{quote(table_name, safe='')}"
+                params = []
+                if view_name:
+                    params.append(f"view={quote(view_name)}")
                 if offset_param:
                     params.append(f"offset={quote(offset_param)}")
-                url += "?" + "&".join(params)
+                if params:
+                    url += "?" + "&".join(params)
                 headers = {"Authorization": f"Bearer {self.config['airtable']['api_key']}"}
                 response = requests.get(url, headers=headers, timeout=15)
                 if response.status_code != 200:
                     logging.error(f"Airtable operations query failed: {response.text}")
-                    return jsonify({"status": "error", "message": "Failed to query Airtable"}), 500
+                    detail = ""
+                    try:
+                        detail = str((response.json() or {}).get("error", {}).get("message") or "")
+                    except Exception:
+                        detail = ""
+                    msg = "Failed to query Airtable"
+                    if detail:
+                        msg = f"{msg}: {detail}"
+                    return jsonify({"status": "error", "message": msg}), 500
                 resp = response.json() or {}
                 return jsonify({
                     "status": "success",
                     "data": resp.get("records", []) or [],
                     "offset": resp.get("offset"),
-                    "server_filtered": False
+                    "server_filtered": False,
+                    "airtable_view_applied": bool(view_name),
+                    "table_name": table_name,
                 })
             except Exception as e:
                 logging.error(f"Error in api_operations_bookings_query: {e}", exc_info=True)
@@ -33757,8 +37188,16 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             try:
                 actor_username = request.args.get('actor_username')
                 table_name = request.args.get('table_name')
+                # scope=main  → always FTS AI Operation List (external)
+                # scope=religious → religious base schema
+                # omitted → infer from actor locations (legacy)
+                scope = str(request.args.get('scope') or request.args.get('base') or '').strip().lower()
                 is_religious = False
-                if actor_username:
+                if scope in ('main', 'external', 'list', 'ai_operation'):
+                    is_religious = False
+                elif scope in ('religious', 'religion'):
+                    is_religious = True
+                elif actor_username:
                     val = chat_db.get_setting("dashboard_users")
                     if val:
                         import json
@@ -33777,14 +37216,225 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     "data": self.airtable_mirror.list_schema_for_main_list(
                         is_religious=is_religious,
                         table_name=table_name,
-                    )
+                    ),
+                    "scope": "religious" if is_religious else "main",
                 })
             except Exception as e:
                 logging.error(f"Error in api_mirror_schema_list: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
-        @app.route('/api/operations/create_record', methods=['POST'])
+        @app.route('/api/airtable/bases', methods=['GET', 'OPTIONS'])
+        def api_airtable_bases():
+            """List configured Airtable Base IDs (main / religious / trips) for Settings ACL UI."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "ok"})
+            try:
+                bases = self._configured_airtable_bases()
+                actor_username = str(request.args.get("actor_username") or "").strip()
+                for_admin = str(request.args.get("for_admin") or "").strip().lower() in ("1", "true", "yes")
+                if actor_username and not for_admin:
+                    user_obj = self._load_dashboard_user_by_actor({"username": actor_username})
+                    if user_obj and not self._ai_operation_actor_is_admin(user_obj, actor={"username": actor_username}):
+                        bases = [
+                            b for b in bases
+                            if self._user_can_access_base_id(user_obj, b.get("baseId"))
+                        ]
+                return jsonify({"status": "success", "bases": bases})
+            except Exception as e:
+                logging.error(f"Error in api_airtable_bases: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/operations/import_airtable_view', methods=['POST', 'OPTIONS'])
+        def api_operations_import_airtable_view():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "ok"})
+            try:
+                data = request.json or {}
+                view_ref = str(data.get("view") or data.get("view_name") or data.get("view_id") or "").strip()
+                if not view_ref:
+                    return jsonify({"status": "error", "message": "view is required"}), 400
+                base_scope = str(data.get("base_scope") or data.get("scope") or "main").strip().lower() or "main"
+                table_name = str(data.get("table_name") or data.get("table") or "").strip() or None
+                actor = data.get("actor") or {}
+                if data.get("actor_username") and not actor.get("username"):
+                    actor = {**actor, "username": data.get("actor_username")}
+                user_obj = self._load_dashboard_user_by_actor(actor) if actor else None
+                if user_obj and not self._user_can_access_base_scope(user_obj, base_scope):
+                    return jsonify({
+                        "status": "error",
+                        "message": f"You do not have permission to access base scope '{base_scope}'",
+                    }), 403
+                result = self.resolve_airtable_list_view_layout(
+                    view_ref,
+                    base_scope=base_scope,
+                    table_name=table_name,
+                )
+                if result.get("status") == "success":
+                    resolved_table = str(((result.get("data") or {}) or {}).get("tableName") or table_name or "").strip()
+                    scope_key = "religious" if base_scope in ("religious", "religion", "rel", "hajj") else "main"
+                    if resolved_table and user_obj and not self._user_can_access_airtable_table(user_obj, resolved_table, scope_key):
+                        return jsonify({
+                            "status": "error",
+                            "message": f"You do not have permission to access table '{resolved_table}'",
+                        }), 403
+                status = 200 if result.get("status") == "success" else 400
+                return jsonify(result), status
+            except Exception as e:
+                logging.error(f"Error in api_operations_import_airtable_view: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/mirror/tables', methods=['GET', 'OPTIONS'])
+        def api_mirror_tables():
+            """List tables in main or religious Airtable base (from mirror metadata, Meta API fallback)."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "ok"})
+            try:
+                scope = str(request.args.get("scope") or request.args.get("base_scope") or "main").strip().lower()
+                if scope in ("religious", "religion", "rel", "hajj"):
+                    scope = "religious"
+                else:
+                    scope = "main"
+                # Admin settings UI can pass for_admin=1 to see all tables when editing ACL.
+                for_admin = str(request.args.get("for_admin") or "").strip().lower() in ("1", "true", "yes")
+                actor_username = str(request.args.get("actor_username") or "").strip()
+                tables = []
+                if getattr(self, "airtable_mirror", None):
+                    try:
+                        for row in (self.airtable_mirror.status() or []):
+                            if str(row.get("base_label") or "").strip().lower() != scope:
+                                continue
+                            if int(row.get("ignored") or 0):
+                                continue
+                            name = str(row.get("table_name") or "").strip()
+                            if not name:
+                                continue
+                            tables.append({
+                                "name": name,
+                                "recordCount": int(row.get("record_count") or 0),
+                                "lastSyncIso": row.get("last_sync_iso"),
+                                "ignored": False,
+                            })
+                    except Exception as mirror_err:
+                        logging.warning(f"mirror tables list from status failed: {mirror_err}")
+                if not tables:
+                    try:
+                        airtable_cfg = (self.config.get("airtable", {}) or {})
+                        api_key = str(airtable_cfg.get("api_key") or "").strip()
+                        base_id = (
+                            str(airtable_cfg.get("religious_base_id") or "").strip()
+                            if scope == "religious"
+                            else str(airtable_cfg.get("base_id") or "").strip()
+                        )
+                        if api_key and base_id:
+                            meta = requests.get(
+                                f"https://api.airtable.com/v0/meta/bases/{base_id}/tables",
+                                headers={"Authorization": f"Bearer {api_key}"},
+                                timeout=30,
+                            )
+                            if meta.status_code == 200:
+                                for t in (meta.json() or {}).get("tables") or []:
+                                    name = str((t or {}).get("name") or "").strip()
+                                    if name:
+                                        tables.append({
+                                            "name": name,
+                                            "recordCount": 0,
+                                            "lastSyncIso": None,
+                                            "ignored": False,
+                                        })
+                    except Exception as meta_err:
+                        logging.warning(f"mirror tables Meta API fallback failed: {meta_err}")
+                tables.sort(key=lambda t: str(t.get("name") or "").lower())
+                if actor_username and not for_admin:
+                    user_obj = self._load_dashboard_user_by_actor({"username": actor_username})
+                    if user_obj and not self._ai_operation_actor_is_admin(user_obj, actor={"username": actor_username}):
+                        if not self._user_can_access_base_scope(user_obj, scope):
+                            return jsonify({
+                                "status": "error",
+                                "message": f"You do not have permission to access base scope '{scope}'",
+                                "scope": scope,
+                                "tables": [],
+                            }), 403
+                        tables = [
+                            t for t in tables
+                            if self._user_can_access_airtable_table(user_obj, t.get("name"), scope)
+                        ]
+                return jsonify({"status": "success", "scope": scope, "tables": tables})
+            except Exception as e:
+                logging.error(f"Error in api_mirror_tables: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/operations/parse_booking_draft', methods=['POST', 'OPTIONS'])
+        def api_parse_operations_booking_draft():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                data = request.get_json(silent=True) or {}
+                text = str(data.get('text') or data.get('prompt') or data.get('details') or '').strip()
+                if not text:
+                    return _apply_api_cors_headers(jsonify({
+                        "status": "error",
+                        "message": "Booking details text is required"
+                    })), 400
+                if len(text) > 50000:
+                    return _apply_api_cors_headers(jsonify({
+                        "status": "error",
+                        "message": "Booking details text is too long"
+                    })), 400
+
+                fields = self.parse_operations_booking_draft(text) or {}
+                # Hard guarantee: Agency stays empty for manual operator selection.
+                if isinstance(fields, dict):
+                    fields.pop('Agency', None)
+
+                return _apply_api_cors_headers(jsonify({
+                    "status": "success",
+                    "fields": fields,
+                    "agency_required": True,
+                    "message": "Draft fields extracted. Choose Agency manually before creating the record."
+                })), 200
+            except Exception as e:
+                logging.error(f"Error in /api/operations/parse_booking_draft: {e}", exc_info=True)
+                return _apply_api_cors_headers(jsonify({
+                    "status": "error",
+                    "message": str(e)
+                })), 500
+
+        @app.route('/api/operations/parse_filter', methods=['POST', 'OPTIONS'])
+        def api_parse_operations_filter():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                data = request.get_json(silent=True) or {}
+                text = str(data.get('text') or data.get('prompt') or data.get('query') or '').strip()
+                if not text:
+                    return _apply_api_cors_headers(jsonify({
+                        "status": "error",
+                        "message": "Filter description text is required"
+                    })), 400
+                if len(text) > 20000:
+                    return _apply_api_cors_headers(jsonify({
+                        "status": "error",
+                        "message": "Filter description text is too long"
+                    })), 400
+                fields_meta = data.get('fields') if isinstance(data.get('fields'), list) else []
+                scope = str(data.get('scope') or 'main').strip().lower() or 'main'
+                filters = self.parse_operations_filter_prompt(text, fields_meta=fields_meta, scope=scope) or []
+                return _apply_api_cors_headers(jsonify({
+                    "status": "success",
+                    "filters": filters,
+                    "count": len(filters),
+                })), 200
+            except Exception as e:
+                logging.error(f"Error in /api/operations/parse_filter: {e}", exc_info=True)
+                return _apply_api_cors_headers(jsonify({
+                    "status": "error",
+                    "message": str(e)
+                })), 500
+
+        @app.route('/api/operations/create_record', methods=['POST', 'OPTIONS'])
         def api_create_operations_record():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
             try:
                 data = request.json
                 fields = data.get('fields')
@@ -33803,14 +37453,51 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     'حجاج تحسين', 'حجاج بري', 'حجاج كوكتيل', 'إحصائيات البرامج', 'استفسارات جديدة'
                 ]
                 
+                # Airtable views (Operation Today, etc.) are NOT table names — map to List.
+                operation_views = {
+                    'Booking_today', 'Booking_tomorrow', 'Booking_Weekly',
+                    'Operation Today', 'Operation Tomorrow', 'Operation Weekly',
+                    'All Booking', 'bassant_Khaled', 'nadeen_Hossam', 'ahmedsaad_sales'
+                }
+                
                 is_religious = table_name in religious_views
 
                 target_base_id = self.config['airtable'].get('religious_base_id') if is_religious else self.config['airtable']['base_id']
                 
-                target_table_name = table_name if table_name else TABLE_NAME
+                if not table_name or str(table_name).strip() in operation_views:
+                    target_table_name = TABLE_NAME
+                else:
+                    target_table_name = table_name
                 
                 if not target_table_name:
                     return jsonify({"status": "error", "message": "Missing table_name"}), 400
+
+                require_agency = bool(data.get('require_agency')) or (not is_religious and target_table_name == TABLE_NAME)
+                agency_val = str((fields or {}).get('Agency') or '').strip()
+                if require_agency and not agency_val:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Agency is required. Select or type the agency before creating the record."
+                    }), 400
+
+                # Field ACL for FTS AI Operation (List / non-religious creates).
+                if not is_religious and target_table_name == TABLE_NAME:
+                    user_obj = self._load_dashboard_user_by_actor(actor)
+                    if not self._ai_operation_can_create_record(user_obj, actor=actor):
+                        return jsonify({
+                            "status": "error",
+                            "message": "You do not have permission to create bookings."
+                        }), 403
+                    fields, denied = self._filter_ai_operation_fields_by_acl(
+                        fields, user_obj, action="create", actor=actor
+                    )
+                    if denied:
+                        return jsonify({
+                            "status": "error",
+                            "message": f"No permission to set fields on create: {', '.join(denied[:8])}"
+                        }), 403
+                    if not fields:
+                        return jsonify({"status": "error", "message": "Missing fields"}), 400
 
                 url = f"https://api.airtable.com/v0/{target_base_id}/{quote(target_table_name)}"
                 headers = {
@@ -33832,6 +37519,16 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 if response.status_code in [200, 201]:
                     res_data = response.json()
                     created_record = res_data.get('records', [{}])[0]
+                    created_id = str((created_record or {}).get('id') or '').strip()
+                    created_fields = (created_record or {}).get('fields') or fields or {}
+
+                    # Sync into local mirror so FTS AI Operation shows the record immediately.
+                    if created_id and not is_religious and getattr(self, "airtable_mirror", None):
+                        try:
+                            self.airtable_mirror.upsert_main_list_record(created_id, created_fields)
+                        except Exception as mirror_err:
+                            logging.warning(f"Created Airtable record {created_id} but mirror upsert failed: {mirror_err}")
+
                     return jsonify({
                         "status": "success", 
                         "message": "Record created successfully",
@@ -33887,6 +37584,28 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                 if row:
                                     target_table_name = row["table_name"]
 
+                # Field ACL for FTS AI Operation updates (non-religious List).
+                typecast_allowed = True
+                if not is_religious:
+                    user_obj = self._load_dashboard_user_by_actor(actor)
+                    fields, denied = self._filter_ai_operation_fields_by_acl(
+                        fields, user_obj, action="edit", actor=actor
+                    )
+                    if denied:
+                        return jsonify({
+                            "status": "error",
+                            "message": f"No permission to edit fields: {', '.join(denied[:8])}"
+                        }), 403
+                    if not fields:
+                        return jsonify({"status": "error", "message": "Missing record_id or fields"}), 400
+                    # Creating brand-new select options via typecast requires Create ACL.
+                    for fk in list(fields.keys()):
+                        if not self._ai_operation_field_allowed(user_obj, fk, action="create", actor=actor):
+                            typecast_allowed = False
+                            break
+                else:
+                    user_obj = None
+
                 url = f"https://api.airtable.com/v0/{target_base_id}/{quote(target_table_name)}/{record_id}"
                 headers = {
                     "Authorization": f"Bearer {self.config['airtable']['api_key']}",
@@ -33917,16 +37636,48 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                             exact = k
                         fixed_fields[exact] = v
                         original_name_by_exact[exact] = k
-                    fields = fixed_fields
+                    fields = self._sanitize_booking_field_updates(fixed_fields)
+                    if not fields:
+                        return jsonify({"status": "error", "message": "No valid fields to update"}), 400
                 except Exception:
                     original_name_by_exact = {k: k for k in (fields or {}).keys()}
+                    fields = self._sanitize_booking_field_updates(fields or {})
+                    if not fields:
+                        return jsonify({"status": "error", "message": "No valid fields to update"}), 400
 
-                payload = {"fields": fields, "typecast": True}
-                response = requests.patch(url, headers=headers, json=payload, timeout=15)
+                payload = {"fields": fields}
+                response = requests.patch(
+                    url,
+                    headers=headers,
+                    params={"typecast": "true" if typecast_allowed else "false"},
+                    json=payload,
+                    timeout=15,
+                )
                 
                 if response.status_code != 200:
-                    logging.error(f"Failed to update Airtable record {record_id}: {response.text}")
+                    logging.error(
+                        "Failed to update Airtable record %s: %s | fields=%s",
+                        record_id,
+                        response.text,
+                        {k: fields.get(k) for k in list(fields.keys())[:12]},
+                    )
                     return jsonify({"status": "error", "message": f"Airtable update failed: {response.text}"}), 500
+
+                # Bust select-options cache so newly typecast-created choices appear next fetch.
+                try:
+                    opt_cache = getattr(api_operations_select_field_options, "_cache", None)
+                    if isinstance(opt_cache, dict):
+                        for fk in list(fields.keys()):
+                            name = str(fk or "").strip()
+                            if not name:
+                                continue
+                            opt_cache.pop(name, None)
+                            # Also drop case-insensitive aliases used as cache keys.
+                            for ck in list(opt_cache.keys()):
+                                if str(ck).strip().lower() == name.lower():
+                                    opt_cache.pop(ck, None)
+                except Exception:
+                    pass
 
                 updated_payload = None
                 try:
@@ -34186,9 +37937,17 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 allowed_attachment_fields = {
                     "Attachments",
                     "Tickets",
-                    "Attachments Boarding"
+                    "Attachments Boarding",
+                    "Attachments Operations",
+                    "Attachments Chat",
+                    "Photo invoice",
                 }
-                if str(field_name).strip() not in allowed_attachment_fields:
+                field_name_l = str(field_name or "").strip().lower()
+                if (
+                    str(field_name).strip() not in allowed_attachment_fields
+                    and "attachment" not in field_name_l
+                    and field_name_l not in ("tickets", "photo invoice")
+                ):
                     return jsonify({
                         "status": "error",
                         "message": f"Unsupported attachment field: {str(field_name).strip()}"
@@ -34198,6 +37957,13 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     actor = json.loads(actor_raw) if actor_raw else {}
                 except Exception:
                     actor = {}
+
+                user_obj = self._load_dashboard_user_by_actor(actor)
+                if not self._ai_operation_field_allowed(user_obj, str(field_name).strip(), action="edit", actor=actor):
+                    return jsonify({
+                        "status": "error",
+                        "message": f"No permission to edit field: {str(field_name).strip()}"
+                    }), 403
 
                 try:
                     from airtable_fields import ID_TO_READABLE_NAME
@@ -34318,13 +38084,28 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 allowed_attachment_fields = {
                     "Attachments",
                     "Tickets",
-                    "Attachments Boarding"
+                    "Attachments Boarding",
+                    "Attachments Operations",
+                    "Attachments Chat",
+                    "Photo invoice",
                 }
-                if str(field_name).strip() not in allowed_attachment_fields:
+                field_name_l = str(field_name or "").strip().lower()
+                if (
+                    str(field_name).strip() not in allowed_attachment_fields
+                    and "attachment" not in field_name_l
+                    and field_name_l not in ("tickets", "photo invoice")
+                ):
                     return jsonify({
                         "status": "error",
                         "message": f"Unsupported attachment field: {str(field_name).strip()}"
                     }), 400
+
+                user_obj = self._load_dashboard_user_by_actor(actor)
+                if not self._ai_operation_field_allowed(user_obj, str(field_name).strip(), action="edit", actor=actor):
+                    return jsonify({
+                        "status": "error",
+                        "message": f"No permission to edit field: {str(field_name).strip()}"
+                    }), 403
 
                 try:
                     from airtable_fields import ID_TO_READABLE_NAME
@@ -34872,6 +38653,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     else:
                         allowed_locations = [loc for loc in allowed_locations if loc != "All"]
 
+                    shift_fields = self._sanitize_user_shift_fields(user_obj)
                     return {
                         "id": str(user_obj.get("id") or ""),
                         "username": username,
@@ -34879,10 +38661,11 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                         "role": role,
                         "allowedLocations": allowed_locations,
                         "allowedTabs": user_obj.get("allowedTabs"),
-                        "workingDays": user_obj.get("workingDays"),
-                        "shiftStart": user_obj.get("shiftStart"),
-                        "shiftEnd": user_obj.get("shiftEnd"),
-                        "additionalShifts": user_obj.get("additionalShifts"),
+                        "weeklySchedule": shift_fields.get("weeklySchedule"),
+                        "workingDays": shift_fields.get("workingDays"),
+                        "shiftStart": shift_fields.get("shiftStart"),
+                        "shiftEnd": shift_fields.get("shiftEnd"),
+                        "additionalShifts": shift_fields.get("additionalShifts"),
                         "dedicatedWhatsApp": user_obj.get("dedicatedWhatsApp"),
                         "toolPhone": re.sub(r"\D", "", str(user_obj.get("toolPhone") or "")),
                         "allowIntents": [
@@ -34897,7 +38680,10 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                         ][:40],
                         "canManageChannels": bool(user_obj.get("canManageChannels") or False),
                         "createdBy": str(user_obj.get("createdBy") or ""),
-                        "skipWhatsAppSetup": bool(user_obj.get("skipWhatsAppSetup") or False)
+                        "skipWhatsAppSetup": bool(user_obj.get("skipWhatsAppSetup") or False),
+                        "aiOperationAcl": self._sanitize_ai_operation_acl(user_obj.get("aiOperationAcl")),
+                        "religiousOperationAcl": self._sanitize_religious_operation_acl(user_obj.get("religiousOperationAcl")),
+                        "allowedBaseIds": self._sanitize_allowed_base_ids(user_obj.get("allowedBaseIds")),
                     }
 
                 def _has_team_overlap(user_obj, actor_teams):
@@ -35016,6 +38802,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                             "role": str(u.get("role") or ""),
                                             "allowedLocations": [str(x) for x in (u.get("allowedLocations") or []) if str(x).strip()],
                                             "allowedTabs": u.get("allowedTabs"),
+                                            "weeklySchedule": u.get("weeklySchedule"),
                                             "workingDays": u.get("workingDays"),
                                             "shiftStart": u.get("shiftStart"),
                                             "shiftEnd": u.get("shiftEnd"),
@@ -35034,7 +38821,10 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                                             ][:40],
                                             "canManageChannels": bool(u.get("canManageChannels") or False),
                                             "createdBy": str(u.get("createdBy") or ""),
-                                            "skipWhatsAppSetup": bool(u.get("skipWhatsAppSetup") or False)
+                                            "skipWhatsAppSetup": bool(u.get("skipWhatsAppSetup") or False),
+                                            "aiOperationAcl": self._sanitize_ai_operation_acl(u.get("aiOperationAcl")),
+                                            "religiousOperationAcl": self._sanitize_religious_operation_acl(u.get("religiousOperationAcl")),
+                                            "allowedBaseIds": self._sanitize_allowed_base_ids(u.get("allowedBaseIds")),
                                         }
                                     )
                             return out
@@ -36940,6 +40730,10 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 import os, json
                 script_dir = os.path.dirname(os.path.abspath(__file__))
                 settings_file = os.path.join(script_dir, 'git_push_settings.json')
+                # GitHub/Netlify target is the Vite app, not the backend repo.
+                git_cwd = os.path.join(script_dir, 'frontend_dashboard', 'new_frontend_dashboard')
+                if not os.path.isdir(os.path.join(git_cwd, '.git')):
+                    git_cwd = script_dir
 
                 data = request.get_json(silent=True) or {}
                 actor = _create_with_pi_parse_actor(data)
@@ -36957,7 +40751,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     try:
                         result = _git_subprocess_run(
                             ['git', 'remote', 'get-url', 'origin'],
-                            cwd=script_dir,
+                            cwd=git_cwd,
                             timeout=10,
                         )
                         out, _err = _git_out(result)
@@ -36986,19 +40780,19 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                     try:
                         check = _git_subprocess_run(
                             ['git', 'remote', 'get-url', 'origin'],
-                            cwd=script_dir,
+                            cwd=git_cwd,
                             timeout=10,
                         )
                         if check.returncode == 0:
                             _git_subprocess_run(
                                 ['git', 'remote', 'set-url', 'origin', repo_url],
-                                cwd=script_dir,
+                                cwd=git_cwd,
                                 timeout=15,
                             )
                         else:
                             _git_subprocess_run(
                                 ['git', 'remote', 'add', 'origin', repo_url],
-                                cwd=script_dir,
+                                cwd=git_cwd,
                                 timeout=15,
                             )
                     except Exception as e:
@@ -37021,8 +40815,15 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             try:
                 import os, json, subprocess
                 script_dir = os.path.dirname(os.path.abspath(__file__))
-                git_dir = os.path.join(script_dir, '.git')
                 settings_file = os.path.join(script_dir, 'git_push_settings.json')
+                # Push the Vite frontend that Netlify builds. Pushing the backend
+                # records frontend_dashboard as a gitlink without .gitmodules and
+                # Netlify fails during "preparing repo".
+                work_dir = os.path.join(script_dir, 'frontend_dashboard', 'new_frontend_dashboard')
+                if not os.path.isdir(os.path.join(work_dir, '.git')):
+                    work_dir = script_dir
+                git_dir = os.path.join(work_dir, '.git')
+                script_dir = work_dir
 
                 data = request.get_json(silent=True) or {}
                 actor = _create_with_pi_parse_actor(data)
@@ -39165,7 +42966,6 @@ Draft to optimize:
 
         @app.route('/api/make/send_notification', methods=['POST', 'OPTIONS'])
         def api_make_send_notification():
-            import logging
             if request.method == 'OPTIONS':
                 return _apply_api_cors_headers(app.make_default_options_response())
             try:
@@ -39174,63 +42974,80 @@ Draft to optimize:
                 text = data.get('text', '')
                 if not text:
                     return jsonify({"status": "error", "message": "text is required"}), 400
-                
-                # Load Balancing Logic
-                import random
-                import json
-                
-                target_phone_normalized = str(phone).replace('+', '')
-                if target_phone_normalized.startswith('2'):
-                    pass # Already has country code
-                elif len(target_phone_normalized) == 11 and target_phone_normalized.startswith('01'):
-                    target_phone_normalized = '2' + target_phone_normalized
-                    
-                instances = []
-                try:
-                    with open('config.json', 'r', encoding='utf-8') as f:
-                        config_data = json.load(f)
-                        instances = config_data.get('evolution_api', {}).get('instances', [])
-                except Exception as e:
-                    logging.error(f"Failed to load instances from config: {e}")
-                    
-                # Default instance if config loading fails
-                if not instances:
-                    instances = [{"instance_name": "user_Hazem_Mohamed_1781759616156_1", "phone_number": "201020711106"}]
-                    
-                # Filter out the instance that matches the target phone
-                available_instances = [inst for inst in instances if inst.get('phone_number') != target_phone_normalized]
-                
-                # Fallback if all are filtered out (shouldn't happen with multiple instances)
-                if not available_instances:
-                    available_instances = instances
-                    
-                # Select a random instance
-                selected_instance = random.choice(available_instances)
-                instance_name = selected_instance.get('instance_name')
-                logging.info(f"Load Balancer: Selected instance {instance_name} to send message to {target_phone_normalized}")
 
-                # Send via internal Evolution API
-                url = f"http://localhost:8080/message/sendText/{instance_name}"
-                headers = {
-                    "apikey": "429683C4C977415CAAFCCE10F7D57E11",
-                    "Content-Type": "application/json"
-                }
-                payload = {
-                    "number": str(phone),
-                    "options": {
-                        "delay": 0,
-                        "presence": "composing"
-                    },
-                    "text": str(text)
-                }
-                import requests
-                resp = requests.post(url, json=payload, headers=headers, timeout=10)
-                if resp.status_code in (200, 201):
-                    return jsonify({"status": "success", "message": "Notification sent successfully", "evolution_response": resp.json(), "sent_via": instance_name}), 200
+                # Internal Notifications number ONLY — never distribute to other Evolution numbers
+                if not hasattr(self, "send_internal_notifications_whatsapp_text_detailed"):
+                    return jsonify({"status": "error", "message": "Internal notifications sender unavailable"}), 500
+                ok_internal, send_meta = self.send_internal_notifications_whatsapp_text_detailed(phone, text)
+                if ok_internal:
+                    return jsonify({
+                        "status": "success",
+                        "message": "Notification sent via internal notifications channel",
+                        "sent_via": "fts_internal_notifications",
+                        "meta": send_meta,
+                    }), 200
+
+                is_group = bool((send_meta or {}).get("is_group"))
+                if is_group:
+                    user_message = (
+                        "Failed to send to WhatsApp GROUP. "
+                        "The Internal Notifications number must be a member of this group, "
+                        "and the group ID must be current (not an old/stale @g.us id). "
+                        f"Target: {phone}"
+                    )
                 else:
-                    return jsonify({"status": "error", "message": f"Evolution API returned {resp.status_code}", "evolution_error": resp.text}), 500
+                    user_message = (
+                        "Failed to send via Internal Notifications WhatsApp. "
+                        "Check Evolution session / recipient number. "
+                        "Reconnect only if connectionStatus is not connected."
+                    )
+                return jsonify({
+                    "status": "error",
+                    "message": user_message,
+                    "sent_via": "fts_internal_notifications",
+                    "meta": send_meta,
+                    "hint": (send_meta or {}).get("hint"),
+                }), 500
             except Exception as e:
                 logging.error(f"Error in /api/make/send_notification: {e}")
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/internal_notifications/webhook/<slug>', methods=['POST', 'OPTIONS'])
+        def api_internal_notifications_webhook(slug):
+            """Make.com Custom Webhook replacement for Internal Notifications scenarios."""
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(app.make_default_options_response())
+            try:
+                data = request.json if isinstance(request.json, dict) else {}
+                dry_run = bool((data or {}).get("dry_run", False))
+                result = self.run_automation_script(
+                    "internal_webhook_notify.py",
+                    {
+                        **(data or {}),
+                        "webhook_slug": str(slug or "").strip(),
+                        "dry_run": dry_run,
+                    },
+                )
+                if str((result or {}).get("status") or "").lower() == "error":
+                    return jsonify(result), 500
+                return jsonify({"status": "success", "data": (result or {}).get("data") or result}), 200
+            except Exception as e:
+                logging.error(f"Error in internal_notifications webhook: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/internal_notifications/view_notify/run', methods=['POST', 'OPTIONS'])
+        def api_internal_view_notify_run():
+            """Manual/API trigger for Airtable-view internal notification scenarios."""
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(app.make_default_options_response())
+            try:
+                data = request.json if isinstance(request.json, dict) else {}
+                result = self.run_automation_script("internal_view_notify.py", data or {})
+                if str((result or {}).get("status") or "").lower() == "error":
+                    return jsonify(result), 500
+                return jsonify({"status": "success", "data": (result or {}).get("data") or result}), 200
+            except Exception as e:
+                logging.error(f"Error in internal view notify run: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/ad_followup_120246971083710757/run', methods=['POST', 'OPTIONS'])
@@ -39511,62 +43328,42 @@ Draft to optimize:
                     # Wait for file writes to complete
                     time.sleep(2.0)
 
-                    # ── Step 1: Push submodule ──
-                    submodule_ok = False
-                    if os.path.exists(os.path.join(_FRONTEND_DIR, '.git')):
+                    # Push ONLY new_frontend_dashboard to FTS_AI_CRM.git (Netlify source).
+                    # Never push the backend repo to that remote: origin of SCRIPT_DIR is
+                    # the same URL, and a gitlink for frontend_dashboard without .gitmodules
+                    # makes Netlify fail with "No url found for submodule path".
+                    if os.path.exists(os.path.join(_FRONTEND_SUBDIR, '.git')):
                         try:
-                            logging.info("📤 Auto-pushing frontend submodule to GitHub...")
+                            logging.info("📤 Auto-pushing frontend dashboard to GitHub (Netlify)...")
+                            subprocess.run(
+                                ["git", "remote", "set-url", "origin", _FRONTEND_REMOTE],
+                                cwd=_FRONTEND_SUBDIR,
+                                capture_output=True, text=True, timeout=15
+                            )
                             subprocess.run(
                                 ["git", "add", "."],
-                                cwd=_FRONTEND_DIR,
+                                cwd=_FRONTEND_SUBDIR,
                                 capture_output=True, text=True, timeout=30
                             )
                             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                             subprocess.run(
                                 ["git", "commit", "-m", f"Auto-update frontend - {timestamp}"],
-                                cwd=_FRONTEND_DIR,
+                                cwd=_FRONTEND_SUBDIR,
                                 capture_output=True, text=True, timeout=30
                             )
                             result = subprocess.run(
-                                ["git", "push", "-u", "origin", "main", "--force"],
-                                cwd=_FRONTEND_DIR,
+                                ["git", "push", "-u", "origin", "main"],
+                                cwd=_FRONTEND_SUBDIR,
                                 capture_output=True, text=True, timeout=120
                             )
                             if result.returncode == 0:
-                                logging.info("✅ Frontend submodule pushed successfully!")
-                                submodule_ok = True
+                                logging.info("✅ Frontend dashboard pushed to FTS_AI_CRM.git successfully!")
                             else:
-                                logging.warning(f"⚠️ Submodule push issue: {result.stderr[:200]}")
+                                logging.warning(f"⚠️ Frontend push issue: {(result.stderr or result.stdout or '')[:200]}")
                         except Exception as e:
-                            logging.warning(f"⚠️ Submodule push failed: {e}")
-
-                    # ── Step 2: Update main repo submodule pointer ──
-                    if submodule_ok:
-                        try:
-                            logging.info("🔄 Updating main repo submodule pointer...")
-                            subprocess.run(
-                                ["git", "add", "frontend_dashboard"],
-                                cwd=SCRIPT_DIR,
-                                capture_output=True, text=True, timeout=30
-                            )
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            subprocess.run(
-                                ["git", "commit", "-m", f"Auto-update frontend submodule pointer - {timestamp}"],
-                                cwd=SCRIPT_DIR,
-                                capture_output=True, text=True, timeout=30
-                            )
-                            push_result = subprocess.run(
-                                ["git", "push", "origin", "main", "--force"],
-                                cwd=SCRIPT_DIR,
-                                capture_output=True, text=True, timeout=300
-                            )
-                            if push_result.returncode == 0:
-                                logging.info("✅ Main repo pushed successfully!")
-                            else:
-                                err_msg = push_result.stderr[:300] if push_result.stderr else "timed out"
-                                logging.warning(f"⚠️ Main repo push: {err_msg}")
-                        except Exception as e:
-                            logging.warning(f"⚠️ Main repo update failed: {e}")
+                            logging.warning(f"⚠️ Frontend push failed: {e}")
+                    else:
+                        logging.warning("⚠️ Frontend git repo missing at new_frontend_dashboard; skip auto-upload.")
 
                 except Exception as e:
                     logging.warning(f"⚠️ Auto-upload error: {e}")
@@ -40206,7 +44003,7 @@ Draft to optimize:
                 
                 # Separate Try/Except Blocks
                 try:
-                    is_leads_table = self._is_lead_like_table(booking_record.get('table_name'))
+                    is_leads_table = self._is_lead_like_record(booking_record)
 
                     # 1. Update Inquiry Type (Skip for Leads)
                     if not is_leads_table:
@@ -40417,9 +44214,24 @@ Draft to optimize:
                             time.sleep(min(60, backoff))
                             backoff = min(60, backoff * 2)
 
+                def _mirror_list_delta_loop():
+                    """Keep List delta independent of other tables / background full sync."""
+                    backoff = 1
+                    while not self._mirror_stop_event.is_set():
+                        try:
+                            self.airtable_mirror.tick_main_list()
+                            backoff = 1
+                            time.sleep(2)
+                        except Exception as e:
+                            logging.error(f"Airtable Mirror List delta loop error: {e}")
+                            time.sleep(min(60, backoff))
+                            backoff = min(60, backoff * 2)
+
                 mirror_thread = threading.Thread(target=_mirror_loop, daemon=True)
                 mirror_thread.start()
-                logging.info("Airtable Mirror started.")
+                mirror_list_thread = threading.Thread(target=_mirror_list_delta_loop, daemon=True)
+                mirror_list_thread.start()
+                logging.info("Airtable Mirror started (List delta loop + full/other tables loop).")
         except Exception as e:
             logging.error(f"Failed to start Airtable Mirror: {e}")
         

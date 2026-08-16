@@ -155,14 +155,26 @@ class AutomationEngine:
                 last_ts = float(st.get("last_ts") or 0.0)
                 if last_ts and (time.time() - last_ts) < interval:
                     continue
+                # Prevent overlapping concurrent runs of the same scheduled workflow
+                if bool(st.get("running")):
+                    continue
 
-                self._schedule_state[wid] = {"last_ts": time.time()}
-                threading.Thread(
-                    target=self._run_workflow_by_id,
-                    args=(wid,),
-                    kwargs={"event_type": "schedule", "event_payload": {"trigger": trigger_cfg}},
-                    daemon=True,
-                ).start()
+                self._schedule_state[wid] = {"last_ts": time.time(), "running": True}
+
+                def _runner(_wid=wid):
+                    try:
+                        self._run_workflow_by_id(
+                            _wid,
+                            event_type="schedule",
+                            event_payload={"trigger": trigger_cfg},
+                        )
+                    finally:
+                        cur = self._schedule_state.get(_wid) or {}
+                        cur["running"] = False
+                        cur["last_ts"] = time.time()
+                        self._schedule_state[_wid] = cur
+
+                threading.Thread(target=_runner, daemon=True).start()
             except Exception:
                 continue
 
@@ -268,6 +280,8 @@ class AutomationEngine:
                     self._step_send_email(step, ctx)
                 elif stype == "http_request":
                     self._step_http_request(step, ctx)
+                elif stype == "send_internal_notification":
+                    self._step_send_internal_notification(step, ctx)
                 else:
                     continue
             try:
@@ -391,6 +405,22 @@ class AutomationEngine:
                 chat_db.add_message(chat_id=chat_id, sender_type="agent", text=text, status="sent", source="WhatsApp")
             except Exception:
                 pass
+
+    def _step_send_internal_notification(self, step: dict, ctx: dict):
+        """Send via Internal Notifications Evolution channel (staff alerts)."""
+        to_phone = _render_template(step.get("to") or step.get("phone") or "", ctx).strip()
+        to_phone = to_phone.replace("+", "").replace(" ", "")
+        if not to_phone:
+            raise Exception("send_internal_notification_missing_to")
+        text = _render_template(step.get("text") or "", ctx).strip()
+        if not text:
+            return
+        if not self.agent or not hasattr(self.agent, "send_internal_notifications_whatsapp_text"):
+            raise Exception("send_internal_notification_unavailable")
+        ok = bool(self.agent.send_internal_notifications_whatsapp_text(to_phone, text))
+        if not ok:
+            raise Exception("send_internal_notification_failed")
+        ctx.setdefault("vars", {})["_workflow_sent"] = True
 
     def _step_send_email(self, step: dict, ctx: dict):
         to_email = _render_template(step.get("to") or "", ctx).strip()

@@ -46,6 +46,36 @@ Workflow: Hajj Tahseen 3-Stage Follow-Up - Religious - حج طيران تحسي�
       التشغيل timeout الـ http_request (60 ثانية) — التشغيل التالي يكمل الباقي
       لأن الحالة محفوظة فور كل إرسال.
     - نصوص الرسائل الثلاثة تُرسل كما هي بالحرف (لا نعيد صياغتها).
+
+القاعدة العامة (تحديث 2026-08-16 من المدير):
+    السلسلة معمولة لعميل أخد رد (من الصفحة أو الـ agent) وسكت.
+    مش لعميل بعت رسالة ومحدش رد عليه.
+
+قواعد الحماية الأربع (تُفحص بالترتيب قبل إرسال أي رسالة من الثلاثة،
+ولو أي شرط اتحقق لا نرسل):
+    1) آخر رسالة في المحادثة من العميل (بعت حاجة بعد آخر رد من الصفحة
+       أو الـ agent ومحدش رد عليه) ← لا نرسل، ونعلّم المحادثة
+       'Pending Reply' (tag: pending-reply-hajj-tahseen) ونتحول لبشري
+       (needs_help=1).
+    2) العميل بعت رقم موبايل في أي وقت خلال المحادثة ← لا نرسل،
+       ونلغي السلسلة كلها ونحوّل كـ lead ساخن (مع حفظ الرقم).
+    3) العميل بعت صورة بطاقة (صورة/مستند صورة في أي وقت خلال المحادثة)
+       ← لا نرسل، ونلغي السلسلة كلها ونتحول لبشري.
+    4) الفريق أو الـ agent رد على العميل بعد ما السلسلة بدأت ← نلغي
+       السلسلة الحالية ونبدأها من جديد محسوبة من وقت الرد الجديد
+       (الرسالة الأولى بعد ساعتين من آخر رد).
+
+ملاحظات هندسية للتحديث (لماذا هذه الشروط):
+    - المرساة (Anchor) للتوقيت أصبحت آخر رد حقيقي من الفريق/الـ agent
+      (sender_type IN ('agent','ai')) وليس آخر رسالة عميل — باستثناء
+      رسائل النظام ([System Log]...) ورسائل المراحل نفسها (حتى لا تُعيد
+      رسالة المرحلة ضبط نفسها).
+    - فحص "في أي وقت" للأرقام وصور البطاقات يتم بمسح كامل رسائل العميل
+      في المحادثة (وليس آخر رسالة فقط) كما طلب المدير حرفياً.
+    - التحويل لبشري يتم بنفس آلية needs_help=1 المستخدمة في بقية النظام
+      (توقف الرد الآلي وتُظهر المحادثة للموظف البشري).
+    - سجلات الحالة القديمة (بدون last_agent_reply_ts) تُرحَّل تلقائياً
+      دون إعادة ضبط التسلسل الجاري حتى لا نكرر رسالة سبق إرسالها.
 """
 
 import os
@@ -86,6 +116,9 @@ MAX_SENDS_PER_RUN = 20
 # الـ tag المطلوب وضعه عند اكتمال التسلسل الثلاثي بدون رد
 TAG_NO_RESPONSE = "no-response-hajj-tahseen"
 TAG_HOT_LEAD = "hajj-tahseen-hot-lead"
+# تحديث 2026-08-16 من المدير: tags قواعد الحماية الأربع
+TAG_PENDING_REPLY = "pending-reply-hajj-tahseen"   # الشرط 1: عميل مستني رد
+TAG_CARD_IMAGE = "card-image-hajj-tahseen"          # الشرط 3: عميل بعت صورة بطاقة
 
 log = logging.getLogger("HajjTahseenFollowup")
 
@@ -336,6 +369,114 @@ def _extract_phone(text: str):
 
 
 # =============================================================================
+# قواعد الحماية الأربع (تحديث 2026-08-16 من المدير)
+# =============================================================================
+def _is_card_image(text: str) -> bool:
+    """الشرط 3: هل أرسل العميل صورة (بطاقة)؟
+    نكشف صيغ صور فيسبوك وواتساب الفعلية (attachments) وليس النصوص:
+      - [Customer sent an image. Image ID: ...]
+      - [Customer sent a Facebook image]
+      - [Facebook image: https://...]
+      - [Customer sent a document ... Filename: *.jpg|png|...] أو اسم ملف
+        يحوي كلمة بطاقة/card/id/national.
+    ملاحظة: في سياق هذا الإعلان أي صورة يرسلها العميل تُعتبر صورة بطاقته
+    (الرسائل الثلاث تطلب منه صورة البطاقة تحديداً).
+    """
+    low = str(text or "").lower()
+    if re.search(r"\[customer sent an image", low):
+        return True
+    if re.search(r"\[customer sent a facebook image", low):
+        return True
+    if re.search(r"\[facebook image:", low):
+        return True
+    m = re.search(r"\[customer sent a document[^\]]*filename:\s*([^\]|]+)", low)
+    if m:
+        fname = m.group(1).strip().strip('"').strip("'")
+        if re.search(r"\.(jpe?g|png|gif|webp|bmp|heic|heif)$", fname):
+            return True
+        if re.search(r"(بطاقة|card|\bid\b|national)", fname):
+            return True
+    return False
+
+
+def _customer_messages(cursor, chat_id, cap: int = 500):
+    """كل رسائل العميل الحقيقية في المحادثة (نص، توقيت) تصاعدياً.
+    نستبعد فقط رسائل الإحالة/النظام ([Facebook Ad Referral] / [System Log]...)
+    لأنها ليست تفاعلاً حقيقياً من العميل. أما الميديا (صوت/فيديو/صورة/ستيكر)
+    فهي تفاعل حقيقي ويتم فحصها — الصور تحديداً للشرط 3 والأرقام للشرط 2.
+    تُستخدم هذه الدالة لمسح "في أي وقت خلال المحادثة" (الشرطان 2 و3) ولتحديد
+    آخر رسالة عميل (الشرط 1) — استعلام واحد بدلاً من عدة استعلامات.
+    """
+    cursor.execute(
+        """
+        SELECT text, timestamp
+        FROM messages
+        WHERE chat_id = ? AND sender_type = 'customer'
+        ORDER BY timestamp ASC
+        LIMIT ?
+        """,
+        (chat_id, cap),
+    )
+    out = []
+    for row in cursor.fetchall():
+        text, ts = str(row[0] or ""), row[1]
+        if text.startswith("[Facebook Ad Referral]") or text.startswith("[Facebook Referral]"):
+            continue
+        if text.startswith("[System Log]") or text.startswith("[System]"):
+            continue
+        if not text.strip():
+            continue
+        out.append((text, ts))
+    return out
+
+
+def _last_agent_reply(cursor, chat_id):
+    """آخر رد حقيقي من الفريق/الـ agent (المرساة الجديدة للتوقيت - الشرط 4).
+    نستبعد:
+      - رسائل النظام ([System Log] / [System]) لأنها ليست رداً على العميل.
+      - نصوص المراحل الثلاث نفسها (MSG_STAGE1/2/3) حتى لا تُعيد رسالة
+        المرحلة ضبط نفسها كمرساة (كانت ستدفع M2 بعد M1 بـ 8 ساعات بدلاً من
+        8 ساعات من الرد الحقيقي).
+    أما ردود الملخص/الحجز/الشكر التي يرسلها هذا الـ Workflow نفسه فهي ردود
+    حقيقية للعميل → تبقى مرساة سليمة (العميل أخد رد وسكت).
+    """
+    cursor.execute(
+        """
+        SELECT text, timestamp
+        FROM messages
+        WHERE chat_id = ? AND sender_type IN ('agent','ai')
+        ORDER BY timestamp DESC
+        LIMIT 40
+        """,
+        (chat_id,),
+    )
+    stage_texts = {MSG_STAGE1_NORMAL, MSG_STAGE1_HOT, MSG_STAGE2, MSG_STAGE3}
+    for row in cursor.fetchall():
+        text, ts = str(row[0] or ""), row[1]
+        if text in stage_texts:
+            continue
+        if text.startswith("[System Log]") or text.startswith("[System]"):
+            continue
+        if not text.strip():
+            continue
+        return text, ts
+    return None, None
+
+
+def _is_pending_reply(last_customer_ts, last_agent_ts) -> bool:
+    """الشرط 1: آخر رسالة في المحادثة من العميل ولم يرد عليه أحد بعد.
+    (العميل بعت حاجة بعد آخر رد من الصفحة/الـ agent ومحدش رد عليه)
+    → لا نرسل مراحل، نعلّم Pending Reply ونتحول لبشري.
+    """
+    if last_customer_ts is None:
+        return False
+    if last_agent_ts is None:
+        return True
+    return last_customer_ts > last_agent_ts
+
+
+
+# =============================================================================
 # استعلامات قاعدة البيانات (فلترة صارمة من الجذور)
 # =============================================================================
 def _get_ad_conversations(cursor):
@@ -520,10 +661,12 @@ def _send_message(agent, conv: dict, text: str, dry_run: bool = False):
         return False, str(e)[:300]
 
 
-def _transfer_to_customer_service(chat_id: str, reason: str, phone: str = None, dry_run: bool = False):
+def _transfer_to_customer_service(chat_id: str, reason: str, phone: str = None, dry_run: bool = False, tag: str = None):
     """تحويل المحادثة لموظف خدمة العملاء:
     needs_help=1 (يوقف الرد الآلي ويُظهر المحادثة للموظف البشري)
     + تسجيل الـ lead الساخن في sales_customer_state.
+    tag: (اختياري) وسم إضافي — افتراضياً TAG_HOT_LEAD، ويُستخدم أيضاً
+    TAG_PENDING_REPLY (الشرط 1) و TAG_CARD_IMAGE (الشرط 3).
     """
     if dry_run:
         return
@@ -538,8 +681,9 @@ def _transfer_to_customer_service(chat_id: str, reason: str, phone: str = None, 
         # دمج الـ tag مع أي tags موجودة (لا نحذف الموجود)
         existing = chat_db.get_sales_state(chat_id) or {}
         tags = str(existing.get("tags") or "")
-        if TAG_HOT_LEAD not in tags:
-            tags = (tags + "," + TAG_HOT_LEAD) if tags else TAG_HOT_LEAD
+        use_tag = tag or TAG_HOT_LEAD
+        if use_tag not in tags:
+            tags = (tags + "," + use_tag) if tags else use_tag
         chat_db.upsert_sales_state(chat_id, {"tags": tags, "lead_status": "new"})
         chat_db.add_message(
             chat_id,
@@ -550,6 +694,13 @@ def _transfer_to_customer_service(chat_id: str, reason: str, phone: str = None, 
         )
     except Exception as e:
         log.error(f"Failed to transfer {chat_id}: {e}")
+
+
+def _transfer_pending_to_human(chat_id: str, dry_run: bool = False):
+    """الشرط 1: آخر رسالة من العميل ولم يرد عليها أحد → علّم المحادثة
+    'Pending Reply' (tag: pending-reply-hajj-tahseen) وحوّلها لبشري.
+    """
+    _transfer_to_customer_service(chat_id, reason="pending_reply", dry_run=dry_run, tag=TAG_PENDING_REPLY)
 
 
 def _apply_no_response_tag(chat_id: str, dry_run: bool = False):
@@ -575,10 +726,14 @@ def _apply_no_response_tag(chat_id: str, dry_run: bool = False):
 
 
 def _init_entry(first_messages, last_text: str, last_ts: datetime, now_iso: str) -> dict:
-    """تهيئة سجل الحالة لمحادثة جديدة (يُصنَّف الـ lead مرة واحدة ويُحفظ)."""
+    """تهيئة سجل الحالة لمحادثة جديدة (يُصنَّف الـ lead مرة واحدة ويُحفظ).
+    last_agent_reply_ts: المرساة الجديدة (آخر رد حقيقي من الفريق) — تُملأ
+    بعد الاستدعاء من نتيجة _last_agent_reply (تحديث 2026-08-16).
+    """
     first_msgs = list(first_messages or [])
     return {
         "last_customer_reply": last_ts.isoformat(),
+        "last_agent_reply_ts": None,   # المرساة = آخر رد من الفريق/الـ agent
         "highest_stage_sent": 0,
         "stages": {},
         "hot_lead": _classify_hot_lead(first_msgs),
@@ -720,37 +875,86 @@ def run(agent, payload: dict = None) -> dict:
                 if lmt is None or (now - lmt).total_seconds() / 3600.0 > WINDOW_HOURS:
                     continue
 
-            last_text, last_ts_raw = _last_customer_message(cursor, chat_id)
-            if last_ts_raw is None:
+            # ===== حالة نهائية: اكتمل التسلسل أو أُوقف أو حُوّل → لا نعيد =====
+            # (ننقل الفحص هنا قبل استعلامات الرسائل لتوفير استعلامات كثيرة)
+            if entry is not None and (entry.get("opted_out") or entry.get("handled") or entry.get("sequence_done")):
+                processed_chats += 1
                 continue
-            last_ts = _parse_dt(last_ts_raw)
-            if last_ts is None:
-                continue
-            first_msgs = _first_customer_messages(cursor, chat_id)
 
-            # ===== محادثة جديدة: تهيئة الحالة ولا نرسل شيئاً الآن =====
+            # ===== لقطة المحادثة (استعلامان فقط لكل محادثة) =====
+            cust_msgs = _customer_messages(cursor, chat_id)   # كل رسائل العميل الحقيقية (نص، توقيت)
+            if not cust_msgs:
+                continue
+            last_customer_text, last_ts_raw = cust_msgs[-1]
+            last_customer_ts = _parse_dt(last_ts_raw)
+            if last_customer_ts is None:
+                continue
+            first_msgs = [t for t, _ts in cust_msgs if not _is_referral_or_media(t)][:5]
+
+            # الشرطان 2 و3: فحص "في أي وقت خلال المحادثة" (كل رسائل العميل وليس آخرها فقط)
+            phone_anytime = None
+            card_anytime = None
+            for t, _ts in cust_msgs:
+                if phone_anytime is None:
+                    phone_anytime = _extract_phone(t)
+                if card_anytime is None and _is_card_image(t):
+                    card_anytime = t
+                if phone_anytime is not None and card_anytime is not None:
+                    break
+
+            # المرساة: آخر رد حقيقي من الفريق/الـ agent (الشرط 4)
+            _last_agent_text, last_agent_ts_raw = _last_agent_reply(cursor, chat_id)
+            last_agent_ts = _parse_dt(last_agent_ts_raw)
+
+            # ===== محادثة جديدة: تهيئة الحالة ثم فحص قواعد الحماية فوراً =====
             if entry is None:
-                entry = _init_entry(first_msgs, last_text, last_ts, now_iso)
+                entry = _init_entry(first_msgs, last_customer_text, last_customer_ts, now_iso)
+                entry["last_agent_reply_ts"] = last_agent_ts.isoformat() if last_agent_ts else None
                 chats[chat_id] = entry
                 processed_chats += 1
+                # الشرط 3: صورة بطاقة في أي وقت → ألغِ السلسلة كلها
+                if card_anytime is not None:
+                    entry["handled"] = True
+                    entry["handled_reason"] = "card_image_sent"
+                    _transfer_to_customer_service(chat_id, reason="card_image_sent", dry_run=dry_run, tag=TAG_CARD_IMAGE)
+                # الشرط 2: رقم موبايل في أي وقت → ألغِ السلسلة كلها (lead ساخن)
+                elif phone_anytime is not None:
+                    entry["handled"] = True
+                    entry["handled_reason"] = f"phone_at_any_time:{phone_anytime}"
+                    _transfer_to_customer_service(chat_id, reason="hot_lead_phone", phone=phone_anytime, dry_run=dry_run)
+                # الشرط 1: آخر رسالة من العميل ومحدش رد → Pending Reply + تحويل لبشري
+                elif _is_pending_reply(last_customer_ts, last_agent_ts):
+                    entry["handled"] = True
+                    entry["handled_reason"] = "pending_reply"
+                    _transfer_pending_to_human(chat_id, dry_run)
+                entry["updated_at"] = now_iso
                 if not dry_run:
                     _save_state(state)
                 continue
 
-            # ===== حالة نهائية: اكتمل التسلسل أو أُوقف أو حُوّل → لا نعيد =====
-            if entry.get("opted_out") or entry.get("handled") or entry.get("sequence_done"):
-                processed_chats += 1
-                continue
+            # ===== ترحيل سجلات الحالة القديمة (بدون last_agent_reply_ts) =====
+            # نملأ المرساة من آخر رد حقيقي للفريق دون إعادة ضبط التسلسل الجاري
+            # (حتى لا نكرر رسالة مرحلة سبق إرسالها للعميل).
+            if entry.get("last_agent_reply_ts") is None:
+                entry["last_agent_reply_ts"] = (
+                    last_agent_ts.isoformat() if last_agent_ts else entry.get("last_customer_reply")
+                )
 
             # ===== كشف رد جديد من العميل أثناء التسلسل =====
             prev_ts = _parse_dt(entry.get("last_customer_reply"))
-            if prev_ts is None or last_ts > prev_ts:
-                action, sent = _process_new_reply(agent, conv, entry, last_text, last_ts, now, dry_run)
+            if prev_ts is None or last_customer_ts > prev_ts:
+                action, sent = _process_new_reply(agent, conv, entry, last_customer_text, last_customer_ts, now, dry_run)
                 actions[action] = actions.get(action, 0) + 1
-                entry["last_customer_text"] = str(last_text or "")[:200]
+                entry["last_customer_text"] = str(last_customer_text or "")[:200]
                 entry["updated_at"] = now_iso
                 if sent:
                     sent_count += 1
+                # الشرط 1: لو الرد الجديد "أي رد آخر" (لم يُرسل منه رد تلقائي)
+                # والعميل لسه مستني رد → لا نرسل مراحل، نعلّم Pending Reply ونتحول لبشري
+                if action == "other_reply" and _is_pending_reply(last_customer_ts, last_agent_ts):
+                    entry["handled"] = True
+                    entry["handled_reason"] = "pending_reply"
+                    _transfer_pending_to_human(chat_id, dry_run)
                 processed_chats += 1
                 if not dry_run:
                     _save_state(state)
@@ -758,8 +962,58 @@ def run(agent, payload: dict = None) -> dict:
                     break
                 continue
 
-            # ===== لا رد جديد → منطق إرسال المراحل =====
-            last_reply_dt = prev_ts or last_ts
+            # ===== قواعد الحماية الأربع (تُفحص بالترتيب قبل إرسال أي رسالة من الثلاثة) =====
+            # الشرط 1: آخر رسالة من العميل ولم يرد عليه أحد → Pending Reply + تحويل لبشري
+            if _is_pending_reply(last_customer_ts, last_agent_ts):
+                entry["handled"] = True
+                entry["handled_reason"] = "pending_reply"
+                entry["updated_at"] = now_iso
+                _transfer_pending_to_human(chat_id, dry_run)
+                processed_chats += 1
+                if not dry_run:
+                    _save_state(state)
+                continue
+
+            # الشرط 2: العميل بعت رقم موبايل في أي وقت خلال المحادثة → ألغِ السلسلة كلها
+            if phone_anytime is not None:
+                entry["handled"] = True
+                entry["handled_reason"] = f"phone_at_any_time:{phone_anytime}"
+                entry["updated_at"] = now_iso
+                _transfer_to_customer_service(chat_id, reason="hot_lead_phone", phone=phone_anytime, dry_run=dry_run)
+                processed_chats += 1
+                if not dry_run:
+                    _save_state(state)
+                continue
+
+            # الشرط 3: العميل بعت صورة بطاقة في أي وقت → ألغِ السلسلة كلها
+            if card_anytime is not None:
+                entry["handled"] = True
+                entry["handled_reason"] = "card_image_sent"
+                entry["updated_at"] = now_iso
+                _transfer_to_customer_service(chat_id, reason="card_image_sent", dry_run=dry_run, tag=TAG_CARD_IMAGE)
+                processed_chats += 1
+                if not dry_run:
+                    _save_state(state)
+                continue
+
+            # الشرط 4: الفريق/الـ agent رد بعد ما السلسلة بدأت → ألغِ الحالية وابدأ من جديد
+            # (الرسالة الأولى بعد ساعتين من آخر رد) — نكمل للمنطق التالي بنفس المرساة الجديدة
+            # ولا نرسل شيئاً إلا إذا استحقت المرحلة من الرد الجديد نفسه.
+            prev_anchor = _parse_dt(entry.get("last_agent_reply_ts"))
+            if last_agent_ts is not None and (prev_anchor is None or last_agent_ts > prev_anchor):
+                entry["last_agent_reply_ts"] = last_agent_ts.isoformat()
+                entry["highest_stage_sent"] = 0
+                entry["stages"] = {}
+                entry["sequence_done"] = False
+                entry["tagged"] = False
+                entry["updated_at"] = now_iso
+                processed_chats += 1
+                if not dry_run:
+                    _save_state(state)
+
+            # ===== لا رد جديد → منطق إرسال المراحل (المرساة = آخر رد من الفريق) =====
+            anchor = _parse_dt(entry.get("last_agent_reply_ts")) or last_customer_ts
+            last_reply_dt = anchor
             elapsed_h = (now - last_reply_dt).total_seconds() / 3600.0
 
             # نافذة الـ 24 ساعة انتهت: لا نرسل شيئاً

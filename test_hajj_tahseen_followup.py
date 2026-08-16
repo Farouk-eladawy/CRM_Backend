@@ -18,6 +18,14 @@
   9) محادثة من إعلان آخر → لا تُلمس نهائياً.
   10) منع الإرسال المزدوج عند تشغيلين متتاليين (ملف الحالة).
   11) الرد بميديا (صوت) → يعيد ضبط العداد ولا يُرسل follow-up قبل أوانه.
+  12) الشرط 1 (تحديث 2026-08-16): عميل بعت رسالة ومحدش رد → Pending Reply + تحويل لبشري.
+  13) الشرط 2: رقم موبايل في أي وقت خلال المحادثة → إلغاء السلسلة كلها.
+  14) الشرط 3: صورة بطاقة في أي وقت خلال المحادثة → إلغاء السلسلة كلها.
+  15) الشرط 4: الفريق رد بعد بداية السلسلة → إلغاء وإعادة البدء من الرد الجديد.
+
+ملاحظة: القاعدة العامة الجديدة تتطلب وجود رد من الفريق/الـ agent حتى تبدأ
+السلسلة (السلسلة معمولة لعميل أخد رد وسكت)، لذلك أُضيف رد agent بعد رسالة
+العميل في السيناريوهات التي تختبر التسلسل نفسه.
 """
 import os
 import sys
@@ -157,6 +165,8 @@ def main():
     t0 = now - timedelta(hours=2, minutes=30)
     _add_conv(conn, c1, "psid_1", last_ts=t0.isoformat())
     _add_msg(conn, c1, "customer", "تفاصيل البرنامج", t0.isoformat())
+    # القاعدة العامة: العميل أخد رد وسكت → نضيف رد الفريق بعد رسالته (المرساة)
+    _add_msg(conn, c1, "agent", "تمام! تفاصيل البرنامج دي طيران تحسين 🕋", (t0 + timedelta(minutes=1)).isoformat())
     _run(agent)                       # تشغيل 1: تهيئة فقط
     _run(agent)                       # تشغيل 2: M1
     m1 = [m for m in agent.sent_fb if m["to"] == "psid_1" and "حضرتك لسه معانا؟ 🕋" in m["text"]]
@@ -170,7 +180,7 @@ def main():
 
     FAKE_NOW = now + timedelta(hours=19, minutes=5)  # إجمالي 21.5 ساعة
     _run(agent)
-    m3 = [m for m in agent.sent_fb if m["to"] == "psid_1" and "قبل ما اليوم يخلص حابين نفكر حضرتك 📌" in m["text"]]
+    m3 = [m for m in agent.sent_fb if m["to"] == "psid_1" and "أنت من حجاج هذا العام" in m["text"]]
     check("M3 أُرسلت بعد 21 ساعة", len(m3) == 1)
 
     FAKE_NOW = now + timedelta(hours=24, minutes=10)  # إغلاق نافذة 24 ساعة
@@ -194,6 +204,7 @@ def main():
     _add_conv(conn, c2, "psid_2", last_ts=t1.isoformat())
     _add_msg(conn, c2, "customer", "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120246971083710757", (t1 - timedelta(minutes=1)).isoformat())
     _add_msg(conn, c2, "customer", "إزاي أحجز؟", t1.isoformat())
+    _add_msg(conn, c2, "agent", "أهلًا بحضرتك! خطوات الحجز جاية في رسالة 👌", (t1 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)
     hot = [m for m in agent.sent_fb if m["to"] == "psid_2" and "خطوات الحجز" in m["text"]]
@@ -205,6 +216,7 @@ def main():
     t1b = base - timedelta(minutes=20)
     _add_conv(conn, c2b, "psid_2b", last_ts=t1b.isoformat())
     _add_msg(conn, c2b, "customer", "إزاي أحجز؟", t1b.isoformat())
+    _add_msg(conn, c2b, "agent", "أهلًا بحضرتك! 👌", (t1b + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)
     check("قبل 45 دقيقة لا تُرسل M1 للساخن", not any(m["to"] == "psid_2b" for m in agent.sent_fb))
@@ -217,6 +229,7 @@ def main():
     t2 = base - timedelta(hours=3)
     _add_conv(conn, c3, "psid_3", last_ts=t2.isoformat())
     _add_msg(conn, c3, "customer", "عايز أعرف تفاصيل البرنامج", t2.isoformat())
+    _add_msg(conn, c3, "agent", "تفضل، دي تفاصيل برنامج طيران تحسين ✅", (t2 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)  # M1
     t2b = FAKE_NOW + timedelta(minutes=10)
@@ -238,6 +251,7 @@ def main():
     t3 = base - timedelta(hours=2, minutes=30)
     _add_conv(conn, c4, "psid_4", last_ts=t3.isoformat())
     _add_msg(conn, c4, "customer", "مميزات طيران تحسين", t3.isoformat())
+    _add_msg(conn, c4, "agent", "مميزات كتير! هبعتلك التفاصيل 👌", (t3 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)  # M1
     t3b = FAKE_NOW + timedelta(minutes=5)
@@ -258,6 +272,7 @@ def main():
     t4 = base - timedelta(hours=2, minutes=30)
     _add_conv(conn, c5, "psid_5", last_ts=t4.isoformat())
     _add_msg(conn, c5, "customer", "تفاصيل", t4.isoformat())
+    _add_msg(conn, c5, "agent", "تفاصيل البرنامج دي 👇", (t4 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)  # M1
     t4b = FAKE_NOW + timedelta(minutes=5)
@@ -282,6 +297,7 @@ def main():
     t5 = base - timedelta(hours=3)
     _add_conv(conn, c6, "psid_6", last_ts=t5.isoformat())
     _add_msg(conn, c6, "customer", "تفاصيل البرنامج", t5.isoformat())
+    _add_msg(conn, c6, "agent", "تفاصيل البرنامج دي طيران تحسين 🕋", (t5 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)  # M1
     t5b = FAKE_NOW + timedelta(minutes=5)
@@ -315,6 +331,7 @@ def main():
     t7 = base - timedelta(hours=10)
     _add_conv(conn, c8, "psid_8", last_ts=t7.isoformat())
     _add_msg(conn, c8, "customer", "مميزات طيران تحسين", t7.isoformat())
+    _add_msg(conn, c8, "agent", "مميزات كتير! 👌", (t7 + timedelta(minutes=1)).isoformat())
     _run(agent)  # تهيئة
     _run(agent)  # مرحلة مستحقة
     m8 = [m for m in agent.sent_fb if m["to"] == "psid_8"]
@@ -342,6 +359,7 @@ def main():
     t8 = base - timedelta(hours=2, minutes=30)
     _add_conv(conn, c10, "psid_10", last_ts=t8.isoformat())
     _add_msg(conn, c10, "customer", "تفاصيل البرنامج", t8.isoformat())
+    _add_msg(conn, c10, "agent", "تمام! البرنامج جاهز 🕋", (t8 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)
     _run(agent)  # تشغيل ثالث — يجب ألا يكرر M1
@@ -356,6 +374,7 @@ def main():
     t9 = base - timedelta(hours=3)
     _add_conv(conn, c11, "psid_11", last_ts=t9.isoformat())
     _add_msg(conn, c11, "customer", "تفاصيل", t9.isoformat())
+    _add_msg(conn, c11, "agent", "تمام! 👌", (t9 + timedelta(minutes=1)).isoformat())
     _run(agent)
     _run(agent)  # M1 أُرسلت
     t9b = FAKE_NOW + timedelta(minutes=30)
@@ -368,6 +387,103 @@ def main():
     st = _state()
     e11 = st["chats"].get(c11, {})
     check("العداد أُعيد ضبطه من الرد الصوتي (highest=0)", e11.get("highest_stage_sent") == 0, str(e11))
+    # الشرط 1: العميل بعت (صوت) بعد آخر رد ومحدش رد عليه → Pending Reply + بشري
+    check("الرد الصوتي بلا رد من الفريق → handled_reason=pending_reply", e11.get("handled_reason") == "pending_reply", str(e11))
+    r11 = _needs_help(conn, c11)
+    check("تحويل Pending Reply لبشري (needs_help=1)", r11 and r11[0] == 1)
+
+    # ---------------------------------------------------------------
+    print("== 12) الشرط 1: عميل بعت رسالة ومحدش رد → Pending Reply + تحويل لبشري ==")
+    agent.sent_fb.clear()
+    c12 = "chat-pending-1"
+    base = FAKE_NOW
+    t10 = base - timedelta(hours=3)
+    _add_conv(conn, c12, "psid_12", last_ts=t10.isoformat())
+    _add_msg(conn, c12, "customer", "تفاصيل البرنامج", t10.isoformat())
+    # لا يوجد أي رد من الفريق/الـ agent إطلاقاً
+    n_before = len(agent.sent_fb)
+    _run(agent)  # تشغيل واحد يكفي: يُهيّأ ويُحوَّل فوراً
+    check("لا تُرسل أي مرحلة لعميل مستني رد", not any(m["to"] == "psid_12" for m in agent.sent_fb[n_before:]))
+    st = _state()
+    e12 = st["chats"].get(c12, {})
+    check("الحالة: handled_reason=pending_reply", e12.get("handled_reason") == "pending_reply", str(e12))
+    r12 = _needs_help(conn, c12)
+    check("تحويل لبشري (needs_help=1)", r12 and r12[0] == 1)
+    s12 = _sales(conn, c12)
+    check("tag pending-reply-hajj-tahseen في sales_customer_state", s12 and "pending-reply-hajj-tahseen" in (s12[0] or ""))
+
+    # ---------------------------------------------------------------
+    print("== 13) الشرط 2: رقم موبايل في أي وقت خلال المحادثة → ألغِ السلسلة كلها ==")
+    agent.sent_fb.clear()
+    c13 = "chat-phone-anytime"
+    base = FAKE_NOW
+    t11 = base - timedelta(hours=3, minutes=30)
+    _add_conv(conn, c13, "psid_13", last_ts=(t11 + timedelta(minutes=31)).isoformat())
+    _add_msg(conn, c13, "customer", "تفاصيل", t11.isoformat())
+    _add_msg(conn, c13, "agent", "تمام! عندك سؤال تاني؟", (t11 + timedelta(minutes=1)).isoformat())
+    _add_msg(conn, c13, "customer", "رقمي 01012345678", (t11 + timedelta(minutes=30)).isoformat())
+    _add_msg(conn, c13, "agent", "تم استلام رقم حضرتك، هنتواصل معاك قريب 🙏", (t11 + timedelta(minutes=31)).isoformat())
+    n_before = len(agent.sent_fb)
+    _run(agent)
+    check("لا تُرسل مراحل رغم مرور 3.5 ساعة (الرقم اتسجل قبل كده)", not any(m["to"] == "psid_13" for m in agent.sent_fb[n_before:]))
+    st = _state()
+    e13 = st["chats"].get(c13, {})
+    check("الحالة: handled_reason=phone_at_any_time", str(e13.get("handled_reason") or "").startswith("phone_at_any_time"), str(e13))
+    r13 = _needs_help(conn, c13)
+    check("تحويل كـ lead ساخن (needs_help=1)", r13 and r13[0] == 1)
+    ph13 = conn.execute("SELECT customer_phone FROM conversations WHERE chat_id=?", (c13,)).fetchone()
+    check("تم حفظ رقم العميل في customer_phone", ph13 and ph13[0] == "01012345678")
+
+    # ---------------------------------------------------------------
+    print("== 14) الشرط 3: صورة بطاقة في أي وقت → ألغِ السلسلة كلها ==")
+    agent.sent_fb.clear()
+    c14 = "chat-card-image"
+    base = FAKE_NOW
+    t12 = base - timedelta(hours=3)
+    _add_conv(conn, c14, "psid_14", last_ts=(t12 + timedelta(minutes=21)).isoformat())
+    _add_msg(conn, c14, "customer", "تفاصيل", t12.isoformat())
+    _add_msg(conn, c14, "agent", "تمام! ابعتلنا صورة البطاقة 📋", (t12 + timedelta(minutes=1)).isoformat())
+    _add_msg(conn, c14, "customer", "[Customer sent an image. Image ID: 1234567890]", (t12 + timedelta(minutes=20)).isoformat())
+    _add_msg(conn, c14, "agent", "تسلم يا غالي، بنبدأ الإجراءات فوراً ✅", (t12 + timedelta(minutes=21)).isoformat())
+    n_before = len(agent.sent_fb)
+    _run(agent)
+    check("لا تُرسل مراحل بعد إرسال صورة البطاقة", not any(m["to"] == "psid_14" for m in agent.sent_fb[n_before:]))
+    st = _state()
+    e14 = st["chats"].get(c14, {})
+    check("الحالة: handled_reason=card_image_sent", e14.get("handled_reason") == "card_image_sent", str(e14))
+    r14 = _needs_help(conn, c14)
+    check("تحويل لبشري (needs_help=1)", r14 and r14[0] == 1)
+    s14 = _sales(conn, c14)
+    check("tag card-image-hajj-tahseen في sales_customer_state", s14 and "card-image-hajj-tahseen" in (s14[0] or ""))
+
+    # ---------------------------------------------------------------
+    print("== 15) الشرط 4: الفريق رد بعد بداية السلسلة → إلغاء وإعادة البدء من الرد الجديد ==")
+    agent.sent_fb.clear()
+    c15 = "chat-agent-restart"
+    base = FAKE_NOW
+    t13 = base - timedelta(hours=2, minutes=30)
+    _add_conv(conn, c15, "psid_15", last_ts=t13.isoformat())
+    _add_msg(conn, c15, "customer", "تفاصيل البرنامج", t13.isoformat())
+    _add_msg(conn, c15, "agent", "تمام! البرنامج جاهز عندنا 🕋", (t13 + timedelta(minutes=1)).isoformat())
+    _run(agent)  # تهيئة
+    _run(agent)  # M1
+    m15_1 = [m for m in agent.sent_fb if m["to"] == "psid_15" and "حضرتك لسه معانا؟ 🕋" in m["text"]]
+    check("M1 أُرسلت قبل الرد البشري", len(m15_1) == 1, str(len(m15_1)))
+    t14 = base + timedelta(minutes=30)   # رد بشري بعد ما السلسلة بدأت
+    _add_msg(conn, c15, "agent", "حضرتك، لو محتاج أي مساعدة أنا موجود 👌", t14.isoformat())
+    FAKE_NOW = t14 + timedelta(minutes=1)
+    n_before = len(agent.sent_fb)
+    _run(agent)
+    check("لا رسالة جديدة بعد الرد البشري مباشرة", len(agent.sent_fb) == n_before)
+    st = _state()
+    e15 = st["chats"].get(c15, {})
+    check("أُلغيت السلسلة الحالية (highest_stage_sent=0)", e15.get("highest_stage_sent") == 0, str(e15))
+    FAKE_NOW = t14 + timedelta(hours=8, minutes=10)
+    _run(agent)
+    m15_2 = [m for m in agent.sent_fb if m["to"] == "psid_15" and "عارفين إن قرار الحج مش سهل" in m["text"]]
+    check("M2 أُرسلت بعد 8 ساعات من الرد البشري الجديد", len(m15_2) == 1, str(len(m15_2)))
+    m15_1b = [m for m in agent.sent_fb if m["to"] == "psid_15" and "حضرتك لسه معانا؟ 🕋" in m["text"]]
+    check("لم تُكرر M1 (البدء من المرحلة المستحقة فقط)", len(m15_1b) == 1, str(len(m15_1b)))
 
     conn.close()
     print(f"\n=== النتيجة: {PASS} نجح / {FAIL} فشل ===")

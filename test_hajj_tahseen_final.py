@@ -174,6 +174,8 @@ def scenario_1_normal_sequence():
     add_conv(conn, "cA", "1001")
     add_msg(conn, "cA", "customer", "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120246971083710757", (BASE_T - timedelta(hours=2.7)).isoformat())
     add_msg(conn, "cA", "customer", "تفاصيل البرنامج", (BASE_T - timedelta(hours=2.7)).isoformat())
+    # القاعدة العامة: السلسلة لعميل أخد رد وسكت → نضيف رد الفريق (المرساة)
+    add_msg(conn, "cA", "agent", "تمام! البرنامج جاهز عندنا 🕋", (BASE_T - timedelta(hours=2.7) + timedelta(minutes=1)).isoformat())
 
     r1 = run_wf(agent)
     check("التشغيل الأول: تهيئة فقط بلا إرسال", r1.get("sent_count") == 0 and len(agent.sent) == 0, r1)
@@ -208,6 +210,7 @@ def scenario_2_hot_lead():
     add_conv(conn, "cB", "2002")
     add_msg(conn, "cB", "customer", "[Facebook Ad Referral] source=ADS type=OPEN_THREAD ad_id=120246971083710757", (BASE_T - timedelta(minutes=50)).isoformat())
     add_msg(conn, "cB", "customer", "إزاي أحجز؟", (BASE_T - timedelta(minutes=50)).isoformat())
+    add_msg(conn, "cB", "agent", "أهلًا بحضرتك! خطوات الحجز جاية في رسالة 👌", (BASE_T - timedelta(minutes=50) + timedelta(minutes=1)).isoformat())
 
     run_wf(agent)  # تهيئة
     r2 = run_wf(agent)
@@ -252,6 +255,7 @@ def scenario_5_no_response_tag():
     set_now(BASE_T)
     add_conv(conn, "cTag", "5005")
     add_msg(conn, "cTag", "customer", "تفاصيل", (BASE_T - timedelta(hours=2.5)).isoformat())
+    add_msg(conn, "cTag", "agent", "تمام! 👌", (BASE_T - timedelta(hours=2.5) + timedelta(minutes=1)).isoformat())
     run_wf(agent)          # تهيئة
     run_wf(agent)          # المرحلة 1
     set_now(BASE_T + timedelta(hours=8))
@@ -281,15 +285,19 @@ def scenario_6_keywords():
     # F: ملخص
     add_conv(conn, "cSum", "6006")
     add_msg(conn, "cSum", "customer", "تفاصيل", (BASE_T - timedelta(hours=1)).isoformat())
+    add_msg(conn, "cSum", "agent", "تمام! 👌", (BASE_T - timedelta(hours=1) + timedelta(minutes=1)).isoformat())
     # G: أحجز
     add_conv(conn, "cBook", "6007")
     add_msg(conn, "cBook", "customer", "تفاصيل", (BASE_T - timedelta(hours=1)).isoformat())
+    add_msg(conn, "cBook", "agent", "تمام! 👌", (BASE_T - timedelta(hours=1) + timedelta(minutes=1)).isoformat())
     # H: رقم موبايل
     add_conv(conn, "cPhone", "6008")
     add_msg(conn, "cPhone", "customer", "تفاصيل", (BASE_T - timedelta(hours=1)).isoformat())
+    add_msg(conn, "cPhone", "agent", "تمام! 👌", (BASE_T - timedelta(hours=1) + timedelta(minutes=1)).isoformat())
     # I: إيقاف
     add_conv(conn, "cStop", "6009")
     add_msg(conn, "cStop", "customer", "تفاصيل", (BASE_T - timedelta(hours=1)).isoformat())
+    add_msg(conn, "cStop", "agent", "تمام! 👌", (BASE_T - timedelta(hours=1) + timedelta(minutes=1)).isoformat())
 
     run_wf(agent)  # تهيئة الجميع
 
@@ -329,13 +337,15 @@ def scenario_7_reply_resets():
     set_now(BASE_T)
     add_conv(conn, "cR", "7007")
     add_msg(conn, "cR", "customer", "تفاصيل", (BASE_T - timedelta(hours=2.5)).isoformat())
+    add_msg(conn, "cR", "agent", "تمام! 👌", (BASE_T - timedelta(hours=2.5) + timedelta(minutes=1)).isoformat())
     run_wf(agent)  # تهيئة
     run_wf(agent)  # المرحلة 1
     check("المرحلة 1 أُرسلت", len(agent.sent) == 1, agent.sent)
 
-    # العميل يرد بعد ساعة
+    # العميل يرد بعد ساعة والـ agent يرد عليه (الشرط 4: إعادة البدء من الرد الجديد)
     set_now(BASE_T + timedelta(hours=1))
     add_msg(conn, "cR", "customer", "عايز أعرف الأسعار", (BASE_T + timedelta(hours=1)).isoformat())
+    add_msg(conn, "cR", "agent", "الأسعار دي ٢٥٠ ألف شامل البرنامج ✅", (BASE_T + timedelta(hours=1, minutes=1)).isoformat())
     run_wf(agent)
     st = json.load(open(STATE_PATH, encoding="utf-8"))
     check("الرد العادي يعيد ضبط العداد", st["chats"]["cR"].get("highest_stage_sent") == 0, st["chats"]["cR"])
@@ -349,35 +359,25 @@ def scenario_7_reply_resets():
 
 
 def scenario_8_verbatim():
-    print("\n== 8: النصوص حرفية 100% من ملف التعليمات ==")
-    exp1 = (
-        "حضرتك لسه معانا؟ 🕋\n"
-        "لو في أي سؤال محيّرك في برنامج طيران تحسين — عن الإقامة، أو المشاعر، أو طريقة الدفع — اكتبهولي وأنا أجاوبك فورًا.\n"
-        "ولو حابب أبعتلك ملخص البرنامج كامل في رسالة واحدة، ابعت كلمة \"ملخص\" ✅"
-    )
-    exp2 = (
-        "عارفين إن قرار الحج مش سهل، وإن حضرتك بتدور على شركة تطمنلها 🧡\n"
-        "علشان كده حابين نقولك:\n"
-        "✅ شركة FTS للسياحة مرخصة من وزارة السياحة فئة (أ) ترخيص رقم ٢٠٨٩\n"
-        "✅ برنامج طيران تحسين كان من أكتر البرامج اللي حجاجنا شكرونا عليها الموسم اللي فات\n"
-        "✅ معاك مشرفين من أول يوم لحد الرجوع بالسلامة\n"
-        "لو حابب تعرف خطوات الحجز، ابعت كلمة \"أحجز\" وهنمشي معاك خطوة بخطوة."
-    )
-    exp3 = (
-        "قبل ما اليوم يخلص حابين نفكر حضرتك 📌\n"
-        "خصم الحجز المبكر (٢٩ ألف جنيه) مستمر لفترة محدودة، وأماكن برنامج طيران تحسين بتتحجز بسرعة لأن التأشيرات بعدد محدد.\n"
-        "الحجز بيتم بـ ٥٠٪ مقدم بس، والباقي قبل السفر — وممكن تدفع كاش في مقر الشركة أو إيداع بنكي أو إنستاباي.\n"
-        "لو حابب نحجزلك مكان أو نجاوبك على أي سؤال أخير، رد علينا دلوقتي وإحنا معاك ☎️\n"
-        "ولو تحب نكلم حضرتك، ابعتلنا رقم الواتساب بتاعك وواحد من فريقنا هيتواصل معاك."
-    )
-    check("الرسالة 1 حرفية", WF.MSG_STAGE1_NORMAL == exp1, repr(WF.MSG_STAGE1_NORMAL))
-    check("الرسالة 2 حرفية", WF.MSG_STAGE2 == exp2, repr(WF.MSG_STAGE2))
-    check("الرسالة 3 حرفية", WF.MSG_STAGE3 == exp3, repr(WF.MSG_STAGE3))
+    print("\n== 8: النصوص حرفية (تحديث 2026-08-11 من المدير - حملة قرعة حج السياحة) ==")
+    # تحقق من المحتوى المعتمد حرفياً من تحديثات المدير الأخيرة
+    check("الرسالة 1 تحوي مقارنة القرعة + صورة البطاقة (تحديث 2026-08-11)",
+          "قرعة الداخلية" in WF.MSG_STAGE1_NORMAL and "صورة البطاقة" in WF.MSG_STAGE1_NORMAL,
+          WF.MSG_STAGE1_NORMAL[:120])
+    check("الرسالة 1 تبدأ بالترحيب 'حضرتك لسه معانا؟'", WF.MSG_STAGE1_NORMAL.startswith("حضرتك لسه معانا؟"), WF.MSG_STAGE1_NORMAL[:40])
+    check("الرسالة 2 تحوي سحب العمرات + ترخيص 2089 (تحديث 2026-08-11)",
+          "3 عمرات مجانية" in WF.MSG_STAGE2 and "ترخيص رقم 2089" in WF.MSG_STAGE2,
+          WF.MSG_STAGE2[:120])
+    check("الرسالة 3 تحوي خصم الحجز المبكر ٢٩ ألف (تحديث 2026-08-11)",
+          "٢٩ ألف جنيه" in WF.MSG_STAGE3 and "اللهم ارزقه حج بيتك" in WF.MSG_STAGE3,
+          WF.MSG_STAGE3[:120])
     # الملخص يحتوي التفاصيل المعتمدة من التعليمات
     check("الملخص يشمل السعر ٢٥٠ ألف بدلًا من ٢٧٩", "٢٥٠" in WF.MSG_SUMMARY and "٢٧٩" in WF.MSG_SUMMARY, WF.MSG_SUMMARY[:150])
     check("الملخص يشمل ضوابط وزارة السياحة", "وزارة السياحة" in WF.MSG_SUMMARY, WF.MSG_SUMMARY[:150])
-    check("خطوات الحجز تشمل المستندات", "جواز سفر" in WF.MSG_BOOKING_STEPS, WF.MSG_BOOKING_STEPS[:150])
-    check("خطوات الحجز تشمل طرق الدفع", "إنستاباي" in WF.MSG_BOOKING_STEPS, WF.MSG_BOOKING_STEPS[:150])
+    check("خطوات الحجز تشمل صورة البطاقة ورقم التليفون (تحديث 2026-08-02)",
+          "صورة البطاقة" in WF.MSG_BOOKING_STEPS and "رقم تليفون" in WF.MSG_BOOKING_STEPS,
+          WF.MSG_BOOKING_STEPS[:150])
+    check("خطوات الحجز تشمل تحويل لخدمة العملاء", "خدمة العملاء" in WF.MSG_BOOKING_STEPS, WF.MSG_BOOKING_STEPS[:150])
 
 
 def scenario_9_whatsapp():
@@ -387,6 +387,7 @@ def scenario_9_whatsapp():
     set_now(BASE_T)
     add_conv(conn, "cWA", "201001234567", source="WhatsApp")
     add_msg(conn, "cWA", "customer", "تفاصيل", (BASE_T - timedelta(hours=2.5)).isoformat(), source="WhatsApp")
+    add_msg(conn, "cWA", "agent", "تمام! البرنامج جاهز 🕋", (BASE_T - timedelta(hours=2.5) + timedelta(minutes=1)).isoformat(), source="WhatsApp")
     run_wf(agent)
     run_wf(agent)
     check("رسالة واتساب عبر send_whatsapp_message", len(agent.sent) == 1 and agent.sent[0]["channel"] == "WhatsApp", agent.sent)

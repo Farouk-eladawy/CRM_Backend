@@ -13154,39 +13154,22 @@ Conversation:
                                 if structured_vars and comp_type == 'body' and isinstance(structured_vars.get('body'), list):
                                     local_params = [str(x) for x in (structured_vars.get('body') or [])]
                                 
-                                # If the user didn't provide enough parameters manually, and we have booking_data, ask the AI to map it
+                                # If the user didn't provide enough parameters manually, map them from booking fields.
                                 if len(local_params) < expected_count and booking_data and not structured_vars:
                                     try:
-                                        prompt = f"""You are an assistant. You need to extract exactly {expected_count} values from the following booking data to fill in the variables {{1}} to {{{{{expected_count}}}}} in the template text.
-Template Text:
-{comp_text}
-
-Booking Data:
-{booking_data}
-
-Instructions:
-- If the template requires an invoice link or payment link (often variable 3 or similar), look specifically for fields like "Strip Invoice", "Stripe Link", "Payment Link", or "Invoice URL" in the Booking Data.
-- Return ONLY a valid JSON array of strings containing exactly {expected_count} elements in order. 
-- Use a hyphen "-" if a value is not found or empty. 
-Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]"""
-                                        
-                                        # Use the query_ai logic but force a text response
-                                        ai_response = self.query_ai(prompt, system_role="analyzer")
-                                        
-                                        if ai_response:
-                                            import json
-                                            # Attempt to parse the JSON array from the response
-                                            clean_json = ai_response.strip()
-                                            if clean_json.startswith("```json"):
-                                                clean_json = clean_json.split("```json")[1].split("```")[0].strip()
-                                            elif clean_json.startswith("```"):
-                                                clean_json = clean_json.split("```")[1].strip()
-
-                                            extracted_params = self._extract_first_json_array(clean_json)
-                                            if isinstance(extracted_params, list) and len(extracted_params) >= expected_count:
-                                                local_params = [str(x) for x in extracted_params]
-                                    except Exception as ai_e:
-                                        logging.error(f"Error using AI to map template params: {ai_e}")
+                                        mapped_params = self._map_whatsapp_template_variables(
+                                            comp_text,
+                                            booking_data=booking_data,
+                                            template_name=template_name,
+                                            agent_name=str((booking_data or {}).get("_agent_name") or ""),
+                                            contact_name=str((booking_data or {}).get("Customer Name") or ""),
+                                        ) or []
+                                        if len(mapped_params) >= expected_count:
+                                            local_params = [str(x) for x in mapped_params]
+                                        elif mapped_params:
+                                            local_params = list(local_params) + [str(x) for x in mapped_params[len(local_params):]]
+                                    except Exception as map_e:
+                                        logging.error(f"Error mapping template params: {map_e}")
                                 
                                 try:
                                     addons_val = ""
@@ -15706,6 +15689,131 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
             trip_name,
             add_ons,
         ]
+
+    def _stringify_template_field(self, value):
+        if value is None:
+            return ""
+        if isinstance(value, list):
+            return " | ".join([self._stringify_template_field(x) for x in value if self._stringify_template_field(x)])
+        if isinstance(value, dict):
+            return str(value.get("name") or value.get("url") or "").strip()
+        s = str(value).strip()
+        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})(?:[T\s]|$)", s)
+        if m and ("T" in s or "00:00:00" in s):
+            return f"{m.group(3)}/{m.group(2)}/{m.group(1)}"
+        return s
+
+    def _booking_field_for_template(self, booking_data, *keys):
+        data = booking_data if isinstance(booking_data, dict) else {}
+        wanted = {str(k).strip().lower() for k in keys if str(k).strip()}
+        for ek, ev in data.items():
+            if str(ek).strip().lower() in wanted:
+                s = self._stringify_template_field(ev)
+                if s:
+                    return s
+        return ""
+
+    def _map_whatsapp_template_variables(self, template_text, booking_data=None, template_name="", agent_name="", contact_name=""):
+        text = str(template_text or "")
+        nums = []
+        for inner in re.findall(r"\{\{([^}]+)\}\}", text):
+            for d in re.findall(r"\d+", str(inner)):
+                try:
+                    nums.append(int(d))
+                except Exception:
+                    pass
+        expected = max(nums) if nums else 0
+        if expected <= 0:
+            return []
+
+        agent_first = str(agent_name or "").strip().split()[0] if str(agent_name or "").strip() else ""
+        catalog = {
+            "customer_name": self._booking_field_for_template(booking_data, "Customer Name", "Traveler name") or str(contact_name or "").strip(),
+            "agent_name": agent_first,
+            "booking_nr": self._booking_field_for_template(booking_data, "Booking Nr.", "Booking Number", "Booking Nr"),
+            "trip_name": self._booking_field_for_template(booking_data, "trip Name", "Trip Name", "Real Product Name"),
+            "hotel": self._booking_field_for_template(booking_data, "Hotel Name"),
+            "pickup": self._booking_field_for_template(booking_data, "pickup time", "Pickup Time"),
+            "room": self._booking_field_for_template(booking_data, "Room number", "Room Number"),
+            "date": self._booking_field_for_template(booking_data, "Date Trip", "Date"),
+            "phone": self._booking_field_for_template(booking_data, "Customer Phone"),
+            "invoice": self._booking_field_for_template(booking_data, "Stripe invoice", "Strip Invoice", "Payment Link", "Invoice URL"),
+            "addons": self._booking_field_for_template(booking_data, "Add-Ons ((MultiSelect))", "Add - Ons"),
+            "option": self._booking_field_for_template(booking_data, "Option"),
+        }
+        keywords = {
+            "customer_name": ("hello", "dear", "hi ", "guest", "customer name", "passenger"),
+            "agent_name": ("this is", "i am", "from fts", "my name", "agent"),
+            "booking_nr": ("booking", "reference", "ref", "nr.", "#"),
+            "trip_name": ("trip", "tour", "excursion", "activity", "product"),
+            "hotel": ("hotel",),
+            "pickup": ("pickup", "pick up", "pick-up"),
+            "room": ("room",),
+            "date": ("date", "day of"),
+            "phone": ("phone", "whatsapp", "mobile"),
+            "invoice": ("invoice", "payment", "stripe", "pay now", "pay here"),
+            "addons": ("addon", "add-on", "add on", "extra"),
+            "option": ("option",),
+        }
+        known_layouts = {
+            "opening": ["customer_name", "agent_name", "booking_nr", "trip_name"],
+            "welcome_booking": ["customer_name", "trip_name", "booking_nr", "date"],
+            "ftstravels_confirm_payment": ["customer_name", "booking_nr", "trip_name", "invoice", "addons", "trip_name"],
+        }
+        name_lower = str(template_name or "").strip().lower()
+        known = None
+        for key, layout in known_layouts.items():
+            if name_lower == key or key in name_lower:
+                known = layout
+                break
+
+        parts = re.split(r"\{\{\s*\d+\s*\}\}", text)
+        matches = re.findall(r"\{\{\s*(\d+)\s*\}\}", text)
+        used = set()
+        values = []
+        leftover_skip = {"invoice", "phone", "agent_name"}
+
+        for i in range(1, expected + 1):
+            picked = ""
+            if known and i - 1 < len(known):
+                picked = known[i - 1]
+            else:
+                ctx = ""
+                for idx, num_s in enumerate(matches):
+                    try:
+                        n = int(num_s)
+                    except Exception:
+                        continue
+                    if n != i:
+                        continue
+                    before = parts[idx] if idx < len(parts) else ""
+                    after = parts[idx + 1] if idx + 1 < len(parts) else ""
+                    ctx = f"{before[-48:]} {after[:14]}".lower()
+                    break
+                best_key = ""
+                best_score = 0
+                for key, kws in keywords.items():
+                    if key in used and key != "trip_name":
+                        continue
+                    score = 0
+                    for kw in kws:
+                        if kw in ctx:
+                            score += max(3, len(kw))
+                    if score > best_score:
+                        best_score = score
+                        best_key = key
+                if best_score > 0:
+                    picked = best_key
+            if not picked:
+                for key, val in catalog.items():
+                    if key in used or key in leftover_skip or not val:
+                        continue
+                    picked = key
+                    break
+            if picked:
+                used.add(picked)
+            values.append(str(catalog.get(picked) or "") if picked else "")
+        return values
 
     def _fetch_whatsapp_templates_from_meta(self, location=None, statuses=None, max_pages=25):
         """
@@ -31883,6 +31991,8 @@ Write ONE short message only. No JSON. No explanations."""
             template_language = data.get('template_language', 'en')
             location = data.get('location', 'Unknown')
             booking_data = data.get('booking_data')
+            agent_name = data.get('agent_name') or ''
+            contact_name = data.get('contact_name') or ''
             
             if not template_name:
                 return jsonify({"status": "error", "message": "Missing template_name"}), 400
@@ -31939,37 +32049,21 @@ Write ONE short message only. No JSON. No explanations."""
                                 
                         user_params = []
                         if expected_count > 0:
-                            if booking_data:
-                                try:
-                                    prompt = f"""You are an assistant. You need to extract exactly {expected_count} values from the following booking data to fill in the variables {{1}} to {{{{{expected_count}}}}} in the template text.
-Template Text:
-{comp_text}
-
-Booking Data:
-{booking_data}
-
-Instructions:
-- If the template requires an invoice link or payment link (often variable 3 or similar), look specifically for fields like "Strip Invoice", "Stripe Link", "Payment Link", or "Invoice URL" in the Booking Data.
-- Return ONLY a valid JSON array of strings containing exactly {expected_count} elements in order. 
-- Use a hyphen "-" if a value is not found or empty. 
-Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]"""
-                                    ai_response = self.query_ai(prompt, system_role="analyzer")
-                                    if ai_response:
-                                        import json
-                                        clean_json = ai_response.strip()
-                                        if clean_json.startswith("```json"):
-                                            clean_json = clean_json.split("```json")[1].split("```")[0].strip()
-                                        elif clean_json.startswith("```"):
-                                            clean_json = clean_json.split("```")[1].strip()
-                                        extracted_params = json.loads(clean_json)
-                                        if isinstance(extracted_params, list) and len(extracted_params) >= expected_count:
-                                            user_params = [str(x) for x in extracted_params]
-                                except Exception as ai_e:
-                                    logging.error(f"Error using AI to map template params in preview: {ai_e}")
+                            try:
+                                user_params = self._map_whatsapp_template_variables(
+                                    comp_text,
+                                    booking_data=booking_data,
+                                    template_name=template_name,
+                                    agent_name=agent_name,
+                                    contact_name=contact_name,
+                                ) or []
+                            except Exception as map_e:
+                                logging.error(f"Error mapping template params in preview: {map_e}")
+                                user_params = []
                             
-                            # Fill missing with "-"
+                            # Fill missing with empty strings so the agent can type them.
                             while len(user_params) < expected_count:
-                                user_params.append("-")
+                                user_params.append("")
 
                             try:
                                 addons_val = ""

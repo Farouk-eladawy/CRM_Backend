@@ -98734,3 +98734,362 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "AC8C6EB57C79DF8B1C72032F832495D8",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "AC8C6EB57C79DF8B1C72032F832495D8",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "senderKeyDistributionMessage": {
+        "groupId": "201013498777-1578317593@g.us",
+        "axolotlSenderKeyDistributionMessage": {
+          "0": 51,
+          "1": 8,
+          "2": 248,
+          "3": 232,
+          "4": 248,
+          "5": 132,
+          "6": 6,
+          "7": 16,
+          "8": 0,
+          "9": 26,
+          "10": 32,
+          "11": 7,
+          "12": 26,
+          "13": 66,
+          "14": 10,
+          "15": 32,
+          "16": 124,
+          "17": 249,
+          "18": 196,
+          "19": 160,
+          "20": 146,
+          "21": 142,
+          "22": 151,
+          "23": 123,
+          "24": 107,
+          "25": 242,
+          "26": 179,
+          "27": 232,
+          "28": 173,
+          "29": 24,
+          "30": 72,
+          "31": 149,
+          "32": 134,
+          "33": 21,
+          "34": 254,
+          "35": 14,
+          "36": 38,
+          "37": 100,
+          "38": 104,
+          "39": 192,
+          "40": 208,
+          "41": 98,
+          "42": 192,
+          "43": 34,
+          "44": 33,
+          "45": 5,
+          "46": 92,
+          "47": 176,
+          "48": 173,
+          "49": 196,
+          "50": 253,
+          "51": 174,
+          "52": 164,
+          "53": 51,
+          "54": 4,
+          "55": 85,
+          "56": 88,
+          "57": 186,
+          "58": 39,
+          "59": 18,
+          "60": 234,
+          "61": 215,
+          "62": 3,
+          "63": 92,
+          "64": 29,
+          "65": 3,
+          "66": 17,
+          "67": 231,
+          "68": 67,
+          "69": 126,
+          "70": 123,
+          "71": 218,
+          "72": 217,
+          "73": 128,
+          "74": 118,
+          "75": 34,
+          "76": 158,
+          "77": 79
+        }
+      },
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 129,
+          "1": 248,
+          "2": 25,
+          "3": 23,
+          "4": 133,
+          "5": 159,
+          "6": 141,
+          "7": 230,
+          "8": 36,
+          "9": 228,
+          "10": 7,
+          "11": 116,
+          "12": 61,
+          "13": 245,
+          "14": 65,
+          "15": 165,
+          "16": 107,
+          "17": 71,
+          "18": 213,
+          "19": 121,
+          "20": 51,
+          "21": 145,
+          "22": 80,
+          "23": 198,
+          "24": 253,
+          "25": 148,
+          "26": 249,
+          "27": 235,
+          "28": 199,
+          "29": 124,
+          "30": 5,
+          "31": 231
+        }
+      },
+      "conversation": "هو ده ازاي 18 😂😂😂\nاوتوميشين خربان بصوت مستر محمد بربر"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "stanzaId": "3EB011A9A3ACA54FB6F206",
+      "participant": "221453379186733@lid",
+      "quotedMessage": {
+        "conversation": "Trip Name: Private Airport Arrival/Departure One Way Transfer\nTotal Booking: 1\nDate Trip: 2026-08-18\nTotal Travelers: 3\nLink Excel: https://drive.google.com/uc?export=download&id=1bX3nt4NVFJeSDvYmVlcyl1WyQUHcIkq9"
+      },
+      "quotedType": 0
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786915322,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "android"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T14:22:02.827Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D3B2A30B8F957177C7"
+    },
+    "keyId": "3EB0D3B2A30B8F957177C7",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hello [MR/ Ahmady],\n\nI hope you're doing well.\n\nHere is the Daily Report for today:\nReport_Standard_2026-08-17.html\nhttps://res.cloudinary.com/dqlurfwet/raw/upload/v1786915887/tlokumxr8t3tdinoanps.html"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786743089,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786915890,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T14:31:30.885Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0597E691DF695899889"
+    },
+    "keyId": "3EB0597E691DF695899889",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hello [MR/ Ahmady],\n\nI hope you're doing well.\n\nHere is the Daily Report for today:\nReport_Manager_2026-08-17.html\nhttps://res.cloudinary.com/dqlurfwet/raw/upload/v1786915891/atxuhx13hb50nljtzcet.html"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786743092,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786915892,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T14:31:33.503Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB0E95F7CDD265B3DB222",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0E95F7CDD265B3DB222",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "هو التقرير صح بس التاريخ اللي اطبع غلط تقريبا لان الحجز رحلته 17 بالفعل",
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 68,
+          "1": 86,
+          "2": 43,
+          "3": 182,
+          "4": 17,
+          "5": 255,
+          "6": 224,
+          "7": 235,
+          "8": 201,
+          "9": 65,
+          "10": 93,
+          "11": 250,
+          "12": 13,
+          "13": 161,
+          "14": 187,
+          "15": 96,
+          "16": 186,
+          "17": 58,
+          "18": 212,
+          "19": 240,
+          "20": 253,
+          "21": 192,
+          "22": 87,
+          "23": 65,
+          "24": 100,
+          "25": 91,
+          "26": 188,
+          "27": 3,
+          "28": 186,
+          "29": 40,
+          "30": 191,
+          "31": 202
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786916005,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T14:33:25.582Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D394EE27696235339F"
+    },
+    "keyId": "3EB0D394EE27696235339F",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Here is the Daily Report for today:\nhttps://drive.google.com/uc?export=download&id=10xnfCgeWL1f-qbr61kOk9QWCMcIn9a2r"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786743766,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786916567,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T14:42:48.041Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

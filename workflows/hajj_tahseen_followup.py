@@ -120,6 +120,32 @@ TAG_HOT_LEAD = "hajj-tahseen-hot-lead"
 TAG_PENDING_REPLY = "pending-reply-hajj-tahseen"   # الشرط 1: عميل مستني رد
 TAG_CARD_IMAGE = "card-image-hajj-tahseen"          # الشرط 3: عميل بعت صورة بطاقة
 
+# بادئات رسائل الـ agent/ai التي ليست رداً حقيقياً على العميل (تُستثنى من حساب
+# "آخر رد من الفريق"):
+#   [PROPOSED_DRAFT]    → مسودة مقترحة من الـ AI للموظف — لم تُرسل للعميل أبداً
+#   [System Log]/[SYSTEM] → سجلات نظام
+#   [ESCALATE]          → إشعار تحويل نظامي (ليس رداً)
+#   [LANGUAGE: ...]     → ملاحظة داخلية للـ AI عن لغة الرد
+#   [Collect Email]     → ملاحظة داخلية لجمع الإيميل
+#   [AI_PROVIDER_FAILED_SILENTLY] → سجل فشل داخلي
+#   [AUTO]              → سجل إجراء تلقائي (مثل إرسال تذكرة PDF)
+#   [Agent reacted ...] → تفاعل الـ agent (ليس رداً نصياً)
+# اكتُشفت في 2026-08-16 (سجل recBIziG25Nq4SmiP): رسالة [PROPOSED_DRAFT] بعد
+# آخر رسالة عميل جعلت الـ Workflow يظن أن الفريق رد → أرسل المرحلة 1 لعميل
+# مستني رد. هذا الاستثناء يمنع تكرار ذلك.
+_NON_REPLY_AGENT_PREFIXES = (
+    "[System Log]",
+    "[System]",
+    "[SYSTEM]",
+    "[PROPOSED_DRAFT]",
+    "[ESCALATE]",
+    "[LANGUAGE:",
+    "[Collect Email]",
+    "[AI_PROVIDER_FAILED_SILENTLY]",
+    "[AUTO]",
+    "[Agent reacted",
+)
+
 log = logging.getLogger("HajjTahseenFollowup")
 
 # =============================================================================
@@ -433,10 +459,12 @@ def _customer_messages(cursor, chat_id, cap: int = 500):
 def _last_agent_reply(cursor, chat_id):
     """آخر رد حقيقي من الفريق/الـ agent (المرساة الجديدة للتوقيت - الشرط 4).
     نستبعد:
-      - رسائل النظام ([System Log] / [System]) لأنها ليست رداً على العميل.
+      - رسائل النظام والمسودات غير المُرسلة ([System Log] / [PROPOSED_DRAFT] /
+        [ESCALATE] / [LANGUAGE: ...] ...) لأنها ليست رداً فعلياً على العميل —
+        المسودة خاصة: تظهر بعد آخر رسالة عميل وتجعل العميل يبدو "مردود عليه"
+        بينما هو في الحقيقة مستني رد (حالة recBIziG25Nq4SmiP الحقيقية).
       - نصوص المراحل الثلاث نفسها (MSG_STAGE1/2/3) حتى لا تُعيد رسالة
-        المرحلة ضبط نفسها كمرساة (كانت ستدفع M2 بعد M1 بـ 8 ساعات بدلاً من
-        8 ساعات من الرد الحقيقي).
+        المرحلة ضبط نفسها كمرساة.
     أما ردود الملخص/الحجز/الشكر التي يرسلها هذا الـ Workflow نفسه فهي ردود
     حقيقية للعميل → تبقى مرساة سليمة (العميل أخد رد وسكت).
     """
@@ -455,7 +483,8 @@ def _last_agent_reply(cursor, chat_id):
         text, ts = str(row[0] or ""), row[1]
         if text in stage_texts:
             continue
-        if text.startswith("[System Log]") or text.startswith("[System]"):
+        low = text.lower()
+        if any(low.startswith(p.lower()) for p in _NON_REPLY_AGENT_PREFIXES):
             continue
         if not text.strip():
             continue
@@ -1010,6 +1039,12 @@ def run(agent, payload: dict = None) -> dict:
                 processed_chats += 1
                 if not dry_run:
                     _save_state(state)
+            elif last_agent_ts is not None and prev_anchor is not None and last_agent_ts < prev_anchor:
+                # المرساة المخزنة أحدث من آخر رد حقيقي (حدث بسبب رسالة [PROPOSED_DRAFT]
+                # قديمة سُجّلت كمرساة قبل استثنائها) → نصّح المرساة لآخر رد حقيقي
+                # دون إعادة ضبط التسلسل (حتى لا نكرر رسائل سبق إرسالها).
+                entry["last_agent_reply_ts"] = last_agent_ts.isoformat()
+                entry["updated_at"] = now_iso
 
             # ===== لا رد جديد → منطق إرسال المراحل (المرساة = آخر رد من الفريق) =====
             anchor = _parse_dt(entry.get("last_agent_reply_ts")) or last_customer_ts

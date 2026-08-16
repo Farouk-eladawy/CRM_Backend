@@ -437,6 +437,8 @@ def _should_suppress_internal_error_alert(record):
         or "more than 24 hours have passed" in message_text
     ):
         return True
+    if "no module named 'soundfile'" in message_text:
+        return True
     return False
 
 
@@ -3194,19 +3196,50 @@ class AIAgent:
             logging.error(f"Failed to update record {record_id} in {table_name}: {e}")
             raise e
 
+    def _booking_nr_search_variants(self, booking_nr):
+        raw = str(booking_nr or "").strip()
+        if not raw:
+            return []
+        variants = [raw]
+        upper = raw.upper()
+        if upper.startswith("BR-") and len(raw) > 3:
+            stripped = raw[3:].strip()
+            if stripped and stripped not in variants:
+                variants.append(stripped)
+        elif raw.isdigit():
+            prefixed = f"BR-{raw}"
+            if prefixed not in variants:
+                variants.append(prefixed)
+        return variants
+
     def find_booking_by_number(self, booking_nr):
         """Find a booking record by Booking Nr. using ID query"""
+        booking_nr = str(booking_nr or "").strip()
+        if not booking_nr or self._is_placeholder_booking_number(booking_nr):
+            logging.info(f"Skipping placeholder/invalid booking lookup: {booking_nr}")
+            return None
+        last_error = None
+        for variant in self._booking_nr_search_variants(booking_nr):
+            try:
+                rec = self._find_booking_by_number_exact(variant)
+                if rec:
+                    if variant != booking_nr:
+                        logging.info(f"Found booking using variant '{variant}' for input '{booking_nr}'")
+                    return rec
+            except Exception as e:
+                last_error = e
+                logging.error(f"Error finding booking {variant}: {e}")
+        if last_error:
+            return None
+        return None
+
+    def _find_booking_by_number_exact(self, booking_nr):
+        """Find a booking record by exact Booking Nr. value."""
         try:
             # Formula still uses Field Names usually! 
             # PyAirtable 'formula' parameter sends string to Airtable API.
             # Airtable API formulas use Field Names, NOT IDs.
             # So we MUST keep using Names in the formula string.
-            
-            # Sanitize booking_nr (trim spaces)
-            booking_nr = str(booking_nr).strip()
-            if not booking_nr or self._is_placeholder_booking_number(booking_nr):
-                logging.info(f"Skipping placeholder/invalid booking lookup: {booking_nr}")
-                return None
             
             formula = f"{{Booking Nr.}}='{booking_nr}'"
             logging.info(f"DEBUG: Searching Table with formula: {formula}")
@@ -6452,16 +6485,6 @@ User request:
                     self._link_email_if_needed(rec, sender_email)
                 return rec
             else:
-                # --- VIATOR BR- PREFIX RETRY LOGIC ---
-                if confidence == "STRONG" and cand.isdigit() and not cand.startswith("BR-"):
-                     viator_cand = f"BR-{cand}"
-                     logging.info(f"Retrying with Viator Prefix: {viator_cand}")
-                     rec_viator = _find_by_booking_number_scoped(viator_cand)
-                     if rec_viator:
-                         logging.info(f"Found booking with Viator Prefix: {viator_cand}")
-                         return rec_viator
-                # -------------------------------------
-
                 if confidence == "STRONG":
                     logging.warning(f"Strong Booking ID candidate '{cand}' NOT found in DB. Continuing to search by contact info...")
 
@@ -9182,6 +9205,86 @@ Conversation:
         except Exception:
             return False
 
+    def _extract_explicit_ota_booking_number(self, *texts):
+        """Return a strong GYG/Viator booking number from thread id, sender, subject, or body."""
+        combined = "\n".join(str(t or "") for t in texts if t)
+        if not combined.strip():
+            return None
+        gyg_matches = re.findall(r"\bGYG[A-Z0-9]{6,}\b", combined, re.IGNORECASE)
+        if gyg_matches:
+            return str(gyg_matches[0]).strip()
+        br_matches = re.findall(r"\bBR-\d{6,}\b", combined, re.IGNORECASE)
+        if br_matches:
+            return str(br_matches[0]).strip()
+        for raw in texts:
+            s = str(raw or "").strip()
+            for sep in ("::", ":"):
+                if sep not in s:
+                    continue
+                tail = s.rsplit(sep, 1)[-1].strip()
+                if re.fullmatch(r"GYG[A-Z0-9]{6,}", tail, re.IGNORECASE) or re.fullmatch(r"BR-\d{6,}", tail, re.IGNORECASE):
+                    return tail
+        return None
+
+    def _try_immediate_ota_booking_link(
+        self,
+        chat_id,
+        message_body="",
+        subject="",
+        thread_id="",
+        sender_identifier="",
+        location="Unknown",
+        receiving_phone_id=None,
+        source="Email",
+    ):
+        """Link an unlinked OTA email chat using an explicit booking number already in the thread."""
+        if not chat_id:
+            return False
+        try:
+            import chat_db
+        except Exception:
+            return False
+        try:
+            conv = chat_db.get_conversation(chat_id) or {}
+        except Exception:
+            conv = {}
+        if str((conv or {}).get("airtable_record_id") or "").strip():
+            return True
+        booking_nr = self._extract_explicit_ota_booking_number(
+            thread_id, sender_identifier, subject, message_body
+        )
+        if not booking_nr:
+            return False
+        rec = self.find_booking_by_number(booking_nr)
+        if not rec:
+            logging.info("Immediate OTA lookup found no Airtable record for %s", booking_nr)
+            return False
+        is_leads_table = rec.get("table_name") == LEADS_TABLE_NAME
+        db_location = self._derive_chat_location_from_fields(
+            rec.get("fields", {}) or {},
+            fallback_location=location or (conv or {}).get("location") or "Unknown",
+            receiving_phone_id=receiving_phone_id,
+            is_leads_table=is_leads_table,
+        )
+        booking_nr_val = self.get_field_value(rec.get("fields", {}) or {}, FieldIds.BOOKING_NR) or booking_nr
+        contact_name = self.get_field_value(rec.get("fields", {}) or {}, FieldIds.CUSTOMER_NAME) or None
+        chat_db.update_conversation_info(
+            chat_id=chat_id,
+            contact_name=contact_name,
+            airtable_record_id=rec.get("id"),
+            location=db_location,
+            booking_number=booking_nr_val,
+            sales_inbox=False,
+        )
+        logging.info(
+            "Immediate OTA link: chat %s -> %s (%s), Location: %s",
+            chat_id,
+            rec.get("id"),
+            booking_nr_val,
+            db_location,
+        )
+        return True
+
     def process_unified_message(self, sender_identifier, message_body, history_text, source="Email", subject=None, thread_id=None, history_list=None, location="Unknown", receiving_phone_id=None, skip_db_save=False, mailbox=None, incoming_external_message_id=None, email_account_id=None):
         """
         Unified logic for processing messages from Email or WhatsApp.
@@ -9310,11 +9413,24 @@ Conversation:
                     sales_inbox=True if (source == "Email" and str(mailbox or "").lower() == "sales") else None,
                     email_account_id=email_account_id if source == "Email" else None
                 )
+                self._current_chat_id = chat_conv['chat_id']
+                try:
+                    self._try_immediate_ota_booking_link(
+                        chat_conv['chat_id'],
+                        message_body=message_body,
+                        subject=subject,
+                        thread_id=thread_id,
+                        sender_identifier=sender_identifier,
+                        location=location,
+                        receiving_phone_id=receiving_phone_id,
+                        source=source,
+                    )
+                except Exception as e:
+                    logging.warning("Immediate OTA booking link failed: %s", e)
                 if source == "Email" and incoming_external_message_id:
                     try:
                         existing_id = chat_db.get_message_id_by_external_id(chat_conv['chat_id'], incoming_external_message_id)
                         if existing_id:
-                            self._current_chat_id = chat_conv['chat_id']
                             return None
                     except Exception:
                         pass
@@ -9403,6 +9519,19 @@ Conversation:
                     email_account_id=email_account_id if source == "Email" else None
                 )
                 self._current_chat_id = chat_conv['chat_id']
+                try:
+                    self._try_immediate_ota_booking_link(
+                        chat_conv['chat_id'],
+                        message_body=message_body,
+                        subject=subject,
+                        thread_id=thread_id,
+                        sender_identifier=sender_identifier,
+                        location=location,
+                        receiving_phone_id=receiving_phone_id,
+                        source=source,
+                    )
+                except Exception as e:
+                    logging.warning("Immediate OTA booking link failed: %s", e)
             except Exception as e:
                 logging.error(f"Error retrieving chat_id when skip_db_save=True: {e}")
                 self._current_chat_id = None
@@ -10715,69 +10844,178 @@ Conversation:
             logging.error(f"Error downloading media {media_id} for AI Vision: {e}")
             return None
 
+    def _openai_audio_api_key(self):
+        ai_section = (self.config.get("ai") or {}) if isinstance(getattr(self, "config", None), dict) else {}
+        providers = ai_section.get("providers") if isinstance(ai_section, dict) else {}
+        openai_cfg = providers.get("openai") if isinstance(providers, dict) else {}
+        if not isinstance(openai_cfg, dict):
+            openai_cfg = {}
+        key = str(openai_cfg.get("api_key") or "").strip()
+        if not key or "YOUR_" in key or len(key) < 10:
+            return ""
+        return key
+
+    def _whisper_transcribe_bytes(self, audio_bytes, filename="voice.ogg"):
+        api_key = self._openai_audio_api_key()
+        if not api_key or not audio_bytes:
+            return None
+        import requests
+        name = str(filename or "voice.ogg").strip() or "voice.ogg"
+        if "." not in name:
+            name = f"{name}.ogg"
+        files = {"file": (name, audio_bytes)}
+        data = {"model": "whisper-1"}
+        try:
+            response = requests.post(
+                "https://api.openai.com/v1/audio/transcriptions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                files=files,
+                data=data,
+                timeout=60,
+            )
+            if response.status_code != 200:
+                logging.warning("Whisper transcription failed (%s): %s", response.status_code, (response.text or "")[:300])
+                return None
+            text = str((response.json() or {}).get("text") or "").strip()
+            return text or None
+        except Exception as e:
+            logging.warning("Whisper transcription error: %s", e)
+            return None
+
+    def _convert_audio_file_to_wav(self, src_path, wav_path):
+        import os
+        import subprocess
+        converters = []
+
+        def _ffmpeg():
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", src_path, "-ar", "16000", "-ac", "1", wav_path],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=40,
+            )
+
+        def _pydub():
+            from pydub import AudioSegment
+            AudioSegment.from_file(src_path).set_frame_rate(16000).set_channels(1).export(wav_path, format="wav")
+
+        def _soundfile():
+            import soundfile as sf
+            data, samplerate = sf.read(src_path)
+            sf.write(wav_path, data, samplerate)
+
+        converters.extend((_ffmpeg, _pydub, _soundfile))
+        last_error = None
+        for convert in converters:
+            try:
+                convert()
+                if os.path.exists(wav_path) and os.path.getsize(wav_path) > 0:
+                    return True
+            except Exception as e:
+                last_error = e
+        if last_error:
+            logging.warning("Audio WAV conversion failed: %s", last_error)
+        return False
+
+    def _google_transcribe_wav(self, wav_path):
+        try:
+            import speech_recognition as sr
+        except Exception as e:
+            logging.warning("speech_recognition is unavailable: %s", e)
+            return None
+        recognizer = sr.Recognizer()
+        try:
+            with sr.AudioFile(wav_path) as source:
+                audio_data = recognizer.record(source)
+            for lang in ("ar-EG", "ar", "en-US"):
+                try:
+                    text = str(recognizer.recognize_google(audio_data, language=lang) or "").strip()
+                    if text:
+                        return text
+                except sr.UnknownValueError:
+                    continue
+                except sr.RequestError as e:
+                    logging.warning("Google speech API error (%s): %s", lang, e)
+                    break
+            return None
+        except Exception as e:
+            logging.warning("Google WAV transcription failed: %s", e)
+            return None
+
+    def _transcribe_audio_bytes(self, audio_bytes, filename="voice.ogg"):
+        if not audio_bytes:
+            return None, "تعذر تفريغ الرسالة الصوتية"
+        text = self._whisper_transcribe_bytes(audio_bytes, filename=filename)
+        if text:
+            return text, None
+
+        import os
+        import tempfile
+        suffix = os.path.splitext(str(filename or ""))[1] or ".ogg"
+        tmp_src = None
+        tmp_wav = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(audio_bytes)
+                tmp_src = tmp.name
+            tmp_wav = tmp_src + ".wav"
+            if self._convert_audio_file_to_wav(tmp_src, tmp_wav):
+                text = self._google_transcribe_wav(tmp_wav)
+                if text:
+                    return text, None
+        except Exception as e:
+            logging.warning("Local audio transcription fallback failed: %s", e)
+        finally:
+            for path in (tmp_src, tmp_wav):
+                try:
+                    if path and os.path.exists(path):
+                        os.remove(path)
+                except Exception:
+                    pass
+        return None, "تعذر تفريغ الرسالة الصوتية"
+
     def download_and_transcribe_audio(self, media_id):
         """
-        Downloads a WhatsApp audio message and transcribes it using Google Web Speech API.
+        Downloads a WhatsApp audio message and transcribes it.
+        Prefers OpenAI Whisper (accepts OGG/OPUS directly). Falls back to local WAV conversion.
         """
         try:
-            import requests, tempfile, os
-            import soundfile as sf
-            import speech_recognition as sr
-            
+            import requests
+
             access_token = self._get_whatsapp_access_token()
             if not access_token:
-                return None, "[Audio Error: No Access Token]"
-            
-            url = f"https://graph.facebook.com/v18.0/{media_id}"
+                return None, "تعذر تفريغ الرسالة الصوتية"
+
+            url = f"https://graph.facebook.com/{META_GRAPH_VERSION}/{media_id}"
             headers = {"Authorization": f"Bearer {access_token}"}
             res = requests.get(url, headers=headers, timeout=10)
             if res.status_code != 200:
-                return None, f"[Audio Error: Failed to get URL - {res.status_code}]"
-            
-            media_url = res.json().get('url')
+                logging.warning("Audio media URL lookup failed for %s: %s", media_id, res.status_code)
+                return None, "تعذر تفريغ الرسالة الصوتية"
+
+            media_url = res.json().get("url")
             if not media_url:
-                return None, "[Audio Error: Empty media URL]"
-                
-            media_res = requests.get(media_url, headers=headers, timeout=20)
+                return None, "تعذر تفريغ الرسالة الصوتية"
+
+            media_res = requests.get(media_url, headers=headers, timeout=30)
             if media_res.status_code != 200:
-                return None, f"[Audio Error: Failed to download media - {media_res.status_code}]"
-                
-            # Save the raw audio (usually OGG/OPUS) to a temp file
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".ogg") as tmp_ogg:
-                tmp_ogg.write(media_res.content)
-                tmp_ogg_path = tmp_ogg.name
-                
-            tmp_wav_path = tmp_ogg_path + ".wav"
-            
-            try:
-                # Convert OGG to WAV using soundfile
-                data, samplerate = sf.read(tmp_ogg_path)
-                sf.write(tmp_wav_path, data, samplerate)
-                
-                # Transcribe using SpeechRecognition
-                recognizer = sr.Recognizer()
-                with sr.AudioFile(tmp_wav_path) as source:
-                    audio_data = recognizer.record(source)
-                    # Use Google Web Speech API (supports Arabic "ar-EG")
-                    text = recognizer.recognize_google(audio_data, language="ar-EG")
-                    return text, None
-            except sr.UnknownValueError:
-                return None, "[Audio Error: Could not understand audio]"
-            except sr.RequestError as e:
-                return None, f"[Audio Error: Google API error - {e}]"
-            except Exception as e:
-                logging.error(f"Error during transcription: {e}")
-                return None, f"[Audio Error: Conversion/Transcription failed - {e}]"
-            finally:
-                # Clean up temp files
-                if os.path.exists(tmp_ogg_path):
-                    os.remove(tmp_ogg_path)
-                if os.path.exists(tmp_wav_path):
-                    os.remove(tmp_wav_path)
-                    
+                logging.warning("Audio download failed for %s: %s", media_id, media_res.status_code)
+                return None, "تعذر تفريغ الرسالة الصوتية"
+
+            content_type = str(media_res.headers.get("content-type") or "").lower()
+            if "mp4" in content_type or "m4a" in content_type or "aac" in content_type:
+                filename = "voice.m4a"
+            elif "mpeg" in content_type or "mp3" in content_type:
+                filename = "voice.mp3"
+            elif "wav" in content_type:
+                filename = "voice.wav"
+            else:
+                filename = "voice.ogg"
+            return self._transcribe_audio_bytes(media_res.content, filename=filename)
         except Exception as e:
-            logging.error(f"Error in download_and_transcribe_audio for {media_id}: {e}")
-            return None, f"[Audio Error: {str(e)}]"
+            logging.warning("Error in download_and_transcribe_audio for %s: %s", media_id, e)
+            return None, "تعذر تفريغ الرسالة الصوتية"
 
     _WEEKDAY_NAMES = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
     _WEEKDAY_KEYS = ("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday")
@@ -39869,9 +40107,7 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                 if incoming_text and incoming_text.startswith("__AUDIO_EVOLUTION_MSG__:"):
                     evolution_msg_json = incoming_text.split(":", 1)[1]
                     try:
-                        import requests, tempfile, os, json, base64
-                        import soundfile as sf
-                        import speech_recognition as sr
+                        import requests, json, base64
                         
                         cfg = _load_internal_whatsapp_config()
                         api_key = str((cfg or {}).get("apiKey") or "").strip()
@@ -39883,7 +40119,6 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                         headers = {"apikey": api_key, "Content-Type": "application/json"}
                         base64_endpoint = f"{api_url}/chat/getBase64FromMediaMessage/{instance_name_for_api}"
                         
-                        # Post the message object to get base64
                         payload_for_base64 = {"message": msg_data}
                         logging.info(f"Requesting base64 from {base64_endpoint}")
                         media_res = requests.post(base64_endpoint, headers=headers, json=payload_for_base64, timeout=30)
@@ -39892,40 +40127,21 @@ Example: ["Ali", "1234", "https://invoice.stripe.com/...", "08:00 AM", "-", "-"]
                             media_data = media_res.json()
                             base64_audio = media_data.get("base64")
                             if base64_audio:
-                                # Ensure correct padding if missing
-                                base64_audio = base64_audio.split(",")[-1] # Remove data URI scheme if present
+                                base64_audio = base64_audio.split(",")[-1]
                                 base64_bytes = base64.b64decode(base64_audio + '==')
-                                
-                                with tempfile.NamedTemporaryFile(delete=False, suffix=".ogg") as tmp_ogg:
-                                    tmp_ogg.write(base64_bytes)
-                                    tmp_ogg_path = tmp_ogg.name
-                                    
-                                tmp_wav_path = tmp_ogg_path + ".wav"
-                                try:
-                                    data, samplerate = sf.read(tmp_ogg_path)
-                                    sf.write(tmp_wav_path, data, samplerate)
-                                    
-                                    recognizer = sr.Recognizer()
-                                    with sr.AudioFile(tmp_wav_path) as source:
-                                        audio_data = recognizer.record(source)
-                                        transcription = recognizer.recognize_google(audio_data, language="ar-EG")
-                                        incoming_text = transcription
-                                        logging.info(f"Internal Audio Transcribed: {transcription}")
-                                except sr.UnknownValueError:
-                                    incoming_text = "[رسالة صوتية غير مفهومة]"
-                                except Exception as e:
-                                    logging.error(f"Error transcribing internal audio: {e}")
-                                    incoming_text = "[خطأ في معالجة الرسالة الصوتية]"
-                                finally:
-                                    if os.path.exists(tmp_ogg_path): os.remove(tmp_ogg_path)
-                                    if os.path.exists(tmp_wav_path): os.remove(tmp_wav_path)
+                                transcription, err = self._transcribe_audio_bytes(base64_bytes, filename="voice.ogg")
+                                if transcription:
+                                    incoming_text = transcription
+                                    logging.info(f"Internal Audio Transcribed: {transcription}")
+                                else:
+                                    incoming_text = "[رسالة صوتية غير مفهومة]" if not err else "[تعذر تفريغ الرسالة الصوتية]"
                             else:
                                 incoming_text = "[خطأ: لم يتم إرجاع Base64 للصوت]"
                         else:
-                            logging.error(f"Failed to get base64: {media_res.text}")
+                            logging.warning("Failed to get base64: %s", media_res.text)
                             incoming_text = "[خطأ في تحميل الرسالة الصوتية من الخادم]"
                     except Exception as e:
-                        logging.error(f"Error downloading internal audio: {e}")
+                        logging.warning("Error downloading internal audio: %s", e)
                         incoming_text = "[خطأ في تحميل الرسالة الصوتية]"
 
                 is_message_event = any(

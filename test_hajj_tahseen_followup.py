@@ -22,6 +22,10 @@
   13) الشرط 2: رقم موبايل في أي وقت خلال المحادثة → إلغاء السلسلة كلها.
   14) الشرط 3: صورة بطاقة في أي وقت خلال المحادثة → إلغاء السلسلة كلها.
   15) الشرط 4: الفريق رد بعد بداية السلسلة → إلغاء وإعادة البدء من الرد الجديد.
+  16) [PROPOSED_DRAFT] (مسودة AI لم تُرسل) لا تُحسب رداً → عميل مستني رد
+     يتحول لبشري ولا تُرسل له مراحل (إصلاح حالة recBIziG25Nq4SmiP الحقيقية).
+  16) رسالة [PROPOSED_DRAFT] (مسودة غير مُرسلة) لا تُعتبر رداً → Pending Reply
+     (إعادة إنتاج الحالة الحقيقية recBIziG25Nq4SmiP التي أُرسلت فيها M1 لعميل مستني رد).
 
 ملاحظة: القاعدة العامة الجديدة تتطلب وجود رد من الفريق/الـ agent حتى تبدأ
 السلسلة (السلسلة معمولة لعميل أخد رد وسكت)، لذلك أُضيف رد agent بعد رسالة
@@ -484,6 +488,31 @@ def main():
     check("M2 أُرسلت بعد 8 ساعات من الرد البشري الجديد", len(m15_2) == 1, str(len(m15_2)))
     m15_1b = [m for m in agent.sent_fb if m["to"] == "psid_15" and "حضرتك لسه معانا؟ 🕋" in m["text"]]
     check("لم تُكرر M1 (البدء من المرحلة المستحقة فقط)", len(m15_1b) == 1, str(len(m15_1b)))
+
+    # ---------------------------------------------------------------
+    print("== 16) [PROPOSED_DRAFT] لا يُعتبر رداً → Pending Reply (حالة recBIziG25Nq4SmiP) ==")
+    agent.sent_fb.clear()
+    c16 = "chat-draft-bug"
+    base = FAKE_NOW
+    t16 = base - timedelta(hours=3)
+    _add_conv(conn, c16, "psid_16", last_ts=(t16 + timedelta(minutes=30, seconds=11)).isoformat())
+    _add_msg(conn, c16, "customer", "تفاصيل البرنامج", t16.isoformat())
+    _add_msg(conn, c16, "agent", "تفاصيل البرنامج دي طيران تحسين 🕋", (t16 + timedelta(minutes=1)).isoformat())
+    # العميل يرد، والـ AI يقترح مسودة لم تُرسل (PROPOSED_DRAFT) بعد ردّه بـ 11 ثانية
+    _add_msg(conn, c16, "customer", "لا القسط كبير جدا", (t16 + timedelta(minutes=30)).isoformat())
+    _add_msg(conn, c16, "agent", "[PROPOSED_DRAFT] فاهم حضرتك، لو القسط الشهري هو اللي شاغل حضرتك...", (t16 + timedelta(minutes=30, seconds=11)).isoformat())
+    n_before = len(agent.sent_fb)
+    _run(agent)  # تهيئة + فحص القواعد
+    _run(agent)  # تشغيل ثانٍ — يجب ألا تُرسل أي مرحلة
+    check("لا تُرسل مرحلة لعميل ردّه الأخير لم يُجب عليه أحد (المسودة ليست رداً)",
+          not any(m["to"] == "psid_16" for m in agent.sent_fb[n_before:]))
+    st = _state()
+    e16 = st["chats"].get(c16, {})
+    check("الحالة: handled_reason=pending_reply", e16.get("handled_reason") == "pending_reply", str(e16))
+    r16 = _needs_help(conn, c16)
+    check("تحويل لبشري (needs_help=1)", r16 and r16[0] == 1)
+    s16 = _sales(conn, c16)
+    check("tag pending-reply-hajj-tahseen", s16 and "pending-reply-hajj-tahseen" in (s16[0] or ""))
 
     conn.close()
     print(f"\n=== النتيجة: {PASS} نجح / {FAIL} فشل ===")

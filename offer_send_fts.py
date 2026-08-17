@@ -9,7 +9,7 @@ from airtable_fields import FieldIds
 
 
 REDIRECT_BASE = "https://redirect.ftstravels.com/"
-DEFAULT_TEMPLATE_NAME = "gift_bounce"
+DEFAULT_TEMPLATE_NAME = "gift_bounce2"
 GYG_ANALYTICS_TABLE = "GYG Analytics"
 BONUS_HURGHADA_CITY_TOUR = "1279014"
 BONUS_SHARM_SIGNATURE = "1278978"
@@ -659,7 +659,7 @@ def _log_whatsapp(
             err_body = _clean_str(wa_meta.get("body"))
         header = f"[Sent WhatsApp] Offer Send FTS Template Sent ({template_name})"
         if err_body == "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY":
-            header = "[Sent WhatsApp] Offer Send FTS BLOCKED — gift_bounce Meta template has Cancel Recovery text"
+            header = "[Sent WhatsApp] Offer Send FTS BLOCKED — cross-sell Meta template has Cancel Recovery text"
         txt = f"{header}\n{template_text or fallback_text}"
         chat_db.add_message(
             chat_id=chat_id,
@@ -745,11 +745,13 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     offer_status_field = _clean_str(payload.get("offer_status_field")) or "Offer Send Status"
     retry_cooldown_minutes = int(payload.get("retry_cooldown_minutes") or 180)
 
-    # gift_bounce: Hi {{1}} / booked {{2}} / offer {{3}} / bonus {{4}} + 1 dynamic URL button
-    # Prefer explicit template_name. Ignore legacy template_gift1/gift2 so old
-    # workflow bodies cannot accidentally keep sending gift1.
+    # gift_bounce2 body:
+    # {{1}} First Name, {{2}} First Tour, {{3}} Second Tour,
+    # {{4}} City Tour Name, {{5}} Bounce tour + URL CTA + Help Me Choose + Stop Offers
+    # Prefer explicit template_name. Ignore legacy names so old workflow bodies
+    # cannot accidentally keep sending gift1/gift_bounce.
     template_name = _clean_str(payload.get("template_name")) or DEFAULT_TEMPLATE_NAME
-    if template_name in ("gift1", "gift2"):
+    if template_name in ("gift1", "gift2", "gift_bounce", "gift_bounce1"):
         logging.warning(
             "Offer Send FTS ignoring legacy template_name=%s; using %s",
             template_name,
@@ -937,15 +939,28 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             continue
 
         button_url_params = [_make_redirect_param(btn_full)]
+        # {{4}} City Tour Name and {{5}} Bounce tour both use the route bonus product
+        # (Hurghada City Tour / Sharm Signature) — one complimentary gift in mapping.
+        city_tour_name = bonus_display
+        bounce_tour_name = bonus_display
         structured_vars = {
-            "body": [short_name, booked_display, offer_display, bonus_display],
+            "body": [short_name, booked_display, offer_display, city_tour_name, bounce_tour_name],
             "button_url": button_url_params,
         }
         fallback_text = "\n".join(
             [
-                f"Hi {short_name}",
-                f"Thank you for booking {booked_display} with us through GetYourGuide.",
-                f"Book {offer_display} through GetYourGuide and enjoy {bonus_display} FREE.",
+                f"Hi {short_name},",
+                f"Thank you for booking our {booked_display} through GetYourGuide.",
+                "",
+                "Complete your trip with a special guest benefit.",
+                f"Book {offer_display} through GetYourGuide within the next 48 hours "
+                f"and receive our {city_tour_name} at no extra cost.",
+                "",
+                f"Once your booking is confirmed, we'll verify it and arrange your complimentary {bounce_tour_name}.",
+                "Not sure if this is the right experience for your itinerary? "
+                "Tap Help Me Choose and we'll recommend the best option for you.",
+                "Best regards,",
+                "FTS Travels Team",
                 btn_full,
             ]
         )
@@ -969,6 +984,13 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                     "offer_product_id": offer_pid,
                     "bonus_product_id": bonus_pid,
                     "body_vars": structured_vars["body"],
+                    "body_var_map": {
+                        "First_Name": short_name,
+                        "First_Tour": booked_display,
+                        "Second_Tour": offer_display,
+                        "City_Tour_Name": city_tour_name,
+                        "Bounce_tour": bounce_tour_name,
+                    },
                     "button_params": button_url_params,
                     "whatsapp_location": wa_location,
                 }

@@ -1070,6 +1070,7 @@ def _friendly_template_title(template_name):
         "photographers__sent_link": "Photographer Template Sent",
         "collect_info": "Collection Template Sent",
         "new_collect": "Collection Template Sent",
+        "welcome_plane": "Welcome Plane Template Sent",
     }
     return mapping.get(name, f"{str(template_name or 'Template').strip()} Sent")
 
@@ -1606,7 +1607,7 @@ class AIAgent:
                 "max_records": 10,
                 "dry_run": True,
                 "template_language": "en",
-                "template_name": "gift_bounce",
+                "template_name": "gift_bounce2",
                 "redirect_base": "https://redirect.ftstravels.com/",
                 "offer_status_field": "Offer Send Status",
                 "follow_sales_field": "Follow sales",
@@ -1618,7 +1619,11 @@ class AIAgent:
                 automation_db.upsert_workflow({
                     "id": offer_send_fts_wid,
                     "name": "Offer Send FTS",
-                    "description": "Sends gift_bounce WhatsApp cross-sell by Product ID mapping (Hurghada/Sharm) via redirect.ftstravels.com and logs to dashboard.",
+                    "description": (
+                        "Sends gift_bounce2 WhatsApp cross-sell by Product ID mapping "
+                        "(First Name / First Tour / Second Tour / City Tour / Bounce tour + redirect CTA) "
+                        "via redirect.ftstravels.com and logs to dashboard."
+                    ),
                     "enabled": False,
                     "trigger_type": "schedule",
                     "trigger_config": {"every_minutes": 15},
@@ -1634,7 +1639,7 @@ class AIAgent:
                     ]
                 })
             else:
-                # Migrate legacy gift1/gift2 workflow body to gift_bounce without
+                # Migrate legacy gift1/gift2/gift_bounce workflow body to gift_bounce2 without
                 # changing enabled/dry_run from the operator's current settings.
                 try:
                     steps = list(offer_send_fts_existing.get("steps") or [])
@@ -1645,14 +1650,15 @@ class AIAgent:
                         body = step.get("body")
                         if not isinstance(body, dict):
                             continue
+                        current_tn = str(body.get("template_name") or "").strip()
                         legacy = (
                             body.get("template_gift1")
                             or body.get("template_gift2")
                             or body.get("gift1_button_0")
                             or body.get("gift2_button_0")
-                            or (str(body.get("template_name") or "").strip() in ("", "gift1", "gift2"))
+                            or (current_tn in ("", "gift1", "gift2", "gift_bounce", "gift_bounce1"))
                         )
-                        if not legacy and str(body.get("template_name") or "").strip() == "gift_bounce":
+                        if not legacy and current_tn == "gift_bounce2":
                             if str(body.get("redirect_base") or "").strip():
                                 continue
                         # Preserve operator dry_run if already set
@@ -1678,13 +1684,14 @@ class AIAgent:
                     if changed:
                         offer_send_fts_existing["steps"] = steps
                         offer_send_fts_existing["description"] = (
-                            "Sends gift_bounce WhatsApp cross-sell by Product ID mapping "
-                            "(Hurghada/Sharm) via redirect.ftstravels.com and logs to dashboard."
+                            "Sends gift_bounce2 WhatsApp cross-sell by Product ID mapping "
+                            "(First Name / First Tour / Second Tour / City Tour / Bounce tour + redirect CTA) "
+                            "via redirect.ftstravels.com and logs to dashboard."
                         )
                         automation_db.upsert_workflow(offer_send_fts_existing)
-                        logging.info("Migrated offer_send_fts_v1 workflow body to gift_bounce")
+                        logging.info("Migrated offer_send_fts_v1 workflow body to gift_bounce2")
                 except Exception as mig_err:
-                    logging.warning(f"offer_send_fts_v1 gift_bounce migration skipped: {mig_err}")
+                    logging.warning(f"offer_send_fts_v1 gift_bounce2 migration skipped: {mig_err}")
 
             offer_bonus_fts_wid = "offer_bonus_fts_v1"
             if not automation_db.get_workflow(offer_bonus_fts_wid):
@@ -13252,13 +13259,13 @@ Conversation:
             import requests
             logging.info(f"Sending WhatsApp template payload: {json.dumps(payload, indent=2)}")
 
-            # Guard: Offer Send FTS uses gift_bounce. If Meta body was accidentally
+            # Guard: Offer Send FTS uses gift_bounce2. If Meta body was accidentally
             # published with Cancel Recovery copy, refuse to send so customers don't
             # get the wrong campaign (evidence: chat 201090005205 / GYGTESTTEST).
             try:
                 tmpl_l = str(template_name or "").strip().lower()
                 preview_l = str(actual_template_text or "").strip().lower()
-                if tmpl_l in ("gift_bounce", "gift1", "gift2") and preview_l:
+                if tmpl_l in ("gift_bounce2", "gift_bounce", "gift_bounce1", "gift1", "gift2") and preview_l:
                     cancel_markers = (
                         "was cancelled",
                         "booking was cancelled",
@@ -13268,7 +13275,7 @@ Conversation:
                     if any(m in preview_l for m in cancel_markers):
                         logging.error(
                             "Refusing WhatsApp send: template '%s' body looks like Cancel Recovery "
-                            "(preview markers found). Fix the Meta template content for gift_bounce.",
+                            "(preview markers found). Fix the Meta template content for gift_bounce2.",
                             template_name,
                         )
                         return False, {

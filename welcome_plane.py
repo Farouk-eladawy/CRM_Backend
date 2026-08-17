@@ -229,7 +229,7 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             continue
 
         location = _infer_location(des)
-        template_name = "new_collect" if location == "Sharm" else "collect_info"
+        template_name = "welcome_plane"
         template_language = "en"
         body_vars = [booking_nr or "-", (option_name + "-") if option_name else "-", customer_name]
         structured_vars = {"body": body_vars, "quick_reply_payload": ["Send Details Now"]}

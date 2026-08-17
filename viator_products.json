@@ -1,0 +1,111 @@
+{
+  "_comment": "FTS Travels catalog for the Viator Supplier / Reservation System API. Only live=true products appear in Tour List (required for portal mapping). Set api_connected=true after the product is mapped in supplier.viator.com so API ingest is treated as primary vs email/scraper fallback.",
+  "currency": "USD",
+  "products": [
+    {
+      "supplier_product_code": "LUXOR-HRG",
+      "supplier_product_name": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
+      "viator_product_code": "14976P3",
+      "live": true,
+      "api_connected": false,
+      "pilot": true,
+      "country_code": "EG",
+      "destination_code": "HRG",
+      "destination_name": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "tour_description": "Full-day guided tour of Luxor from Hurghada: Karnak, Valley of the Kings, Hatshepsut Temple, lunch, hotel transfers.",
+      "daily_capacity": 15,
+      "cutoff_hours": 12,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "options": [
+        {
+          "supplier_option_code": "BASIC",
+          "supplier_option_name": "Tour with Entry Fees",
+          "product_option_id": "LUXOR-HRG:BASIC:0400",
+          "departure_time": "04:00:00",
+          "adult_retail": 45.0,
+          "adult_net": 35.72,
+          "child_retail": 35.0,
+          "child_net": 28.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "NOFEES",
+          "supplier_option_name": "Tour without Entry Fees",
+          "product_option_id": "LUXOR-HRG:NOFEES:0400",
+          "departure_time": "04:00:00",
+          "adult_retail": 40.0,
+          "adult_net": 32.0,
+          "child_retail": 30.0,
+          "child_net": 24.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        }
+      ]
+    },
+    {
+      "supplier_product_code": "BIANCA-HRG",
+      "supplier_product_name": "Utopia - Bianca Island with Transfer and Lunch from Hurghada",
+      "viator_product_code": "14976P139",
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "country_code": "EG",
+      "destination_code": "HRG",
+      "destination_name": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "tour_description": "Cruise from Hurghada to Bianca Island (Utopia) with snorkeling, lunch, and hotel pickup.",
+      "daily_capacity": 40,
+      "cutoff_hours": 8,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "options": [
+        {
+          "supplier_option_code": "BASIC",
+          "supplier_option_name": "Island cruise with lunch",
+          "product_option_id": "BIANCA-HRG:BASIC:0800",
+          "departure_time": "08:00:00",
+          "adult_retail": 45.0,
+          "adult_net": 36.0,
+          "child_retail": 30.0,
+          "child_net": 24.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        }
+      ]
+    },
+    {
+      "supplier_product_code": "LUXOR-PRIVATE",
+      "supplier_product_name": "Private Luxor Day Tour W/Horse Carriage Ride & Flexible Itinerary",
+      "viator_product_code": "14976P141",
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "country_code": "EG",
+      "destination_code": "LXR",
+      "destination_name": "Luxor",
+      "location": "Luxor, Egypt",
+      "tour_description": "Private customizable Luxor day tour with hotel pickup and horse-drawn carriage.",
+      "daily_capacity": 8,
+      "cutoff_hours": 12,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "options": [
+        {
+          "supplier_option_code": "BASIC",
+          "supplier_option_name": "Private tour with hotel pickup",
+          "product_option_id": "LUXOR-PRIVATE:BASIC:0800",
+          "departure_time": "08:00:00",
+          "adult_retail": 40.0,
+          "adult_net": 30.0,
+          "child_retail": 25.0,
+          "child_net": 20.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        }
+      ]
+    }
+  ]
+}

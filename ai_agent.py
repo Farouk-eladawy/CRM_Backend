@@ -18588,7 +18588,7 @@ Conversation:
                 response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
                 response.headers["Access-Control-Allow-Headers"] = (
                     request.headers.get("Access-Control-Request-Headers")
-                    or "Content-Type, Authorization, Range, X-Requested-With, Cache-Control"
+                    or "Content-Type, Authorization, Range, X-Requested-With, Cache-Control, X-Api-Key, Api-Key"
                 )
                 response.headers["Access-Control-Expose-Headers"] = (
                     "Content-Type, Content-Length, Content-Disposition, "
@@ -18602,6 +18602,12 @@ Conversation:
         @app.after_request
         def _ensure_api_cors_headers(response):
             return _apply_api_cors_headers(response)
+
+        try:
+            from viator_supplier_api import register_viator_supplier_routes
+            register_viator_supplier_routes(app, agent=self)
+        except Exception as e:
+            logging.error(f"Failed to register Viator Supplier API routes: {e}", exc_info=True)
 
         def _public_legal_html_response(filename):
             from flask import Response, send_file

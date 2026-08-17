@@ -204,6 +204,19 @@
       }
     ]
   },
+  "viator_supplier": {
+    "enabled": true,
+    "environment": "sandbox",
+    "api_key": "",
+    "api_key_sandbox": "",
+    "api_key_production": "",
+    "supplier_id": 0,
+    "reseller_id": "",
+    "currency": "USD",
+    "ip_allowlist": [],
+    "products_file": "viator_products.json",
+    "async_airtable": true
+  },
   "facebook_auto_reply_enabled": true,
   "auto_reply_locations": [
     "Hurghada/Cairo",

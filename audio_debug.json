@@ -99175,3 +99175,85 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0AE1950AE77D3D242FA"
+    },
+    "keyId": "3EB0AE1950AE77D3D242FA",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:38007 in api_update_operations_booking\nLogger: root\nReason: Failed to update Airtable record recLZujN1ETNVdEAU: {\"error\":{\"type\":\"INVALID_VALUE_FOR_COLUMN\",\"message\":\"Field \\\"Create Date  \\\" cannot accept a value because the field is computed\"}} | fields={'Create Date  ': '2026-08-04'}\nAt: 2026-08-16 18:04:53"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786755894,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786928694,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T18:04:55.407Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB02CC2E20665EC7B4309"
+    },
+    "keyId": "3EB02CC2E20665EC7B4309",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:38007 in api_update_operations_booking\nLogger: root\nReason: Failed to update Airtable record recyuiI3OG2S0CXqa: {\"error\":{\"type\":\"INVALID_VALUE_FOR_COLUMN\",\"message\":\"Field \\\"Create Date  \\\" cannot accept a value because the field is computed\"}} | fields={'Create Date  ': '2026-08-05'}\nAt: 2026-08-16 18:05:08"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786755909,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1786928709,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-16T18:05:10.127Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

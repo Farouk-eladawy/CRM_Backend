@@ -1721,11 +1721,12 @@ class AIAgent:
                 "max_records": 15,
                 "dry_run": True,
                 "template_language": "en",
-                "template_name": "cancel_recovery",
-                "template_name_sharm": "cancel_recovery_sharm",
+                "template_name": "cancelleation_reason",
+                "template_name_sharm": "cancelleation_reason",
                 "redirect_base": "https://redirect.ftstravels.com/",
                 "retry_cooldown_minutes": 180,
                 "recovery_status_field": "Recovery Offer Status",
+                "require_eligible_product": False,
             }
             cancelled_recovery_send_existing = automation_db.get_workflow(cancelled_recovery_send_wid)
             if not cancelled_recovery_send_existing:
@@ -1733,9 +1734,9 @@ class AIAgent:
                     "id": cancelled_recovery_send_wid,
                     "name": "Cancelled Recovery Offer",
                     "description": (
-                        "For high-value Cancelled bookings: WhatsApp offer to rebook the same Product ID "
-                        "via redirect.ftstravels.com (Hurghada City Tour / Sharm Signature bonus promise). "
-                        "Sets Recovery Offer Status checkbox after each send attempt."
+                        "For Cancelled bookings in view: send WhatsApp template cancelleation_reason once "
+                        "(Guest_Name / Tour_Name / Booking_Reference) with rebook URL button. "
+                        "Sets Recovery Offer Status after each send attempt; no product whitelist skip."
                     ),
                     "enabled": False,
                     "trigger_type": "schedule",
@@ -1752,27 +1753,43 @@ class AIAgent:
                     ],
                 })
             else:
-                # Ensure recovery_status_field is present on existing workflow bodies
+                # Migrate template name + send-all + recovery_status_field on existing workflow
                 try:
                     steps = list(cancelled_recovery_send_existing.get("steps") or [])
                     changed = False
+                    old_templates = {"cancel_recovery", "cancel_recovery_sharm"}
                     for step in steps:
                         if not isinstance(step, dict):
                             continue
                         body = step.get("body")
                         if not isinstance(body, dict):
                             continue
-                        if str(body.get("recovery_status_field") or "").strip():
-                            continue
-                        body["recovery_status_field"] = "Recovery Offer Status"
+                        if not str(body.get("recovery_status_field") or "").strip():
+                            body["recovery_status_field"] = "Recovery Offer Status"
+                            changed = True
+                        tn = str(body.get("template_name") or "").strip()
+                        tn_s = str(body.get("template_name_sharm") or "").strip()
+                        if (not tn) or (tn in old_templates):
+                            body["template_name"] = "cancelleation_reason"
+                            changed = True
+                        if (not tn_s) or (tn_s in old_templates):
+                            body["template_name_sharm"] = "cancelleation_reason"
+                            changed = True
+                        if "require_eligible_product" not in body:
+                            body["require_eligible_product"] = False
+                            changed = True
                         step["body"] = body
-                        changed = True
                     if changed:
                         cancelled_recovery_send_existing["steps"] = steps
+                        cancelled_recovery_send_existing["description"] = (
+                            "For Cancelled bookings in view: send WhatsApp template cancelleation_reason once "
+                            "(Guest_Name / Tour_Name / Booking_Reference) with rebook URL button. "
+                            "Sets Recovery Offer Status after each send attempt; no product whitelist skip."
+                        )
                         automation_db.upsert_workflow(cancelled_recovery_send_existing)
-                        logging.info("Migrated cancelled_recovery_send_v1: added recovery_status_field")
+                        logging.info("Migrated cancelled_recovery_send_v1: cancelleation_reason + send-all")
                 except Exception as mig_err:
-                    logging.warning(f"cancelled_recovery_send_v1 recovery_status migration skipped: {mig_err}")
+                    logging.warning(f"cancelled_recovery_send_v1 cancelleation_reason migration skipped: {mig_err}")
 
             cancelled_recovery_bonus_wid = "cancelled_recovery_bonus_v1"
             if not automation_db.get_workflow(cancelled_recovery_bonus_wid):

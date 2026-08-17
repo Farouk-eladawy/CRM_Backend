@@ -1,11 +1,13 @@
 """
 Cancelled Booking Recovery FTS
 ------------------------------
-1) run_send: cancelled eligible booking -> WhatsApp rebook-same-product offer
+1) run_send: every cancelled booking in the recovery view -> WhatsApp template
+   `cancelleation_reason` once (Guest_Name / Tour_Name / Booking_Reference + rebook URL).
+   No product-eligibility skip on send; once-only via Recovery Offer Status / marker.
 2) run_bonus: new confirmed booking with same phone + same Product ID as a prior
    Cancelled eligible booking -> create complimentary bonus List record (no Date Trip)
 
-Conservative eligible list (high-value trips only).
+Bonus path still uses the conservative high-value eligible product list.
 """
 
 from __future__ import annotations
@@ -46,8 +48,9 @@ from offer_send_fts import (
     get_product_display_name,
 )
 
-DEFAULT_RECOVERY_TEMPLATE = "cancel_recovery"
-DEFAULT_RECOVERY_TEMPLATE_SHARM = "cancel_recovery_sharm"
+# Meta template name (spelling matches WhatsApp Manager)
+DEFAULT_RECOVERY_TEMPLATE = "cancelleation_reason"
+DEFAULT_RECOVERY_TEMPLATE_SHARM = "cancelleation_reason"
 DEFAULT_RECOVERY_STATUS_FIELD = "Recovery Offer Status"
 RECOVERY_SENT_MARKER = "[RECOVERY_OFFER_SENT]"
 RECOVERY_BONUS_NOTE = "Complimentary bonus for cancelled-booking recovery."
@@ -101,6 +104,42 @@ def _select_email(fields: Dict[str, Any], agent) -> str:
 
 def _wa_location(region: str) -> str:
     return "Sharm" if _clean_str(region).lower() == "sharm" else "Hurghada/Cairo"
+
+
+def _infer_region(agent, fields: Dict[str, Any], pid: str, eligible: Dict[str, Dict[str, str]], product_map: Dict[str, Any]) -> str:
+    """Pick WhatsApp number region without requiring product eligibility."""
+    cfg = eligible.get(pid) or {}
+    if _clean_str(cfg.get("region")).lower() == "sharm":
+        return "sharm"
+    meta = product_map.get(pid) if isinstance(product_map, dict) else None
+    if isinstance(meta, dict):
+        blob = " ".join(
+            [
+                _clean_str(meta.get("tour")),
+                _clean_str(meta.get("location_path")),
+                _clean_str(meta.get("display_name")),
+                _clean_str(meta.get("url")),
+            ]
+        ).lower()
+        if "sharm" in blob:
+            return "sharm"
+    dest = _clean_str(_get_field(agent, fields, FieldIds.DES, "des")).lower()
+    trip = _clean_str(_get_field(agent, fields, FieldIds.TRIP_NAME, "trip Name")).lower()
+    if "sharm" in dest or "sharm" in trip:
+        return "sharm"
+    return "hurghada"
+
+
+def _generic_rebook_redirect(booking_nr: str, phone: str, redirect_base: str) -> str:
+    base = _clean_str(redirect_base) or REDIRECT_BASE
+    if not base.endswith("/"):
+        base = base + "/"
+    bn = _clean_str(booking_nr) or "unknown"
+    ph = _clean_phone(phone)
+    return (
+        f"{base}?bookingNr={bn}&tour=rebook"
+        f"&redirect=https://www.getyourguide.com/&phone={ph}"
+    )
 
 
 def _ensure_chat(agent, record_id, customer_name_short, customer_email, to_phone, booking_nr, location="Hurghada/Cairo"):
@@ -287,19 +326,25 @@ def _fetch_view_or_formula(agent, view: str, formula: str, max_records: int) -> 
 
 
 def run_send(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """Send rebook offer for cancelled eligible bookings."""
+    """Send cancelleation_reason template once per cancelled booking in the view."""
     payload = payload or {}
     view = _clean_str(payload.get("view")) or "Cancelled Recovery Offer"
     max_records = int(payload.get("max_records") or 15)
     dry_run = bool(payload.get("dry_run", True))
     template_language = _clean_str(payload.get("template_language")) or "en"
     template_hurghada = _clean_str(payload.get("template_name")) or DEFAULT_RECOVERY_TEMPLATE
-    template_sharm = _clean_str(payload.get("template_name_sharm")) or DEFAULT_RECOVERY_TEMPLATE_SHARM
+    template_sharm = (
+        _clean_str(payload.get("template_name_sharm"))
+        or template_hurghada
+        or DEFAULT_RECOVERY_TEMPLATE_SHARM
+    )
     redirect_base = _clean_str(payload.get("redirect_base")) or REDIRECT_BASE
     cooldown = int(payload.get("retry_cooldown_minutes") or 180)
     recovery_status_field = (
         _clean_str(payload.get("recovery_status_field")) or DEFAULT_RECOVERY_STATUS_FIELD
     )
+    # Default: send to every cancelled record in the view (no product whitelist skip).
+    require_eligible = bool(payload.get("require_eligible_product", False))
 
     eligible = dict(DEFAULT_RECOVERY_ELIGIBLE)
     if isinstance(payload.get("eligible"), dict) and payload.get("eligible"):
@@ -309,14 +354,15 @@ def run_send(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     if isinstance(payload.get("products"), dict) and payload.get("products"):
         product_map = {**DEFAULT_OFFER_PRODUCTS, **payload["products"]}
 
-    # Fallback formula if view missing: cancelled + any eligible product id
-    pid_bits = [f"FIND('{pid}', {{Product ID}}&'')" for pid in sorted(eligible.keys())]
+    # Fallback formula if view missing: any cancelled booking (not product-filtered)
     formula = (
-        f"AND("
-        f"OR(FIND('Cancel', {{Booking Status}}&''), FIND('cancel', {{Booking Status}}&''), FIND('CANCEL', {{Booking Status}}&'')),"
-        f"OR({','.join(pid_bits)})"
-        f")"
-    ) if pid_bits else ""
+        "OR("
+        "FIND('Cancel', {Booking Status}&''),"
+        "FIND('cancel', {Booking Status}&''),"
+        "FIND('CANCEL', {Booking Status}&''),"
+        "FIND('ملغ', {Booking Status}&'')"
+        ")"
+    )
 
     records = _fetch_view_or_formula(agent, view, formula, max_records)
     results: List[Dict[str, Any]] = []
@@ -342,7 +388,7 @@ def run_send(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             fields.get(recovery_status_field) or fields.get(DEFAULT_RECOVERY_STATUS_FIELD)
         )
 
-        if pid not in eligible:
+        if require_eligible and pid not in eligible:
             results.append({"record_id": rid, "status": "skipped", "message": "not_eligible_product", "product_id": pid})
             continue
         if not _is_cancelled_status(status):
@@ -376,39 +422,59 @@ def run_send(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             )
             continue
 
-        cfg = eligible[pid]
-        bonus_pid = _extract_product_id(cfg.get("bonus_product_id"))
-        region = _clean_str(cfg.get("region")) or "hurghada"
-        product_meta = enrich_product_from_agent(agent, pid, product_map=product_map, analytics_cache=analytics_cache)
-        trip_display = trip_name or product_meta.get("display_name") or pid
-        bonus_display = get_product_display_name(bonus_pid, product_map, fallback="complimentary tour")
-
-        btn_full = build_offer_redirect_url(
-            booking_nr,
-            phone,
-            pid,
-            tour_key=product_meta.get("tour"),
-            gyg_url=product_meta.get("url"),
-            product_map=product_map,
-            redirect_base=redirect_base,
+        region = _infer_region(agent, fields, pid, eligible, product_map)
+        product_meta = (
+            enrich_product_from_agent(agent, pid, product_map=product_map, analytics_cache=analytics_cache)
+            if pid
+            else {}
         )
+        trip_display = (
+            trip_name
+            or (product_meta.get("display_name") if isinstance(product_meta, dict) else "")
+            or pid
+            or "your tour"
+        )
+        booking_ref = booking_nr or rid
+
+        btn_full = ""
+        if pid:
+            btn_full = build_offer_redirect_url(
+                booking_nr,
+                phone,
+                pid,
+                tour_key=(product_meta.get("tour") if isinstance(product_meta, dict) else None),
+                gyg_url=(product_meta.get("url") if isinstance(product_meta, dict) else None),
+                product_map=product_map,
+                redirect_base=redirect_base,
+            )
         if not btn_full:
-            results.append({"record_id": rid, "status": "error", "message": "failed_build_redirect", "booking_nr": booking_nr})
-            continue
+            btn_full = _generic_rebook_redirect(booking_nr, phone, redirect_base)
 
         button_params = [_make_redirect_param(btn_full)]
-        # Meta template: {{1}} name, {{2}} cancelled trip, {{3}} bonus name (recommended)
+        # Meta cancelleation_reason: {{1}} Guest_Name, {{2}} Tour_Name, {{3}} Booking_Reference
         structured_vars = {
-            "body": [short_name, trip_display, bonus_display],
+            "body": [short_name, trip_display, booking_ref],
             "button_url": button_params,
         }
         template_name = template_sharm if region == "sharm" else template_hurghada
         wa_location = _wa_location(region)
         fallback = "\n".join(
             [
-                f"Hi {short_name}",
-                f"We noticed that your {trip_display} booking was cancelled.",
-                f"Rebook the same experience and receive {bonus_display} complimentary.",
+                f"Dear {short_name},",
+                "",
+                "We're sorry to see that your booking has been cancelled.",
+                "",
+                f"Tour Name: {trip_display}",
+                f"Booking Reference: {booking_ref}",
+                "",
+                "We were looking forward to welcoming you. As we are always working to improve "
+                "the quality of our services, we would greatly appreciate it if you could share "
+                "the reason for your cancellation or any feedback regarding your booking experience.",
+                "",
+                "Your feedback is very valuable to us and will help us improve our services in the future.",
+                "",
+                "Kind regards,",
+                "FTS Travels Team",
                 btn_full,
             ]
         )
@@ -420,9 +486,13 @@ def run_send(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                     "status": "dry_run",
                     "booking_nr": booking_nr,
                     "product_id": pid,
-                    "bonus_product_id": bonus_pid,
                     "template_name": template_name,
                     "body_vars": structured_vars["body"],
+                    "body_var_map": {
+                        "Guest_Name": short_name,
+                        "Tour_Name": trip_display,
+                        "Booking_Reference": booking_ref,
+                    },
                     "button_params": button_params,
                     "whatsapp_location": wa_location,
                     "recovery_status_field": recovery_status_field,
@@ -478,8 +548,9 @@ def run_send(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "mode": "send",
             "view": view,
             "dry_run": dry_run,
+            "template_name": template_hurghada,
             "recovery_status_field": recovery_status_field,
-            "eligible_product_ids": sorted(eligible.keys()),
+            "require_eligible_product": require_eligible,
             "processed": len(results),
             "sent_whatsapp": sent,
             "airtable_updated": updated,

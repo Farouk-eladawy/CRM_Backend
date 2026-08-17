@@ -18609,6 +18609,12 @@ Conversation:
         except Exception as e:
             logging.error(f"Failed to register Viator Supplier API routes: {e}", exc_info=True)
 
+        try:
+            from booking_platforms import register_booking_platforms_routes
+            register_booking_platforms_routes(app, agent=self)
+        except Exception as e:
+            logging.error(f"Failed to register booking platform settings routes: {e}", exc_info=True)
+
         def _public_legal_html_response(filename):
             from flask import Response, send_file
             html_path = os.path.join(SCRIPT_DIR, "static", filename)

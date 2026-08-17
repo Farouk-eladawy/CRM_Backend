@@ -210,6 +210,20 @@ def load_viator_config(override: Optional[dict] = None) -> dict:
     except Exception as exc:
         LOGGER.warning("Could not load viator_supplier config.json section: %s", exc)
 
+    try:
+        from booking_platforms import get_viator_dashboard_config
+        dash = get_viator_dashboard_config() or {}
+        for key, value in dash.items():
+            if key in ("api_key", "api_key_sandbox", "api_key_production", "reseller_id") and not str(value or "").strip():
+                continue
+            if key == "supplier_id" and not value:
+                continue
+            if key == "ip_allowlist" and not value:
+                continue
+            cfg[key] = value
+    except Exception:
+        pass
+
     env_map = {
         "VIATOR_SUPPLIER_API_KEY": "api_key",
         "VIATOR_SUPPLIER_API_KEY_SANDBOX": "api_key_sandbox",

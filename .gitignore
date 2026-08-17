@@ -23,6 +23,7 @@ railway_vars.json
 google_reviews_token.json
 .env
 .env.*
+booking_platforms.json
 .hourly_github_backup.lock
 
 # Virtual Environments

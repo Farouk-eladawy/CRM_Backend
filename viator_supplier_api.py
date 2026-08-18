@@ -715,26 +715,33 @@ class ViatorSupplierService:
         for product in self.catalog.live_products():
             tour_options = []
             for option in product.get("options") or []:
-                option_body = {
-                    "SupplierOptionCode": option.get("supplier_option_code") or "",
-                    "SupplierOptionName": option.get("supplier_option_name") or "",
-                    "productOptionId": option.get("product_option_id") or "",
-                    "Option": [],
-                }
-                # TourDepartureTime is a mapping value. Sending it locks the portal
-                # Product Connection UI to start-times mode.
+                times = list(option.get("departure_times") or [])
+                if not times and option.get("departure_time"):
+                    times = [option.get("departure_time")]
+                if not times:
+                    times = [None]
                 start_times_mode = product.get("start_times_mode")
-                if start_times_mode is False:
-                    pass
-                elif option.get("departure_time"):
-                    option_body["TourDepartureTime"] = _hhmmss(option.get("departure_time"))
-                languages = option.get("languages") or product.get("languages") or []
-                if product.get("language_as_mapping_value"):
-                    for lang in languages:
-                        text = str(lang or "").strip()
-                        if text:
-                            option_body["Option"].append({"Name": "Language", "Value": text})
-                tour_options.append(option_body)
+                for dep in times:
+                    option_body = {
+                        "SupplierOptionCode": option.get("supplier_option_code") or "",
+                        "SupplierOptionName": option.get("supplier_option_name") or "",
+                        "productOptionId": option.get("product_option_id") or "",
+                        "Option": [],
+                    }
+                    if dep and (len(times) > 1 or not option_body["productOptionId"]):
+                        hhmm = _hhmmss(dep).replace(":", "")[:4]
+                        option_body["productOptionId"] = f"{product.get('supplier_product_code')}:{option.get('supplier_option_code')}:{hhmm}"
+                    if start_times_mode is False:
+                        pass
+                    elif dep:
+                        option_body["TourDepartureTime"] = _hhmmss(dep)
+                    languages = option.get("languages") or product.get("languages") or []
+                    if product.get("language_as_mapping_value"):
+                        for lang in languages:
+                            text = str(lang or "").strip()
+                            if text:
+                                option_body["Option"].append({"Name": "Language", "Value": text})
+                    tour_options.append(option_body)
             tours.append({
                 "SupplierProductCode": product.get("supplier_product_code"),
                 "SupplierProductName": product.get("supplier_product_name"),

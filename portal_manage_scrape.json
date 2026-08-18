@@ -1,0 +1,440 @@
+{
+  "source": "supplier.viator.com Manage tabs",
+  "supplier_id": 14976,
+  "products": [
+    {
+      "code": "14976P156",
+      "title": "Sharm El Sheikh Red Sea Beach Horse Riding Tour",
+      "cutoff_hours": 2,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 22,
+      "max_travelers_per_booking": 15,
+      "daily_capacity": 50,
+      "pickup_offered": true,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 10},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1266499"
+      },
+      "options": [
+        {"code": "TG2", "name": "Without Nabq Nature Fees", "portal_option_id": "r2521588", "times": "10:30am, 2:30pm, 5:30pm", "adult_retail": 32, "child_retail": 22, "infant_retail": 0},
+        {"code": "TG1", "name": "Swimming & Riding on the Beach", "portal_option_id": "r2521589", "times": "10:30am, 2:30pm, 5:30pm", "adult_retail": 42, "child_retail": 25, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P153",
+      "title": "From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake",
+      "cutoff_hours": 6,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
+        "Child": {"enabled": true, "min_age": 3, "max_age": 9},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 10, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1235725"
+      },
+      "options": [
+        {"code": "TG4", "name": "Fayoum Summer Offer", "portal_option_id": "r2459442", "times": "7:30am", "adult_retail": 100, "child_retail": 100, "infant_retail": 0},
+        {"code": "TG2", "name": "Valley of the Whales & Safari", "portal_option_id": "r2454998", "times": "7:30am", "adult_retail": 185, "child_retail": 165, "infant_retail": 0},
+        {"code": "TG1", "name": "Wadi El Rayan & Magic Lake", "portal_option_id": "r2454999", "times": "7:30am", "adult_retail": 155, "child_retail": 135, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P152",
+      "title": "Cairo Ancient Egypt Discovery with Immersive VR Experience",
+      "cutoff_hours": 3,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 22,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 5},
+        "Child": {"enabled": true, "min_age": 6, "max_age": 12},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 13, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1261499"},
+      "options": [
+        {"code": "TG5", "name": "Philae Show", "portal_option_id": "r2524570p", "times": "8:00pm", "adult_retail": 28, "child_retail": 16, "infant_retail": 0},
+        {"code": "TG4", "name": "Abu Simbel Show", "portal_option_id": "r2524573p", "times": "8:00pm", "adult_retail": 28, "child_retail": 16, "infant_retail": 0},
+        {"code": "TG3", "name": "Edfu Temple Show", "portal_option_id": "r2524572p", "times": "8:00pm", "adult_retail": 21, "child_retail": 12, "infant_retail": 0},
+        {"code": "TG2", "name": "Karnak show", "portal_option_id": "r2524571p", "times": "8:00pm", "adult_retail": 28, "child_retail": 16, "infant_retail": 0},
+        {"code": "TG1", "name": "Pyramids Sound and Light Show", "portal_option_id": "r2507983p", "times": "7:00pm, 8:00pm", "adult_retail": 32, "child_retail": 20, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P151",
+      "title": "Sahl Hasheesh Elite Beach Dive and Coral Reef Experience",
+      "cutoff_hours": 1,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
+        "Child": {"enabled": true, "min_age": 5, "max_age": 9},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 10, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1199701"},
+      "options": [
+        {"code": "TG3", "name": "From El Gouna or Safaga", "portal_option_id": "r2373928", "times": "9:00am, 12:00pm, 3:00pm, 4:00pm", "adult_retail": 76.93, "child_retail": 61.54, "infant_retail": 20},
+        {"code": "TG2", "name": "From Hurghada or Makadi Bay", "portal_option_id": "r2373926", "times": "9:00am, 12:00pm, 3:00pm, 4:00pm", "adult_retail": 72.31, "child_retail": 58.47, "infant_retail": 20},
+        {"code": "TG1", "name": "Beach Dive & Coral Reef Experience", "portal_option_id": "r2373927", "times": "9:00am, 12:00pm, 3:00pm, 4:00pm", "adult_retail": 49.24, "child_retail": 49.24, "infant_retail": 20}
+      ]
+    },
+    {
+      "code": "14976P150",
+      "title": "Opal Nile Romantic Dinner Cruise with Optional Jetcar Adventure",
+      "cutoff_hours": 2,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
+        "Child": {"enabled": true, "min_age": 3, "max_age": 10},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1226434"},
+      "options": [
+        {"code": "TG3", "name": "Nile Dinner With Jetcar", "portal_option_id": "r2431616", "times": "6:00pm, 8:00pm, 10:30pm", "adult_retail": 50, "child_retail": 30, "infant_retail": 0},
+        {"code": "TG2", "name": "Nile Dinner Including Transfer", "portal_option_id": "r2431615", "times": "6:00pm, 8:00pm, 10:30pm", "adult_retail": 50, "child_retail": 30, "infant_retail": 0},
+        {"code": "TG1", "name": "Nile Dinner Excluding Transfer", "portal_option_id": "r2431617", "times": "6:00pm, 8:00pm, 10:30pm", "adult_retail": 28, "child_retail": 22, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P148",
+      "title": "Sharm El Sheikh Cairo 2 Day Tour with Pyramids View Stay",
+      "cutoff_hours": 3,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 1, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1230133"},
+      "options": [
+        {"code": "TG2", "name": "Full Historical Program", "portal_option_id": "r2441832", "times": "1:30am", "adult_retail": 380, "child_retail": 246, "infant_retail": 0},
+        {"code": "TG1", "name": "Pyramids & GEM + luxury stay", "portal_option_id": "r2441833", "times": "1:30am", "adult_retail": 285, "child_retail": 208, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P147",
+      "title": "Cairo Pyramids & Sphinx Adventure with Camel Ride & Optional ATV",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "age_bands": {
+        "Infant": {"enabled": false},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 10},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1162999"},
+      "options": [
+        {"code": "TG5", "name": "Cairo Pyramids & Sphinx ticket", "portal_option_id": "r2357902", "times": "9:00am, 10:00am", "adult_retail": 30, "child_retail": 15, "infant_retail": 0},
+        {"code": "TG4", "name": "Giza & ATV Ride Included", "portal_option_id": "r2315164", "times": "9:00am, 10:00am", "adult_retail": 140, "child_retail": 50, "infant_retail": 0},
+        {"code": "TG3", "name": "Giza & Camel + ATV Combo", "portal_option_id": "r2311351", "times": "9:00am, 10:00am", "adult_retail": 170, "child_retail": 65, "infant_retail": 0},
+        {"code": "TG2", "name": "Giza & Camel Ride Included", "portal_option_id": "r2311353", "times": "9:00am, 10:00am", "adult_retail": 120, "child_retail": 46, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P146",
+      "title": "Hurghada: Cairo 2-Day Tour with Luxury Pyramids View Stay",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
+        "Child": {"enabled": true, "min_age": 5, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1162642"},
+      "options": [
+        {"code": "TG3", "name": "Full Historical Program", "portal_option_id": "r2419709", "times": "1:30am", "adult_retail": 251.43, "child_retail": 230, "infant_retail": 0},
+        {"code": "TG1", "name": "Pyramids & GEM + luxury stay", "portal_option_id": "r2310562", "times": "1:30am", "adult_retail": 232.36, "child_retail": 200, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P144",
+      "title": "Hurghada to Luxor Karnak, Hatshepsut & the Valley of the Kings",
+      "cutoff_hours": 2,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 45,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
+        "Child": {"enabled": true, "min_age": 5, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1207017"},
+      "options": [
+        {"code": "TG6", "name": "Luxor trip without Tut Tomb", "portal_option_id": "r2514339", "times": "3:30am", "adult_retail": 100, "child_retail": 60, "infant_retail": 0},
+        {"code": "TG5", "name": "Small Group & Tutankhamun Tomb", "portal_option_id": "r2449837", "times": "3:30am", "adult_retail": 136.37, "child_retail": 110, "infant_retail": 0},
+        {"code": "TG4", "name": "Small Group & Ramses V and VI", "portal_option_id": "r2449838", "times": "3:30am", "adult_retail": 110, "child_retail": 85, "infant_retail": 0},
+        {"code": "TG2", "name": "Luxor without Entry Fees", "portal_option_id": "r2389861", "times": "3:30am", "adult_retail": 55, "child_retail": 35, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P143",
+      "title": "Nunia Aquarena Makadi Bay Water Park From Hurghada",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
+        "Child": {"enabled": true, "min_age": 5, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1156367"},
+      "options": [
+        {"code": "TG4", "name": "Nunia Aquarena With Transfer", "portal_option_id": "r2505077p", "times": "9:00am", "adult_retail": 200, "child_retail": 200, "infant_retail": 100},
+        {"code": "TG3", "name": "Aquarena Without Transfer", "portal_option_id": "r2505076p", "times": "9:00am", "adult_retail": 180, "child_retail": 180, "infant_retail": 90}
+      ]
+    },
+    {
+      "code": "14976P142",
+      "title": "Shagie Farms Eco-Tourism Strawberry Picking Experience from Cairo",
+      "cutoff_hours": 8,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 36,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1143933"},
+      "options": [
+        {"code": "TG1", "name": "Strawberry Picking Experience from Cairo", "portal_option_id": "r2272813", "times": "5:00am", "adult_retail": 210, "child_retail": 145, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P141",
+      "title": "Private Luxor Day Tour W/Horse Carriage Ride & Flexible Itinerary",
+      "cutoff_hours": 7,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
+        "Child": {"enabled": true, "min_age": 3, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1133175"},
+      "options": [
+        {"code": "TG2", "name": "8-Hour Tour with Hotel Pickup", "portal_option_id": "r2249388", "times": "8:00am", "adult_retail": 120, "child_retail": 45, "infant_retail": 0},
+        {"code": "TG1", "name": "8-Hour Tour with Airport Pickup", "portal_option_id": "r2249389", "times": "8:00am", "adult_retail": 135, "child_retail": 50, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P139",
+      "title": "Utopia - Bianca Island with Transfer and Lunch from Hurghada",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1128280"},
+      "options": [
+        {"code": "TG2", "name": "Basic Snorkeling", "portal_option_id": "r2439335", "times": "8:00am", "adult_retail": 40, "child_retail": 40, "infant_retail": 40},
+        {"code": "TG1", "name": "Full Utopia Island Experience", "portal_option_id": "r2240085", "times": "8:00am, 12:30pm", "adult_retail": 100, "child_retail": 70, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P135",
+      "title": "Airport Private Transfer from Hurghada,Fast & Comfortable Service",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": false,
+      "commission_rate": 50,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": false},
+        "Child": {"enabled": false},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 0, "max_age": 120},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1109673"},
+      "options": [
+        {"code": "TG2", "name": "Departure", "portal_option_id": "r2204995", "times": "", "adult_retail": 25, "child_retail": 0, "infant_retail": 0},
+        {"code": "TG1", "name": "Arrival", "portal_option_id": "r2204994", "times": "", "adult_retail": 25, "child_retail": 0, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P133",
+      "title": "Luxor and Abu Simbel 2-Day Private Tour from Hurghada",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1095747"},
+      "options": [
+        {"code": "TG1", "name": "DEFAULT", "portal_option_id": "r2176576", "times": "4:30am", "adult_retail": 800, "child_retail": 350, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P129",
+      "title": "Dendera, Osireion & Abydos Full-Day Tour from Hurghada",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 28,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094910"},
+      "options": [
+        {"code": "TG1", "name": "Dendera, Osireion & Abydos Full-Day Tour", "portal_option_id": "r2174813", "times": "4:30am", "adult_retail": 280, "child_retail": 80, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P127",
+      "title": "Sea Turtles Marsa Mubarak, Boat trip with Snorkeling-Marsa Alam",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094232"},
+      "options": [
+        {"code": "TG1", "name": "Boat trip with sea Turtles", "portal_option_id": "r2173352", "times": "7:30am", "adult_retail": 65, "child_retail": 45, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P126",
+      "title": "Shaab Samadai, Snorkeling Adventure & Coral Reef at Marsa Alam",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094678"},
+      "options": [
+        {"code": "TG1", "name": "Shaab Samadai, Snorkeling Adventure & Coral Reef", "portal_option_id": "r2174300", "times": "7:00am", "adult_retail": 70, "child_retail": 45, "infant_retail": 0}
+      ]
+    }
+  ]
+}

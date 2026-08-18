@@ -9,7 +9,9 @@ from airtable_fields import FieldIds
 
 
 REDIRECT_BASE = "https://redirect.ftstravels.com/"
-DEFAULT_TEMPLATE_NAME = "gift_bounce2"
+TEMPLATE_HURGHADA_CAIRO = "gift_bounce1"
+TEMPLATE_SHARM = "gift_bounce2"
+DEFAULT_TEMPLATE_NAME = TEMPLATE_SHARM
 GYG_ANALYTICS_TABLE = "GYG Analytics"
 BONUS_HURGHADA_CITY_TOUR = "1279014"
 BONUS_SHARM_SIGNATURE = "1278978"
@@ -147,6 +149,35 @@ _REDIRECT_PREFIXES = (
 
 def _clean_str(v: Any) -> str:
     return str(v or "").strip()
+
+
+def resolve_offer_whatsapp_location(
+    destination: str = "",
+    offer_display: str = "",
+    bonus_product_id: str = "",
+) -> str:
+    dest_l = _clean_str(destination).lower()
+    offer_l = _clean_str(offer_display).lower()
+    if "sharm" in dest_l or "sharm" in offer_l or _clean_str(bonus_product_id) == BONUS_SHARM_SIGNATURE:
+        return "Sharm"
+    return "Hurghada/Cairo"
+
+
+def resolve_offer_template_name(wa_location: str, payload: Optional[Dict[str, Any]] = None) -> str:
+    """Hurghada/Cairo sender uses gift_bounce1; Sharm sender uses gift_bounce2."""
+    payload = payload if isinstance(payload, dict) else {}
+    hurghada_tmpl = (
+        _clean_str(payload.get("template_hurghada_cairo") or payload.get("template_gift1"))
+        or TEMPLATE_HURGHADA_CAIRO
+    )
+    sharm_tmpl = (
+        _clean_str(payload.get("template_sharm") or payload.get("template_gift2"))
+        or TEMPLATE_SHARM
+    )
+    loc = _clean_str(wa_location).lower()
+    if "sharm" in loc:
+        return sharm_tmpl
+    return hurghada_tmpl
 
 
 def _row_value(row: Any, key: str) -> Any:
@@ -662,7 +693,7 @@ def _log_whatsapp(
             "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY",
             "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED",
         ):
-            header = "[Sent WhatsApp] Offer Send FTS BLOCKED — gift_bounce2 Meta template misconfigured"
+            header = f"[Sent WhatsApp] Offer Send FTS BLOCKED — {template_name or 'gift_bounce'} Meta template misconfigured"
         txt = f"{header}\n{template_text or fallback_text}"
         chat_db.add_message(
             chat_id=chat_id,
@@ -748,20 +779,19 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     offer_status_field = _clean_str(payload.get("offer_status_field")) or "Offer Send Status"
     retry_cooldown_minutes = int(payload.get("retry_cooldown_minutes") or 180)
 
-    # gift_bounce2 body (Meta-corrected 2026-08-18):
-    # {{1}} First Name, {{2}} First Tour (booked), {{3}} Second Tour (offer),
-    # {{4}} complimentary City Tour / Signature. "Bounce tour" is STATIC text in Meta.
+    # gift_bounce1 (Hurghada/Cairo phone) and gift_bounce2 (Sharm phone).
+    # Body (Meta-corrected): {{1}} First Name, {{2}} First Tour (booked),
+    # {{3}} Second Tour (offer), {{4}} complimentary City Tour / Signature.
+    # "Bounce tour" is STATIC text in Meta.
     # CTA: View [redirect] + Help Me Choose + Stop Offers
-    # Prefer explicit template_name. Ignore legacy names so old workflow bodies
-    # cannot accidentally keep sending gift1/gift_bounce.
-    template_name = _clean_str(payload.get("template_name")) or DEFAULT_TEMPLATE_NAME
-    if template_name in ("gift1", "gift2", "gift_bounce", "gift_bounce1"):
-        logging.warning(
-            "Offer Send FTS ignoring legacy template_name=%s; using %s",
-            template_name,
-            DEFAULT_TEMPLATE_NAME,
-        )
-        template_name = DEFAULT_TEMPLATE_NAME
+    template_hurghada_cairo = (
+        _clean_str(payload.get("template_hurghada_cairo") or payload.get("template_gift1"))
+        or TEMPLATE_HURGHADA_CAIRO
+    )
+    template_sharm = (
+        _clean_str(payload.get("template_sharm") or payload.get("template_gift2"))
+        or TEMPLATE_SHARM
+    )
     redirect_base = _clean_str(payload.get("redirect_base")) or REDIRECT_BASE
 
     product_map = DEFAULT_OFFER_PRODUCTS
@@ -967,12 +997,10 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             ]
         )
 
-        # WhatsApp location: Sharm bonus routes use Sharm sender when destination hints Sharm
-        wa_location = "Hurghada/Cairo"
-        dest_l = destination.lower()
-        offer_l = (offer_display or "").lower()
-        if "sharm" in dest_l or "sharm" in offer_l or bonus_pid == BONUS_SHARM_SIGNATURE:
-            wa_location = "Sharm"
+        # WhatsApp sender + matching Meta template:
+        # Hurghada/Cairo phone -> gift_bounce1, Sharm phone -> gift_bounce2
+        wa_location = resolve_offer_whatsapp_location(destination, offer_display, bonus_pid)
+        template_name = resolve_offer_template_name(wa_location, payload)
 
         if dry_run:
             results.append(
@@ -1022,19 +1050,30 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             location=wa_location,
         )
 
-        # Mark processed on BOTH success and failure so the Airtable view
-        # filter removes the record and we do not keep re-sending offers.
-        mark_info = _mark_offer_processed(
-            agent,
-            rid,
-            booking_nr,
-            offer_status_field,
-            follow_sales_field,
-            clear_follow_sales,
-            bool(wa_ok),
+        wa_err = ""
+        if isinstance(wa_meta, dict) and not wa_ok:
+            wa_err = _clean_str(wa_meta.get("body"))
+        template_misconfigured = wa_err in (
+            "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED",
+            "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY",
         )
-        if mark_info.get("status_updated"):
-            updated += 1
+
+        # Mark processed on success and normal send failures so the view
+        # filter removes the record. Do NOT mark when the Meta template itself
+        # is blocked locally — those records should retry after a template fix.
+        mark_info = {"status_updated": False, "follow_sales_cleared": False, "error": None}
+        if not template_misconfigured:
+            mark_info = _mark_offer_processed(
+                agent,
+                rid,
+                booking_nr,
+                offer_status_field,
+                follow_sales_field,
+                clear_follow_sales,
+                bool(wa_ok),
+            )
+            if mark_info.get("status_updated"):
+                updated += 1
 
         results.append(
             {
@@ -1048,6 +1087,7 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "bonus_product_id": bonus_pid,
                 "whatsapp_ok": bool(wa_ok),
                 "whatsapp_location": wa_location,
+                "whatsapp_error": wa_err or None,
                 "airtable_status_updated": bool(mark_info.get("status_updated")),
                 "follow_sales_cleared": bool(mark_info.get("follow_sales_cleared")),
                 "airtable_update_error": mark_info.get("error"),
@@ -1058,7 +1098,8 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "status": "success",
         "data": {
             "view": view,
-            "template_name": template_name,
+            "template_hurghada_cairo": template_hurghada_cairo,
+            "template_sharm": template_sharm,
             "redirect_base": redirect_base,
             "retry_cooldown_minutes": retry_cooldown_minutes,
             "dry_run": dry_run,

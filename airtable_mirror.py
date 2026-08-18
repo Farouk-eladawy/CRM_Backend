@@ -80,6 +80,42 @@ def _iso_to_dt(v):
         return None
 
 
+def _parse_flexible_date_only(v):
+    """
+    Parse a calendar date from ISO (YYYY-MM-DD), US (M/D/YYYY), or EU (D/M/YYYY).
+    Returns datetime.date or None. Does not apply timezone conversion.
+    """
+    if v is None:
+        return None
+    s = str(v).strip()
+    if not s or s == "@exact":
+        return None
+    if "T" in s:
+        s = s.split("T", 1)[0].strip()
+    elif " " in s and len(s) >= 10 and s[4] == "-":
+        s = s.split(" ", 1)[0].strip()
+    if re.match(r"^\d{4}-\d{2}-\d{2}$", s):
+        try:
+            return datetime.fromisoformat(s).date()
+        except Exception:
+            return None
+    m = re.match(r"^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$", s)
+    if not m:
+        return None
+    a, b, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    if a > 12 and b <= 12:
+        day, month = a, b
+    elif b > 12 and a <= 12:
+        month, day = a, b
+    else:
+        # Ambiguous: match browser <input type="date"> locale display (US M/D/Y).
+        month, day = a, b
+    try:
+        return datetime(y, month, day).date()
+    except Exception:
+        return None
+
+
 def _dt_to_iso(dt):
     try:
         if not dt:
@@ -95,7 +131,7 @@ def _safe_table_key(base_id, table_id):
     return f"{base_id}:{table_id}"
 
 
-# Airtable List: Create Date is stored as "Create Date  " (trailing spaces).
+# Airtable List: some field names have trailing spaces (e.g. "Create Date  ").
 _CREATE_DATE_FIELD_ALIASES = (
     "Create Date  ",
     "Create Date ",
@@ -103,31 +139,94 @@ _CREATE_DATE_FIELD_ALIASES = (
     "Created Date",
 )
 
+_ID_TO_READABLE_CACHE = None
+_READABLE_TO_ID_NORM_CACHE = None
 
-def _resolve_record_field_key(fields, field_name):
-    """Resolve display field name to the actual key present on a mirror record."""
+
+def _load_airtable_id_maps():
+    global _ID_TO_READABLE_CACHE, _READABLE_TO_ID_NORM_CACHE
+    if _ID_TO_READABLE_CACHE is not None:
+        return _ID_TO_READABLE_CACHE, _READABLE_TO_ID_NORM_CACHE
+    try:
+        from airtable_fields import ID_TO_READABLE_NAME, READABLE_NAME_TO_ID_NORM
+        _ID_TO_READABLE_CACHE = dict(ID_TO_READABLE_NAME or {})
+        _READABLE_TO_ID_NORM_CACHE = dict(READABLE_NAME_TO_ID_NORM or {})
+    except Exception:
+        _ID_TO_READABLE_CACHE = {}
+        _READABLE_TO_ID_NORM_CACHE = {}
+    return _ID_TO_READABLE_CACHE, _READABLE_TO_ID_NORM_CACHE
+
+
+def _resolve_record_field_key(fields, field_name=None, field_id=None, id_to_name=None):
+    """
+    Resolve a filter field to the actual key present on a mirror record.
+    Prefer Airtable field_id (stable); fall back to exact/aliased field names.
+    """
     if not isinstance(fields, dict):
         return str(field_name or "").strip() or str(field_name or "")
+
+    fid = str(field_id or "").strip()
+    id_to_name = id_to_name or {}
+    id_map, name_norm_map = _load_airtable_id_maps()
+
+    candidates = []
+    if fid:
+        candidates.append(fid)
+        for src in (id_to_name, id_map):
+            nm = src.get(fid)
+            if nm:
+                candidates.append(nm)
+
     wanted = str(field_name or "")
-    if wanted in fields:
-        return wanted
     trimmed = wanted.strip()
-    if trimmed and trimmed in fields:
-        return trimmed
-    for k in fields.keys():
-        ks = str(k)
-        if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
-            return k
+    if wanted:
+        candidates.append(wanted)
+    if trimmed and trimmed != wanted:
+        candidates.append(trimmed)
+
+    if not fid and trimmed:
+        inferred = name_norm_map.get(trimmed.lower())
+        if inferred:
+            candidates.append(inferred)
+            for src in (id_to_name, id_map):
+                nm = src.get(inferred)
+                if nm:
+                    candidates.append(nm)
+
     if trimmed.lower() in ("create date", "created date"):
-        for alias in _CREATE_DATE_FIELD_ALIASES:
-            if alias in fields:
-                return alias
-    return trimmed or wanted
+        candidates.extend(_CREATE_DATE_FIELD_ALIASES)
+
+    seen = set()
+    for key in candidates:
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        if key in fields:
+            return key
+
+    # Last resort: trim/case-insensitive scan of record keys
+    if trimmed:
+        for k in fields.keys():
+            ks = str(k)
+            if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
+                return k
+    return trimmed or wanted or fid
 
 
-def _resolve_schema_field_type(schema_types, field_name):
-    """Lookup schema type with trim/case tolerance; infer date for Create Date aliases."""
+def _resolve_schema_field_type(schema_types, field_name, field_id=None, id_to_name=None):
+    """Lookup schema type with id/name tolerance; infer date for Create Date aliases."""
     schema_types = schema_types or {}
+    id_to_name = id_to_name or {}
+    fid = str(field_id or "").strip()
+    if fid:
+        for label in (fid, id_to_name.get(fid), (_load_airtable_id_maps()[0] or {}).get(fid)):
+            if not label:
+                continue
+            if label in schema_types:
+                return schema_types[label]
+            stripped = str(label).strip()
+            if stripped in schema_types:
+                return schema_types[stripped]
     wanted = str(field_name or "")
     if wanted in schema_types:
         return schema_types[wanted]
@@ -337,9 +436,10 @@ class AirtableMirror:
                         )
                         for f in (fields or []):
                             f_id = str(f.get("id") or "").strip()
-                            f_name = str(f.get("name") or "").strip()
+                            # Keep exact Airtable name (trailing spaces matter, e.g. "Create Date  ").
+                            f_name = str(f.get("name") or "")
                             f_type = str(f.get("type") or "").strip()
-                            if not f_id or not f_name:
+                            if not f_id or not f_name.strip():
                                 continue
                             c.execute(
                                 """
@@ -1280,7 +1380,7 @@ class AirtableMirror:
                 if target_name:
                     c.execute(
                         """
-                        SELECT mf.field_name, mf.field_type
+                        SELECT mf.field_id, mf.field_name, mf.field_type
                         FROM mirror_fields mf
                         JOIN mirror_tables mt ON mt.table_key = mf.table_key
                         WHERE mt.base_label='religious' AND mt.table_name=?
@@ -1292,7 +1392,7 @@ class AirtableMirror:
 
                 c.execute(
                     """
-                    SELECT mf.field_name, MIN(mf.field_type) AS field_type
+                    SELECT MIN(mf.field_id) AS field_id, mf.field_name, MIN(mf.field_type) AS field_type
                     FROM mirror_fields mf
                     JOIN mirror_tables mt ON mt.table_key = mf.table_key
                     WHERE mt.base_label='religious' AND mt.ignored=0
@@ -1306,7 +1406,7 @@ class AirtableMirror:
             if target_name and target_name.lower() != "list":
                 c.execute(
                     """
-                    SELECT mf.field_name, mf.field_type
+                    SELECT mf.field_id, mf.field_name, mf.field_type
                     FROM mirror_fields mf
                     JOIN mirror_tables mt ON mt.table_key = mf.table_key
                     WHERE mt.base_label='main' AND mt.table_name=?
@@ -1322,7 +1422,7 @@ class AirtableMirror:
             if not table_key:
                 return []
             c.execute(
-                "SELECT field_name, field_type FROM mirror_fields WHERE table_key=? ORDER BY field_name",
+                "SELECT field_id, field_name, field_type FROM mirror_fields WHERE table_key=? ORDER BY field_name",
                 (table_key,),
             )
             return [dict(r) for r in (c.fetchall() or [])]
@@ -1505,20 +1605,46 @@ class AirtableMirror:
                     fts_ids = None
 
         schema_types = {}
+        id_to_name = {}
         try:
             for it in self.list_schema_for_main_list() or []:
-                name = str(it.get("field_name") or "").strip()
+                fid = str(it.get("field_id") or "").strip()
+                raw_name = str(it.get("field_name") or "")
+                name = raw_name.strip()
                 typ = str(it.get("field_type") or "").strip().lower()
-                if not name:
+                if not name and not fid:
                     continue
+                if fid and raw_name:
+                    id_to_name[fid] = raw_name
                 if "date" in typ or "time" in typ or typ in ("createdtime", "lastmodifiedtime"):
-                    schema_types[name] = "date"
+                    ftype = "date"
+                elif "number" in typ or "currency" in typ or "percent" in typ or typ == "count":
+                    ftype = "number"
                 elif "select" in typ or "checkbox" in typ:
-                    schema_types[name] = "select"
+                    ftype = "select"
                 else:
-                    schema_types[name] = "text"
+                    ftype = "text"
+                if name:
+                    schema_types[name] = ftype
+                if raw_name and raw_name != name:
+                    schema_types[raw_name] = ftype
+                if fid:
+                    schema_types[fid] = ftype
+            # Prefer authoritative exact names from airtable_fields (trailing spaces).
+            id_map, _ = _load_airtable_id_maps()
+            for fid, exact in (id_map or {}).items():
+                if fid and exact and fid not in id_to_name:
+                    id_to_name[fid] = exact
+                elif fid and exact:
+                    # Prefer exact trailing-space names for record lookup.
+                    id_to_name[fid] = exact
         except Exception:
             schema_types = {}
+            id_to_name = {}
+            try:
+                id_to_name = dict(_load_airtable_id_maps()[0] or {})
+            except Exception:
+                id_to_name = {}
 
         def _to_lower_str(v):
             if v is None:
@@ -1580,15 +1706,26 @@ class AirtableMirror:
                 return out
 
             field = cond.get("field")
+            field_id = str(cond.get("fieldId") or cond.get("field_id") or "").strip()
             op = cond.get("operator")
-            if not field or not op:
+            if (not field and not field_id) or not op:
                 return True
-            field_key = _resolve_record_field_key(fields, field)
+            field_key = _resolve_record_field_key(
+                fields,
+                field_name=field,
+                field_id=field_id,
+                id_to_name=id_to_name,
+            )
             val_raw = (fields or {}).get(field_key) if isinstance(fields, dict) else None
             val = _to_lower_str(val_raw)
             cond_val_raw = cond.get("value")
             cond_val = _to_lower_str(cond_val_raw)
-            ftype = _resolve_schema_field_type(schema_types, field)
+            ftype = _resolve_schema_field_type(
+                schema_types,
+                field,
+                field_id=field_id,
+                id_to_name=id_to_name,
+            )
             op_l = str(op or "").strip().lower()
 
             def _decode_multi(raw):
@@ -1724,41 +1861,45 @@ class AirtableMirror:
                         return False
                     return (today - timedelta(days=7)) <= d_field <= today
 
-                # Airtable-style date mode in value: @today / @tomorrow / YYYY-MM-DD / …
+                # Airtable-style date mode in value: @today / @tomorrow / YYYY-MM-DD / M/D/YYYY …
                 def _resolve_date_mode(raw_mode_val):
                     s = str(raw_mode_val or "").strip()
                     if not s or s == "@exact":
                         return None
                     if len(s) >= 10 and s[0:4].isdigit() and s[4] == "-" and s[7] == "-":
-                        return _parse_date(s[:10])
+                        return _parse_date(s[:10]) or _parse_flexible_date_only(s[:10])
                     token = s[1:] if s.startswith("@") else s
-                    token = token.lower().replace("-", "_").replace(" ", "_")
-                    if token == "today":
+                    token_norm = token.lower().replace("-", "_").replace(" ", "_")
+                    if token_norm == "today":
                         return today
-                    if token == "tomorrow":
+                    if token_norm == "tomorrow":
                         return today + timedelta(days=1)
-                    if token == "yesterday":
+                    if token_norm == "yesterday":
                         return today - timedelta(days=1)
-                    if token == "one_week_ago":
+                    if token_norm == "one_week_ago":
                         return today - timedelta(days=7)
-                    if token == "one_week_from_now":
+                    if token_norm == "one_week_from_now":
                         return today + timedelta(days=7)
-                    if token == "one_month_ago":
+                    if token_norm == "one_month_ago":
                         y, m = today.year, today.month - 1
                         if m < 1:
                             y, m = y - 1, 12
                         d = min(today.day, calendar.monthrange(y, m)[1])
                         return today.replace(year=y, month=m, day=d)
-                    if token == "one_month_from_now":
+                    if token_norm == "one_month_from_now":
                         y, m = today.year, today.month + 1
                         if m > 12:
                             y, m = y + 1, 1
                         d = min(today.day, calendar.monthrange(y, m)[1])
                         return today.replace(year=y, month=m, day=d)
-                    return _parse_date(s)
+                    # Locale dates from UI (07/18/2026) or other free-text dates.
+                    return _parse_flexible_date_only(s) or _parse_date(s)
 
                 if op_l in ("is", "is before", "is after", "is on or before", "is on or after"):
                     d_cond = _resolve_date_mode(cond_val_raw)
+                    # Incomplete exact-date filter (empty / @exact): do not exclude records.
+                    if d_cond is None and str(cond_val_raw or "").strip() in ("", "@exact"):
+                        return True
                     if not d_field or not d_cond:
                         return False
                     if op_l == "is":
@@ -1962,7 +2103,7 @@ class AirtableMirror:
             table_key = row["table_key"]
 
             c.execute(
-                "SELECT field_name, field_type FROM mirror_fields WHERE table_key=? ORDER BY field_name",
+                "SELECT field_id, field_name, field_type FROM mirror_fields WHERE table_key=? ORDER BY field_name",
                 (table_key,),
             )
             schema_rows = c.fetchall() or []
@@ -1974,19 +2115,37 @@ class AirtableMirror:
             raw_rows = c.fetchall() or []
 
         schema_types = {}
+        id_to_name = {}
         for r in schema_rows:
-            name = str(r["field_name"] or "").strip()
+            fid = str(r["field_id"] or "").strip() if "field_id" in r.keys() else ""
+            raw_name = str(r["field_name"] or "")
+            name = raw_name.strip()
             typ = str(r["field_type"] or "").strip().lower()
-            if not name:
+            if not name and not fid:
                 continue
+            if fid and raw_name:
+                id_to_name[fid] = raw_name
             if "date" in typ or "time" in typ or typ in ("createdtime", "lastmodifiedtime"):
-                schema_types[name] = "date"
+                ftype = "date"
             elif "number" in typ or "currency" in typ or "percent" in typ or typ == "count":
-                schema_types[name] = "number"
+                ftype = "number"
             elif "select" in typ or "checkbox" in typ:
-                schema_types[name] = "select"
+                ftype = "select"
             else:
-                schema_types[name] = "text"
+                ftype = "text"
+            if name:
+                schema_types[name] = ftype
+            if raw_name and raw_name != name:
+                schema_types[raw_name] = ftype
+            if fid:
+                schema_types[fid] = ftype
+        try:
+            id_map, _ = _load_airtable_id_maps()
+            for fid, exact in (id_map or {}).items():
+                if fid and exact:
+                    id_to_name[fid] = exact
+        except Exception:
+            pass
 
         def _to_lower_str(v):
             if v is None:
@@ -2035,15 +2194,26 @@ class AirtableMirror:
                 return out
 
             field = cond.get("field")
+            field_id = str(cond.get("fieldId") or cond.get("field_id") or "").strip()
             op = cond.get("operator")
-            if not field or not op:
+            if (not field and not field_id) or not op:
                 return True
-            field_key = _resolve_record_field_key(fields, field)
+            field_key = _resolve_record_field_key(
+                fields,
+                field_name=field,
+                field_id=field_id,
+                id_to_name=id_to_name,
+            )
             val_raw = (fields or {}).get(field_key) if isinstance(fields, dict) else None
             val = _to_lower_str(val_raw)
             cond_val_raw = cond.get("value")
             cond_val = _to_lower_str(cond_val_raw)
-            ftype = _resolve_schema_field_type(schema_types, field)
+            ftype = _resolve_schema_field_type(
+                schema_types,
+                field,
+                field_id=field_id,
+                id_to_name=id_to_name,
+            )
             op_l = str(op or "").strip().lower()
             today = _cairo_now().date()
 
@@ -2078,35 +2248,37 @@ class AirtableMirror:
                     if not s or s == "@exact":
                         return None
                     if len(s) >= 10 and s[0:4].isdigit() and s[4] == "-" and s[7] == "-":
-                        return _parse_date(s[:10])
+                        return _parse_date(s[:10]) or _parse_flexible_date_only(s[:10])
                     token = s[1:] if s.startswith("@") else s
-                    token = token.lower().replace("-", "_").replace(" ", "_")
-                    if token == "today":
+                    token_norm = token.lower().replace("-", "_").replace(" ", "_")
+                    if token_norm == "today":
                         return today
-                    if token == "tomorrow":
+                    if token_norm == "tomorrow":
                         return today + timedelta(days=1)
-                    if token == "yesterday":
+                    if token_norm == "yesterday":
                         return today - timedelta(days=1)
-                    if token == "one_week_ago":
+                    if token_norm == "one_week_ago":
                         return today - timedelta(days=7)
-                    if token == "one_week_from_now":
+                    if token_norm == "one_week_from_now":
                         return today + timedelta(days=7)
-                    if token == "one_month_ago":
+                    if token_norm == "one_month_ago":
                         y, m = today.year, today.month - 1
                         if m < 1:
                             y, m = y - 1, 12
                         d = min(today.day, calendar.monthrange(y, m)[1])
                         return today.replace(year=y, month=m, day=d)
-                    if token == "one_month_from_now":
+                    if token_norm == "one_month_from_now":
                         y, m = today.year, today.month + 1
                         if m > 12:
                             y, m = y + 1, 1
                         d = min(today.day, calendar.monthrange(y, m)[1])
                         return today.replace(year=y, month=m, day=d)
-                    return _parse_date(s)
+                    return _parse_flexible_date_only(s) or _parse_date(s)
 
                 if op_l in ("is", "is before", "is after", "is on or before", "is on or after"):
                     d_cond = _resolve_date_mode(cond_val_raw)
+                    if d_cond is None and str(cond_val_raw or "").strip() in ("", "@exact"):
+                        return True
                     if not d_field or not d_cond:
                         return False
                     if op_l == "is":

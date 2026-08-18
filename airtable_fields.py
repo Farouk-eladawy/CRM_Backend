@@ -332,6 +332,13 @@ JSON_KEY_TO_ID = {
     "Note": FieldIds.NOTE
 }
 
+# Exact Airtable names (incl. trailing spaces) → Field ID
+READABLE_NAME_TO_ID = {str(name): fid for fid, name in ID_TO_READABLE_NAME.items()}
+# Trimmed / case-insensitive display labels → Field ID (UI uses trimmed names)
+READABLE_NAME_TO_ID_NORM = {
+    str(name).strip().lower(): fid for fid, name in ID_TO_READABLE_NAME.items() if str(name).strip()
+}
+
 # Financial Fields to Exclude from AI Context
 FINANCIAL_FIELDS = {
     FieldIds.ADT, FieldIds.STD, FieldIds.CHD, FieldIds.INF, # Prices usually? No these are Pax counts. Keep them.

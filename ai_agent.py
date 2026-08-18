@@ -1607,7 +1607,8 @@ class AIAgent:
                 "max_records": 10,
                 "dry_run": True,
                 "template_language": "en",
-                "template_name": "gift_bounce2",
+                "template_hurghada_cairo": "gift_bounce1",
+                "template_sharm": "gift_bounce2",
                 "redirect_base": "https://redirect.ftstravels.com/",
                 "offer_status_field": "Offer Send Status",
                 "follow_sales_field": "Follow sales",
@@ -1620,7 +1621,8 @@ class AIAgent:
                     "id": offer_send_fts_wid,
                     "name": "Offer Send FTS",
                     "description": (
-                        "Sends gift_bounce2 WhatsApp cross-sell by Product ID mapping "
+                        "Sends WhatsApp cross-sell by Product ID mapping: "
+                        "Hurghada/Cairo phone uses gift_bounce1, Sharm phone uses gift_bounce2 "
                         "({{1}} name / {{2}} booked / {{3}} offer / {{4}} complimentary; Bounce tour is static) "
                         "via redirect.ftstravels.com and logs to dashboard."
                     ),
@@ -1639,8 +1641,7 @@ class AIAgent:
                     ]
                 })
             else:
-                # Migrate legacy gift1/gift2/gift_bounce workflow body to gift_bounce2 without
-                # changing enabled/dry_run from the operator's current settings.
+                # Split sender-specific templates: Hurghada/Cairo -> gift_bounce1, Sharm -> gift_bounce2.
                 try:
                     steps = list(offer_send_fts_existing.get("steps") or [])
                     changed = False
@@ -1651,27 +1652,30 @@ class AIAgent:
                         if not isinstance(body, dict):
                             continue
                         current_tn = str(body.get("template_name") or "").strip()
-                        legacy = (
-                            body.get("template_gift1")
-                            or body.get("template_gift2")
-                            or body.get("gift1_button_0")
-                            or body.get("gift2_button_0")
-                            or (current_tn in ("", "gift1", "gift2", "gift_bounce", "gift_bounce1"))
+                        has_split = bool(
+                            str(body.get("template_hurghada_cairo") or "").strip()
+                            and str(body.get("template_sharm") or "").strip()
                         )
-                        if not legacy and current_tn == "gift_bounce2":
-                            if str(body.get("redirect_base") or "").strip():
-                                continue
-                        # Preserve operator dry_run if already set
+                        if has_split and str(body.get("redirect_base") or "").strip():
+                            continue
                         preserved_dry_run = body.get("dry_run", offer_send_fts_body["dry_run"])
                         new_body = dict(offer_send_fts_body)
                         new_body["dry_run"] = bool(preserved_dry_run)
-                        # Keep any custom view / max_records / cooldown overrides
-                        for keep_key in ("view", "max_records", "retry_cooldown_minutes", "template_language",
-                                         "offer_status_field", "follow_sales_field", "clear_follow_sales"):
+                        for keep_key in (
+                            "view", "max_records", "retry_cooldown_minutes", "template_language",
+                            "offer_status_field", "follow_sales_field", "clear_follow_sales",
+                            "template_hurghada_cairo", "template_sharm", "template_gift1", "template_gift2",
+                        ):
                             if keep_key in body and body.get(keep_key) is not None and str(body.get(keep_key)).strip() != "":
                                 new_body[keep_key] = body.get(keep_key)
+                        if current_tn in ("gift_bounce1", "gift1"):
+                            new_body["template_hurghada_cairo"] = current_tn if current_tn == "gift_bounce1" else "gift_bounce1"
+                        if current_tn in ("gift_bounce2", "gift2"):
+                            new_body["template_sharm"] = "gift_bounce2"
+                        new_body["template_hurghada_cairo"] = str(new_body.get("template_hurghada_cairo") or "gift_bounce1").strip() or "gift_bounce1"
+                        new_body["template_sharm"] = str(new_body.get("template_sharm") or "gift_bounce2").strip() or "gift_bounce2"
+                        new_body.pop("template_name", None)
                         step["body"] = new_body
-                        # Drop legacy keys that confuse operators
                         for legacy_key in (
                             "template_gift1", "template_gift2",
                             "gift1_button_0", "gift1_button_1",
@@ -1684,14 +1688,15 @@ class AIAgent:
                     if changed:
                         offer_send_fts_existing["steps"] = steps
                         offer_send_fts_existing["description"] = (
-                            "Sends gift_bounce2 WhatsApp cross-sell by Product ID mapping "
+                            "Sends WhatsApp cross-sell by Product ID mapping: "
+                            "Hurghada/Cairo phone uses gift_bounce1, Sharm phone uses gift_bounce2 "
                             "({{1}} name / {{2}} booked / {{3}} offer / {{4}} complimentary; Bounce tour is static) "
                             "via redirect.ftstravels.com and logs to dashboard."
                         )
                         automation_db.upsert_workflow(offer_send_fts_existing)
-                        logging.info("Migrated offer_send_fts_v1 workflow body to gift_bounce2")
+                        logging.info("Migrated offer_send_fts_v1 to gift_bounce1 (Hurghada/Cairo) + gift_bounce2 (Sharm)")
                 except Exception as mig_err:
-                    logging.warning(f"offer_send_fts_v1 gift_bounce2 migration skipped: {mig_err}")
+                    logging.warning(f"offer_send_fts_v1 template split migration skipped: {mig_err}")
 
             offer_bonus_fts_wid = "offer_bonus_fts_v1"
             if not automation_db.get_workflow(offer_bonus_fts_wid):
@@ -12938,6 +12943,7 @@ Conversation:
                 
                 components = []
                 actual_template_text = ""
+                raw_template_body = ""
                 structured_vars = template_variables if isinstance(template_variables, dict) else None
                 if template_variables and isinstance(template_variables, list):
                     user_params = [str(p) for p in template_variables]
@@ -13078,6 +13084,7 @@ Conversation:
                             
                             if comp_type == 'body':
                                 actual_template_text = comp_text
+                                raw_template_body = comp_text
 
                             if comp_type == 'header' and comp_format in ('image', 'document', 'video'):
                                 header_type = str(template_header_media_type or comp_format).lower().strip()
@@ -13258,47 +13265,6 @@ Conversation:
             
             import requests
             logging.info(f"Sending WhatsApp template payload: {json.dumps(payload, indent=2)}")
-
-            # Guard: Offer Send FTS uses gift_bounce2. Refuse send if Meta body is
-            # misconfigured (Cancel Recovery copy, or broken placeholders like
-            # literal "[First Name]" without {{1}} — caused wrong offers to customers).
-            try:
-                tmpl_l = str(template_name or "").strip().lower()
-                preview_l = str(actual_template_text or "").strip().lower()
-                preview_raw = str(actual_template_text or "")
-                if tmpl_l in ("gift_bounce2", "gift_bounce", "gift_bounce1", "gift1", "gift2") and preview_l:
-                    cancel_markers = (
-                        "was cancelled",
-                        "booking was cancelled",
-                        "rebook the same experience",
-                        "special return offer",
-                    )
-                    broken_placeholder_markers = (
-                        "[first name]",
-                        "[first tour]",
-                        "[second tour]",
-                        "[city tour name]",
-                    )
-                    # Bounce tour is intentionally static text in Meta (with decorative brackets).
-                    missing_positional = "{{1}}" not in preview_raw
-                    if any(m in preview_l for m in cancel_markers) or any(
-                        m in preview_l for m in broken_placeholder_markers
-                    ) or missing_positional:
-                        logging.error(
-                            "Refusing WhatsApp send: template '%s' body looks misconfigured "
-                            "(cancel-recovery copy or broken placeholders like [First Name]). "
-                            "Fix Meta gift_bounce2 to use {{1}}..{{4}}.",
-                            template_name,
-                        )
-                        return False, {
-                            "status_code": 400,
-                            "body": "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED",
-                            "template_name": template_name,
-                            "template_text": actual_template_text,
-                            "phone_number_id": phone_number_id,
-                        }
-            except Exception:
-                pass
 
             # #region debug-point A:meta-request
             try:
@@ -37476,8 +37442,11 @@ Write ONE short message only. No JSON. No explanations."""
                             "server_filtered": True,
                             "table_name": table_name,
                         })
-                except Exception:
-                    pass
+                except Exception as mirror_query_err:
+                    logging.error(
+                        f"Mirror bookings_query failed (falling back): {mirror_query_err}",
+                        exc_info=True,
+                    )
 
                 if is_list_table and str(view_name or "").strip() == "All Booking":
                     return jsonify({"status": "error", "message": "All Booking is available only after Mirror is ready. Please wait for initial sync."}), 400

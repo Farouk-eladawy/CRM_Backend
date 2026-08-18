@@ -100897,3 +100897,208 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0CC47BF532ABDC794CC"
+    },
+    "keyId": "3EB0CC47BF532ABDC794CC",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:13408 in send_whatsapp_message\nLogger: root\nReason: Failed to send WhatsApp message. Status: 400, Attempt: 1/3, Response: {\"error\":{\"message\":\"(#131009) Parameter value is not valid\",\"code\":131009,\"type\":\"OAuthException\",\"error_data\":{\"messaging_product\":\"whatsapp\",\"details\":\"The phone number is malformed: Please use the format: +1234567890.\"},\"fbtrace_id\":\"ArGWg1uedud01nH43_Y_ZWM\"}}\nAt: 2026-08-18 07:41:33"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786891294,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787064094,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T07:41:35.086Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0452E455F7E77985997"
+    },
+    "keyId": "3EB0452E455F7E77985997",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:13293 in send_whatsapp_message\nLogger: root\nReason: Refusing WhatsApp send: template 'gift_bounce2' body looks misconfigured (cancel-recovery copy or broken placeholders like [First Name]). Fix Meta gift_bounce2 to use {{1}}..{{4}}.\nAt: 2026-08-18 07:54:24"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786892064,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787064864,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T07:54:25.921Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB00AB99C09E1C2E29E8E"
+    },
+    "keyId": "3EB00AB99C09E1C2E29E8E",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:13293 in send_whatsapp_message\nLogger: root\nReason: Refusing WhatsApp send: template 'gift_bounce1' body looks misconfigured (cancel-recovery copy or broken placeholders like [First Name]). Fix Meta gift_bounce2 to use {{1}}..{{4}}.\nAt: 2026-08-18 07:54:29"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786892069,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787064869,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T07:54:30.653Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BF1479ABD58E82EA11"
+    },
+    "keyId": "3EB0BF1479ABD58E82EA11",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:13294 in send_whatsapp_message\nLogger: root\nReason: Refusing WhatsApp send: template 'gift_bounce2' body looks misconfigured (cancel-recovery copy or broken placeholders like [First Name]). Fix Meta gift_bounce2 to use {{1}}..{{4}}.\nAt: 2026-08-18 08:01:18"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786892479,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787065279,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T08:01:20.137Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB050BDA8DFA31116E7C1"
+    },
+    "keyId": "3EB050BDA8DFA31116E7C1",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:13294 in send_whatsapp_message\nLogger: root\nReason: Refusing WhatsApp send: template 'gift_bounce1' body looks misconfigured (cancel-recovery copy or broken placeholders like [First Name]). Fix Meta gift_bounce1 to use {{1}}..{{4}}.\nAt: 2026-08-18 08:01:23"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786892483,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787065283,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T08:01:24.170Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

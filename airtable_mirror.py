@@ -95,6 +95,57 @@ def _safe_table_key(base_id, table_id):
     return f"{base_id}:{table_id}"
 
 
+# Airtable List: Create Date is stored as "Create Date  " (trailing spaces).
+_CREATE_DATE_FIELD_ALIASES = (
+    "Create Date  ",
+    "Create Date ",
+    "Create Date",
+    "Created Date",
+)
+
+
+def _resolve_record_field_key(fields, field_name):
+    """Resolve display field name to the actual key present on a mirror record."""
+    if not isinstance(fields, dict):
+        return str(field_name or "").strip() or str(field_name or "")
+    wanted = str(field_name or "")
+    if wanted in fields:
+        return wanted
+    trimmed = wanted.strip()
+    if trimmed and trimmed in fields:
+        return trimmed
+    for k in fields.keys():
+        ks = str(k)
+        if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
+            return k
+    if trimmed.lower() in ("create date", "created date"):
+        for alias in _CREATE_DATE_FIELD_ALIASES:
+            if alias in fields:
+                return alias
+    return trimmed or wanted
+
+
+def _resolve_schema_field_type(schema_types, field_name):
+    """Lookup schema type with trim/case tolerance; infer date for Create Date aliases."""
+    schema_types = schema_types or {}
+    wanted = str(field_name or "")
+    if wanted in schema_types:
+        return schema_types[wanted]
+    trimmed = wanted.strip()
+    if trimmed in schema_types:
+        return schema_types[trimmed]
+    for k, v in schema_types.items():
+        ks = str(k).strip()
+        if ks == trimmed or ks.lower() == trimmed.lower():
+            return v
+    low = trimmed.lower()
+    if low in ("create date", "created date"):
+        return "date"
+    if "date" in low or "created" in low or "modified" in low:
+        return "date"
+    return "text"
+
+
 class AirtableMirror:
     def __init__(self, config, db_path=None):
         self.config = config or {}
@@ -1532,11 +1583,12 @@ class AirtableMirror:
             op = cond.get("operator")
             if not field or not op:
                 return True
-            val_raw = (fields or {}).get(field)
+            field_key = _resolve_record_field_key(fields, field)
+            val_raw = (fields or {}).get(field_key) if isinstance(fields, dict) else None
             val = _to_lower_str(val_raw)
             cond_val_raw = cond.get("value")
             cond_val = _to_lower_str(cond_val_raw)
-            ftype = schema_types.get(field) or "text"
+            ftype = _resolve_schema_field_type(schema_types, field)
             op_l = str(op or "").strip().lower()
 
             def _decode_multi(raw):
@@ -1838,7 +1890,6 @@ class AirtableMirror:
                     out.append({"id": rid, "fields": fields})
                 return out
 
-        filters_applied_in_scan = True
         while scanned < max_scan and len(records) < scan_target:
             ids = _fetch_projection_ids(batch_size, scan_offset)
             if not ids:
@@ -1861,194 +1912,18 @@ class AirtableMirror:
                         continue
                     records.append(r)
 
-        schema_types = {}
-        try:
-            for it in self.list_schema_for_main_list() or []:
-                name = str(it.get("field_name") or "").strip()
-                typ = str(it.get("field_type") or "").strip().lower()
-                if not name:
-                    continue
-                if "date" in typ or "time" in typ or typ in ("createdtime", "lastmodifiedtime"):
-                    schema_types[name] = "date"
-                elif "select" in typ or "checkbox" in typ:
-                    schema_types[name] = "select"
-                else:
-                    schema_types[name] = "text"
-        except Exception:
-            schema_types = {}
-
-        def _get_val(fields, field):
-            try:
-                return fields.get(field)
-            except Exception:
-                return None
-
-        def _to_lower_str(v):
-            if v is None:
-                return ""
-            if isinstance(v, list):
-                try:
-                    return " ".join([str(x) for x in v]).lower()
-                except Exception:
-                    return str(v).lower()
-            if isinstance(v, dict):
-                try:
-                    return json.dumps(v, ensure_ascii=False).lower()
-                except Exception:
-                    return str(v).lower()
-            return str(v).lower()
-
-        def _parse_date(v):
-            if v is None:
-                return None
-            try:
-                s = str(v).strip()
-                if not s:
-                    return None
-                if "T" in s:
-                    dt = _iso_to_dt(s)
-                    return dt.date() if dt else None
-                return datetime.fromisoformat(s.split(" ", 1)[0]).date()
-            except Exception:
-                try:
-                    return datetime.fromisoformat(str(v)).date()
-                except Exception:
-                    return None
-
-        def _eval_node(fields, cond):
-            if not cond:
-                return True
-            if cond.get("isGroup") and isinstance(cond.get("conditions"), list):
-                kids = cond.get("conditions") or []
-                if not kids:
-                    return True
-                logic = str(cond.get("groupLogic") or "and").lower()
-                out = _eval_node(fields, kids[0])
-                for i in range(1, len(kids)):
-                    child = _eval_node(fields, kids[i])
-                    if logic == "and":
-                        out = out and child
-                    else:
-                        out = out or child
-                return out
-
-            field = cond.get("field")
-            op = cond.get("operator")
-            if not field or not op:
-                return True
-            val_raw = _get_val(fields, field)
-            val = _to_lower_str(val_raw)
-            cond_val = _to_lower_str(cond.get("value"))
-            ftype = schema_types.get(field) or "text"
-
-            if ftype == "date" and val and op in ("is today", "is tomorrow", "is yesterday"):
-                d_field = _parse_date(val_raw)
-                if not d_field:
-                    return False
-                target = today
-                if op == "is tomorrow":
-                    target = today + timedelta(days=1)
-                elif op == "is yesterday":
-                    target = today - timedelta(days=1)
-                return d_field == target
-
-            if op == "contains":
-                return cond_val in val
-            if op == "does not contain":
-                return cond_val not in val
-            if op == "is":
-                if ftype == "date" and val_raw is not None and cond.get("value"):
-                    d1 = _parse_date(val_raw)
-                    d2 = _parse_date(cond.get("value"))
-                    if d1 and d2:
-                        return d1 == d2
-                if isinstance(val_raw, list):
-                    return any(_to_lower_str(x) == cond_val for x in val_raw)
-                return val == cond_val
-            if op == "is not":
-                if isinstance(val_raw, list):
-                    return all(_to_lower_str(x) != cond_val for x in val_raw)
-                return val != cond_val
-            if op == "is empty":
-                return val == ""
-            if op == "is not empty":
-                return val != ""
-            if op == "is before":
-                d1 = _parse_date(val_raw)
-                d2 = _parse_date(cond.get("value"))
-                return bool(d1 and d2 and d1 < d2)
-            if op == "is after":
-                d1 = _parse_date(val_raw)
-                d2 = _parse_date(cond.get("value"))
-                return bool(d1 and d2 and d1 > d2)
-            return True
-
-        if fs and not filters_applied_in_scan:
-            next_records = []
-            for r in records:
-                f = r.get("fields") or {}
-                is_match = _eval_node(f, fs[0])
-                for i in range(1, len(fs)):
-                    cm = _eval_node(f, fs[i])
-                    if str((fs[i] or {}).get("connector") or "and").lower() == "and":
-                        is_match = is_match and cm
-                    else:
-                        is_match = is_match or cm
-                if is_match:
-                    next_records.append(r)
-            records = next_records
-
         if ss:
-            CREATE_DATE_ALIASES = (
-                "Create Date  ",
-                "Create Date ",
-                "Create Date",
-                "Created Date",
-            )
-
-            def _resolve_field_key(fields, field_name):
-                if not isinstance(fields, dict):
-                    return field_name
-                wanted = str(field_name or "")
-                if wanted in fields:
-                    return wanted
-                trimmed = wanted.strip()
-                if trimmed in fields:
-                    return trimmed
-                for k in fields.keys():
-                    ks = str(k)
-                    if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
-                        return k
-                if trimmed.lower() in ("create date", "created date"):
-                    for alias in CREATE_DATE_ALIASES:
-                        if alias in fields:
-                            return alias
-                return trimmed or wanted
-
-            def _resolve_ftype(field_name):
-                wanted = str(field_name or "").strip()
-                if wanted in schema_types:
-                    return schema_types[wanted]
-                for k, v in (schema_types or {}).items():
-                    ks = str(k).strip()
-                    if ks == wanted or ks.lower() == wanted.lower():
-                        return v
-                low = wanted.lower()
-                if "date" in low or low.endswith(" time") or "created" in low or "modified" in low:
-                    return "date"
-                return "text"
-
             for s in reversed(ss):
                 field = str(s.get("field") or "").strip()
                 direction = str(s.get("direction") or "asc").lower()
                 if not field:
                     continue
-                ftype = _resolve_ftype(field)
+                ftype = _resolve_schema_field_type(schema_types, field)
 
                 def _key(rec, _field=field, _ftype=ftype):
                     fields = rec.get("fields") or {}
-                    key = _resolve_field_key(fields, _field)
-                    vraw = fields.get(key)
+                    key = _resolve_record_field_key(fields, _field)
+                    vraw = fields.get(key) if isinstance(fields, dict) else None
                     if vraw is None or vraw == "":
                         return (1, "")
                     if _ftype == "date":
@@ -2163,40 +2038,100 @@ class AirtableMirror:
             op = cond.get("operator")
             if not field or not op:
                 return True
-            val_raw = (fields or {}).get(field)
+            field_key = _resolve_record_field_key(fields, field)
+            val_raw = (fields or {}).get(field_key) if isinstance(fields, dict) else None
             val = _to_lower_str(val_raw)
-            cond_val = _to_lower_str(cond.get("value"))
-            ftype = schema_types.get(field) or "text"
+            cond_val_raw = cond.get("value")
+            cond_val = _to_lower_str(cond_val_raw)
+            ftype = _resolve_schema_field_type(schema_types, field)
+            op_l = str(op or "").strip().lower()
+            today = _cairo_now().date()
 
-            if op == "contains":
-                return cond_val in val
-            if op == "does not contain":
-                return cond_val not in val
-            if op == "is":
-                if ftype == "date":
-                    d1 = _parse_date(val_raw)
-                    d2 = _parse_date(cond.get("value"))
-                    if d1 and d2:
-                        return d1 == d2
+            if op_l in ("is empty",):
+                return val_raw is None or val_raw == "" or (isinstance(val_raw, list) and len(val_raw) == 0)
+            if op_l in ("is not empty",):
+                return not (
+                    val_raw is None
+                    or val_raw == ""
+                    or (isinstance(val_raw, list) and len(val_raw) == 0)
+                )
+
+            if ftype == "date" or op_l in (
+                "is today", "is tomorrow", "is yesterday",
+                "is within next 7 days", "is within past 7 days",
+                "is before", "is after", "is on or before", "is on or after",
+            ):
+                d_field = _parse_date(val_raw)
+                if op_l == "is today":
+                    return bool(d_field and d_field == today)
+                if op_l == "is tomorrow":
+                    return bool(d_field and d_field == (today + timedelta(days=1)))
+                if op_l == "is yesterday":
+                    return bool(d_field and d_field == (today - timedelta(days=1)))
+                if op_l == "is within next 7 days":
+                    return bool(d_field and today <= d_field <= (today + timedelta(days=7)))
+                if op_l == "is within past 7 days":
+                    return bool(d_field and (today - timedelta(days=7)) <= d_field <= today)
+
+                def _resolve_date_mode(raw_mode_val):
+                    s = str(raw_mode_val or "").strip()
+                    if not s or s == "@exact":
+                        return None
+                    if len(s) >= 10 and s[0:4].isdigit() and s[4] == "-" and s[7] == "-":
+                        return _parse_date(s[:10])
+                    token = s[1:] if s.startswith("@") else s
+                    token = token.lower().replace("-", "_").replace(" ", "_")
+                    if token == "today":
+                        return today
+                    if token == "tomorrow":
+                        return today + timedelta(days=1)
+                    if token == "yesterday":
+                        return today - timedelta(days=1)
+                    if token == "one_week_ago":
+                        return today - timedelta(days=7)
+                    if token == "one_week_from_now":
+                        return today + timedelta(days=7)
+                    if token == "one_month_ago":
+                        y, m = today.year, today.month - 1
+                        if m < 1:
+                            y, m = y - 1, 12
+                        d = min(today.day, calendar.monthrange(y, m)[1])
+                        return today.replace(year=y, month=m, day=d)
+                    if token == "one_month_from_now":
+                        y, m = today.year, today.month + 1
+                        if m > 12:
+                            y, m = y + 1, 1
+                        d = min(today.day, calendar.monthrange(y, m)[1])
+                        return today.replace(year=y, month=m, day=d)
+                    return _parse_date(s)
+
+                if op_l in ("is", "is before", "is after", "is on or before", "is on or after"):
+                    d_cond = _resolve_date_mode(cond_val_raw)
+                    if not d_field or not d_cond:
+                        return False
+                    if op_l == "is":
+                        return d_field == d_cond
+                    if op_l == "is before":
+                        return d_field < d_cond
+                    if op_l == "is after":
+                        return d_field > d_cond
+                    if op_l == "is on or before":
+                        return d_field <= d_cond
+                    if op_l == "is on or after":
+                        return d_field >= d_cond
+
+            if op_l == "contains":
+                return cond_val in val if cond_val else False
+            if op_l == "does not contain":
+                return cond_val not in val if cond_val else True
+            if op_l == "is":
                 if isinstance(val_raw, list):
                     return any(_to_lower_str(x) == cond_val for x in val_raw)
                 return val == cond_val
-            if op == "is not":
+            if op_l == "is not":
                 if isinstance(val_raw, list):
                     return all(_to_lower_str(x) != cond_val for x in val_raw)
                 return val != cond_val
-            if op == "is empty":
-                return val == ""
-            if op == "is not empty":
-                return val != ""
-            if op == "is before":
-                d1 = _parse_date(val_raw)
-                d2 = _parse_date(cond.get("value"))
-                return bool(d1 and d2 and d1 < d2)
-            if op == "is after":
-                d1 = _parse_date(val_raw)
-                d2 = _parse_date(cond.get("value"))
-                return bool(d1 and d2 and d1 > d2)
             return True
 
         fs = filters if isinstance(filters, list) else []
@@ -2230,42 +2165,12 @@ class AirtableMirror:
             direction = str(s.get("direction") or "asc").lower()
             if not field:
                 continue
-            ftype = schema_types.get(field) or "text"
-            if ftype == "text":
-                low = field.lower()
-                if "date" in low or low.endswith(" time") or "created" in low or "modified" in low:
-                    ftype = "date"
-
-            CREATE_DATE_ALIASES = (
-                "Create Date  ",
-                "Create Date ",
-                "Create Date",
-                "Created Date",
-            )
-
-            def _resolve_field_key(fields, field_name):
-                if not isinstance(fields, dict):
-                    return field_name
-                wanted = str(field_name or "")
-                if wanted in fields:
-                    return wanted
-                trimmed = wanted.strip()
-                if trimmed in fields:
-                    return trimmed
-                for k in fields.keys():
-                    ks = str(k)
-                    if ks.strip() == trimmed or ks.strip().lower() == trimmed.lower():
-                        return k
-                if trimmed.lower() in ("create date", "created date"):
-                    for alias in CREATE_DATE_ALIASES:
-                        if alias in fields:
-                            return alias
-                return trimmed or wanted
+            ftype = _resolve_schema_field_type(schema_types, field)
 
             def _key(rec, _field=field, _ftype=ftype):
                 fields = rec.get("fields") or {}
-                key = _resolve_field_key(fields, _field)
-                vraw = fields.get(key)
+                key = _resolve_record_field_key(fields, _field)
+                vraw = fields.get(key) if isinstance(fields, dict) else None
                 if vraw is None or vraw == "":
                     return (1, "")
                 if _ftype == "date":

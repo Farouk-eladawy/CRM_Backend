@@ -712,13 +712,15 @@ class ViatorSupplierService:
         for product in self.catalog.live_products():
             tour_options = []
             for option in product.get("options") or []:
-                tour_options.append({
+                option_body = {
                     "SupplierOptionCode": option.get("supplier_option_code") or "",
                     "SupplierOptionName": option.get("supplier_option_name") or "",
-                    "TourDepartureTime": _hhmmss(option.get("departure_time")),
                     "productOptionId": option.get("product_option_id") or "",
                     "Option": [],
-                })
+                }
+                if option.get("departure_time"):
+                    option_body["TourDepartureTime"] = _hhmmss(option.get("departure_time"))
+                tour_options.append(option_body)
             tours.append({
                 "SupplierProductCode": product.get("supplier_product_code"),
                 "SupplierProductName": product.get("supplier_product_name"),

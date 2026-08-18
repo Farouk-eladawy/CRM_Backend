@@ -12,7 +12,7 @@ from viator_supplier_api import create_test_app
 
 TEST_KEY = "viator-test-api-key"
 SUPPLIER_ID = 1004
-OPTION_ID = "LUXOR-HRG:BASIC:0400"
+OPTION_ID = "14976P3:BASIC:0400"
 
 
 def _cfg(**extra):
@@ -40,7 +40,7 @@ SAMPLE_BOOKING = {
         "Timestamp": "2013-07-25T13:30:52.616+10:00",
         "BookingReference": "BR-1357708331",
         "TravelDate": "2026-12-10",
-        "SupplierProductCode": "LUXOR-HRG",
+        "SupplierProductCode": "14976P3",
         "Location": "Hurghada, Egypt",
         "TourOptions": {
             "SupplierOptionCode": "BASIC",
@@ -121,11 +121,9 @@ class ViatorSupplierApiTests(unittest.TestCase):
         self.assertEqual(body["responseType"], "TourListResponse")
         self.assertEqual(body["data"]["RequestStatus"]["Status"], "SUCCESS")
         codes = [t["SupplierProductCode"] for t in body["data"]["Tour"]]
-        self.assertIn("LUXOR-HRG", codes)
+        self.assertIn("14976P3", codes)
         option_ids = [o["productOptionId"] for t in body["data"]["Tour"] for o in t["TourOption"]]
         self.assertIn(OPTION_ID, option_ids)
-        times = [o["TourDepartureTime"] for t in body["data"]["Tour"] for o in t["TourOption"]]
-        self.assertIn("04:00:00", times)
 
     def test_booking_creates_trip_and_is_idempotent(self):
         first = self.client.post("/viator/booking", headers=self.headers, json=SAMPLE_BOOKING)
@@ -150,7 +148,7 @@ class ViatorSupplierApiTests(unittest.TestCase):
         self.assertEqual(row["lead_name"], "Emmanuel MAS")
         self.assertEqual(row["adults"], 2)
         self.assertEqual(row["travel_date"], "2026-12-10")
-        self.assertEqual(row["option_name"], "Tour with Entry Fees")
+        self.assertEqual(row["option_name"], "Hotel pickup included")
         self.assertEqual(row["pickup_point"], "Hurghada, Red Sea Governorate, Egypt")
         self.assertEqual(row["phone"], "+33688921282")
         self.assertEqual(row["net_amount"], 126.0)
@@ -199,7 +197,7 @@ class ViatorSupplierApiTests(unittest.TestCase):
         from viator_supplier_api import ViatorStore
         store = ViatorStore(db_path=self._tmp.name)
         self.assertEqual(store.get_booking("BR-1357708331")["status"], "CANCELLED")
-        self.assertEqual(store.booked_pax("LUXOR-HRG", "2026-12-10", "BASIC"), 0)
+        self.assertEqual(store.booked_pax("14976P3", "2026-12-10", "BASIC"), 0)
 
     def test_realtime_availability_sold_out_blocks_checkout(self):
         product_cfg = {
@@ -319,7 +317,7 @@ class ViatorSupplierApiTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         rows = resp.get_json()["data"]["BatchTourAvailability"]
         codes = {row["SupplierProductCode"] for row in rows}
-        self.assertIn("LUXOR-HRG", codes)
+        self.assertIn("14976P3", codes)
 
 
 if __name__ == "__main__":

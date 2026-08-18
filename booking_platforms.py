@@ -129,7 +129,7 @@ def _default_platform_settings(platform_id: str) -> dict:
             "api_key": "",
             "api_key_sandbox": "",
             "api_key_production": "",
-            "supplier_id": 0,
+            "supplier_id": 14976,
             "reseller_id": "",
             "currency": "USD",
             "ip_allowlist": [],

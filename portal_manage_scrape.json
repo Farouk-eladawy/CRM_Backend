@@ -435,6 +435,270 @@
       "options": [
         {"code": "TG1", "name": "Shaab Samadai, Snorkeling Adventure & Coral Reef", "portal_option_id": "r2174300", "times": "7:00am", "adult_retail": 70, "child_retail": 45, "infant_retail": 0}
       ]
+    },
+    {
+      "code": "14976P125",
+      "title": "Luxor Tour to Valley of the Kings, Karnak Temples from Marsa Alam",
+      "cutoff_hours": 8,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094495"},
+      "options": [
+        {"code": "TG4", "name": "without Entry Fees", "portal_option_id": "r2174805", "times": "2:30am", "adult_retail": 230, "child_retail": 85, "infant_retail": 0},
+        {"code": "TG3", "name": "Entry Fees & Tutankhamun Tomb", "portal_option_id": "r2173948", "times": "2:30am", "adult_retail": 350, "child_retail": 133.34, "infant_retail": 0},
+        {"code": "TG2", "name": "Private & Entrance Fees", "portal_option_id": "r2173946", "times": "2:30am", "adult_retail": 580, "child_retail": 200, "infant_retail": 0},
+        {"code": "TG1", "name": "Small Group with Entrance Fees", "portal_option_id": "r2173947", "times": "2:30am", "adult_retail": 290, "child_retail": 116.67, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P124",
+      "title": "From Sharm Elsheikh : The Lost City of Petra & Day Tour By Ferry",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 37,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1093166"},
+      "options": [
+        {"code": "TG1", "name": "City Of Petra Visit", "portal_option_id": "r2170734", "times": "12:30am", "adult_retail": 390, "child_retail": 350, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P121",
+      "title": "Sharm ElSheikh: ATV Quad & Buggy Adventure Sunrise or Sunset",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092636"},
+      "options": [
+        {"code": "TG6", "name": "Family Buggy - 4 People in 1 B", "portal_option_id": "r2169609", "times": "4:00pm, 5:00pm", "adult_retail": 50, "child_retail": 30, "infant_retail": 0},
+        {"code": "TG5", "name": "Triple Buggy - 3 Person In 1 B", "portal_option_id": "r2169610", "times": "4:00pm, 5:00pm", "adult_retail": 45, "child_retail": 25, "infant_retail": 0},
+        {"code": "TG4", "name": "Double Buggy - 2 People In 1 B", "portal_option_id": "r2169608", "times": "4:00pm, 5:00pm", "adult_retail": 40, "child_retail": 25, "infant_retail": 0},
+        {"code": "TG3", "name": "Single Buggy - 1 Person in 1 B", "portal_option_id": "r2169612", "times": "5:00pm", "adult_retail": 55, "child_retail": 45, "infant_retail": 0},
+        {"code": "TG2", "name": "Single Quad - 1 Person in 1 Q", "portal_option_id": "r2169611", "times": "4:00pm, 5:00pm", "adult_retail": 55, "child_retail": 45, "infant_retail": 0},
+        {"code": "TG1", "name": "Double Quad - 2 People in 1 Q", "portal_option_id": "r2169613", "times": "5:00pm", "adult_retail": 45, "child_retail": 35, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P120",
+      "title": "Sharm El-Sheikh: Ras Mohamed Half-Day Tour and Allah's Gate",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 32,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
+        "Child": {"enabled": true, "min_age": 3, "max_age": 7},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 8, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092634"},
+      "options": [
+        {"code": "TG5", "name": "Without Entrance Fees", "portal_option_id": "r2505533", "times": "8:00am", "adult_retail": 15, "child_retail": 15, "infant_retail": 0},
+        {"code": "TG1", "name": "Ras Mohamed Half-Day Tour and Allah's Gate", "portal_option_id": "r2505479", "times": "8:00am", "adult_retail": 28, "child_retail": 20, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P119",
+      "title": "Sharm El Sheikh Mount Sinai and St. Catherine Monastery Tour",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Dates of Birth", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": false},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 7},
+        "Youth": {"enabled": true, "min_age": 8, "max_age": 11},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094212"},
+      "options": [
+        {"code": "TG2", "name": "Without Entrance Fees", "portal_option_id": "r2252418", "times": "8:30pm", "adult_retail": 35, "child_retail": 35, "infant_retail": 0},
+        {"code": "TG1", "name": "Mount Sinai and St. Catherine Monastery Tour", "portal_option_id": "r2173281", "times": "8:30pm", "adult_retail": 58, "child_retail": 40, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P118",
+      "title": "Sharm El-Sheikh City Tour : Mosque,Cathedral,Cafe & Optional Meal",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 10},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092603"},
+      "options": [
+        {"code": "TG6", "name": "City Tour with Star Fish Meal", "portal_option_id": "r2492951", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 45, "child_retail": 35, "infant_retail": 0},
+        {"code": "TG5", "name": "Old Market & Panorama Cafe", "portal_option_id": "r2492913", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 40, "child_retail": 35, "infant_retail": 0},
+        {"code": "TG4", "name": "MOSQUE & MARKET", "portal_option_id": "r2459294", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 15, "child_retail": 15, "infant_retail": 0},
+        {"code": "TG2", "name": "Mosque, Cathedral & Old Market", "portal_option_id": "r2255242", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 25, "child_retail": 20, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P115",
+      "title": "Grand Egyptian Museum QR Ticket in Cairo with Optional Transfer",
+      "cutoff_hours": 1,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 22,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": false},
+        "Child": {"enabled": true, "min_age": 0, "max_age": 4},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 5, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092082"},
+      "options": [
+        {"code": "TG6", "name": "A) QR + English Audio Guide", "portal_option_id": "r2469874p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm, 4:30pm, 5:00pm, 5:30pm, 6:00pm, 6:30pm, 7:00pm", "adult_retail": 45.5, "child_retail": 31.5, "infant_retail": 0},
+        {"code": "TG3", "name": "D) QR Ticket , Transfer, Guide", "portal_option_id": "r2231813p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm", "adult_retail": 150, "child_retail": 45, "infant_retail": 0},
+        {"code": "TG2", "name": "C ) QR Ticket with Transfer", "portal_option_id": "r2168452p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm", "adult_retail": 83, "child_retail": 30, "infant_retail": 0},
+        {"code": "TG1", "name": "B ) GEM QR Entry Ticket", "portal_option_id": "r2168395p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm", "adult_retail": 52, "child_retail": 29, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P114",
+      "title": "Discover Cairo, Great Pyramids & Quad Bike - From Sharm By Bus",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 34,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1089783"},
+      "options": [
+        {"code": "TG6", "name": "Great Pyramids & Quad Bike", "portal_option_id": "r2509723", "times": "12:30am", "adult_retail": 125, "child_retail": 85, "infant_retail": 0},
+        {"code": "TG5", "name": "Without Entrance", "portal_option_id": "r2459295", "times": "12:30am", "adult_retail": 80, "child_retail": 80, "infant_retail": 0},
+        {"code": "TG3", "name": "Pyramids Area& Egyptian Museum", "portal_option_id": "r2162970", "times": "12:30am", "adult_retail": 118, "child_retail": 75, "infant_retail": 0},
+        {"code": "TG1", "name": "Pyramids Area & Grand Museum", "portal_option_id": "r2162972", "times": "12:30am", "adult_retail": 140, "child_retail": 100, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P113",
+      "title": "Private Guided Cairo Tour, Egyptian Museum, Citadel and Old Cairo",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 8,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
+        "Child": {"enabled": true, "min_age": 3, "max_age": 10},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094248"},
+      "options": [
+        {"code": "TG1", "name": "Transfer & lunch & Guide", "portal_option_id": "r2173402", "times": "8:00am, 9:00am, 10:00am, 11:00am", "adult_retail": 200, "child_retail": 50, "infant_retail": 0}
+      ]
+    },
+    {
+      "code": "14976P112",
+      "title": "Giza Pyramids, Sphinx, and Grand Egyptian Museum from Cairo",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 38,
+      "max_travelers_per_booking": 8,
+      "pickup_offered": true,
+      "booking_questions": [
+        {"question_text": "Full Names", "required": true},
+        {"question_text": "Passport Details", "required": true}
+      ],
+      "age_bands": {
+        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
+        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
+        "Youth": {"enabled": false},
+        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
+        "Senior": {"enabled": false}
+      },
+      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094216"},
+      "options": [
+        {"code": "TG2", "name": "With Entry Tickets & Lunch", "portal_option_id": "r2173286", "times": "8:00am, 9:00am, 10:00am, 11:00am", "adult_retail": 201.62, "child_retail": 80.65, "infant_retail": 0},
+        {"code": "TG1", "name": "Without Entry Tickets & Lunch", "portal_option_id": "r2173287", "times": "8:00am, 9:00am, 10:00am, 11:00am", "adult_retail": 125, "child_retail": 50, "infant_retail": 0}
+      ]
     }
   ]
 }

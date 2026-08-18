@@ -9,8 +9,8 @@
     "portal_active_count": 20,
     "catalog_count": 85,
     "skipped_foreign_products": 167,
-    "manage_scraped_at": "2026-08-18T16:49:11Z",
-    "manage_scraped_count": 12
+    "manage_scraped_at": "2026-08-18T17:39:00Z",
+    "manage_scraped_count": 28
   },
   "products": [
     {
@@ -1306,7 +1306,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "HRG",
       "destination_name": "Hurghada",
@@ -1320,22 +1320,76 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 100,
-      "cutoff_hours": 24,
+      "cutoff_hours": 0,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P139:BASIC:0000",
-          "adult_retail": 30.0,
-          "adult_net": 22.5,
-          "child_retail": 21.0,
-          "child_net": 15.75,
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "Basic Snorkeling",
+          "product_option_id": "14976P139:TG2",
+          "portal_option_id": "r2439335",
+          "departure_times": [
+            "08:00:00"
+          ],
+          "adult_retail": 40.0,
+          "adult_net": 26.0,
+          "child_retail": 40.0,
+          "child_net": 26.0,
+          "infant_retail": 40.0,
+          "infant_net": 26.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Full Utopia Island Experience",
+          "product_option_id": "14976P139:TG1",
+          "portal_option_id": "r2240085",
+          "departure_times": [
+            "08:00:00",
+            "12:30:00"
+          ],
+          "adult_retail": 100.0,
+          "adult_net": 65.0,
+          "child_retail": 70.0,
+          "child_net": 45.5,
           "infant_retail": 0.0,
           "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1128280"
+      }
     },
     {
       "supplier_product_code": "14976P135",
@@ -1345,7 +1399,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "HRG",
       "destination_name": "Hurghada",
@@ -1358,23 +1412,72 @@
       "pickup_offered": true,
       "private_tour": true,
       "daily_capacity": 8,
-      "cutoff_hours": 24,
+      "cutoff_hours": 0,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P135:BASIC:0000",
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "Departure",
+          "product_option_id": "14976P135:TG2",
+          "portal_option_id": "r2204995",
+          "departure_times": [],
           "adult_retail": 25.0,
-          "adult_net": 18.75,
-          "child_retail": 17.5,
-          "child_net": 13.12,
+          "adult_net": 12.5,
+          "child_retail": 0.0,
+          "child_net": 0.0,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "00:00:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Arrival",
+          "product_option_id": "14976P135:TG1",
+          "portal_option_id": "r2204994",
+          "departure_times": [],
+          "adult_retail": 25.0,
+          "adult_net": 12.5,
+          "child_retail": 0.0,
+          "child_net": 0.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": false,
+      "commission_rate": 50.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": false
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1109673"
+      }
     },
     {
       "supplier_product_code": "14976P133",
@@ -1384,7 +1487,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "LXR",
       "destination_name": "Luxor",
@@ -1397,23 +1500,69 @@
       "pickup_offered": true,
       "private_tour": true,
       "daily_capacity": 8,
-      "cutoff_hours": 24,
+      "cutoff_hours": 0,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P133:BASIC:0430",
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "DEFAULT",
+          "product_option_id": "14976P133:TG1",
+          "portal_option_id": "r2176576",
+          "departure_times": [
+            "04:30:00"
+          ],
           "adult_retail": 800.0,
-          "adult_net": 600.0,
-          "child_retail": 560.0,
-          "child_net": 420.0,
+          "adult_net": 480.0,
+          "child_retail": 350.0,
+          "child_net": 210.0,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "04:30:00"
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1095747"
+      }
     },
     {
       "supplier_product_code": "14976P129",
@@ -1423,7 +1572,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "HRG",
       "destination_name": "Hurghada",
@@ -1436,23 +1585,65 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 0,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P129:BASIC:0430",
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Dendera, Osireion & Abydos Full-Day Tour",
+          "product_option_id": "14976P129:TG1",
+          "portal_option_id": "r2174813",
+          "departure_times": [
+            "04:30:00"
+          ],
           "adult_retail": 280.0,
-          "adult_net": 210.0,
-          "child_retail": 196.0,
-          "child_net": 147.0,
+          "adult_net": 201.6,
+          "child_retail": 80.0,
+          "child_net": 57.6,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "04:30:00"
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 28.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094910"
+      }
     },
     {
       "supplier_product_code": "14976P127",
@@ -1462,7 +1653,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "RMF",
       "destination_name": "Marsa Alam",
@@ -1475,23 +1666,69 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 40,
-      "cutoff_hours": 24,
+      "cutoff_hours": 5,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P127:BASIC:0730",
-          "adult_retail": 50.0,
-          "adult_net": 37.5,
-          "child_retail": 35.0,
-          "child_net": 26.25,
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Boat trip with sea Turtles",
+          "product_option_id": "14976P127:TG1",
+          "portal_option_id": "r2173352",
+          "departure_times": [
+            "07:30:00"
+          ],
+          "adult_retail": 65.0,
+          "adult_net": 45.5,
+          "child_retail": 45.0,
+          "child_net": 31.5,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "07:30:00"
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094232"
+      }
     },
     {
       "supplier_product_code": "14976P126",
@@ -1501,7 +1738,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "RMF",
       "destination_name": "Marsa Alam",
@@ -1514,23 +1751,69 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 40,
-      "cutoff_hours": 24,
+      "cutoff_hours": 10,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P126:BASIC:0700",
-          "adult_retail": 60.0,
-          "adult_net": 45.0,
-          "child_retail": 42.0,
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Shaab Samadai, Snorkeling Adventure & Coral Reef",
+          "product_option_id": "14976P126:TG1",
+          "portal_option_id": "r2174300",
+          "departure_times": [
+            "07:00:00"
+          ],
+          "adult_retail": 70.0,
+          "adult_net": 49.0,
+          "child_retail": 45.0,
           "child_net": 31.5,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "07:00:00"
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094678"
+      }
     },
     {
       "supplier_product_code": "14976P125",
@@ -1540,7 +1823,7 @@
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "RMF",
       "destination_name": "Marsa Alam",
@@ -1553,33 +1836,120 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 8,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P125:BASIC:0230",
-          "adult_retail": 350.0,
-          "adult_net": 262.5,
-          "child_retail": 245.0,
-          "child_net": 183.75,
+          "supplier_option_code": "TG4",
+          "supplier_option_name": "without Entry Fees",
+          "product_option_id": "14976P125:TG4",
+          "portal_option_id": "r2174805",
+          "departure_times": [
+            "02:30:00"
+          ],
+          "adult_retail": 230.0,
+          "adult_net": 138.0,
+          "child_retail": 85.0,
+          "child_net": 51.0,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "02:30:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG3",
+          "supplier_option_name": "Entry Fees & Tutankhamun Tomb",
+          "product_option_id": "14976P125:TG3",
+          "portal_option_id": "r2173948",
+          "departure_times": [
+            "02:30:00"
+          ],
+          "adult_retail": 350.0,
+          "adult_net": 210.0,
+          "child_retail": 133.34,
+          "child_net": 80.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "Private & Entrance Fees",
+          "product_option_id": "14976P125:TG2",
+          "portal_option_id": "r2173946",
+          "departure_times": [
+            "02:30:00"
+          ],
+          "adult_retail": 580.0,
+          "adult_net": 348.0,
+          "child_retail": 200.0,
+          "child_net": 120.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Small Group with Entrance Fees",
+          "product_option_id": "14976P125:TG1",
+          "portal_option_id": "r2173947",
+          "departure_times": [
+            "02:30:00"
+          ],
+          "adult_retail": 290.0,
+          "adult_net": 174.0,
+          "child_retail": 116.67,
+          "child_net": 70.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094495"
+      }
     },
     {
       "supplier_product_code": "14976P124",
-      "supplier_product_name": "from sharm elsheikh the lost city petra day tour by ferry",
+      "supplier_product_name": "From Sharm Elsheikh : The Lost City of Petra & Day Tour By Ferry",
       "viator_product_code": "14976P124",
       "live": true,
       "api_connected": false,
       "pilot": false,
       "confirmed_on_supplier_portal": true,
-      "title_source": "catalog",
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "SSH",
       "destination_name": "Sharm",
@@ -1592,23 +1962,69 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 150,
-      "cutoff_hours": 24,
+      "cutoff_hours": 0,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P124:BASIC:0030",
-          "adult_retail": 255.0,
-          "adult_net": 191.25,
-          "child_retail": 178.5,
-          "child_net": 133.88,
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "City Of Petra Visit",
+          "product_option_id": "14976P124:TG1",
+          "portal_option_id": "r2170734",
+          "departure_times": [
+            "00:30:00"
+          ],
+          "adult_retail": 390.0,
+          "adult_net": 245.7,
+          "child_retail": 350.0,
+          "child_net": 220.5,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "00:30:00"
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 37.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1093166"
+      }
     },
     {
       "supplier_product_code": "14976P140",
@@ -1734,8 +2150,8 @@
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "SSH",
       "destination_name": "Sharm",
@@ -1749,23 +2165,144 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 50,
-      "cutoff_hours": 24,
+      "cutoff_hours": 5,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P121:BASIC:1700",
-          "adult_retail": 17.0,
-          "adult_net": 12.75,
-          "child_retail": 11.9,
-          "child_net": 8.93,
+          "supplier_option_code": "TG6",
+          "supplier_option_name": "Family Buggy - 4 People in 1 B",
+          "product_option_id": "14976P121:TG6",
+          "portal_option_id": "r2169609",
+          "departure_times": [
+            "16:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 50.0,
+          "adult_net": 35.0,
+          "child_retail": 30.0,
+          "child_net": 21.0,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "17:00:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG5",
+          "supplier_option_name": "Triple Buggy - 3 Person In 1 B",
+          "product_option_id": "14976P121:TG5",
+          "portal_option_id": "r2169610",
+          "departure_times": [
+            "16:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 45.0,
+          "adult_net": 31.5,
+          "child_retail": 25.0,
+          "child_net": 17.5,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG4",
+          "supplier_option_name": "Double Buggy - 2 People In 1 B",
+          "product_option_id": "14976P121:TG4",
+          "portal_option_id": "r2169608",
+          "departure_times": [
+            "16:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 40.0,
+          "adult_net": 28.0,
+          "child_retail": 25.0,
+          "child_net": 17.5,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG3",
+          "supplier_option_name": "Single Buggy - 1 Person in 1 B",
+          "product_option_id": "14976P121:TG3",
+          "portal_option_id": "r2169612",
+          "departure_times": [
+            "17:00:00"
+          ],
+          "adult_retail": 55.0,
+          "adult_net": 38.5,
+          "child_retail": 45.0,
+          "child_net": 31.5,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "Single Quad - 1 Person in 1 Q",
+          "product_option_id": "14976P121:TG2",
+          "portal_option_id": "r2169611",
+          "departure_times": [
+            "16:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 55.0,
+          "adult_net": 38.5,
+          "child_retail": 45.0,
+          "child_net": 31.5,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Double Quad - 2 People in 1 Q",
+          "product_option_id": "14976P121:TG1",
+          "portal_option_id": "r2169613",
+          "departure_times": [
+            "17:00:00"
+          ],
+          "adult_retail": 45.0,
+          "adult_net": 31.5,
+          "child_retail": 35.0,
+          "child_net": 24.5,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092636"
+      }
     },
     {
       "supplier_product_code": "14976P120",
@@ -1774,8 +2311,8 @@
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "SSH",
       "destination_name": "Sharm",
@@ -1788,23 +2325,84 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 5,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P120:BASIC:0900",
-          "adult_retail": 28.36,
-          "adult_net": 21.27,
-          "child_retail": 19.85,
-          "child_net": 14.89,
+          "supplier_option_code": "TG5",
+          "supplier_option_name": "Without Entrance Fees",
+          "product_option_id": "14976P120:TG5",
+          "portal_option_id": "r2505533",
+          "departure_times": [
+            "08:00:00"
+          ],
+          "adult_retail": 15.0,
+          "adult_net": 10.2,
+          "child_retail": 15.0,
+          "child_net": 10.2,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "09:00:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Ras Mohamed Half-Day Tour and Allah's Gate",
+          "product_option_id": "14976P120:TG1",
+          "portal_option_id": "r2505479",
+          "departure_times": [
+            "08:00:00"
+          ],
+          "adult_retail": 28.0,
+          "adult_net": 19.04,
+          "child_retail": 20.0,
+          "child_net": 13.6,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 32.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092634"
+      }
     },
     {
       "supplier_product_code": "14976P119",
@@ -1813,8 +2411,8 @@
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "SSH",
       "destination_name": "Sharm",
@@ -1827,33 +2425,98 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 4,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P119:BASIC:2030",
-          "adult_retail": 50.0,
-          "adult_net": 37.5,
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "Without Entrance Fees",
+          "product_option_id": "14976P119:TG2",
+          "portal_option_id": "r2252418",
+          "departure_times": [
+            "20:30:00"
+          ],
+          "adult_retail": 35.0,
+          "adult_net": 23.45,
           "child_retail": 35.0,
-          "child_net": 26.25,
+          "child_net": 23.45,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "20:30:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Mount Sinai and St. Catherine Monastery Tour",
+          "product_option_id": "14976P119:TG1",
+          "portal_option_id": "r2173281",
+          "departure_times": [
+            "20:30:00"
+          ],
+          "adult_retail": 58.0,
+          "adult_net": 38.86,
+          "child_retail": 40.0,
+          "child_net": 26.8,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Dates of Birth",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 11
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094212"
+      }
     },
     {
       "supplier_product_code": "14976P118",
-      "supplier_product_name": "Sharm El-Sheikh City Tour with Optional Seafood Meal",
+      "supplier_product_name": "Sharm El-Sheikh City Tour : Mosque,Cathedral,Cafe & Optional Meal",
       "viator_product_code": "14976P118",
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "SSH",
       "destination_name": "Sharm",
@@ -1866,33 +2529,128 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 4,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P118:BASIC:0130",
-          "adult_retail": 25.0,
-          "adult_net": 18.75,
-          "child_retail": 17.5,
-          "child_net": 13.12,
+          "supplier_option_code": "TG6",
+          "supplier_option_name": "City Tour with Star Fish Meal",
+          "product_option_id": "14976P118:TG6",
+          "portal_option_id": "r2492951",
+          "departure_times": [
+            "13:00:00",
+            "15:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 45.0,
+          "adult_net": 30.15,
+          "child_retail": 35.0,
+          "child_net": 23.45,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "01:30:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG5",
+          "supplier_option_name": "Old Market & Panorama Cafe",
+          "product_option_id": "14976P118:TG5",
+          "portal_option_id": "r2492913",
+          "departure_times": [
+            "13:00:00",
+            "15:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 40.0,
+          "adult_net": 26.8,
+          "child_retail": 35.0,
+          "child_net": 23.45,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG4",
+          "supplier_option_name": "MOSQUE & MARKET",
+          "product_option_id": "14976P118:TG4",
+          "portal_option_id": "r2459294",
+          "departure_times": [
+            "13:00:00",
+            "15:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 15.0,
+          "adult_net": 10.05,
+          "child_retail": 15.0,
+          "child_net": 10.05,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "Mosque, Cathedral & Old Market",
+          "product_option_id": "14976P118:TG2",
+          "portal_option_id": "r2255242",
+          "departure_times": [
+            "13:00:00",
+            "15:00:00",
+            "17:00:00"
+          ],
+          "adult_retail": 25.0,
+          "adult_net": 16.75,
+          "child_retail": 20.0,
+          "child_net": 13.4,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092603"
+      }
     },
     {
       "supplier_product_code": "14976P115",
-      "supplier_product_name": "Grand Egyptian Museum QR Ticket in Cairo",
+      "supplier_product_name": "Grand Egyptian Museum QR Ticket in Cairo with Optional Transfer",
       "viator_product_code": "14976P115",
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "CAI",
       "destination_name": "Cairo",
@@ -1902,36 +2660,195 @@
         "English"
       ],
       "duration": "2 hours and 30 minutes",
-      "pickup_offered": false,
+      "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 1,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Standard",
-          "product_option_id": "14976P115:BASIC:0800",
-          "adult_retail": 41.56,
-          "adult_net": 31.17,
-          "child_retail": 29.09,
-          "child_net": 21.82,
+          "supplier_option_code": "TG6",
+          "supplier_option_name": "A) QR + English Audio Guide",
+          "product_option_id": "14976P115:TG6",
+          "portal_option_id": "r2469874p",
+          "departure_times": [
+            "08:00:00",
+            "08:30:00",
+            "09:00:00",
+            "09:30:00",
+            "10:00:00",
+            "10:30:00",
+            "11:00:00",
+            "11:30:00",
+            "12:00:00",
+            "12:30:00",
+            "13:00:00",
+            "13:30:00",
+            "14:00:00",
+            "14:30:00",
+            "15:00:00",
+            "15:30:00",
+            "16:00:00",
+            "16:30:00",
+            "17:00:00",
+            "17:30:00",
+            "18:00:00",
+            "18:30:00",
+            "19:00:00"
+          ],
+          "adult_retail": 45.5,
+          "adult_net": 35.49,
+          "child_retail": 31.5,
+          "child_net": 24.57,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "08:00:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG3",
+          "supplier_option_name": "D) QR Ticket , Transfer, Guide",
+          "product_option_id": "14976P115:TG3",
+          "portal_option_id": "r2231813p",
+          "departure_times": [
+            "08:00:00",
+            "08:30:00",
+            "09:00:00",
+            "09:30:00",
+            "10:00:00",
+            "10:30:00",
+            "11:00:00",
+            "11:30:00",
+            "12:00:00",
+            "12:30:00",
+            "13:00:00",
+            "13:30:00",
+            "14:00:00",
+            "14:30:00",
+            "15:00:00",
+            "15:30:00",
+            "16:00:00"
+          ],
+          "adult_retail": 150.0,
+          "adult_net": 117.0,
+          "child_retail": 45.0,
+          "child_net": 35.1,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "C ) QR Ticket with Transfer",
+          "product_option_id": "14976P115:TG2",
+          "portal_option_id": "r2168452p",
+          "departure_times": [
+            "08:00:00",
+            "08:30:00",
+            "09:00:00",
+            "09:30:00",
+            "10:00:00",
+            "10:30:00",
+            "11:00:00",
+            "11:30:00",
+            "12:00:00",
+            "12:30:00",
+            "13:00:00",
+            "13:30:00",
+            "14:00:00",
+            "14:30:00",
+            "15:00:00",
+            "15:30:00",
+            "16:00:00"
+          ],
+          "adult_retail": 83.0,
+          "adult_net": 64.74,
+          "child_retail": 30.0,
+          "child_net": 23.4,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "B ) GEM QR Entry Ticket",
+          "product_option_id": "14976P115:TG1",
+          "portal_option_id": "r2168395p",
+          "departure_times": [
+            "08:00:00",
+            "08:30:00",
+            "09:00:00",
+            "09:30:00",
+            "10:00:00",
+            "10:30:00",
+            "11:00:00",
+            "11:30:00",
+            "12:00:00",
+            "12:30:00",
+            "13:00:00",
+            "13:30:00",
+            "14:00:00",
+            "14:30:00",
+            "15:00:00",
+            "15:30:00",
+            "16:00:00"
+          ],
+          "adult_retail": 52.0,
+          "adult_net": 40.56,
+          "child_retail": 29.0,
+          "child_net": 22.62,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 22.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092082"
+      }
     },
     {
       "supplier_product_code": "14976P114",
-      "supplier_product_name": "Discover Cairo & the Great Pyramids – Full Day From Sharm By Bus",
+      "supplier_product_name": "Discover Cairo, Great Pyramids & Quad Bike - From Sharm By Bus",
       "viator_product_code": "14976P114",
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "SSH",
       "destination_name": "Sharm",
@@ -1944,33 +2861,124 @@
       "pickup_offered": true,
       "private_tour": false,
       "daily_capacity": 15,
-      "cutoff_hours": 24,
+      "cutoff_hours": 5,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P114:BASIC:0030",
-          "adult_retail": 150.0,
-          "adult_net": 112.5,
-          "child_retail": 105.0,
-          "child_net": 78.75,
+          "supplier_option_code": "TG6",
+          "supplier_option_name": "Great Pyramids & Quad Bike",
+          "product_option_id": "14976P114:TG6",
+          "portal_option_id": "r2509723",
+          "departure_times": [
+            "00:30:00"
+          ],
+          "adult_retail": 125.0,
+          "adult_net": 82.5,
+          "child_retail": 85.0,
+          "child_net": 56.1,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "00:30:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG5",
+          "supplier_option_name": "Without Entrance",
+          "product_option_id": "14976P114:TG5",
+          "portal_option_id": "r2459295",
+          "departure_times": [
+            "00:30:00"
+          ],
+          "adult_retail": 80.0,
+          "adult_net": 52.8,
+          "child_retail": 80.0,
+          "child_net": 52.8,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG3",
+          "supplier_option_name": "Pyramids Area& Egyptian Museum",
+          "product_option_id": "14976P114:TG3",
+          "portal_option_id": "r2162970",
+          "departure_times": [
+            "00:30:00"
+          ],
+          "adult_retail": 118.0,
+          "adult_net": 77.88,
+          "child_retail": 75.0,
+          "child_net": 49.5,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Pyramids Area & Grand Museum",
+          "product_option_id": "14976P114:TG1",
+          "portal_option_id": "r2162972",
+          "departure_times": [
+            "00:30:00"
+          ],
+          "adult_retail": 140.0,
+          "adult_net": 92.4,
+          "child_retail": 100.0,
+          "child_net": 66.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 34.0,
+      "max_travelers_per_booking": 15,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1089783"
+      }
     },
     {
       "supplier_product_code": "14976P113",
-      "supplier_product_name": "QR Ticket -Egyptian Civilization Museum, Citadel & Old Cairo Tour",
+      "supplier_product_name": "Private Guided Cairo Tour, Egyptian Museum, Citadel and Old Cairo",
       "viator_product_code": "14976P113",
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "catalog",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "CAI",
       "destination_name": "Cairo",
@@ -1983,33 +2991,82 @@
       "pickup_offered": true,
       "private_tour": true,
       "daily_capacity": 8,
-      "cutoff_hours": 24,
+      "cutoff_hours": 5,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P113:BASIC:0800",
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Transfer & lunch & Guide",
+          "product_option_id": "14976P113:TG1",
+          "portal_option_id": "r2173402",
+          "departure_times": [
+            "08:00:00",
+            "09:00:00",
+            "10:00:00",
+            "11:00:00"
+          ],
           "adult_retail": 200.0,
-          "adult_net": 150.0,
-          "child_retail": 140.0,
-          "child_net": 105.0,
+          "adult_net": 120.0,
+          "child_retail": 50.0,
+          "child_net": 30.0,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "08:00:00"
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40.0,
+      "max_travelers_per_booking": 8,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094248"
+      }
     },
     {
       "supplier_product_code": "14976P112",
-      "supplier_product_name": "Cairo Pyramids Sphinx And Grand Egyptian Museum With Lunch",
+      "supplier_product_name": "Giza Pyramids, Sphinx, and Grand Egyptian Museum from Cairo",
       "viator_product_code": "14976P112",
       "live": true,
       "api_connected": false,
       "pilot": false,
-      "confirmed_on_supplier_portal": false,
-      "title_source": "url",
+      "confirmed_on_supplier_portal": true,
+      "title_source": "portal_manage",
       "country_code": "EG",
       "destination_code": "CAI",
       "destination_name": "Cairo",
@@ -2022,23 +3079,90 @@
       "pickup_offered": true,
       "private_tour": true,
       "daily_capacity": 8,
-      "cutoff_hours": 24,
+      "cutoff_hours": 0,
       "closed_weekdays": [],
       "blockout_dates": [],
       "options": [
         {
-          "supplier_option_code": "BASIC",
-          "supplier_option_name": "Hotel pickup included",
-          "product_option_id": "14976P112:BASIC:0800",
-          "adult_retail": 127.28,
-          "adult_net": 95.46,
-          "child_retail": 89.1,
-          "child_net": 66.82,
+          "supplier_option_code": "TG2",
+          "supplier_option_name": "With Entry Tickets & Lunch",
+          "product_option_id": "14976P112:TG2",
+          "portal_option_id": "r2173286",
+          "departure_times": [
+            "08:00:00",
+            "09:00:00",
+            "10:00:00",
+            "11:00:00"
+          ],
+          "adult_retail": 201.62,
+          "adult_net": 125.0,
+          "child_retail": 80.65,
+          "child_net": 50.0,
           "infant_retail": 0.0,
-          "infant_net": 0.0,
-          "departure_time": "08:00:00"
+          "infant_net": 0.0
+        },
+        {
+          "supplier_option_code": "TG1",
+          "supplier_option_name": "Without Entry Tickets & Lunch",
+          "product_option_id": "14976P112:TG1",
+          "portal_option_id": "r2173287",
+          "departure_times": [
+            "08:00:00",
+            "09:00:00",
+            "10:00:00",
+            "11:00:00"
+          ],
+          "adult_retail": 125.0,
+          "adult_net": 77.5,
+          "child_retail": 50.0,
+          "child_net": 31.0,
+          "infant_retail": 0.0,
+          "infant_net": 0.0
         }
-      ]
+      ],
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 38.0,
+      "max_travelers_per_booking": 8,
+      "ticket_scope": "per_booking",
+      "barcode_from_reservation_system": false,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094216"
+      }
     },
     {
       "supplier_product_code": "14976P110",

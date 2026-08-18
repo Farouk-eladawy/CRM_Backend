@@ -586,7 +586,7 @@ class ViatorSupplierService:
                 return True, "PAST_CUTOFF"
         return False, ""
 
-    def _price_items(self, option: dict) -> list[dict]:
+    def _price_items(self, option: dict, product: Optional[dict] = None) -> list[dict]:
         items = []
         mapping = [
             ("Adult", "adult_retail", "adult_net"),
@@ -595,7 +595,10 @@ class ViatorSupplierService:
             ("Infant", "infant_retail", "infant_net"),
             ("Senior", "senior_retail", "senior_net"),
         ]
+        bands_cfg = (product or {}).get("age_bands") or {}
         for band, retail_key, net_key in mapping:
+            if bands_cfg and (bands_cfg.get(band) or {}).get("enabled") is False:
+                continue
             retail = option.get(retail_key)
             if retail is None and band in ("Youth", "Senior"):
                 continue
@@ -718,8 +721,19 @@ class ViatorSupplierService:
                     "productOptionId": option.get("product_option_id") or "",
                     "Option": [],
                 }
-                if option.get("departure_time"):
+                # TourDepartureTime is a mapping value. Sending it locks the portal
+                # Product Connection UI to start-times mode.
+                start_times_mode = product.get("start_times_mode")
+                if start_times_mode is False:
+                    pass
+                elif option.get("departure_time"):
                     option_body["TourDepartureTime"] = _hhmmss(option.get("departure_time"))
+                languages = option.get("languages") or product.get("languages") or []
+                if product.get("language_as_mapping_value"):
+                    for lang in languages:
+                        text = str(lang or "").strip()
+                        if text:
+                            option_body["Option"].append({"Name": "Language", "Value": text})
                 tour_options.append(option_body)
             tours.append({
                 "SupplierProductCode": product.get("supplier_product_code"),
@@ -753,6 +767,12 @@ class ViatorSupplierService:
             unavail = ""
             mix_ok = {band: True for band in AGE_BANDS}
 
+        bands_cfg = product.get("age_bands") or {}
+        if bands_cfg:
+            for band in AGE_BANDS:
+                if (bands_cfg.get(band) or {}).get("enabled") is False:
+                    mix_ok[band] = False
+
         availability_status: dict[str, Any] = {
             "Status": status,
             "TravellerMixAvailability": mix_ok,
@@ -772,7 +792,7 @@ class ViatorSupplierService:
             "BookingCutoff": {"ProductDateTime": self._cutoff_iso(product, travel_day, option).replace("Z", "")},
             "Price": {
                 "CurrencyCode": self.catalog.currency,
-                "Item": [{"RetailPrice": item["RetailPrice"], "AgeBand": item["AgeBand"]} for item in self._price_items(option)],
+                "Item": [{"RetailPrice": item["RetailPrice"], "AgeBand": item["AgeBand"]} for item in self._price_items(option, product)],
             },
             "Capacity": {
                 "Simple": {

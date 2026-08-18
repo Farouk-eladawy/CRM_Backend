@@ -238,6 +238,32 @@ def load_viator_products() -> dict:
     return data
 
 
+_PRODUCT_BOOL_FIELDS = (
+    "live", "api_connected", "pilot", "pickup_offered", "private_tour",
+    "accelerate_enabled", "barcode_from_reservation_system",
+    "start_times_mode", "language_as_mapping_value", "special_requirements_enabled",
+)
+_PRODUCT_INT_FIELDS = ("daily_capacity", "cutoff_hours", "accelerate_commission_percent")
+_PRODUCT_STR_FIELDS = (
+    "supplier_product_name", "viator_product_code", "tour_description",
+    "location", "destination_code", "destination_name", "country_code",
+    "duration", "meeting_point", "timezone", "confirmation_type",
+    "ticket_scope", "ticket_type", "accelerate_notes",
+)
+_PRODUCT_LIST_FIELDS = (
+    "languages", "closed_weekdays", "blockout_dates", "inclusions",
+    "exclusions", "booking_questions", "translations", "special_offers", "options",
+)
+_PRODUCT_DICT_FIELDS = ("age_bands",)
+
+
+def _as_nonneg_int(value, default=0) -> int:
+    try:
+        return max(0, int(value or 0))
+    except (TypeError, ValueError):
+        return default
+
+
 def save_viator_products(products: list, currency: str = "USD") -> dict:
     path = get_data_path("viator_products.json")
     current = load_viator_products()
@@ -251,21 +277,21 @@ def save_viator_products(products: list, currency: str = "USD") -> dict:
         if not code or code not in by_code:
             continue
         row = by_code[code]
-        for field in ("live", "api_connected", "pilot"):
+        for field in _PRODUCT_BOOL_FIELDS:
             if field in incoming:
                 row[field] = bool(incoming.get(field))
-        if "daily_capacity" in incoming:
-            try:
-                row["daily_capacity"] = max(0, int(incoming.get("daily_capacity") or 0))
-            except (TypeError, ValueError):
-                pass
-        if "cutoff_hours" in incoming:
-            try:
-                row["cutoff_hours"] = max(0, int(incoming.get("cutoff_hours") or 0))
-            except (TypeError, ValueError):
-                pass
-        if incoming.get("supplier_product_name"):
-            row["supplier_product_name"] = str(incoming.get("supplier_product_name"))
+        for field in _PRODUCT_INT_FIELDS:
+            if field in incoming:
+                row[field] = _as_nonneg_int(incoming.get(field), row.get(field) or 0)
+        for field in _PRODUCT_STR_FIELDS:
+            if field in incoming and incoming.get(field) is not None:
+                row[field] = str(incoming.get(field))
+        for field in _PRODUCT_LIST_FIELDS:
+            if field in incoming and isinstance(incoming.get(field), list):
+                row[field] = incoming.get(field)
+        for field in _PRODUCT_DICT_FIELDS:
+            if field in incoming and isinstance(incoming.get(field), dict):
+                row[field] = incoming.get(field)
     current["currency"] = currency or current.get("currency") or "USD"
     updated = []
     for product in current.get("products") or []:

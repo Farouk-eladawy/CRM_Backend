@@ -491,6 +491,51 @@ class AutomationEngine:
         self._mark_sent_from_script_result(ctx, result)
         return True
 
+    def _try_run_local_fts_workflow(self, url: str, body, ctx: dict, output_key: str):
+        """
+        Run local FTS bulk workflows in-process instead of HTTP self-call.
+        Offer Send can take >60s (Meta template fetch + WhatsApp send per record),
+        and the HTTP client used to hard-cap at 60s.
+        """
+        u = str(url or "").strip().lower()
+        local = ("127.0.0.1" in u) or ("localhost" in u)
+        if not local or not isinstance(body, dict) or not self.agent:
+            return False
+
+        runner = None
+        payload_extra = {}
+        if "/api/offer_send_fts/run" in u:
+            from offer_send_fts import run as runner
+        elif "/api/offer_bonus_fts/run" in u:
+            from offer_bonus_fts import run as runner
+        elif "/api/cancelled_recovery_bonus_fts/run" in u:
+            from cancelled_recovery_fts import run as runner
+            payload_extra = {"mode": "bonus"}
+        elif "/api/cancelled_recovery_fts/run" in u:
+            from cancelled_recovery_fts import run as runner
+        else:
+            return False
+
+        rendered_body = {}
+        for k, v in body.items():
+            if isinstance(v, str):
+                rendered_body[k] = _render_template(v, ctx)
+            else:
+                rendered_body[k] = v
+        if payload_extra:
+            rendered_body.update(payload_extra)
+
+        result = runner(self.agent, rendered_body)
+        if not isinstance(result, dict):
+            raise Exception("fts_workflow_invalid_result")
+        if str(result.get("status") or "").lower() == "error":
+            raise Exception(f"fts_workflow_failed:{result.get('message') or 'unknown'}")
+
+        if output_key:
+            ctx.setdefault("vars", {})[output_key] = result
+        self._mark_sent_from_script_result(ctx, result)
+        return True
+
     def _step_http_request(self, step: dict, ctx: dict):
         method = str(step.get("method") or "POST").strip().upper()
         url = _render_template(step.get("url") or "", ctx).strip()
@@ -517,13 +562,15 @@ class AutomationEngine:
         if method == "POST" and isinstance(body, dict):
             if self._try_run_local_automation_script(url, body, ctx, output_key):
                 return
+            if self._try_run_local_fts_workflow(url, body, ctx, output_key):
+                return
 
         timeout_s = step.get("timeout_seconds")
         try:
             timeout_s = float(timeout_s) if timeout_s is not None else 15.0
         except Exception:
             timeout_s = 15.0
-        timeout_s = max(1.0, min(timeout_s, 60.0))
+        timeout_s = max(1.0, min(timeout_s, 300.0))
 
         def _send(**kwargs):
             res = requests.request(method, url, headers=rendered_headers, timeout=timeout_s, **kwargs)

@@ -70,12 +70,25 @@ class BookingPlatformsHelperTests(unittest.TestCase):
                 "live": False,
                 "api_connected": True,
                 "daily_capacity": 9,
+                "pickup_offered": True,
+                "start_times_mode": True,
+                "options": [{
+                    "supplier_option_code": "TG1",
+                    "supplier_option_name": "With lunch",
+                    "departure_time": "04:00:00",
+                    "adult_net": 80,
+                }],
+                "age_bands": {"Adult": {"enabled": True, "min_age": 13, "max_age": 99}},
             }])
         row = saved["products"][0]
         self.assertFalse(row["live"])
         self.assertTrue(row["api_connected"])
         self.assertEqual(row["daily_capacity"], 9)
         self.assertEqual(row["cutoff_hours"], 12)
+        self.assertTrue(row["pickup_offered"])
+        self.assertTrue(row["start_times_mode"])
+        self.assertEqual(row["options"][0]["supplier_option_code"], "TG1")
+        self.assertEqual(row["age_bands"]["Adult"]["min_age"], 13)
 
 
 if __name__ == "__main__":

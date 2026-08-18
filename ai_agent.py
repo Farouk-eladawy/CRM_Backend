@@ -1635,7 +1635,7 @@ class AIAgent:
                             "method": "POST",
                             "url": f"http://127.0.0.1:{port}/api/offer_send_fts/run",
                             "headers": {"content-type": "application/json"},
-                            "timeout_seconds": 60,
+                            "timeout_seconds": 180,
                             "body": dict(offer_send_fts_body),
                         }
                     ]
@@ -1657,6 +1657,13 @@ class AIAgent:
                             and str(body.get("template_sharm") or "").strip()
                         )
                         if has_split and str(body.get("redirect_base") or "").strip():
+                            try:
+                                ts = float(step.get("timeout_seconds") or 0)
+                            except Exception:
+                                ts = 0
+                            if ts < 180:
+                                step["timeout_seconds"] = 180
+                                changed = True
                             continue
                         preserved_dry_run = body.get("dry_run", offer_send_fts_body["dry_run"])
                         new_body = dict(offer_send_fts_body)
@@ -1684,6 +1691,12 @@ class AIAgent:
                             "gift2_product_0", "gift2_product_1",
                         ):
                             step["body"].pop(legacy_key, None)
+                        try:
+                            ts = float(step.get("timeout_seconds") or 0)
+                        except Exception:
+                            ts = 0
+                        if ts < 180:
+                            step["timeout_seconds"] = 180
                         changed = True
                     if changed:
                         offer_send_fts_existing["steps"] = steps

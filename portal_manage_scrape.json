@@ -14,21 +14,58 @@
       "pickup_offered": true,
       "ticket_scope": "per_booking",
       "barcode_from_reservation_system": false,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 10},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
       "portal_connection": {
         "status": "connected_other_rs",
         "external_product_code": "1266499"
       },
       "options": [
-        {"code": "TG2", "name": "Without Nabq Nature Fees", "portal_option_id": "r2521588", "times": "10:30am, 2:30pm, 5:30pm", "adult_retail": 32, "child_retail": 22, "infant_retail": 0},
-        {"code": "TG1", "name": "Swimming & Riding on the Beach", "portal_option_id": "r2521589", "times": "10:30am, 2:30pm, 5:30pm", "adult_retail": 42, "child_retail": 25, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "Without Nabq Nature Fees",
+          "portal_option_id": "r2521588",
+          "times": "10:30am, 2:30pm, 5:30pm",
+          "adult_retail": 32,
+          "child_retail": 22,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Swimming & Riding on the Beach",
+          "portal_option_id": "r2521589",
+          "times": "10:30am, 2:30pm, 5:30pm",
+          "adult_retail": 42,
+          "child_retail": 25,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -41,24 +78,70 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
-        "Child": {"enabled": true, "min_age": 3, "max_age": 9},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 10, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 9
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 10,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
       "portal_connection": {
         "status": "connected_other_rs",
         "external_product_code": "1235725"
       },
       "options": [
-        {"code": "TG4", "name": "Fayoum Summer Offer", "portal_option_id": "r2459442", "times": "7:30am", "adult_retail": 100, "child_retail": 100, "infant_retail": 0},
-        {"code": "TG2", "name": "Valley of the Whales & Safari", "portal_option_id": "r2454998", "times": "7:30am", "adult_retail": 185, "child_retail": 165, "infant_retail": 0},
-        {"code": "TG1", "name": "Wadi El Rayan & Magic Lake", "portal_option_id": "r2454999", "times": "7:30am", "adult_retail": 155, "child_retail": 135, "infant_retail": 0}
+        {
+          "code": "TG4",
+          "name": "Fayoum Summer Offer",
+          "portal_option_id": "r2459442",
+          "times": "7:30am",
+          "adult_retail": 100,
+          "child_retail": 100,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Valley of the Whales & Safari",
+          "portal_option_id": "r2454998",
+          "times": "7:30am",
+          "adult_retail": 185,
+          "child_retail": 165,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Wadi El Rayan & Magic Lake",
+          "portal_option_id": "r2454999",
+          "times": "7:30am",
+          "adult_retail": 155,
+          "child_retail": 135,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -71,19 +154,78 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 5},
-        "Child": {"enabled": true, "min_age": 6, "max_age": 12},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 13, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 5
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 6,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1261499"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1261499"
+      },
       "options": [
-        {"code": "TG5", "name": "Philae Show", "portal_option_id": "r2524570p", "times": "8:00pm", "adult_retail": 28, "child_retail": 16, "infant_retail": 0},
-        {"code": "TG4", "name": "Abu Simbel Show", "portal_option_id": "r2524573p", "times": "8:00pm", "adult_retail": 28, "child_retail": 16, "infant_retail": 0},
-        {"code": "TG3", "name": "Edfu Temple Show", "portal_option_id": "r2524572p", "times": "8:00pm", "adult_retail": 21, "child_retail": 12, "infant_retail": 0},
-        {"code": "TG2", "name": "Karnak show", "portal_option_id": "r2524571p", "times": "8:00pm", "adult_retail": 28, "child_retail": 16, "infant_retail": 0},
-        {"code": "TG1", "name": "Pyramids Sound and Light Show", "portal_option_id": "r2507983p", "times": "7:00pm, 8:00pm", "adult_retail": 32, "child_retail": 20, "infant_retail": 0}
+        {
+          "code": "TG5",
+          "name": "Philae Show",
+          "portal_option_id": "r2524570p",
+          "times": "8:00pm",
+          "adult_retail": 28,
+          "child_retail": 16,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Abu Simbel Show",
+          "portal_option_id": "r2524573p",
+          "times": "8:00pm",
+          "adult_retail": 28,
+          "child_retail": 16,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Edfu Temple Show",
+          "portal_option_id": "r2524572p",
+          "times": "8:00pm",
+          "adult_retail": 21,
+          "child_retail": 12,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Karnak show",
+          "portal_option_id": "r2524571p",
+          "times": "8:00pm",
+          "adult_retail": 28,
+          "child_retail": 16,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Pyramids Sound and Light Show",
+          "portal_option_id": "r2507983p",
+          "times": "7:00pm, 8:00pm",
+          "adult_retail": 32,
+          "child_retail": 20,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -95,19 +237,67 @@
       "commission_rate": 35,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
-        "Child": {"enabled": true, "min_age": 5, "max_age": 9},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 10, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 9
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 10,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1199701"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1199701"
+      },
       "options": [
-        {"code": "TG3", "name": "From El Gouna or Safaga", "portal_option_id": "r2373928", "times": "9:00am, 12:00pm, 3:00pm, 4:00pm", "adult_retail": 76.93, "child_retail": 61.54, "infant_retail": 20},
-        {"code": "TG2", "name": "From Hurghada or Makadi Bay", "portal_option_id": "r2373926", "times": "9:00am, 12:00pm, 3:00pm, 4:00pm", "adult_retail": 72.31, "child_retail": 58.47, "infant_retail": 20},
-        {"code": "TG1", "name": "Beach Dive & Coral Reef Experience", "portal_option_id": "r2373927", "times": "9:00am, 12:00pm, 3:00pm, 4:00pm", "adult_retail": 49.24, "child_retail": 49.24, "infant_retail": 20}
+        {
+          "code": "TG3",
+          "name": "From El Gouna or Safaga",
+          "portal_option_id": "r2373928",
+          "times": "9:00am, 12:00pm, 3:00pm, 4:00pm",
+          "adult_retail": 76.93,
+          "child_retail": 61.54,
+          "infant_retail": 20
+        },
+        {
+          "code": "TG2",
+          "name": "From Hurghada or Makadi Bay",
+          "portal_option_id": "r2373926",
+          "times": "9:00am, 12:00pm, 3:00pm, 4:00pm",
+          "adult_retail": 72.31,
+          "child_retail": 58.47,
+          "infant_retail": 20
+        },
+        {
+          "code": "TG1",
+          "name": "Beach Dive & Coral Reef Experience",
+          "portal_option_id": "r2373927",
+          "times": "9:00am, 12:00pm, 3:00pm, 4:00pm",
+          "adult_retail": 49.24,
+          "child_retail": 49.24,
+          "infant_retail": 20
+        }
       ]
     },
     {
@@ -119,19 +309,67 @@
       "commission_rate": 35,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
-        "Child": {"enabled": true, "min_age": 3, "max_age": 10},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1226434"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1226434"
+      },
       "options": [
-        {"code": "TG3", "name": "Nile Dinner With Jetcar", "portal_option_id": "r2431616", "times": "6:00pm, 8:00pm, 10:30pm", "adult_retail": 50, "child_retail": 30, "infant_retail": 0},
-        {"code": "TG2", "name": "Nile Dinner Including Transfer", "portal_option_id": "r2431615", "times": "6:00pm, 8:00pm, 10:30pm", "adult_retail": 50, "child_retail": 30, "infant_retail": 0},
-        {"code": "TG1", "name": "Nile Dinner Excluding Transfer", "portal_option_id": "r2431617", "times": "6:00pm, 8:00pm, 10:30pm", "adult_retail": 28, "child_retail": 22, "infant_retail": 0}
+        {
+          "code": "TG3",
+          "name": "Nile Dinner With Jetcar",
+          "portal_option_id": "r2431616",
+          "times": "6:00pm, 8:00pm, 10:30pm",
+          "adult_retail": 50,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Nile Dinner Including Transfer",
+          "portal_option_id": "r2431615",
+          "times": "6:00pm, 8:00pm, 10:30pm",
+          "adult_retail": 50,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Nile Dinner Excluding Transfer",
+          "portal_option_id": "r2431617",
+          "times": "6:00pm, 8:00pm, 10:30pm",
+          "adult_retail": 28,
+          "child_retail": 22,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -143,18 +381,58 @@
       "commission_rate": 30,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 1, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1230133"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1230133"
+      },
       "options": [
-        {"code": "TG2", "name": "Full Historical Program", "portal_option_id": "r2441832", "times": "1:30am", "adult_retail": 380, "child_retail": 246, "infant_retail": 0},
-        {"code": "TG1", "name": "Pyramids & GEM + luxury stay", "portal_option_id": "r2441833", "times": "1:30am", "adult_retail": 285, "child_retail": 208, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "Full Historical Program",
+          "portal_option_id": "r2441832",
+          "times": "1:30am",
+          "adult_retail": 380,
+          "child_retail": 246,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Pyramids & GEM + luxury stay",
+          "portal_option_id": "r2441833",
+          "times": "1:30am",
+          "adult_retail": 285,
+          "child_retail": 208,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -167,18 +445,67 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "age_bands": {
-        "Infant": {"enabled": false},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 10},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1162999"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1162999"
+      },
       "options": [
-        {"code": "TG5", "name": "Cairo Pyramids & Sphinx ticket", "portal_option_id": "r2357902", "times": "9:00am, 10:00am", "adult_retail": 30, "child_retail": 15, "infant_retail": 0},
-        {"code": "TG4", "name": "Giza & ATV Ride Included", "portal_option_id": "r2315164", "times": "9:00am, 10:00am", "adult_retail": 140, "child_retail": 50, "infant_retail": 0},
-        {"code": "TG3", "name": "Giza & Camel + ATV Combo", "portal_option_id": "r2311351", "times": "9:00am, 10:00am", "adult_retail": 170, "child_retail": 65, "infant_retail": 0},
-        {"code": "TG2", "name": "Giza & Camel Ride Included", "portal_option_id": "r2311353", "times": "9:00am, 10:00am", "adult_retail": 120, "child_retail": 46, "infant_retail": 0}
+        {
+          "code": "TG5",
+          "name": "Cairo Pyramids & Sphinx ticket",
+          "portal_option_id": "r2357902",
+          "times": "9:00am, 10:00am",
+          "adult_retail": 30,
+          "child_retail": 15,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Giza & ATV Ride Included",
+          "portal_option_id": "r2315164",
+          "times": "9:00am, 10:00am",
+          "adult_retail": 140,
+          "child_retail": 50,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Giza & Camel + ATV Combo",
+          "portal_option_id": "r2311351",
+          "times": "9:00am, 10:00am",
+          "adult_retail": 170,
+          "child_retail": 65,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Giza & Camel Ride Included",
+          "portal_option_id": "r2311353",
+          "times": "9:00am, 10:00am",
+          "adult_retail": 120,
+          "child_retail": 46,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -191,16 +518,51 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
-        "Child": {"enabled": true, "min_age": 5, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1162642"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1162642"
+      },
       "options": [
-        {"code": "TG3", "name": "Full Historical Program", "portal_option_id": "r2419709", "times": "1:30am", "adult_retail": 251.43, "child_retail": 230, "infant_retail": 0},
-        {"code": "TG1", "name": "Pyramids & GEM + luxury stay", "portal_option_id": "r2310562", "times": "1:30am", "adult_retail": 232.36, "child_retail": 200, "infant_retail": 0}
+        {
+          "code": "TG3",
+          "name": "Full Historical Program",
+          "portal_option_id": "r2419709",
+          "times": "1:30am",
+          "adult_retail": 251.43,
+          "child_retail": 230,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Pyramids & GEM + luxury stay",
+          "portal_option_id": "r2310562",
+          "times": "1:30am",
+          "adult_retail": 232.36,
+          "child_retail": 200,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -212,20 +574,76 @@
       "commission_rate": 45,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
-        "Child": {"enabled": true, "min_age": 5, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1207017"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1207017"
+      },
       "options": [
-        {"code": "TG6", "name": "Luxor trip without Tut Tomb", "portal_option_id": "r2514339", "times": "3:30am", "adult_retail": 100, "child_retail": 60, "infant_retail": 0},
-        {"code": "TG5", "name": "Small Group & Tutankhamun Tomb", "portal_option_id": "r2449837", "times": "3:30am", "adult_retail": 136.37, "child_retail": 110, "infant_retail": 0},
-        {"code": "TG4", "name": "Small Group & Ramses V and VI", "portal_option_id": "r2449838", "times": "3:30am", "adult_retail": 110, "child_retail": 85, "infant_retail": 0},
-        {"code": "TG2", "name": "Luxor without Entry Fees", "portal_option_id": "r2389861", "times": "3:30am", "adult_retail": 55, "child_retail": 35, "infant_retail": 0}
+        {
+          "code": "TG6",
+          "name": "Luxor trip without Tut Tomb",
+          "portal_option_id": "r2514339",
+          "times": "3:30am",
+          "adult_retail": 100,
+          "child_retail": 60,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Small Group & Tutankhamun Tomb",
+          "portal_option_id": "r2449837",
+          "times": "3:30am",
+          "adult_retail": 136.37,
+          "child_retail": 110,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Small Group & Ramses V and VI",
+          "portal_option_id": "r2449838",
+          "times": "3:30am",
+          "adult_retail": 110,
+          "child_retail": 85,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Luxor without Entry Fees",
+          "portal_option_id": "r2389861",
+          "times": "3:30am",
+          "adult_retail": 55,
+          "child_retail": 35,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -237,18 +655,58 @@
       "commission_rate": 30,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 4},
-        "Child": {"enabled": true, "min_age": 5, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1156367"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1156367"
+      },
       "options": [
-        {"code": "TG4", "name": "Nunia Aquarena With Transfer", "portal_option_id": "r2505077p", "times": "9:00am", "adult_retail": 200, "child_retail": 200, "infant_retail": 100},
-        {"code": "TG3", "name": "Aquarena Without Transfer", "portal_option_id": "r2505076p", "times": "9:00am", "adult_retail": 180, "child_retail": 180, "infant_retail": 90}
+        {
+          "code": "TG4",
+          "name": "Nunia Aquarena With Transfer",
+          "portal_option_id": "r2505077p",
+          "times": "9:00am",
+          "adult_retail": 200,
+          "child_retail": 200,
+          "infant_retail": 100
+        },
+        {
+          "code": "TG3",
+          "name": "Aquarena Without Transfer",
+          "portal_option_id": "r2505076p",
+          "times": "9:00am",
+          "adult_retail": 180,
+          "child_retail": 180,
+          "infant_retail": 90
+        }
       ]
     },
     {
@@ -261,15 +719,42 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1143933"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1143933"
+      },
       "options": [
-        {"code": "TG1", "name": "Strawberry Picking Experience from Cairo", "portal_option_id": "r2272813", "times": "5:00am", "adult_retail": 210, "child_retail": 145, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "Strawberry Picking Experience from Cairo",
+          "portal_option_id": "r2272813",
+          "times": "5:00am",
+          "adult_retail": 210,
+          "child_retail": 145,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -282,16 +767,51 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
-        "Child": {"enabled": true, "min_age": 3, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1133175"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1133175"
+      },
       "options": [
-        {"code": "TG2", "name": "8-Hour Tour with Hotel Pickup", "portal_option_id": "r2249388", "times": "8:00am", "adult_retail": 120, "child_retail": 45, "infant_retail": 0},
-        {"code": "TG1", "name": "8-Hour Tour with Airport Pickup", "portal_option_id": "r2249389", "times": "8:00am", "adult_retail": 135, "child_retail": 50, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "8-Hour Tour with Hotel Pickup",
+          "portal_option_id": "r2249388",
+          "times": "8:00am",
+          "adult_retail": 120,
+          "child_retail": 45,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "8-Hour Tour with Airport Pickup",
+          "portal_option_id": "r2249389",
+          "times": "8:00am",
+          "adult_retail": 135,
+          "child_retail": 50,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -304,16 +824,51 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1128280"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1128280"
+      },
       "options": [
-        {"code": "TG2", "name": "Basic Snorkeling", "portal_option_id": "r2439335", "times": "8:00am", "adult_retail": 40, "child_retail": 40, "infant_retail": 40},
-        {"code": "TG1", "name": "Full Utopia Island Experience", "portal_option_id": "r2240085", "times": "8:00am, 12:30pm", "adult_retail": 100, "child_retail": 70, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "Basic Snorkeling",
+          "portal_option_id": "r2439335",
+          "times": "8:00am",
+          "adult_retail": 40,
+          "child_retail": 40,
+          "infant_retail": 40
+        },
+        {
+          "code": "TG1",
+          "name": "Full Utopia Island Experience",
+          "portal_option_id": "r2240085",
+          "times": "8:00am, 12:30pm",
+          "adult_retail": 100,
+          "child_retail": 70,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -325,18 +880,54 @@
       "commission_rate": 50,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": false},
-        "Child": {"enabled": false},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 0, "max_age": 120},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": false
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1109673"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1109673"
+      },
       "options": [
-        {"code": "TG2", "name": "Departure", "portal_option_id": "r2204995", "times": "", "adult_retail": 25, "child_retail": 0, "infant_retail": 0},
-        {"code": "TG1", "name": "Arrival", "portal_option_id": "r2204994", "times": "", "adult_retail": 25, "child_retail": 0, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "Departure",
+          "portal_option_id": "r2204995",
+          "times": "",
+          "adult_retail": 25,
+          "child_retail": 0,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Arrival",
+          "portal_option_id": "r2204994",
+          "times": "",
+          "adult_retail": 25,
+          "child_retail": 0,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -349,19 +940,52 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1095747"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1095747"
+      },
       "options": [
-        {"code": "TG1", "name": "DEFAULT", "portal_option_id": "r2176576", "times": "4:30am", "adult_retail": 800, "child_retail": 350, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "DEFAULT",
+          "portal_option_id": "r2176576",
+          "times": "4:30am",
+          "adult_retail": 800,
+          "child_retail": 350,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -373,17 +997,49 @@
       "commission_rate": 28,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094910"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094910"
+      },
       "options": [
-        {"code": "TG1", "name": "Dendera, Osireion & Abydos Full-Day Tour", "portal_option_id": "r2174813", "times": "4:30am", "adult_retail": 280, "child_retail": 80, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "Dendera, Osireion & Abydos Full-Day Tour",
+          "portal_option_id": "r2174813",
+          "times": "4:30am",
+          "adult_retail": 280,
+          "child_retail": 80,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -396,19 +1052,52 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094232"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094232"
+      },
       "options": [
-        {"code": "TG1", "name": "Boat trip with sea Turtles", "portal_option_id": "r2173352", "times": "7:30am", "adult_retail": 65, "child_retail": 45, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "Boat trip with sea Turtles",
+          "portal_option_id": "r2173352",
+          "times": "7:30am",
+          "adult_retail": 65,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -421,19 +1110,52 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094678"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094678"
+      },
       "options": [
-        {"code": "TG1", "name": "Shaab Samadai, Snorkeling Adventure & Coral Reef", "portal_option_id": "r2174300", "times": "7:00am", "adult_retail": 70, "child_retail": 45, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "Shaab Samadai, Snorkeling Adventure & Coral Reef",
+          "portal_option_id": "r2174300",
+          "times": "7:00am",
+          "adult_retail": 70,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -445,20 +1167,76 @@
       "commission_rate": 40,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094495"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094495"
+      },
       "options": [
-        {"code": "TG4", "name": "without Entry Fees", "portal_option_id": "r2174805", "times": "2:30am", "adult_retail": 230, "child_retail": 85, "infant_retail": 0},
-        {"code": "TG3", "name": "Entry Fees & Tutankhamun Tomb", "portal_option_id": "r2173948", "times": "2:30am", "adult_retail": 350, "child_retail": 133.34, "infant_retail": 0},
-        {"code": "TG2", "name": "Private & Entrance Fees", "portal_option_id": "r2173946", "times": "2:30am", "adult_retail": 580, "child_retail": 200, "infant_retail": 0},
-        {"code": "TG1", "name": "Small Group with Entrance Fees", "portal_option_id": "r2173947", "times": "2:30am", "adult_retail": 290, "child_retail": 116.67, "infant_retail": 0}
+        {
+          "code": "TG4",
+          "name": "without Entry Fees",
+          "portal_option_id": "r2174805",
+          "times": "2:30am",
+          "adult_retail": 230,
+          "child_retail": 85,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Entry Fees & Tutankhamun Tomb",
+          "portal_option_id": "r2173948",
+          "times": "2:30am",
+          "adult_retail": 350,
+          "child_retail": 133.34,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Private & Entrance Fees",
+          "portal_option_id": "r2173946",
+          "times": "2:30am",
+          "adult_retail": 580,
+          "child_retail": 200,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Small Group with Entrance Fees",
+          "portal_option_id": "r2173947",
+          "times": "2:30am",
+          "adult_retail": 290,
+          "child_retail": 116.67,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -471,19 +1249,52 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1093166"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1093166"
+      },
       "options": [
-        {"code": "TG1", "name": "City Of Petra Visit", "portal_option_id": "r2170734", "times": "12:30am", "adult_retail": 390, "child_retail": 350, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "City Of Petra Visit",
+          "portal_option_id": "r2170734",
+          "times": "12:30am",
+          "adult_retail": 390,
+          "child_retail": 350,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -495,22 +1306,94 @@
       "commission_rate": 30,
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
-      "booking_questions": [{"question_text": "Full Names", "required": true}],
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092636"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092636"
+      },
       "options": [
-        {"code": "TG6", "name": "Family Buggy - 4 People in 1 B", "portal_option_id": "r2169609", "times": "4:00pm, 5:00pm", "adult_retail": 50, "child_retail": 30, "infant_retail": 0},
-        {"code": "TG5", "name": "Triple Buggy - 3 Person In 1 B", "portal_option_id": "r2169610", "times": "4:00pm, 5:00pm", "adult_retail": 45, "child_retail": 25, "infant_retail": 0},
-        {"code": "TG4", "name": "Double Buggy - 2 People In 1 B", "portal_option_id": "r2169608", "times": "4:00pm, 5:00pm", "adult_retail": 40, "child_retail": 25, "infant_retail": 0},
-        {"code": "TG3", "name": "Single Buggy - 1 Person in 1 B", "portal_option_id": "r2169612", "times": "5:00pm", "adult_retail": 55, "child_retail": 45, "infant_retail": 0},
-        {"code": "TG2", "name": "Single Quad - 1 Person in 1 Q", "portal_option_id": "r2169611", "times": "4:00pm, 5:00pm", "adult_retail": 55, "child_retail": 45, "infant_retail": 0},
-        {"code": "TG1", "name": "Double Quad - 2 People in 1 Q", "portal_option_id": "r2169613", "times": "5:00pm", "adult_retail": 45, "child_retail": 35, "infant_retail": 0}
+        {
+          "code": "TG6",
+          "name": "Family Buggy - 4 People in 1 B",
+          "portal_option_id": "r2169609",
+          "times": "4:00pm, 5:00pm",
+          "adult_retail": 50,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Triple Buggy - 3 Person In 1 B",
+          "portal_option_id": "r2169610",
+          "times": "4:00pm, 5:00pm",
+          "adult_retail": 45,
+          "child_retail": 25,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Double Buggy - 2 People In 1 B",
+          "portal_option_id": "r2169608",
+          "times": "4:00pm, 5:00pm",
+          "adult_retail": 40,
+          "child_retail": 25,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Single Buggy - 1 Person in 1 B",
+          "portal_option_id": "r2169612",
+          "times": "5:00pm",
+          "adult_retail": 55,
+          "child_retail": 45,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Single Quad - 1 Person in 1 Q",
+          "portal_option_id": "r2169611",
+          "times": "4:00pm, 5:00pm",
+          "adult_retail": 55,
+          "child_retail": 45,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Double Quad - 2 People in 1 Q",
+          "portal_option_id": "r2169613",
+          "times": "5:00pm",
+          "adult_retail": 45,
+          "child_retail": 35,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -523,20 +1406,61 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
-        "Child": {"enabled": true, "min_age": 3, "max_age": 7},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 8, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092634"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092634"
+      },
       "options": [
-        {"code": "TG5", "name": "Without Entrance Fees", "portal_option_id": "r2505533", "times": "8:00am", "adult_retail": 15, "child_retail": 15, "infant_retail": 0},
-        {"code": "TG1", "name": "Ras Mohamed Half-Day Tour and Allah's Gate", "portal_option_id": "r2505479", "times": "8:00am", "adult_retail": 28, "child_retail": 20, "infant_retail": 0}
+        {
+          "code": "TG5",
+          "name": "Without Entrance Fees",
+          "portal_option_id": "r2505533",
+          "times": "8:00am",
+          "adult_retail": 15,
+          "child_retail": 15,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Ras Mohamed Half-Day Tour and Allah's Gate",
+          "portal_option_id": "r2505479",
+          "times": "8:00am",
+          "adult_retail": 28,
+          "child_retail": 20,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -549,21 +1473,65 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Dates of Birth", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Dates of Birth",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": false},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 7},
-        "Youth": {"enabled": true, "min_age": 8, "max_age": 11},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 11
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094212"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094212"
+      },
       "options": [
-        {"code": "TG2", "name": "Without Entrance Fees", "portal_option_id": "r2252418", "times": "8:30pm", "adult_retail": 35, "child_retail": 35, "infant_retail": 0},
-        {"code": "TG1", "name": "Mount Sinai and St. Catherine Monastery Tour", "portal_option_id": "r2173281", "times": "8:30pm", "adult_retail": 58, "child_retail": 40, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "Without Entrance Fees",
+          "portal_option_id": "r2252418",
+          "times": "8:30pm",
+          "adult_retail": 35,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Mount Sinai and St. Catherine Monastery Tour",
+          "portal_option_id": "r2173281",
+          "times": "8:30pm",
+          "adult_retail": 58,
+          "child_retail": 40,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -576,21 +1544,75 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 10},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092603"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092603"
+      },
       "options": [
-        {"code": "TG6", "name": "City Tour with Star Fish Meal", "portal_option_id": "r2492951", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 45, "child_retail": 35, "infant_retail": 0},
-        {"code": "TG5", "name": "Old Market & Panorama Cafe", "portal_option_id": "r2492913", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 40, "child_retail": 35, "infant_retail": 0},
-        {"code": "TG4", "name": "MOSQUE & MARKET", "portal_option_id": "r2459294", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 15, "child_retail": 15, "infant_retail": 0},
-        {"code": "TG2", "name": "Mosque, Cathedral & Old Market", "portal_option_id": "r2255242", "times": "1:00pm, 3:00pm, 5:00pm", "adult_retail": 25, "child_retail": 20, "infant_retail": 0}
+        {
+          "code": "TG6",
+          "name": "City Tour with Star Fish Meal",
+          "portal_option_id": "r2492951",
+          "times": "1:00pm, 3:00pm, 5:00pm",
+          "adult_retail": 45,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Old Market & Panorama Cafe",
+          "portal_option_id": "r2492913",
+          "times": "1:00pm, 3:00pm, 5:00pm",
+          "adult_retail": 40,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "MOSQUE & MARKET",
+          "portal_option_id": "r2459294",
+          "times": "1:00pm, 3:00pm, 5:00pm",
+          "adult_retail": 15,
+          "child_retail": 15,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Mosque, Cathedral & Old Market",
+          "portal_option_id": "r2255242",
+          "times": "1:00pm, 3:00pm, 5:00pm",
+          "adult_retail": 25,
+          "child_retail": 20,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -603,22 +1625,77 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": false},
-        "Child": {"enabled": true, "min_age": 0, "max_age": 4},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 5, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1092082"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092082"
+      },
       "options": [
-        {"code": "TG6", "name": "A) QR + English Audio Guide", "portal_option_id": "r2469874p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm, 4:30pm, 5:00pm, 5:30pm, 6:00pm, 6:30pm, 7:00pm", "adult_retail": 45.5, "child_retail": 31.5, "infant_retail": 0},
-        {"code": "TG3", "name": "D) QR Ticket , Transfer, Guide", "portal_option_id": "r2231813p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm", "adult_retail": 150, "child_retail": 45, "infant_retail": 0},
-        {"code": "TG2", "name": "C ) QR Ticket with Transfer", "portal_option_id": "r2168452p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm", "adult_retail": 83, "child_retail": 30, "infant_retail": 0},
-        {"code": "TG1", "name": "B ) GEM QR Entry Ticket", "portal_option_id": "r2168395p", "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm", "adult_retail": 52, "child_retail": 29, "infant_retail": 0}
+        {
+          "code": "TG6",
+          "name": "A) QR + English Audio Guide",
+          "portal_option_id": "r2469874p",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm, 4:30pm, 5:00pm, 5:30pm, 6:00pm, 6:30pm, 7:00pm",
+          "adult_retail": 45.5,
+          "child_retail": 31.5,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "D) QR Ticket , Transfer, Guide",
+          "portal_option_id": "r2231813p",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 150,
+          "child_retail": 45,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "C ) QR Ticket with Transfer",
+          "portal_option_id": "r2168452p",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 83,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "B ) GEM QR Entry Ticket",
+          "portal_option_id": "r2168395p",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 52,
+          "child_retail": 29,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -631,22 +1708,79 @@
       "max_travelers_per_booking": 15,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1089783"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1089783"
+      },
       "options": [
-        {"code": "TG6", "name": "Great Pyramids & Quad Bike", "portal_option_id": "r2509723", "times": "12:30am", "adult_retail": 125, "child_retail": 85, "infant_retail": 0},
-        {"code": "TG5", "name": "Without Entrance", "portal_option_id": "r2459295", "times": "12:30am", "adult_retail": 80, "child_retail": 80, "infant_retail": 0},
-        {"code": "TG3", "name": "Pyramids Area& Egyptian Museum", "portal_option_id": "r2162970", "times": "12:30am", "adult_retail": 118, "child_retail": 75, "infant_retail": 0},
-        {"code": "TG1", "name": "Pyramids Area & Grand Museum", "portal_option_id": "r2162972", "times": "12:30am", "adult_retail": 140, "child_retail": 100, "infant_retail": 0}
+        {
+          "code": "TG6",
+          "name": "Great Pyramids & Quad Bike",
+          "portal_option_id": "r2509723",
+          "times": "12:30am",
+          "adult_retail": 125,
+          "child_retail": 85,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Without Entrance",
+          "portal_option_id": "r2459295",
+          "times": "12:30am",
+          "adult_retail": 80,
+          "child_retail": 80,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Pyramids Area& Egyptian Museum",
+          "portal_option_id": "r2162970",
+          "times": "12:30am",
+          "adult_retail": 118,
+          "child_retail": 75,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Pyramids Area & Grand Museum",
+          "portal_option_id": "r2162972",
+          "times": "12:30am",
+          "adult_retail": 140,
+          "child_retail": 100,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -659,19 +1793,52 @@
       "max_travelers_per_booking": 8,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 2},
-        "Child": {"enabled": true, "min_age": 3, "max_age": 10},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 11, "max_age": 99},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094248"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094248"
+      },
       "options": [
-        {"code": "TG1", "name": "Transfer & lunch & Guide", "portal_option_id": "r2173402", "times": "8:00am, 9:00am, 10:00am, 11:00am", "adult_retail": 200, "child_retail": 50, "infant_retail": 0}
+        {
+          "code": "TG1",
+          "name": "Transfer & lunch & Guide",
+          "portal_option_id": "r2173402",
+          "times": "8:00am, 9:00am, 10:00am, 11:00am",
+          "adult_retail": 200,
+          "child_retail": 50,
+          "infant_retail": 0
+        }
       ]
     },
     {
@@ -684,20 +1851,3492 @@
       "max_travelers_per_booking": 8,
       "pickup_offered": true,
       "booking_questions": [
-        {"question_text": "Full Names", "required": true},
-        {"question_text": "Passport Details", "required": true}
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
       ],
       "age_bands": {
-        "Infant": {"enabled": true, "min_age": 0, "max_age": 3},
-        "Child": {"enabled": true, "min_age": 4, "max_age": 11},
-        "Youth": {"enabled": false},
-        "Adult": {"enabled": true, "min_age": 12, "max_age": 120},
-        "Senior": {"enabled": false}
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 120
+        },
+        "Senior": {
+          "enabled": false
+        }
       },
-      "portal_connection": {"status": "connected_other_rs", "external_product_code": "1094216"},
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094216"
+      },
       "options": [
-        {"code": "TG2", "name": "With Entry Tickets & Lunch", "portal_option_id": "r2173286", "times": "8:00am, 9:00am, 10:00am, 11:00am", "adult_retail": 201.62, "child_retail": 80.65, "infant_retail": 0},
-        {"code": "TG1", "name": "Without Entry Tickets & Lunch", "portal_option_id": "r2173287", "times": "8:00am, 9:00am, 10:00am, 11:00am", "adult_retail": 125, "child_retail": 50, "infant_retail": 0}
+        {
+          "code": "TG2",
+          "name": "With Entry Tickets & Lunch",
+          "portal_option_id": "r2173286",
+          "times": "8:00am, 9:00am, 10:00am, 11:00am",
+          "adult_retail": 201.62,
+          "child_retail": 80.65,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Without Entry Tickets & Lunch",
+          "portal_option_id": "r2173287",
+          "times": "8:00am, 9:00am, 10:00am, 11:00am",
+          "adult_retail": 125,
+          "child_retail": 50,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P110",
+      "title": "Cairo Full-Day Customized Adventure with Free Camel Ride",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 50,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1091805"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "Cairo or Giza: 08-Hour Tour",
+          "portal_option_id": "r2167780",
+          "times": "8:00am, 9:00am, 10:00am, 11:00am, 12:00pm",
+          "adult_retail": 103.18,
+          "child_retail": 55,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P109",
+      "title": "2-Hour Semi-Submarine Tour with Snorkeling from Hurghada",
+      "cutoff_hours": 7,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "997745"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Empire Semi-Submarine Trip",
+          "portal_option_id": "r1959383",
+          "times": "10:00am",
+          "adult_retail": 16,
+          "child_retail": 10,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P108",
+      "title": "Sataya Reefs Dolphin Snorkel Cruise with Lunch - Marsa Alam",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 29
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "996992"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "Dolphin House Reef w/Snorkel",
+          "portal_option_id": "r1939562",
+          "times": "4:30am",
+          "adult_retail": 90,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P107",
+      "title": "Hurghada: Dive Experience for Beginners or Certified Divers",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 29,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Dates of Birth",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1000040"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "Boat trip for Certified Divers",
+          "portal_option_id": "r2175785",
+          "times": "8:00am",
+          "adult_retail": 49.3,
+          "child_retail": 49.3,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Boat Cruise with 2 Intro-dives",
+          "portal_option_id": "r2096047",
+          "times": "8:00am",
+          "adult_retail": 35.22,
+          "child_retail": 35.22,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Boat Cruise with 2 Snorkeling",
+          "portal_option_id": "r2096048",
+          "times": "8:00am",
+          "adult_retail": 21.13,
+          "child_retail": 21.13,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P104",
+      "title": "City Tour & Bazaar with Optional Sand Museum Visit",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 1
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 2,
+          "max_age": 5
+        },
+        "Youth": {
+          "enabled": true,
+          "min_age": 6,
+          "max_age": 16
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 17,
+          "max_age": 64
+        },
+        "Senior": {
+          "enabled": true,
+          "min_age": 65,
+          "max_age": 100
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "992384"
+      },
+      "options": [
+        {
+          "code": "TG7",
+          "name": "Self Guide with transfer",
+          "portal_option_id": "r2392499",
+          "times": "4:00pm",
+          "adult_retail": 8,
+          "child_retail": 0,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Group Sightseeing and Shopping",
+          "portal_option_id": "r2392498",
+          "times": "10:00am, 4:00pm",
+          "adult_retail": 20,
+          "child_retail": 15,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "City Tour & Sand Museum Visit",
+          "portal_option_id": "r1929484",
+          "times": "9:00am, 10:00am, 1:00pm, 2:00pm, 4:00pm",
+          "adult_retail": 30,
+          "child_retail": 20,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P103",
+      "title": "Swim With Dolphins at Dolphin House With Lunch - Hurghada",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "996302"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "Dolphin House hurghada Boat.",
+          "portal_option_id": "r2203445",
+          "times": "8:00am, 8:30am",
+          "adult_retail": 18,
+          "child_retail": 15,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P102",
+      "title": "Sharm 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 38,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1196974"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "3 Pool Snorkelling",
+          "portal_option_id": "r2368663",
+          "times": "8:00am",
+          "adult_retail": 20,
+          "child_retail": 20,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "All Included with Quad Bike",
+          "portal_option_id": "r2368114",
+          "times": "8:00am",
+          "adult_retail": 50,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Tour,Camel ,Red Canyon & Lunch",
+          "portal_option_id": "r2368115",
+          "times": "8:00am",
+          "adult_retail": 35,
+          "child_retail": 25,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P97",
+      "title": "Neverland Aqua Park with Lunch & Transfers from Hurghada",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "914562"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "Hurghada round transfer",
+          "portal_option_id": "r2462256",
+          "times": "9:00am",
+          "adult_retail": 198.58,
+          "child_retail": 99.29,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "entry ticket without transfer",
+          "portal_option_id": "r2462257",
+          "times": "10:00am",
+          "adult_retail": 177.15,
+          "child_retail": 88.58,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P96",
+      "title": "Full-Day Tour to the West and East Banks from Luxor",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1094911"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "without Entrance Fees",
+          "portal_option_id": "r2174814",
+          "times": "8:00am",
+          "adult_retail": 124.62,
+          "child_retail": 38.47,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "with Entrance Fees",
+          "portal_option_id": "r2174815",
+          "times": "8:00am",
+          "adult_retail": 187.7,
+          "child_retail": 69.24,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P92",
+      "title": "Giza Pyramids Skip-the-Line Entry Ticket & Site Access",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 27,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1091313"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "Giza QR With Transfer + Guide",
+          "portal_option_id": "r2286083",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 116.44,
+          "child_retail": 41.1,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Giza Pyramids Complex access",
+          "portal_option_id": "r2243378",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 68.5,
+          "child_retail": 34.25,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Giza Plateau QR Access Ticket",
+          "portal_option_id": "r2166422",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 24,
+          "child_retail": 12,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P90",
+      "title": "Cairo: National Museum of Egyptian Civilization Entry Ticket",
+      "cutoff_hours": 1,
+      "confirmation_type": "instant",
+      "start_times_mode": false,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1090960"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "QR Ticket National Museum",
+          "portal_option_id": "r2244557",
+          "times": "",
+          "adult_retail": 131.67,
+          "child_retail": 48.34,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "QR Ticket with transfer",
+          "portal_option_id": "r2244558",
+          "times": "",
+          "adult_retail": 75,
+          "child_retail": 33.34,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "QR Ticket Without transfer",
+          "portal_option_id": "r2165221",
+          "times": "",
+          "adult_retail": 27,
+          "child_retail": 15,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P88",
+      "title": "Egyptian Museum of Antiquities Online QR Skip the Line Ticket",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "867212"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "QR Tickets + Transfer + Guide",
+          "portal_option_id": "r2179194",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 60,
+          "child_retail": 40,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "QR Ticket with Transfer",
+          "portal_option_id": "r2179193",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 45,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Online QR Skip the Line Ticket",
+          "portal_option_id": "r1669619",
+          "times": "8:00am, 8:30am, 9:00am, 9:30am, 10:00am, 10:30am, 11:00am, 11:30am, 12:00pm, 12:30pm, 1:00pm, 1:30pm, 2:00pm, 2:30pm, 3:00pm, 3:30pm, 4:00pm",
+          "adult_retail": 20,
+          "child_retail": 10,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P86",
+      "title": "Makadi Water World with Lunch & Transfers from Hurghada",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "850550"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Makadi Water Without transfer",
+          "portal_option_id": "r2196666",
+          "times": "10:00am",
+          "adult_retail": 65,
+          "child_retail": 35,
+          "infant_retail": 10
+        },
+        {
+          "code": "TG1",
+          "name": "Makadi Water World with Lunch",
+          "portal_option_id": "r1635639",
+          "times": "9:00am, 11:00am, 3:00pm",
+          "adult_retail": 85,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P85",
+      "title": "Cairo Day Trip Pyramids, Sakkara, & Memphis Tour with Lunch",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 38,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "853377"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Without Entrance Fees & Lunch",
+          "portal_option_id": "r1658695",
+          "times": "9:00am",
+          "adult_retail": 129.04,
+          "child_retail": 48.39,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "With Entrance Fees & Lunch",
+          "portal_option_id": "r1640390",
+          "times": "9:00am",
+          "adult_retail": 177.42,
+          "child_retail": 96.78,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P83",
+      "title": "Stargazing Safari Adventure by Jeep with Bedouin Dinner-Hurghada",
+      "cutoff_hours": 1,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841661"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "Stargazing with Jeep Tour",
+          "portal_option_id": "r1617982",
+          "times": "5:00pm",
+          "adult_retail": 32,
+          "child_retail": 25,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P82",
+      "title": "Hurghada Stargazing Adventure by Jeep and ATV Optional",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841659"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "Stargazing with Quad Ride",
+          "portal_option_id": "r2288385",
+          "times": "2:00pm",
+          "adult_retail": 45.72,
+          "child_retail": 35.72,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Stargazing with Jeep Tour",
+          "portal_option_id": "r1617979",
+          "times": "2:00pm",
+          "adult_retail": 38.58,
+          "child_retail": 28.58,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P81",
+      "title": "Jungle Aqua Park With Lunch & Transfer from Hurghada",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "867211"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "entry ticket without transfer",
+          "portal_option_id": "r2462288",
+          "times": "10:00am",
+          "adult_retail": 177.15,
+          "child_retail": 88.58,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Hurghada round transfer",
+          "portal_option_id": "r2462277",
+          "times": "9:00am",
+          "adult_retail": 198.58,
+          "child_retail": 99.29,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Hurghada round tr",
+          "portal_option_id": "r2258414",
+          "times": "9:00am",
+          "adult_retail": 130,
+          "child_retail": 60,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Jungle Aqua Park",
+          "portal_option_id": "r1669618",
+          "times": "8:30am, 9:00am",
+          "adult_retail": 138.89,
+          "child_retail": 60,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P79",
+      "title": "Orange Bay: Beach & Snorkeling Day With lunch & Transfer",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841656"
+      },
+      "options": [
+        {
+          "code": "TG19",
+          "name": "Basic Snorkeling",
+          "portal_option_id": "r2474829",
+          "times": "8:00am",
+          "adult_retail": 10,
+          "child_retail": 10,
+          "infant_retail": 10
+        },
+        {
+          "code": "TG18",
+          "name": "Full-Day orange Bay",
+          "portal_option_id": "r2229473",
+          "times": "8:00am",
+          "adult_retail": 20,
+          "child_retail": 18,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P78",
+      "title": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841653"
+      },
+      "options": [
+        {
+          "code": "TG6",
+          "name": "Giza Pyramids &Museum Optional",
+          "portal_option_id": "r2281498",
+          "times": "1:30am",
+          "adult_retail": 70,
+          "child_retail": 50,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Grand Egyptian Museum & Giza",
+          "portal_option_id": "r2281493",
+          "times": "1:30am",
+          "adult_retail": 133.85,
+          "child_retail": 100,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Egyptian Museum & Giza Pyramid",
+          "portal_option_id": "r2281494",
+          "times": "1:30am",
+          "adult_retail": 107.7,
+          "child_retail": 84.62,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Without entrance fees",
+          "portal_option_id": "r2283131",
+          "times": "1:30am",
+          "adult_retail": 58,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P77",
+      "title": "7 Days 6 Nights Egypt Travel Holiday Package Included Nile cruise",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        },
+        {
+          "question_text": "Arrival Flight Details",
+          "required": true
+        },
+        {
+          "question_text": "Departure Flight Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841660"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Privat tour-Without Entry Fees",
+          "portal_option_id": "r1617981",
+          "times": "8:00am",
+          "adult_retail": 1800,
+          "child_retail": 500,
+          "infant_retail": 70
+        },
+        {
+          "code": "TG1",
+          "name": "travel Holiday with Entry Fee",
+          "portal_option_id": "r1617980",
+          "times": "8:00am",
+          "adult_retail": 1900,
+          "child_retail": 605.92,
+          "infant_retail": 70
+        }
+      ]
+    },
+    {
+      "code": "14976P74",
+      "title": "Sharm El-Sheikh: Desert Buggy Safari Adventure",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 31,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "839319"
+      },
+      "options": [
+        {
+          "code": "TG6",
+          "name": "Without Transfer",
+          "portal_option_id": "r2459297",
+          "times": "3:00pm",
+          "adult_retail": 25,
+          "child_retail": 25,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Single Buggy - 1 Person in 1 B",
+          "portal_option_id": "r2166864",
+          "times": "3:00pm",
+          "adult_retail": 50,
+          "child_retail": 40,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Double Buggy - 2 People In 1 B",
+          "portal_option_id": "r2166865",
+          "times": "3:00pm",
+          "adult_retail": 45,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Single Quad - 1 Person in 1 Q",
+          "portal_option_id": "r1898388",
+          "times": "3:00pm",
+          "adult_retail": 45,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Dubble Quad - 2 Person In 1 Q",
+          "portal_option_id": "r1613452",
+          "times": "3:00pm",
+          "adult_retail": 40,
+          "child_retail": 30,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P73",
+      "title": "El Gouna Lagoon, Diving with Dolphin, Snorkeling & Lunch",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "846298"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "Diving with Dolphin,snorkeling",
+          "portal_option_id": "r1627746",
+          "times": "8:00am",
+          "adult_retail": 50,
+          "child_retail": 35,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P72",
+      "title": "Half-Day Private Pyramids Tour with Free Camel Ride",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841658"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Guide and car Only",
+          "portal_option_id": "r1617977",
+          "times": "8:00am",
+          "adult_retail": 60,
+          "child_retail": 18,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Pyramids & Sphinx + Free Camel",
+          "portal_option_id": "r1617978",
+          "times": "8:00am",
+          "adult_retail": 85,
+          "child_retail": 25,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P71",
+      "title": "Cairo: Sound and light show with Dinner with Pyramids view",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "844244"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Without entrance fees",
+          "portal_option_id": "r1623225",
+          "times": "8:00am",
+          "adult_retail": 103,
+          "child_retail": 43.15,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P70",
+      "title": "Dahab Snorkeling & Canyon Salama Safari from Sharm Elsheikh",
+      "cutoff_hours": 6,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841654"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "Salama Canyon Visit",
+          "portal_option_id": "r1617970",
+          "times": "7:00am",
+          "adult_retail": 33,
+          "child_retail": 25,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P65",
+      "title": "Cairo : Luxury Nile Topaz Dinner Cruise, Belly Dance & Shows",
+      "cutoff_hours": 2,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 10
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 11,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1091785"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "Nile Dinner without transfer",
+          "portal_option_id": "r2275898",
+          "times": "6:00pm",
+          "adult_retail": 33,
+          "child_retail": 23,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Luxury Topaz With Transfer",
+          "portal_option_id": "r2167740",
+          "times": "6:00pm",
+          "adult_retail": 55,
+          "child_retail": 35,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P61",
+      "title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
+      "cutoff_hours": 6,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 11
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841655"
+      },
+      "options": [
+        {
+          "code": "TG7",
+          "name": "All Excluded",
+          "portal_option_id": "r2459092",
+          "times": "8:00am",
+          "adult_retail": 20,
+          "child_retail": 20,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Without Entrnace Fees-NO Quad",
+          "portal_option_id": "r2378713",
+          "times": "8:00am",
+          "adult_retail": 28,
+          "child_retail": 20,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "WIth Entrance Fees -No Quad",
+          "portal_option_id": "r1763501",
+          "times": "8:00am",
+          "adult_retail": 65,
+          "child_retail": 40,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "ATV Quad & Blue Hole,Abu Galum",
+          "portal_option_id": "r1617971",
+          "times": "8:00am",
+          "adult_retail": 70,
+          "child_retail": 50,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P57",
+      "title": "Canyon Salama Jeep Safari in Sinai Desert and Dahab Snorkeling",
+      "cutoff_hours": 6,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 32,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 7
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 8,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "841662"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Without Entry Fees",
+          "portal_option_id": "r2299625",
+          "times": "7:30am",
+          "adult_retail": 33,
+          "child_retail": 23,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Entrance Fees Included",
+          "portal_option_id": "r1617984",
+          "times": "7:30am",
+          "adult_retail": 60,
+          "child_retail": 40,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P54",
+      "title": "Sharm El-Sheikh: Ghibli Raceway Day Trip",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "837047"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "DEFAULT",
+          "portal_option_id": "r1609378",
+          "times": "3:00pm",
+          "adult_retail": 55,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P53",
+      "title": "Hurghada: ATV Quad or Buggy Adventure Along the Sea & Mountains",
+      "cutoff_hours": 6,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "839318"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "Family - 4 People in 1 Buggy",
+          "portal_option_id": "r2269387",
+          "times": "8:00am",
+          "adult_retail": 95,
+          "child_retail": 0,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Double - 2 People In 1 Buggy",
+          "portal_option_id": "r2269388",
+          "times": "8:00am",
+          "adult_retail": 85,
+          "child_retail": 0,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "ATV Quad and Double Buggy",
+          "portal_option_id": "r1763498",
+          "times": "8:00am",
+          "adult_retail": 25,
+          "child_retail": 20,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P52",
+      "title": "Private Transfer from/to Sharm El Sheikh Airport",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": false,
+      "commission_rate": 50,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "837048"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "Round Airport Transfer",
+          "portal_option_id": "r1609379",
+          "times": "",
+          "adult_retail": 14,
+          "child_retail": 7,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Transfer from Hotel to Airport",
+          "portal_option_id": "r1609380",
+          "times": "",
+          "adult_retail": 28,
+          "child_retail": 8,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Private Transfer from Sharm El Sheikh Airport",
+          "portal_option_id": "r1609381",
+          "times": "",
+          "adult_retail": 28.15,
+          "child_retail": 8,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P51",
+      "title": "Sharm El-Sheikh: Ras Muhammed & White Island By Boat & intro Dive",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "828926"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "Only Snorkling boat trip",
+          "portal_option_id": "r2251820",
+          "times": "8:00am",
+          "adult_retail": 35,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Ras mohamed & White island",
+          "portal_option_id": "r2251801",
+          "times": "8:00am",
+          "adult_retail": 60,
+          "child_retail": 40,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Ras Muhammed & White Island By Boat & intro Dive",
+          "portal_option_id": "r1594145",
+          "times": "8:00am",
+          "adult_retail": 75,
+          "child_retail": 50,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P50",
+      "title": "Sharm El-Sheikh: Ras Mohamed & White Island Snorkeling Trip",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 8
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 9,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "828922"
+      },
+      "options": [
+        {
+          "code": "TG5",
+          "name": "With Entrance Fees (Option 2)",
+          "portal_option_id": "r2167249",
+          "times": "8:00am",
+          "adult_retail": 67,
+          "child_retail": 50,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Without Entrance Fees",
+          "portal_option_id": "r2167250",
+          "times": "8:00am",
+          "adult_retail": 58,
+          "child_retail": 38,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Intro dive & snorkel gear",
+          "portal_option_id": "r2251790",
+          "times": "8:00am",
+          "adult_retail": 75,
+          "child_retail": 60,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "without Park Fees & Transfer",
+          "portal_option_id": "r2232875",
+          "times": "8:00am",
+          "adult_retail": 30,
+          "child_retail": 30,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P49",
+      "title": "Sharm El-Sheikh: Camel Riding, Stargazing, BBQ Dinner & Show",
+      "cutoff_hours": 5,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 36,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 12
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 13,
+          "max_age": 98
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "828927"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "DEFAULT",
+          "portal_option_id": "r1594146",
+          "times": "4:00pm",
+          "adult_retail": 21,
+          "child_retail": 16,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P44",
+      "title": "Sharm El-Sheikh: Ras Mohamed & White Island Snorkeling Trip",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 22,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "828921"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "White Island Snorkeling Day",
+          "portal_option_id": "r1594140",
+          "times": "8:00am",
+          "adult_retail": 52,
+          "child_retail": 42,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P43",
+      "title": "Sharm El-Sheikh: ATV, Camel Ride with BBQ Dinner and Show",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 32,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "828924"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Double Quad - 2 People in 1 Q",
+          "portal_option_id": "r1898935",
+          "times": "3:00pm",
+          "adult_retail": 40,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Single Quad - 1 Person in 1 Q",
+          "portal_option_id": "r1594143",
+          "times": "3:00pm",
+          "adult_retail": 40,
+          "child_retail": 30,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P40",
+      "title": "4-day Private Tour in Cairo",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        },
+        {
+          "question_text": "Arrival Flight Details",
+          "required": true
+        },
+        {
+          "question_text": "Departure Flight Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 80
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "789054"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "4 Days without accomodation",
+          "portal_option_id": "r1504555",
+          "times": "12:00am",
+          "adult_retail": 250,
+          "child_retail": 175,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "4 Days Cairo Short Break tour with accommodation",
+          "portal_option_id": "r1504554",
+          "times": "12:00am",
+          "adult_retail": 430,
+          "child_retail": 214,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P32",
+      "title": "Giza Pyramids with Grand Egyptian Museum and Khan ElKhalili",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 38,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 100
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "1092670"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "DEFAULT",
+          "portal_option_id": "r2169664",
+          "times": "9:00am",
+          "adult_retail": 120,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P24",
+      "title": "Sharm El-Sheikh: Ultimate ATV Quad, Stargazing & BBQ Dinner",
+      "cutoff_hours": 4,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "839320"
+      },
+      "options": [
+        {
+          "code": "TG7",
+          "name": "Without Transfer",
+          "portal_option_id": "r2232883",
+          "times": "1:30pm",
+          "adult_retail": 20,
+          "child_retail": 20,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG6",
+          "name": "Single - 1 People in 1 Buggy",
+          "portal_option_id": "r2182205",
+          "times": "1:30pm",
+          "adult_retail": 55,
+          "child_retail": 50,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG5",
+          "name": "Double - 2 People in 1 Quad",
+          "portal_option_id": "r1926843",
+          "times": "1:30pm",
+          "adult_retail": 38,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG4",
+          "name": "Double - 2 People In 1 Buggy",
+          "portal_option_id": "r1926833",
+          "times": "1:30pm",
+          "adult_retail": 46,
+          "child_retail": 36,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Family - 4 People in 1 Buggy",
+          "portal_option_id": "r1926831",
+          "times": "1:30pm",
+          "adult_retail": 45,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "Single - 1 Person in 1 Quad",
+          "portal_option_id": "r1926832",
+          "times": "1:30pm",
+          "adult_retail": 48,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Triple - 3 Person In 1 Buggy",
+          "portal_option_id": "r1613453",
+          "times": "1:30pm",
+          "adult_retail": 45,
+          "child_retail": 35,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P22",
+      "title": "Hurghada: Desert & Sea Horse Riding Tour w/Optional Swimming",
+      "cutoff_hours": 1,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 4
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 5,
+          "max_age": 9
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 10,
+          "max_age": 90
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "722144"
+      },
+      "options": [
+        {
+          "code": "TG4",
+          "name": "2-H Without transfer and swim",
+          "portal_option_id": "r2197612",
+          "times": "7:00am",
+          "adult_retail": 19,
+          "child_retail": 19,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "2 Hour Horse Ride Without Swim",
+          "portal_option_id": "r1921390",
+          "times": "7:00am",
+          "adult_retail": 35,
+          "child_retail": 35,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG2",
+          "name": "2 Hour Horse Ride With Swim",
+          "portal_option_id": "r1715209",
+          "times": "7:00am",
+          "adult_retail": 42,
+          "child_retail": 42,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "3 Hr Horse Ride & Swim Stop",
+          "portal_option_id": "r1353544",
+          "times": "7:00am",
+          "adult_retail": 50,
+          "child_retail": 50,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P21",
+      "title": "El Gouna Private Half-Day City tour and Lagoon cruise",
+      "cutoff_hours": 2,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 22,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 90
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "748950"
+      },
+      "options": [
+        {
+          "code": "TG1",
+          "name": "Hurghada: Private Sightseeing Tour in El Gouna with Transfer",
+          "portal_option_id": "r1401597",
+          "times": "1:00pm",
+          "adult_retail": 90,
+          "child_retail": 45,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P17",
+      "title": "Eden Island Day Trip with Lunch from Hurghada",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "718536"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Full Day Eden Island",
+          "portal_option_id": "r2397021",
+          "times": "7:30am",
+          "adult_retail": 25,
+          "child_retail": 0,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Full-Day Eden Island",
+          "portal_option_id": "r1347894",
+          "times": "7:30am",
+          "adult_retail": 72,
+          "child_retail": 35,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P7",
+      "title": "From Hurghada Legacy Trip–Explore Cairo’s Pyramids & Grand Museum",
+      "cutoff_hours": 3,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 35,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568655"
+      },
+      "options": [
+        {
+          "code": "TG16",
+          "name": "Grand Museum & The Pyramids",
+          "portal_option_id": "r2459445",
+          "times": "1:30am",
+          "adult_retail": 140,
+          "child_retail": 100,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG15",
+          "name": "Giza Pyramids &Museum Optional",
+          "portal_option_id": "r2459446",
+          "times": "1:30am",
+          "adult_retail": 80,
+          "child_retail": 55,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG14",
+          "name": "Egyptian Museum & The Pyramids",
+          "portal_option_id": "r2459444",
+          "times": "1:30am",
+          "adult_retail": 110,
+          "child_retail": 85,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P1",
+      "title": "Sharm to Cairo Air Tour: Pyramids & Grand Egyptian Museum",
+      "cutoff_hours": 8,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 33,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 1
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 2,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568653"
+      },
+      "options": [
+        {
+          "code": "TG3",
+          "name": "Grand Museum & Pyramids area",
+          "portal_option_id": "r1892588",
+          "times": "4:00am",
+          "adult_retail": 400,
+          "child_retail": 350,
+          "infant_retail": 280
+        },
+        {
+          "code": "TG2",
+          "name": "Egyptian Museum &Pyramids area",
+          "portal_option_id": "r1892587",
+          "times": "4:00am",
+          "adult_retail": 375,
+          "child_retail": 320,
+          "infant_retail": 280
+        },
+        {
+          "code": "TG1",
+          "name": "Without Entrance Fees",
+          "portal_option_id": "r1892586",
+          "times": "4:00am",
+          "adult_retail": 310,
+          "child_retail": 310,
+          "infant_retail": 250
+        }
+      ]
+    },
+    {
+      "code": "14976P11",
+      "title": "Hula Hula Island Boat Trip with Snorkeling & Lunch",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        },
+        {
+          "question_text": "Passport Details",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568656"
+      },
+      "options": [
+        {
+          "code": "TG2",
+          "name": "Without entry fees & Taxes",
+          "portal_option_id": "r2253922",
+          "times": "8:00am",
+          "adult_retail": 10,
+          "child_retail": 0,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "Hula Hula Island with lunch",
+          "portal_option_id": "r2213036",
+          "times": "8:00am",
+          "adult_retail": 30,
+          "child_retail": 24,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P9",
+      "title": "Hurghada: Desert Quad Bike, ATV with BBQ and Transfer",
+      "cutoff_hours": 3,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 0,
+          "max_age": 3
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 4,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568654"
+      },
+      "options": [
+        {
+          "code": "TG6",
+          "name": "Sunset ATV Quad + BBQ Dinner",
+          "portal_option_id": "r2233285",
+          "times": "7:30am",
+          "adult_retail": 42,
+          "child_retail": 32,
+          "infant_retail": 16.67
+        },
+        {
+          "code": "TG5",
+          "name": "3-Hour ATV Quad Tour Sunset",
+          "portal_option_id": "r2233269",
+          "times": "7:30am",
+          "adult_retail": 29,
+          "child_retail": 23,
+          "infant_retail": 8.34
+        },
+        {
+          "code": "TG3",
+          "name": "3-Hour ATV Quad Tour Morning",
+          "portal_option_id": "r1921469",
+          "times": "7:30am",
+          "adult_retail": 29,
+          "child_retail": 23.34,
+          "infant_retail": 8.34
+        }
+      ]
+    },
+    {
+      "code": "14976P4",
+      "title": "Hurghada: 6-Hour Jeep Desert Safari with BBQ Dinner & Show",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 12,
+      "pickup_offered": true,
+      "booking_questions": [],
+      "age_bands": {
+        "Infant": {
+          "enabled": false
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 2,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 65
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568650"
+      },
+      "options": [
+        {
+          "code": "DEFAULT",
+          "name": "ATV Quad, Jeep and Buggy Safari with BBQ Dinner",
+          "portal_option_id": "r1083073",
+          "times": "11:30am",
+          "adult_retail": 30,
+          "child_retail": 20,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P3",
+      "title": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
+      "cutoff_hours": 0,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 40,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 70
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568651"
+      },
+      "options": [
+        {
+          "code": "TG5",
+          "name": "Small Group with Ramses V & V1",
+          "portal_option_id": "r2459005",
+          "times": "3:30am",
+          "adult_retail": 110,
+          "child_retail": 85,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG3",
+          "name": "Luxor with Tutankhamun Tomb",
+          "portal_option_id": "r1715213",
+          "times": "3:30am",
+          "adult_retail": 134,
+          "child_retail": 100,
+          "infant_retail": 0
+        },
+        {
+          "code": "TG1",
+          "name": "without Entrance Fees",
+          "portal_option_id": "r1617985",
+          "times": "3:30am",
+          "adult_retail": 45,
+          "child_retail": 30,
+          "infant_retail": 0
+        },
+        {
+          "code": "DEFAULT",
+          "name": "Luxor Small Group with fees",
+          "portal_option_id": "r1083074",
+          "times": "3:30am",
+          "adult_retail": 105,
+          "child_retail": 85,
+          "infant_retail": 0
+        }
+      ]
+    },
+    {
+      "code": "14976P2",
+      "title": "Fly to Cairo:Explore Pyramids & Optional Tutankhamun’s Mask Visit",
+      "cutoff_hours": 10,
+      "confirmation_type": "instant",
+      "start_times_mode": true,
+      "commission_rate": 30,
+      "max_travelers_per_booking": 15,
+      "pickup_offered": true,
+      "booking_questions": [
+        {
+          "question_text": "Full Names",
+          "required": true
+        }
+      ],
+      "age_bands": {
+        "Infant": {
+          "enabled": true,
+          "min_age": 1,
+          "max_age": 2
+        },
+        "Child": {
+          "enabled": true,
+          "min_age": 3,
+          "max_age": 11
+        },
+        "Youth": {
+          "enabled": false
+        },
+        "Adult": {
+          "enabled": true,
+          "min_age": 12,
+          "max_age": 99
+        },
+        "Senior": {
+          "enabled": false
+        }
+      },
+      "portal_connection": {
+        "status": "connected_other_rs",
+        "external_product_code": "568652"
+      },
+      "options": [
+        {
+          "code": "TG16",
+          "name": "Giza Pyramids &Museum Optional",
+          "portal_option_id": "r2282119",
+          "times": "4:00am",
+          "adult_retail": 267.81,
+          "child_retail": 250,
+          "infant_retail": 200
+        },
+        {
+          "code": "TG15",
+          "name": "Grand Egyptian Museum & Giza",
+          "portal_option_id": "r2282120",
+          "times": "4:00am",
+          "adult_retail": 312.82,
+          "child_retail": 290,
+          "infant_retail": 250
+        },
+        {
+          "code": "TG14",
+          "name": "Egyptian Museum & Giza Pyramid",
+          "portal_option_id": "r2282121",
+          "times": "4:00am",
+          "adult_retail": 290.86,
+          "child_retail": 275,
+          "infant_retail": 200
+        },
+        {
+          "code": "TG9",
+          "name": "Lowest price-excluding taxes",
+          "portal_option_id": "r2189530",
+          "times": "4:00am",
+          "adult_retail": 200,
+          "child_retail": 166.67,
+          "infant_retail": 166.67
+        },
+        {
+          "code": "TG7",
+          "name": "Cairo Full day with Nile Boat",
+          "portal_option_id": "r2171201",
+          "times": "4:00am",
+          "adult_retail": 366.67,
+          "child_retail": 325,
+          "infant_retail": 225
+        }
       ]
     }
   ]

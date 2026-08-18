@@ -439,6 +439,11 @@ def _should_suppress_internal_error_alert(record):
         return True
     if "no module named 'soundfile'" in message_text:
         return True
+    # Transient Airtable gateway timeouts are infrastructure, not app crashes.
+    if "api.airtable.com" in message_text and (
+        "504" in message_text or "gateway time-out" in message_text or "gateway timeout" in message_text
+    ):
+        return True
     return False
 
 
@@ -6706,6 +6711,81 @@ User request:
 
         return list(variants)
 
+    def _is_probable_phone_number(self, value, source=None):
+        """Reject Facebook/Instagram PSIDs and other long IDs that are not phone numbers."""
+        raw = str(value or "").strip()
+        if not raw or "@" in raw:
+            return False
+        digits = re.sub(r"\D", "", raw)
+        n = len(digits)
+        if n < 8 or n > 15:
+            return False
+        src = str(source or "").strip().lower()
+        if src in ("facebook", "instagram", "messenger") and n >= 15 and not raw.startswith("+") and not digits.startswith("00"):
+            return False
+        if n >= 15 and not digits.startswith((
+            "0", "00", "20", "1", "33", "44", "49", "39", "90",
+            "966", "971", "973", "965", "974", "968",
+        )):
+            return False
+        return True
+
+    def _formula_escape_airtable(self, value):
+        return str(value or "").replace("\\", "\\\\").replace("'", "\\'")
+
+    def _build_compact_contact_formula(self, record_id=None, email=None, phone=None, email_fields=None, phone_field=None):
+        """Small indexed/cheap Airtable OR formula. Avoids SCAN-heavy SEARCH per phone variant."""
+        parts = []
+        rec_id = str(record_id or "").strip()
+        if rec_id and re.match(r"^rec[A-Za-z0-9]+$", rec_id):
+            parts.append(f"RECORD_ID()='{self._formula_escape_airtable(rec_id)}'")
+        email_lower = str(email or "").strip().lower()
+        if email_lower and "@" in email_lower:
+            safe_email = self._formula_escape_airtable(email_lower)
+            for field_name in (email_fields or []):
+                if not field_name:
+                    continue
+                parts.append(f"LOWER({{{field_name}}})='{safe_email}'")
+        if phone and phone_field and self._is_probable_phone_number(phone):
+            seen = set()
+            variants = []
+            for variant in self._generate_phone_variants(phone):
+                v = str(variant or "").strip()
+                if not v or v in seen:
+                    continue
+                seen.add(v)
+                variants.append(v)
+            for variant in variants[:6]:
+                parts.append(f"{{{phone_field}}}='{self._formula_escape_airtable(variant)}'")
+            digits = re.sub(r"\D", "", str(phone))
+            needle = digits[-10:] if len(digits) >= 10 else (digits[-9:] if len(digits) >= 9 else digits)
+            if 8 <= len(needle) <= 12:
+                cleaned = (
+                    f"SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({{{phone_field}}}, ' ', ''), '-', ''), '+', '')"
+                )
+                parts.append(f"FIND('{self._formula_escape_airtable(needle)}', {cleaned})")
+        if not parts:
+            return None
+        if len(parts) == 1:
+            return parts[0]
+        return "OR(" + ",".join(parts) + ")"
+
+    def _airtable_all_formula_guarded(self, table, formula, max_records=50):
+        if not table or not formula:
+            return []
+        try:
+            return table.all(formula=formula, max_records=max_records) or []
+        except Exception as e:
+            msg = str(e or "")
+            if "504" in msg or "Time-out" in msg.lower() or "timeout" in msg.lower() or "503" in msg:
+                logging.warning(
+                    "Airtable formula search timed out/unavailable (formula_len=%s): %s",
+                    len(formula or ""),
+                    e,
+                )
+                return []
+            raise
+
     def _normalize_phone_digits(self, phone):
         try:
             return re.sub(r"\D", "", str(phone or ""))
@@ -6814,41 +6894,28 @@ User request:
         if not self.religious_base_id:
             return None
         
-        conditions = []
-        if email:
-            email_lower = email.lower().strip()
-            conditions.append(f"LOWER({{{ReligiousLeadFieldIds.CUSTOMER_EMAIL}}})='{email_lower}'")
-            conditions.append(f"SEARCH('{email_lower}', LOWER({{{ReligiousLeadFieldIds.CUSTOMER_EMAIL}}}))")
-        if phone:
-            phone_variants = self._generate_phone_variants(phone)
-            db_phone_clean = f"SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({{{ReligiousLeadFieldIds.CUSTOMER_PHONE}}}, ' ', ''), '-', ''), '+', '')"
-            for p in phone_variants:
-                conditions.append(f"{{{ReligiousLeadFieldIds.CUSTOMER_PHONE}}}='{p}'")
-                p_clean = p.replace('+', '').replace(' ', '').replace('-', '')
-                if len(p_clean) > 5:
-                     conditions.append(f"SEARCH('{p_clean}', {db_phone_clean})")
-                     if len(p_clean) >= 8:
-                         conditions.append(f"SEARCH('{p_clean[-8:]}', {db_phone_clean})")
-                     elif len(p_clean) >= 6:
-                         conditions.append(f"SEARCH('{p_clean[-6:]}', {db_phone_clean})")
+        lookup_phone = phone if self._is_probable_phone_number(phone) else None
+        formula = self._build_compact_contact_formula(
+            email=email,
+            phone=lookup_phone,
+            email_fields=[ReligiousLeadFieldIds.CUSTOMER_EMAIL],
+            phone_field=ReligiousLeadFieldIds.CUSTOMER_PHONE,
+        )
+        if not formula:
+            return None
         if booking_nr:
             # REMOVED: Searching by Booking Nr. or رقم الجواز globally across all religious tables
             # causes a 422 error because the 'استفسارات جديدة' table does NOT contain these fields.
             # Airtable strictly requires all fields in a formula to exist.
             pass
             
-        if not conditions:
-            return None
-            
-        formula = "OR(" + ",".join(conditions) + ")"
-        
         # Search all religious tables
         all_records = []
         
         # 1. Search main religious tables
         for t_name, t_obj in getattr(self, "religious_tables", {}).items():
             try:
-                records = t_obj.all(formula=formula)
+                records = self._airtable_all_formula_guarded(t_obj, formula, max_records=20)
                 for r in records:
                     r['table_name'] = t_name
                     all_records.append(r)
@@ -6858,7 +6925,7 @@ User request:
         # 2. Search leads table
         if getattr(self, "religious_leads_table", None):
             try:
-                records = self.religious_leads_table.all(formula=formula)
+                records = self._airtable_all_formula_guarded(self.religious_leads_table, formula, max_records=20)
                 leads_name = self.config['airtable']['tables'].get('religious_leads', 'استفسارات جديدة')
                 for r in records:
                     r['table_name'] = leads_name
@@ -32274,10 +32341,18 @@ Write ONE short message only. No JSON. No explanations."""
                 target_table = api.table(target_base_id, target_table_name)
                 
                 # Use sender identifier or contact name to find all bookings
-                email = conv['sender_identifier'] if '@' in conv['sender_identifier'] else None
+                sender_identifier = str(conv['sender_identifier'] or "").strip()
+                try:
+                    source_val = conv['source']
+                except Exception:
+                    source_val = None
+                email = sender_identifier if '@' in sender_identifier else None
                 if email and '<' in email and '>' in email:
                     email = email.split('<')[1].split('>')[0].strip()
-                phone = conv['sender_identifier'] if not email else None
+                phone = sender_identifier if not email else None
+                if phone and not self._is_probable_phone_number(phone, source=source_val):
+                    # Facebook/Instagram PSIDs must not be searched as phone numbers.
+                    phone = None
                 conv_booking_number = None
                 try:
                     conv_booking_number = str(conv.get('booking_number') or "").strip() or None
@@ -32286,63 +32361,58 @@ Write ONE short message only. No JSON. No explanations."""
                         conv_booking_number = str(conv['booking_number'] or "").strip() or None
                     except Exception:
                         conv_booking_number = None
-                
-                # Fetch using the robust function
-                # This returns the primary record, but we want ALL matching records
-                # Let's just do a direct search here to get all of them
-                main_conditions = []
-                
-                if conv['airtable_record_id']:
-                    main_conditions.append(f"RECORD_ID()='{conv['airtable_record_id']}'")
-                
+
                 email_fields = [ReligiousLeadFieldIds.CUSTOMER_EMAIL] if is_religious else ["Customer personal email", "Customer Email"]
                 phone_field = ReligiousLeadFieldIds.CUSTOMER_PHONE if is_religious else "Customer Phone"
-                
-                if email:
-                    email_lower = email.lower().strip()
-                    for e_field in email_fields:
-                        main_conditions.append(f"LOWER({{{e_field}}})='{email_lower}'")
-                        main_conditions.append(f"SEARCH('{email_lower}', LOWER({{{e_field}}}))")
-                
-                if phone:
-                    phone_variants = self._generate_phone_variants(phone)
-                    db_phone_clean = f"SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({{{phone_field}}}, ' ', ''), '-', ''), '+', '')"
-                    for p in phone_variants:
-                        main_conditions.append(f"{{{phone_field}}}='{p}'")
-                        p_clean = p.replace('+', '').replace(' ', '').replace('-', '')
-                        if len(p_clean) > 5:
-                            main_conditions.append(f"SEARCH('{p_clean}', {db_phone_clean})")
-                            if len(p_clean) >= 8:
-                                main_conditions.append(f"SEARCH('{p_clean[-8:]}', {db_phone_clean})")
-                            elif len(p_clean) >= 6:
-                                main_conditions.append(f"SEARCH('{p_clean[-6:]}', {db_phone_clean})")
-                
-                records = []
-                if main_conditions:
-                    formula = "OR(" + ",".join(main_conditions) + ")"
-                    records = target_table.all(formula=formula)
+                record_id = str(conv['airtable_record_id'] or "").strip()
+                records_by_id = {}
 
-                if (not records) and getattr(self, "leads_table", None) and not is_religious:
-                    leads_conditions = []
-                    if email:
-                        email_lower = email.lower().strip()
-                        leads_conditions.append(f"LOWER({{Customer Email}})='{email_lower}'")
-                        leads_conditions.append(f"SEARCH('{email_lower}', LOWER({{Customer Email}}))")
-                    if phone:
-                        phone_variants = self._generate_phone_variants(phone)
-                        db_phone_clean = "SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({Customer Phone}, ' ', ''), '-', ''), '+', '')"
-                        for p in phone_variants:
-                            leads_conditions.append(f"{{Customer Phone}}='{p}'")
-                            p_clean = p.replace('+', '').replace(' ', '').replace('-', '')
-                            if len(p_clean) > 5:
-                                leads_conditions.append(f"SEARCH('{p_clean}', {db_phone_clean})")
-                                if len(p_clean) >= 8:
-                                    leads_conditions.append(f"SEARCH('{p_clean[-8:]}', {db_phone_clean})")
-                                elif len(p_clean) >= 6:
-                                    leads_conditions.append(f"SEARCH('{p_clean[-6:]}', {db_phone_clean})")
-                    if leads_conditions:
-                        formula_leads = "OR(" + ",".join(leads_conditions) + ")"
-                        records = self.leads_table.all(formula=formula_leads)
+                if record_id:
+                    try:
+                        primary_rec = target_table.get(record_id)
+                        if primary_rec:
+                            records_by_id[primary_rec.get('id')] = primary_rec
+                            fields = (primary_rec.get('fields') or {})
+                            if not phone:
+                                rec_phone = fields.get(phone_field)
+                                if self._is_probable_phone_number(rec_phone, source="airtable"):
+                                    phone = rec_phone
+                            if not email:
+                                for e_field in email_fields:
+                                    rec_email = str(fields.get(e_field) or "").strip()
+                                    if rec_email and '@' in rec_email:
+                                        email = rec_email
+                                        break
+                    except Exception as e:
+                        logging.warning("Direct Airtable get(%s) failed: %s", record_id, e)
+
+                sibling_formula = self._build_compact_contact_formula(
+                    record_id=None,
+                    email=email,
+                    phone=phone,
+                    email_fields=email_fields,
+                    phone_field=phone_field,
+                )
+                if sibling_formula:
+                    for rec in self._airtable_all_formula_guarded(target_table, sibling_formula, max_records=50):
+                        rid = rec.get('id')
+                        if rid:
+                            records_by_id[rid] = rec
+
+                if (not records_by_id) and getattr(self, "leads_table", None) and not is_religious:
+                    leads_formula = self._build_compact_contact_formula(
+                        email=email,
+                        phone=phone,
+                        email_fields=["Customer Email"],
+                        phone_field="Customer Phone",
+                    )
+                    if leads_formula:
+                        for rec in self._airtable_all_formula_guarded(self.leads_table, leads_formula, max_records=50):
+                            rid = rec.get('id')
+                            if rid:
+                                records_by_id[rid] = rec
+
+                records = list(records_by_id.values())
                 
                 # Sort records by date descending
                 sorted_records = sorted(records, key=lambda r: r['fields'].get('Date', '0000-00-00'), reverse=True)
@@ -32384,6 +32454,10 @@ Write ONE short message only. No JSON. No explanations."""
                 
                 return jsonify({"status": "success", "data": results}), 200
             except Exception as e:
+                msg = str(e or "")
+                if "504" in msg or "time-out" in msg.lower() or "timeout" in msg.lower():
+                    logging.warning("Airtable timeout in /api/customer_bookings/<chat_id>: %s", e)
+                    return jsonify({"status": "success", "data": []}), 200
                 logging.error(f"Error in /api/customer_bookings/<chat_id>: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 

@@ -658,8 +658,11 @@ def _log_whatsapp(
         if isinstance(wa_meta, dict) and not wa_ok:
             err_body = _clean_str(wa_meta.get("body"))
         header = f"[Sent WhatsApp] Offer Send FTS Template Sent ({template_name})"
-        if err_body == "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY":
-            header = "[Sent WhatsApp] Offer Send FTS BLOCKED — cross-sell Meta template has Cancel Recovery text"
+        if err_body in (
+            "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY",
+            "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED",
+        ):
+            header = "[Sent WhatsApp] Offer Send FTS BLOCKED — gift_bounce2 Meta template misconfigured"
         txt = f"{header}\n{template_text or fallback_text}"
         chat_db.add_message(
             chat_id=chat_id,
@@ -745,9 +748,10 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     offer_status_field = _clean_str(payload.get("offer_status_field")) or "Offer Send Status"
     retry_cooldown_minutes = int(payload.get("retry_cooldown_minutes") or 180)
 
-    # gift_bounce2 body:
-    # {{1}} First Name, {{2}} First Tour, {{3}} Second Tour,
-    # {{4}} City Tour Name, {{5}} Bounce tour + URL CTA + Help Me Choose + Stop Offers
+    # gift_bounce2 body (Meta-corrected 2026-08-18):
+    # {{1}} First Name, {{2}} First Tour (booked), {{3}} Second Tour (offer),
+    # {{4}} complimentary City Tour / Signature. "Bounce tour" is STATIC text in Meta.
+    # CTA: View [redirect] + Help Me Choose + Stop Offers
     # Prefer explicit template_name. Ignore legacy names so old workflow bodies
     # cannot accidentally keep sending gift1/gift_bounce.
     template_name = _clean_str(payload.get("template_name")) or DEFAULT_TEMPLATE_NAME
@@ -939,12 +943,10 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             continue
 
         button_url_params = [_make_redirect_param(btn_full)]
-        # {{4}} City Tour Name and {{5}} Bounce tour both use the route bonus product
-        # (Hurghada City Tour / Sharm Signature) — one complimentary gift in mapping.
-        city_tour_name = bonus_display
-        bounce_tour_name = bonus_display
+        # Exactly 4 body params — Meta keeps "Bounce tour" as fixed wording (not a variable).
+        # {{1}} name, {{2}} booked trip, {{3}} cross-sell offer, {{4}} complimentary bonus.
         structured_vars = {
-            "body": [short_name, booked_display, offer_display, city_tour_name, bounce_tour_name],
+            "body": [short_name, booked_display, offer_display, bonus_display],
             "button_url": button_url_params,
         }
         fallback_text = "\n".join(
@@ -954,9 +956,9 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "",
                 "Complete your trip with a special guest benefit.",
                 f"Book {offer_display} through GetYourGuide within the next 48 hours "
-                f"and receive our {city_tour_name} at no extra cost.",
+                f"and receive our {bonus_display} at no extra cost.",
                 "",
-                f"Once your booking is confirmed, we'll verify it and arrange your complimentary {bounce_tour_name}.",
+                "Once your booking is confirmed, we'll verify it and arrange your complimentary Bounce tour.",
                 "Not sure if this is the right experience for your itinerary? "
                 "Tap Help Me Choose and we'll recommend the best option for you.",
                 "Best regards,",
@@ -985,11 +987,10 @@ def run(agent, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                     "bonus_product_id": bonus_pid,
                     "body_vars": structured_vars["body"],
                     "body_var_map": {
-                        "First_Name": short_name,
-                        "First_Tour": booked_display,
-                        "Second_Tour": offer_display,
-                        "City_Tour_Name": city_tour_name,
-                        "Bounce_tour": bounce_tour_name,
+                        "1_First_Name": short_name,
+                        "2_First_Tour": booked_display,
+                        "3_Second_Tour": offer_display,
+                        "4_Complimentary": bonus_display,
                     },
                     "button_params": button_url_params,
                     "whatsapp_location": wa_location,

@@ -1621,7 +1621,7 @@ class AIAgent:
                     "name": "Offer Send FTS",
                     "description": (
                         "Sends gift_bounce2 WhatsApp cross-sell by Product ID mapping "
-                        "(First Name / First Tour / Second Tour / City Tour / Bounce tour + redirect CTA) "
+                        "({{1}} name / {{2}} booked / {{3}} offer / {{4}} complimentary; Bounce tour is static) "
                         "via redirect.ftstravels.com and logs to dashboard."
                     ),
                     "enabled": False,
@@ -1685,7 +1685,7 @@ class AIAgent:
                         offer_send_fts_existing["steps"] = steps
                         offer_send_fts_existing["description"] = (
                             "Sends gift_bounce2 WhatsApp cross-sell by Product ID mapping "
-                            "(First Name / First Tour / Second Tour / City Tour / Bounce tour + redirect CTA) "
+                            "({{1}} name / {{2}} booked / {{3}} offer / {{4}} complimentary; Bounce tour is static) "
                             "via redirect.ftstravels.com and logs to dashboard."
                         )
                         automation_db.upsert_workflow(offer_send_fts_existing)
@@ -13259,12 +13259,13 @@ Conversation:
             import requests
             logging.info(f"Sending WhatsApp template payload: {json.dumps(payload, indent=2)}")
 
-            # Guard: Offer Send FTS uses gift_bounce2. If Meta body was accidentally
-            # published with Cancel Recovery copy, refuse to send so customers don't
-            # get the wrong campaign (evidence: chat 201090005205 / GYGTESTTEST).
+            # Guard: Offer Send FTS uses gift_bounce2. Refuse send if Meta body is
+            # misconfigured (Cancel Recovery copy, or broken placeholders like
+            # literal "[First Name]" without {{1}} — caused wrong offers to customers).
             try:
                 tmpl_l = str(template_name or "").strip().lower()
                 preview_l = str(actual_template_text or "").strip().lower()
+                preview_raw = str(actual_template_text or "")
                 if tmpl_l in ("gift_bounce2", "gift_bounce", "gift_bounce1", "gift1", "gift2") and preview_l:
                     cancel_markers = (
                         "was cancelled",
@@ -13272,15 +13273,26 @@ Conversation:
                         "rebook the same experience",
                         "special return offer",
                     )
-                    if any(m in preview_l for m in cancel_markers):
+                    broken_placeholder_markers = (
+                        "[first name]",
+                        "[first tour]",
+                        "[second tour]",
+                        "[city tour name]",
+                    )
+                    # Bounce tour is intentionally static text in Meta (with decorative brackets).
+                    missing_positional = "{{1}}" not in preview_raw
+                    if any(m in preview_l for m in cancel_markers) or any(
+                        m in preview_l for m in broken_placeholder_markers
+                    ) or missing_positional:
                         logging.error(
-                            "Refusing WhatsApp send: template '%s' body looks like Cancel Recovery "
-                            "(preview markers found). Fix the Meta template content for gift_bounce2.",
+                            "Refusing WhatsApp send: template '%s' body looks misconfigured "
+                            "(cancel-recovery copy or broken placeholders like [First Name]). "
+                            "Fix Meta gift_bounce2 to use {{1}}..{{4}}.",
                             template_name,
                         )
                         return False, {
                             "status_code": 400,
-                            "body": "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED_AS_CANCEL_RECOVERY",
+                            "body": "GIFT_BOUNCE_TEMPLATE_MISCONFIGURED",
                             "template_name": template_name,
                             "template_text": actual_template_text,
                             "phone_number_id": phone_number_id,

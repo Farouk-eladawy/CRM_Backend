@@ -101184,3 +101184,126 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB01DADA7B437AF45659F"
+    },
+    "keyId": "3EB01DADA7B437AF45659F",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:4880 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-08-18 13:26:20"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786911980,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787084781,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T13:26:22.016Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB025BBC5816925BD3681"
+    },
+    "keyId": "3EB025BBC5816925BD3681",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:8591 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-08-18 13:28:35"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786912115,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787084915,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T13:28:36.869Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0DE2BFA1D7B75E7E19A"
+    },
+    "keyId": "3EB0DE2BFA1D7B75E7E19A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:32387 in api_get_customer_bookings\nLogger: root\nReason: Error in /api/customer_bookings/<chat_id>: 504 Server Error: Gateway Time-out for url: https://api.airtable.com/v0/appzc9rxT8kfD0HMp/%D8%AD%D8%AC%D8%A7%D8%AC%20%D8%AD%D8%AC%20%D9%85%D8%A8%D8%A7%D8%B4%D8%B1?filterByFormula=OR%28RECORD_ID%28%29%3D%27recGzJNdlWJlwR6vp%27%2C%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%3D%2723757821%27%2CSEARCH%28%2723757821%27%2C+SUBSTITUTE%28SUBSTITUTE%28SUBSTITUTE%28%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%2C+%27+%27%2C+%27%27%29%2C+%27-%27%2C+%27%27%29%2C+%27%2B%27%2C+%27%27%29%29%2CSEARCH%28%2723757821%27%2C+SUBSTITUTE%28SUBSTITUTE%28SUBSTITUTE%28%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%2C+%27+%27%2C+%27%27%29%2C+%27-%27%2C+%27%27%29%2C+%27%2B%27%2C+%27%27%29%29%2C%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%3D%27523757821%27%2CSEARCH%28%27523757821%27%2C+SUBSTITUTE%28SUBSTITUTE%28SUBSTITUTE%28%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%2C+%27+%27%2C+%27%27%29%2C+%27-%27%2C+%27%27%29%2C+%27%2B%27%2C+%27%27%29%29%2CSEARCH%28%2723757821%27%2C+SUBSTITUTE%28SUBSTITUTE%28SUBSTITUTE%28%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%2C+%27+%27%2C+%27%27%29%2C+%27-%27%2C+%27%27%29%2C+%27%2B%27%2C+%27%27%29%29%2C%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%3D%2727325679523757821%27%2CSEARCH%28%2727325679523757821%27%2C+SUBSTITUTE%28SUBSTITUTE%28SUBSTITUTE%28%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%86%7D%2C+%27+%27%2C+%27%27%29%2C+%27-%27%2C+%27%27%29%2C+%27%2B%27%2C+%27%27%29%29%2CSEARCH%28%2723757821%27%2C+SUBSTITUTE%28SUBSTITUTE%28SUBSTITUTE%28%7B%D8%B1%D9%82%D9%85+%D8%A7%D9%84%D8%AA%D9%84%D9%8A%D9%81%D9%88%D9%8...\nAt: 2026-08-18 13:46:55"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1786913216,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787086016,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-18T13:46:57.211Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

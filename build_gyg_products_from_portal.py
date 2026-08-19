@@ -110,22 +110,215 @@ def scrape_product_list(page) -> list[dict]:
     return out
 
 
-def expand_sections(page) -> None:
-    for btn in page.locator("button[aria-expanded='false']").all():
+def dismiss_support_chat(page) -> None:
+    """Hide supplier portal support chat iframe that blocks See-all clicks."""
+    try:
+        page.evaluate(
+            """
+            () => {
+                document.querySelectorAll('iframe').forEach((iframe) => {
+                    const r = iframe.getBoundingClientRect();
+                    const src = (iframe.src || '').toLowerCase();
+                    const title = (iframe.title || '').toLowerCase();
+                    if (
+                        (r.width >= 280 && r.height >= 350 && r.right > window.innerWidth - 450) ||
+                        src.includes('support') || src.includes('chat') || src.includes('zendesk') ||
+                        title.includes('support') || title.includes('chat')
+                    ) {
+                        iframe.style.setProperty('display', 'none', 'important');
+                        iframe.style.setProperty('visibility', 'hidden', 'important');
+                        iframe.style.setProperty('pointer-events', 'none', 'important');
+                    }
+                });
+                document.querySelectorAll(
+                    '[class*="launcher"], [id*="launcher"], [class*="ChatWidget"], [id*="chat-widget"]'
+                ).forEach((el) => {
+                    el.style.setProperty('display', 'none', 'important');
+                });
+            }
+            """
+        )
+    except Exception:
+        pass
+
+
+def _click_see_all(page, pattern: str) -> None:
+    dismiss_support_chat(page)
+    regex = re.compile(pattern, re.I)
+    for el in page.get_by_text(regex).all():
         try:
-            if btn.is_visible():
-                btn.click(timeout=800)
-                time.sleep(0.15)
+            if not el.is_visible():
+                continue
+            el.scroll_into_view_if_needed(timeout=1500)
+            dismiss_support_chat(page)
+            clicked = False
+            for xpath in ("ancestor::button[1]", "ancestor::a[1]"):
+                try:
+                    target = el.locator(f"xpath={xpath}")
+                    if target.count() and target.first.is_visible():
+                        target.first.click(timeout=2000)
+                        clicked = True
+                        break
+                except Exception:
+                    pass
+            if not clicked:
+                el.click(timeout=2000)
+            time.sleep(0.35)
         except Exception:
             pass
-    for pattern in (r"^See (more|all)", r"See all \d+"):
-        for el in page.locator(f"text=/{pattern}/i").all():
+
+
+def expand_sections(page) -> None:
+    """Expand accordions, See all/more buttons, and option panels."""
+    dismiss_support_chat(page)
+    try:
+        page.evaluate("window.scrollTo(0, 0)")
+        time.sleep(0.3)
+    except Exception:
+        pass
+
+    for _ in range(2):
+        dismiss_support_chat(page)
+        for pattern in (
+            r"See all \d+ inclusions",
+            r"See all \d+ exclusions",
+            r"See all \d+ highlights",
+            r"See all \d+",
+            r"^See more",
+        ):
+            _click_see_all(page, pattern)
+
+        for btn in page.locator("button[aria-expanded='false']").all():
             try:
-                if el.is_visible():
-                    el.click(timeout=800)
-                    time.sleep(0.15)
+                if btn.is_visible():
+                    dismiss_support_chat(page)
+                    btn.scroll_into_view_if_needed(timeout=800)
+                    btn.click(timeout=1000)
+                    time.sleep(0.2)
             except Exception:
                 pass
+
+        for sp in page.locator("span.p-button-label").all():
+            try:
+                if sp.is_visible() and re.search(r"see (all|more)", sp.inner_text(timeout=300), re.I):
+                    dismiss_support_chat(page)
+                    sp.scroll_into_view_if_needed(timeout=800)
+                    sp.click(timeout=1000)
+                    time.sleep(0.2)
+            except Exception:
+                try:
+                    sp.locator("..").click(timeout=800)
+                except Exception:
+                    pass
+
+        try:
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
+            time.sleep(0.3)
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            time.sleep(0.3)
+        except Exception:
+            pass
+
+
+def _clean_list_item(text: str) -> str:
+    return re.sub(r"^[•\-✘]\s*", "", (text or "").strip())
+
+
+def pick_list_from_page(page, testid: str, label: str) -> list[str]:
+    items: list[str] = []
+    for el in page.locator(f"[data-testid='{testid}'] li").all():
+        txt = _clean_list_item(el.inner_text(timeout=500))
+        if txt:
+            items.append(txt)
+    if items:
+        return items
+    for el in page.locator(f"xpath=//span[contains(text(), '{label}')]/following-sibling::*//li").all():
+        txt = _clean_list_item(el.inner_text(timeout=500))
+        if txt:
+            items.append(txt)
+    return items
+
+
+def extract_options_from_page(page) -> list[dict]:
+    options: list[dict] = []
+    seen: set[str] = set()
+    for label in page.get_by_text("Option ID", exact=True).all():
+        try:
+            card = label.locator("..").locator("..")
+            card_text = card.inner_text(timeout=1500)
+            option: dict[str, str] = {}
+            lines = [ln.strip() for ln in card_text.split("\n")]
+            for idx, line in enumerate(lines):
+                if line == "Title" and idx + 1 < len(lines):
+                    title = lines[idx + 1].strip()
+                    if title.startswith("Option ") or len(title) <= 100:
+                        option["title"] = title.split("\n")[0][:120]
+                elif line == "Reference code" and idx + 1 < len(lines):
+                    option["reference_code"] = lines[idx + 1].strip()
+                elif line == "Option ID" and idx + 1 < len(lines):
+                    option["option_id"] = lines[idx + 1].strip()
+                elif line == "Status" and idx + 1 < len(lines):
+                    option["status"] = lines[idx + 1].strip()
+                elif line == "Type" and idx + 1 < len(lines):
+                    option["type"] = lines[idx + 1].strip()
+            opt_id = option.get("option_id", "")
+            if opt_id and opt_id not in seen:
+                seen.add(opt_id)
+                options.append(option)
+        except Exception:
+            continue
+    return options
+
+
+def _parse_list_section(body_text: str, header: str, stop_headers: tuple[str, ...]) -> list[str]:
+    lines = body_text.split("\n")
+    stop_set = {h.lower() for h in stop_headers}
+    header_lower = header.lower()
+    in_section = False
+    skip = {
+        "edit",
+        "see less",
+        "see all",
+        "see more",
+        "inclusions & exclusions",
+        header_lower,
+    }
+    items: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        low = stripped.lower()
+        if not in_section:
+            if low == header_lower:
+                in_section = True
+            continue
+        if low in stop_set:
+            break
+        if low.startswith("see all ") or low.startswith("see less"):
+            continue
+        txt = _clean_list_item(stripped)
+        if not txt or low in skip or len(txt) < 3:
+            continue
+        items.append(txt)
+    return items
+
+
+def _parse_options_from_body(body_text: str) -> list[dict]:
+    options: list[dict] = []
+    pattern = re.compile(
+        r"Title\s*\n(.+?)\s*\nReference code\s*\n(.+?)\s*\nOption ID\s*\n(\d+)\s*\nStatus\s*\n(Active|Deactivated|Bookable)",
+        re.DOTALL,
+    )
+    for match in pattern.finditer(body_text):
+        title = match.group(1).strip().split("\n")[0][:120]
+        if "Short description" in title or len(match.group(1)) > 120:
+            continue
+        options.append({
+            "title": title,
+            "reference_code": match.group(2).strip().split("\n")[0],
+            "option_id": match.group(3).strip(),
+            "status": match.group(4).strip(),
+        })
+    return options
 
 
 def scrape_product_details(page, tour_id: str) -> dict:
@@ -136,6 +329,10 @@ def scrape_product_details(page, tour_id: str) -> dict:
         timeout=45000,
     )
     time.sleep(1.5)
+    dismiss_support_chat(page)
+    expand_sections(page)
+    time.sleep(0.8)
+    dismiss_support_chat(page)
     expand_sections(page)
     time.sleep(0.5)
 
@@ -150,13 +347,9 @@ def scrape_product_details(page, tour_id: str) -> dict:
         except Exception:
             return ""
 
-    def pick_list(testid: str) -> list[str]:
-        items = []
-        for el in page.locator(f"[data-testid='{testid}'] li").all():
-            txt = el.inner_text(timeout=500).strip()
-            if txt:
-                items.append(re.sub(r"^[•\-]\s*", "", txt))
-        return items
+    def pick_list(testid: str, label: str = "") -> list[str]:
+        label = label or testid.replace("pdp-details-main-information-", "").title()
+        return pick_list_from_page(page, testid, label)
 
     product_id = ""
     m = re.search(r"Product Id:\s*(\d+)", body_text)
@@ -170,8 +363,20 @@ def scrape_product_details(page, tour_id: str) -> dict:
     short_desc = pick_testid("pdp-details-main-information-short-desc")
     full_desc = pick_testid("pdp-details-main-information-full-desc")
     highlights = pick_list("pdp-details-main-information-highlights")
-    inclusions = pick_list("pdp-details-main-information-inclusions")
-    exclusions = pick_list("pdp-details-main-information-exclusions")
+    body_inclusions = _parse_list_section(
+        body_text, "Inclusions", ("Exclusions", "Important information", "Itinerary", "Options")
+    )
+    body_exclusions = _parse_list_section(
+        body_text, "Exclusions", ("Important information", "Itinerary", "Options", "Know before you go")
+    )
+    inclusions = pick_list("pdp-details-main-information-inclusions", "Inclusions")
+    exclusions = pick_list("pdp-details-main-information-exclusions", "Exclusions")
+    if len(body_inclusions) >= len(inclusions):
+        inclusions = body_inclusions
+    if len(body_exclusions) >= len(exclusions):
+        exclusions = body_exclusions
+    inc_lower = {item.lower() for item in inclusions}
+    exclusions = [item for item in exclusions if item.lower() not in inc_lower]
 
     if not short_desc:
         m = re.search(r"Short description\s*\n+(.+?)(?=\n+Full description)", body_text, re.DOTALL)
@@ -182,28 +387,25 @@ def scrape_product_details(page, tour_id: str) -> dict:
         if m:
             full_desc = re.sub(r"\nSee less.*$", "", m.group(1).strip(), flags=re.DOTALL)
 
-    options = []
-    for match in re.finditer(
-        r"Title\s*\n(.+?)\s*\nReference code\s*\n(.+?)\s*\nOption ID\s*\n(\d+)\s*\nStatus\s*\n(Active|Deactivated)",
-        body_text,
-        re.DOTALL,
-    ):
-        options.append({
-            "title": match.group(1).strip(),
-            "reference_code": match.group(2).strip(),
-            "option_id": match.group(3).strip(),
-            "status": match.group(4).strip(),
-        })
+    options = extract_options_from_page(page)
+    if not options:
+        options = _parse_options_from_body(body_text)
 
     pickup = ""
     m = re.search(r"Pickup location:\s*\n(.+?)(?:\n|$)", body_text)
     if m:
         pickup = m.group(1).strip()
+    if not pickup:
+        try:
+            pickup = page.locator("xpath=//div[contains(text(),'Pickup location')]/following-sibling::*").first.inner_text(timeout=1000).strip()
+        except Exception:
+            pass
 
     transportation = ""
     m = re.search(r"Transportation\s*\n+(.+?)(?=\n+Refund policy)", body_text, re.DOTALL)
     if m:
         transportation = m.group(1).replace("\n", ", ").strip()
+    transportation = re.sub(r"^Edit,\s*", "", transportation)
 
     title = ""
     for selector in ("h1", "h3"):

@@ -126,14 +126,26 @@ class BrowserSession:
         return details
 
 
-def pending_products(catalog: list[dict], rescrape_all: bool) -> list[dict]:
+def pending_products(
+    catalog: list[dict],
+    rescrape_all: bool,
+    missing_inclusions_only: bool = False,
+) -> list[dict]:
+    if missing_inclusions_only:
+        return [
+            row for row in catalog
+            if row.get("gyg_tour_id") and len(row.get("inclusions") or []) == 0
+        ]
     return [
         row for row in catalog
         if row.get("gyg_tour_id") and (rescrape_all or not row.get("details_loaded"))
     ]
 
 
-def scrape_until_done(rescrape_all: bool = False) -> None:
+def scrape_until_done(
+    rescrape_all: bool = False,
+    missing_inclusions_only: bool = False,
+) -> None:
     creds = _load_credentials()
     if not creds.get("email"):
         raise RuntimeError("Missing gyg_portal_credentials.json — cannot auto-login.")
@@ -144,21 +156,22 @@ def scrape_until_done(rescrape_all: bool = False) -> None:
 
         try:
             catalog_doc, catalog = load_catalog()
-            if not catalog or rescrape_all:
+            if not catalog:
                 assert session.page is not None
                 catalog = scrape_product_list(session.page)
                 catalog_doc["products"] = catalog
                 save_progress(catalog_doc, catalog)
 
-            while True:
-                catalog_doc, catalog = load_catalog()
-                pending = pending_products(catalog, rescrape_all)
-                if not pending:
-                    break
-
+            pending = pending_products(catalog, rescrape_all, missing_inclusions_only)
+            if not pending:
+                print("Nothing to scrape.")
+            else:
                 total = len(catalog)
-                done = total - len(pending)
-                print(f"\nProgress: {done}/{total} done | {len(pending)} remaining\n")
+                if missing_inclusions_only:
+                    print(f"\nMissing inclusions: {len(pending)} products to enrich\n")
+                else:
+                    done = total - len(pending)
+                    print(f"\nProgress: {done}/{total} done | {len(pending)} remaining\n")
 
                 for row in pending:
                     tour_id = str(row["gyg_tour_id"])
@@ -185,7 +198,7 @@ def scrape_until_done(rescrape_all: bool = False) -> None:
                             session.restart()
                         except Exception as exc:
                             print(f"  Attempt {attempt}: {exc}")
-                            if attempt >= 3 and is_login_page(session.page or session.context.pages[0]):
+                            if attempt >= 3 and session.page and is_login_page(session.page):
                                 session.restart()
                             human_pause(3, 6)
 
@@ -212,8 +225,17 @@ def scrape_until_done(rescrape_all: bool = False) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--all", action="store_true", help="Re-scrape all products")
+    parser.add_argument("--enrich", action="store_true", help="Re-scrape all products to refresh options/inclusions")
+    parser.add_argument(
+        "--missing-inclusions",
+        action="store_true",
+        help="Re-scrape only products with empty inclusions (keeps existing catalog)",
+    )
     args = parser.parse_args()
-    scrape_until_done(rescrape_all=args.all)
+    scrape_until_done(
+        rescrape_all=args.all or args.enrich,
+        missing_inclusions_only=args.missing_inclusions,
+    )
 
 
 if __name__ == "__main__":

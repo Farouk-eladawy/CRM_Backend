@@ -1,0 +1,28 @@
+{
+  "products": [
+    {
+      "gyg_tour_id": "1273778",
+      "reference_code": "T-31032026",
+      "product_title": "Discover Cairo, Great Pyramids & Quad Bike From Sharm By Bus",
+      "short_description": "Experience Cairo from Sharm on a long day trip with a unique photo-focused experience. Visit the Pyramids, capture stunning shots at top viewpoints, and enjoy a Nile ride and local lunch.",
+      "product_description": "Experience Cairo in a different way with this carefully designed day trip from Sharm El Sheikh, combining iconic highlights with a unique photo-focused experience. Travel comfortably by bus to Cairo, where your journey begins at the world-famous Giza Pyramids. Unlike standard tours, this experience is designed to help you capture unforgettable moments, with guided photo stops at the best panoramic viewpoints, including the perfect angles of the pyramids and the Sphinx. Your guide will not only share the history of ancient Egypt but will also assist you in finding the best spots and angles for memorable photos. Whether you are traveling solo, as a couple, or with friends, this experience ensures you leave with stunning memories. Continue your journey with a visit to the Egyptian Museum, home to thousands of ancient artifacts, including treasures of Tutankhamun. Enjoy a local lunch at a carefully selected restaurant before heading to the Nile for a relaxing boat ride, offering a different perspective of Cairo. For those who want an even more premium experience, you can upgrade your tour to include a professional photographer who will capture and edit your best moments at the pyramids.",
+      "highlights": [
+        "Capture stunning photos at the Giza Pyramids viewpoints",
+        "Enjoy guided photo stops with expert local assistance",
+        "Visit the Museums and explore ancient treasures"
+      ],
+      "inclusions": [],
+      "exclusions": [],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Edit, Bus / coach, Van, Car",
+      "options": [
+        {"title": "Option 1 - Egyptian Museum & Giza Pyramids", "reference_code": "default", "option_id": "1948837", "status": "Bookable"},
+        {"title": "Option 2 - The Grand Egyptian Museum (GEM) and Giza Pyramids", "reference_code": "default", "option_id": "1966991", "status": "Bookable"},
+        {"title": "Option 3 - Great Pyramids Visit & Quad Bike Adventure", "reference_code": "default", "option_id": "2163143", "status": "Bookable"}
+      ],
+      "public_url": "https://getyourguide.com/cairo-l92/from-sharm-cairo-by-bus-pyramids-photo-experience-t1273778/",
+      "details_loaded": true,
+      "scraped_at": "2026-08-19T11:56:07.079Z"
+    }
+  ]
+}

@@ -217,6 +217,21 @@
     "products_file": "viator_products.json",
     "async_airtable": true
   },
+  "gyg_supplier": {
+    "enabled": true,
+    "environment": "sandbox",
+    "basic_user": "",
+    "basic_pass": "",
+    "basic_user_sandbox": "",
+    "basic_pass_sandbox": "",
+    "basic_user_production": "",
+    "basic_pass_production": "",
+    "supplier_id": "fts-travels",
+    "currency": "EUR",
+    "ip_allowlist": [],
+    "products_file": "gyg_products.json",
+    "async_airtable": true
+  },
   "facebook_auto_reply_enabled": true,
   "auto_reply_locations": [
     "Hurghada/Cairo",

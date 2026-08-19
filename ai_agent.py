@@ -18668,6 +18668,12 @@ Conversation:
             logging.error(f"Failed to register Viator Supplier API routes: {e}", exc_info=True)
 
         try:
+            from gyg_supplier_api import register_gyg_supplier_routes
+            register_gyg_supplier_routes(app, agent=self)
+        except Exception as e:
+            logging.error(f"Failed to register GetYourGuide Supplier API routes: {e}", exc_info=True)
+
+        try:
             from booking_platforms import register_booking_platforms_routes
             register_booking_platforms_routes(app, agent=self)
         except Exception as e:

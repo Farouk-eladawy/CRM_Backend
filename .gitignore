@@ -3,6 +3,7 @@ headout_browser_data/
 __pycache__/
 .pytest_cache/
 gyg_browser_data/
+gyg_browser_data_edge/
 
 # Databases and Temp DB Files
 *.sqlite
@@ -18,6 +19,7 @@ hourly_data_backup/
 # Secrets and Credentials
 token*.json
 credentials*.json
+gyg_portal_credentials.json
 client_secret_*.json
 railway_vars.json
 google_reviews_token.json

@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 
 from playwright.sync_api import sync_playwright
 
+from gyg_portal_auth import ensure_logged_in, is_login_page
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 LIST_URL = "https://supplier.getyourguide.com/products/list?limit=100"
 STATE_FILE = os.path.join(ROOT, "gyg_auth_state.json")
@@ -321,9 +323,355 @@ def _parse_options_from_body(body_text: str) -> list[dict]:
     return options
 
 
-def scrape_product_details(page, tour_id: str) -> dict:
+def _euro_to_minor(value: str) -> int:
+    try:
+        return int(round(float(value.replace(",", "")) * 100))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _parse_schedule_panel(text: str) -> dict:
+    schedule: dict = {}
+    name_match = re.search(r"^(.*?)(?:Price setup|Participants|Retail price|Date range:|\nEdit\n)", text, re.S)
+    if name_match:
+        schedule["name"] = name_match.group(1).strip()[:120]
+
+    price_match = re.search(
+        r"Retail price\s*(.+?)(?:Minimum participants|Validity|Hide schedule|Weekday|\Z)",
+        text,
+        re.I | re.S,
+    )
+    retail: dict[str, int] = {}
+    if price_match:
+        for cat_match in re.finditer(r"(Infant|Child|Adult|Senior)\s*€([\d.,]+)", price_match.group(1), re.I):
+            retail[cat_match.group(1).upper()] = _euro_to_minor(cat_match.group(2))
+    if not retail:
+        range_match = re.search(r"Pricing:\s*€([\d.,]+)\s*-\s*€([\d.,]+)", text, re.I)
+        if range_match:
+            retail = {
+                "INFANT": _euro_to_minor(range_match.group(1)),
+                "ADULT": _euro_to_minor(range_match.group(2)),
+            }
+    if retail:
+        schedule["retail_prices"] = retail
+
+    participants = re.search(r"Participants\s*(\d+)\s*-\s*(\d+)", text, re.I)
+    if participants:
+        schedule["participants_min"] = int(participants.group(1))
+        schedule["participants_max"] = int(participants.group(2))
+
+    min_booking = re.search(r"Minimum participants per booking\s*(\d+)", text, re.I)
+    if min_booking:
+        schedule["min_participants_per_booking"] = int(min_booking.group(1))
+
+    validity = re.search(r"Validity\s*(.+?)(?:Hide schedule|monday|\Z)", text, re.I | re.S)
+    if not validity:
+        validity = re.search(r"Date range:\s*\n?\s*(.+?)(?:\nParticipants:|\nPricing:|\Z)", text, re.I | re.S)
+    if validity:
+        schedule["validity"] = validity.group(1).strip()[:120]
+
+    departure_times: list[str] = []
+    for day in ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"):
+        day_match = re.search(rf"{day}\s*(\d{{1,2}}:\d{{2}})", text, re.I)
+        if day_match:
+            hh, mm = day_match.group(1).split(":")
+            departure_times.append(f"{int(hh):02d}:{mm}:00")
+    if departure_times:
+        schedule["departure_times"] = sorted(set(departure_times))
+    return schedule
+
+
+def _parse_cutoff_hours(text: str) -> int:
+    match = re.search(r"Cut-off time:\s*\n?\s*(\d+)\s*hours?", text, re.I)
+    if match:
+        return int(match.group(1))
+    return 0
+
+
+def _option_block_for_button(page, button) -> str:
+    try:
+        block = button.locator("xpath=ancestor::div[.//text()[normalize-space()='Option ID']][1]")
+        if block.count():
+            return block.first.inner_text(timeout=2000)
+    except Exception:
+        pass
+    try:
+        return button.locator("xpath=ancestor::div[5]").inner_text(timeout=1500)
+    except Exception:
+        return ""
+
+
+def _extract_option_id(option_text: str) -> str:
+    match = re.search(r"Option ID\s*\n\s*(\d+)", option_text)
+    return match.group(1) if match else ""
+
+
+def _wizard_schedule_open(page) -> bool:
+    try:
+        return bool(
+            page.locator('input[placeholder*="Summer"], input[placeholder*="Weekends"]').count()
+            and page.get_by_role("button", name=re.compile(r"^Save and continue$", re.I)).count()
+        )
+    except Exception:
+        return False
+
+
+def _extract_wizard_schedule(page) -> dict:
+    """Read schedule wizard fields (times, capacity, retail prices)."""
+    schedule: dict = {}
+    try:
+        name_input = page.locator('input[placeholder*="Summer"], input[placeholder*="Weekends"]').first
+        if name_input.count():
+            schedule["name"] = (name_input.input_value(timeout=1500) or "").strip()[:120]
+    except Exception:
+        pass
+
+    times: set[str] = set()
+    try:
+        combo_values: list[str] = []
+        for combo in page.locator('[role="combobox"]').all():
+            try:
+                text = combo.inner_text(timeout=300).strip()
+                if re.fullmatch(r"\d{2}", text):
+                    combo_values.append(text)
+            except Exception:
+                continue
+        for idx in range(0, len(combo_values) - 1, 2):
+            times.add(f"{int(combo_values[idx]):02d}:{combo_values[idx + 1]}:00")
+    except Exception:
+        pass
+    if times:
+        schedule["departure_times"] = sorted(times)
+
+    for _ in range(5):
+        body = page.inner_text("body", timeout=2500)
+        parsed = _parse_schedule_panel(body)
+        for key, val in parsed.items():
+            if val and key not in schedule:
+                schedule[key] = val
+        if schedule.get("retail_prices") and schedule.get("departure_times"):
+            break
+        try:
+            nxt = page.get_by_role("button", name=re.compile(r"^Save and continue$", re.I)).first
+            if not nxt.count() or not nxt.is_visible(timeout=400):
+                break
+            nxt.click(timeout=2000)
+            time.sleep(0.7)
+        except Exception:
+            break
+    return schedule
+
+
+def _open_option_availability(page, option_id: str = "") -> None:
+    dismiss_support_chat(page)
+    if option_id:
+        match = re.search(r"tour_id=(\d+)", page.url or "")
+        if match:
+            target = (
+                f"https://supplier.getyourguide.com/products/details"
+                f"?tour_id={match.group(1)}&optionId={option_id}"
+            )
+            if target not in (page.url or ""):
+                page.goto(target, wait_until="domcontentloaded", timeout=60000)
+                time.sleep(1.0)
+    try:
+        page.locator("text=Options").first.scroll_into_view_if_needed(timeout=3000)
+    except Exception:
+        pass
+    try:
+        avail = page.get_by_role("button", name=re.compile(r"^Availability & Pricing$", re.I)).first
+        if avail.count() and avail.is_visible(timeout=800):
+            avail.click(timeout=2000)
+            time.sleep(0.5)
+    except Exception:
+        pass
+
+
+def _schedule_panel_text(page, hide_btn) -> str:
+    try:
+        return hide_btn.locator("xpath=ancestor::div[3]").inner_text(timeout=2000)
+    except Exception:
+        try:
+            return hide_btn.locator("xpath=ancestor::div[2]").inner_text(timeout=1500)
+        except Exception:
+            return ""
+
+
+def _collect_schedules_in_open_panel(page) -> list[dict]:
+    schedules: list[dict] = []
+    if _wizard_schedule_open(page):
+        parsed = _extract_wizard_schedule(page)
+        if parsed:
+            schedules.append(parsed)
+        return schedules
+
+    for _ in range(12):
+        show_one = page.get_by_role("button", name=re.compile(r"^Show schedule$", re.I)).first
+        try:
+            if not show_one.count():
+                break
+            show_one.scroll_into_view_if_needed(timeout=1500)
+            show_one.click(timeout=2000, force=True)
+            time.sleep(0.6)
+        except Exception:
+            break
+
+        hide_one = page.get_by_role("button", name=re.compile(r"^Hide schedule$", re.I)).first
+        panel_text = ""
+        try:
+            if hide_one.count():
+                panel_text = _schedule_panel_text(page, hide_one)
+        except Exception:
+            panel_text = ""
+        if not panel_text:
+            try:
+                panel_text = page.inner_text("body", timeout=3000)
+            except Exception:
+                panel_text = ""
+        parsed = _parse_schedule_panel(panel_text)
+        if parsed:
+            schedules.append(parsed)
+        try:
+            if hide_one.count():
+                hide_one.click(timeout=1500)
+                time.sleep(0.25)
+        except Exception:
+            pass
+
+    return schedules
+
+
+def extract_schedules_from_page(page, known_option_ids: list[str] | None = None) -> list[dict]:
+    """Expand Show schedules / schedule rows and parse pricing + times."""
+    dismiss_support_chat(page)
+    try:
+        page.locator("text=Options").first.scroll_into_view_if_needed(timeout=3000)
+    except Exception:
+        pass
+    time.sleep(0.4)
+
+    options_out: list[dict] = []
+    option_ids = [oid for oid in (known_option_ids or []) if oid]
+    show_schedules_buttons = page.get_by_role("button", name=re.compile(r"^Show schedules$", re.I)).all()
+
+    if option_ids and len(option_ids) == len(show_schedules_buttons):
+        pairs = list(zip(option_ids, show_schedules_buttons))
+    else:
+        pairs = [( "", btn) for btn in show_schedules_buttons]
+
+    for idx, (option_id_hint, schedules_btn) in enumerate(pairs):
+        try:
+            if not schedules_btn.is_visible():
+                continue
+            option_text = _option_block_for_button(page, schedules_btn)
+            option_id = option_id_hint or _extract_option_id(option_text)
+            cutoff_hours = _parse_cutoff_hours(option_text)
+            dismiss_support_chat(page)
+            if option_id:
+                _open_option_availability(page, option_id)
+            schedules_btn.scroll_into_view_if_needed(timeout=2000)
+            schedules_btn.click(timeout=3000)
+            time.sleep(0.8)
+            try:
+                avail = page.get_by_role("button", name=re.compile(r"^Availability & Pricing$", re.I)).first
+                if avail.count() and avail.is_visible(timeout=500):
+                    avail.click(timeout=1500)
+                    time.sleep(0.5)
+            except Exception:
+                pass
+            schedules = _collect_schedules_in_open_panel(page)
+
+            hide_schedules = page.get_by_role("button", name=re.compile(r"^Hide schedules$", re.I)).first
+            try:
+                if hide_schedules.count() and hide_schedules.is_visible(timeout=500):
+                    hide_schedules.click(timeout=1500)
+                    time.sleep(0.3)
+            except Exception:
+                pass
+
+            if option_id or schedules:
+                options_out.append({
+                    "option_id": option_id or f"option_{idx + 1}",
+                    "cutoff_hours": cutoff_hours,
+                    "schedules": schedules,
+                })
+        except Exception:
+            continue
+    return options_out
+
+
+def _summarize_schedule_data(option_schedules: list[dict]) -> dict:
+    departure_times: set[str] = set()
+    retail_prices: dict[str, int] = {}
+    participants_min = 1
+    participants_max = 15
+    cutoff_hours = 0
+    min_booking = 1
+
+    for option in option_schedules or []:
+        if option.get("cutoff_hours"):
+            cutoff_hours = max(cutoff_hours, int(option["cutoff_hours"]))
+        for schedule in option.get("schedules") or []:
+            for dt in schedule.get("departure_times") or []:
+                departure_times.add(dt)
+            for cat, price in (schedule.get("retail_prices") or {}).items():
+                if cat not in retail_prices or price > retail_prices[cat]:
+                    retail_prices[cat] = price
+            if schedule.get("participants_min") is not None:
+                participants_min = min(participants_min, int(schedule["participants_min"]))
+            if schedule.get("participants_max") is not None:
+                participants_max = max(participants_max, int(schedule["participants_max"]))
+            if schedule.get("min_participants_per_booking") is not None:
+                min_booking = max(min_booking, int(schedule["min_participants_per_booking"]))
+
+    return {
+        "departure_times": sorted(departure_times),
+        "retail_prices": retail_prices,
+        "participants_min": participants_min,
+        "participants_max": participants_max,
+        "min_participants_per_booking": min_booking,
+        "cutoff_hours": cutoff_hours or 2,
+    }
+
+
+def scrape_product_schedules(
+    page,
+    tour_id: str,
+    context=None,
+    creds=None,
+    known_option_ids: list[str] | None = None,
+) -> dict:
     url = f"https://supplier.getyourguide.com/products/details?tour_id={tour_id}"
+    ensure_logged_in(page, context=context, creds=creds)
     page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    if is_login_page(page):
+        ensure_logged_in(page, context=context, creds=creds)
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    page.wait_for_function(
+        "() => document.body && document.body.innerText.includes('Product Id:')",
+        timeout=45000,
+    )
+    time.sleep(1.2)
+    dismiss_support_chat(page)
+    option_schedules = extract_schedules_from_page(page, known_option_ids=known_option_ids)
+    summary = _summarize_schedule_data(option_schedules)
+    has_schedules = any(opt.get("schedules") for opt in option_schedules)
+    return {
+        "gyg_tour_id": tour_id,
+        "option_schedules": option_schedules,
+        "schedule_summary": summary,
+        "schedules_loaded": has_schedules,
+        "schedules_scraped_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def scrape_product_details(page, tour_id: str, context=None, creds=None) -> dict:
+    url = f"https://supplier.getyourguide.com/products/details?tour_id={tour_id}"
+    ensure_logged_in(page, context=context, creds=creds)
+    page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    if is_login_page(page):
+        ensure_logged_in(page, context=context, creds=creds)
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
     page.wait_for_function(
         "() => document.body && document.body.innerText.includes('Product Id:')",
         timeout=45000,
@@ -400,6 +748,25 @@ def scrape_product_details(page, tour_id: str) -> dict:
             pickup = page.locator("xpath=//div[contains(text(),'Pickup location')]/following-sibling::*").first.inner_text(timeout=1000).strip()
         except Exception:
             pass
+    if not pickup:
+        title_for_pickup = ""
+        for selector in ("h1", "h3"):
+            loc = page.locator(selector)
+            for i in range(min(loc.count(), 3)):
+                try:
+                    text = loc.nth(i).inner_text(timeout=1500).strip()
+                    if text and text not in {"Products", "Supply Partner"} and len(text) > 10:
+                        title_for_pickup = text
+                        break
+                except Exception:
+                    continue
+            if title_for_pickup:
+                break
+        if not title_for_pickup:
+            m = re.search(r"Product Reference Code:\s*\S+\s*\n(.+?)(?:\n|$)", body_text)
+            if m:
+                title_for_pickup = m.group(1).strip()
+        pickup = _city_from_title(title_for_pickup, "")
 
     transportation = ""
     m = re.search(r"Transportation\s*\n+(.+?)(?=\n+Refund policy)", body_text, re.DOTALL)
@@ -447,10 +814,9 @@ def build_api_product(row: dict, details: dict) -> dict:
     title = details.get("product_title") or row.get("title") or ""
     city = _city_from_title(title, row.get("public_url") or "")
     product_id = _slug_product_id(title, gyg_id)
-    departure_times = []
-    for opt in details.get("options") or []:
-        # schedules are on a separate modal; default single morning slot unless scraped later
-        pass
+
+    schedule_summary = details.get("schedule_summary") or {}
+    departure_times = list(schedule_summary.get("departure_times") or [])
     if not departure_times:
         lower = title.lower()
         if "luxor" in lower and "hurghada" in lower:
@@ -461,6 +827,49 @@ def build_api_product(row: dict, details: dict) -> dict:
             departure_times = ["00:25:00", "00:40:00"]
         else:
             departure_times = ["08:00:00"]
+
+    retail = schedule_summary.get("retail_prices") or {}
+    participants_min = int(schedule_summary.get("participants_min") or 1)
+    participants_max = int(schedule_summary.get("participants_max") or 15)
+    cutoff_hours = int(schedule_summary.get("cutoff_hours") or 2)
+    min_ticket = int(schedule_summary.get("min_participants_per_booking") or 1)
+    daily_capacity = min(max(participants_max, 15), 500)
+
+    categories = {
+        "ADULT": {
+            "enabled": True,
+            "retail_minor": int(retail.get("ADULT") or 10000),
+            "min_ticket_amount": min_ticket,
+            "max_ticket_amount": daily_capacity,
+            "age_from": 12,
+            "age_to": 99,
+        },
+        "CHILD": {
+            "enabled": "CHILD" in retail or not retail,
+            "retail_minor": int(retail.get("CHILD") or 7500),
+            "min_ticket_amount": 0,
+            "max_ticket_amount": daily_capacity,
+            "age_from": 4,
+            "age_to": 11,
+        },
+        "INFANT": {
+            "enabled": "INFANT" in retail or not retail,
+            "retail_minor": int(retail.get("INFANT") or 0),
+            "min_ticket_amount": 0,
+            "max_ticket_amount": min(5, daily_capacity),
+            "age_from": 0,
+            "age_to": 3,
+        },
+    }
+    if retail.get("SENIOR"):
+        categories["SENIOR"] = {
+            "enabled": True,
+            "retail_minor": int(retail["SENIOR"]),
+            "min_ticket_amount": min_ticket,
+            "max_ticket_amount": daily_capacity,
+            "age_from": 65,
+            "age_to": 99,
+        }
 
     return {
         "product_id": product_id,
@@ -475,6 +884,7 @@ def build_api_product(row: dict, details: dict) -> dict:
         "pickup_location": details.get("pickup_location") or "",
         "transportation": details.get("transportation") or "",
         "options_portal": details.get("options") or [],
+        "option_schedules": details.get("option_schedules") or [],
         "live": str(row.get("status") or "").lower() == "bookable",
         "api_connected": False,
         "pilot": gyg_id in {"1191624", "1303745"},
@@ -485,21 +895,19 @@ def build_api_product(row: dict, details: dict) -> dict:
         "rating": row.get("rating") or "Not rated",
         "public_url": row.get("public_url") or "",
         "supplier_url": row.get("supplier_url") or f"https://supplier.getyourguide.com/products/details?tour_id={gyg_id}",
-        "daily_capacity": 15,
-        "participants_min": 1,
-        "participants_max": 15,
-        "cutoff_hours": 2,
-        "cutoff_seconds": 7200,
+        "daily_capacity": daily_capacity,
+        "participants_min": participants_min,
+        "participants_max": participants_max,
+        "cutoff_hours": cutoff_hours,
+        "cutoff_seconds": cutoff_hours * 3600,
         "closed_weekdays": [],
         "blockout_dates": [],
         "departure_times": departure_times,
-        "categories": {
-            "ADULT": {"enabled": True, "retail_minor": 10000, "min_ticket_amount": 1, "max_ticket_amount": 15, "age_from": 12, "age_to": 99},
-            "CHILD": {"enabled": True, "retail_minor": 7500, "min_ticket_amount": 0, "max_ticket_amount": 15, "age_from": 4, "age_to": 11},
-            "INFANT": {"enabled": True, "retail_minor": 0, "min_ticket_amount": 0, "max_ticket_amount": 5, "age_from": 0, "age_to": 3},
-        },
+        "categories": categories,
         "details_loaded": True,
+        "schedules_loaded": bool(details.get("schedules_loaded")),
         "scraped_at": details.get("scraped_at"),
+        "schedules_scraped_at": details.get("schedules_scraped_at"),
     }
 
 

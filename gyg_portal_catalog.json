@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-08-19T13:13:03.301068+00:00",
+  "scraped_at": "2026-08-19T14:12:33.550542+00:00",
   "source": "https://supplier.getyourguide.com/products/list?limit=100",
   "count": 22,
   "products": [
@@ -52,7 +52,18 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:04:11.428769+00:00"
+      "scraped_at": "2026-08-19T13:04:11.428769+00:00",
+      "option_schedules": [],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": false,
+      "schedules_scraped_at": "2026-08-19T14:11:25.081964+00:00"
     },
     {
       "title": "Cairo: Private Guided Tour to Your Chosen Attraction",
@@ -97,7 +108,18 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:04:57.512910+00:00"
+      "scraped_at": "2026-08-19T13:04:57.512910+00:00",
+      "option_schedules": [],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": false,
+      "schedules_scraped_at": "2026-08-19T14:11:41.964338+00:00"
     },
     {
       "title": "Luxor: Private Customizable Tour with Egyptologist Guide",
@@ -151,7 +173,18 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:05:17.797163+00:00"
+      "scraped_at": "2026-08-19T13:05:17.797163+00:00",
+      "option_schedules": [],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": false,
+      "schedules_scraped_at": "2026-08-19T14:12:08.144071+00:00"
     },
     {
       "title": "Private Customizable Day Tour to Alexandria from Cairo",
@@ -184,7 +217,7 @@
         "Personal expenses and tips",
         "Additional stops or activities not listed in the main itinerary"
       ],
-      "pickup_location": "",
+      "pickup_location": "Cairo",
       "transportation": "Car, Van",
       "options": [
         {
@@ -203,7 +236,18 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:05:38.768325+00:00"
+      "scraped_at": "2026-08-19T13:05:38.768325+00:00",
+      "option_schedules": [],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": false,
+      "schedules_scraped_at": "2026-08-19T14:12:33.549549+00:00"
     },
     {
       "title": "Mount Moses, St. Catherine Monastery & Stargazing Adventure",
@@ -253,7 +297,24 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:05:58.507968+00:00"
+      "scraped_at": "2026-08-19T13:05:58.507968+00:00",
+      "option_schedules": [
+        {
+          "option_id": "2199990",
+          "cutoff_hours": 4,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 4
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:53:05.954643+00:00"
     },
     {
       "title": "From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake",
@@ -315,7 +376,29 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:06:19.163482+00:00"
+      "scraped_at": "2026-08-19T13:06:19.163482+00:00",
+      "option_schedules": [
+        {
+          "option_id": "2078284",
+          "cutoff_hours": 0,
+          "schedules": []
+        },
+        {
+          "option_id": "2078571",
+          "cutoff_hours": 6,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 6
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:53:16.700442+00:00"
     },
     {
       "title": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
@@ -383,7 +466,39 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:06:43.173552+00:00"
+      "scraped_at": "2026-08-19T13:06:43.173552+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1828226",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1828292",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2089103",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2163134",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:53:30.078833+00:00"
     },
     {
       "title": "Hurghada: Cairo Day Trip with Pyramids, Museum & Quad Bike",
@@ -454,7 +569,39 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:07:05.735009+00:00"
+      "scraped_at": "2026-08-19T13:07:05.735009+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1835566",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "1835585",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "1835653",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2018631",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 4
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:53:43.611685+00:00"
     },
     {
       "title": "Hurghada: City Tour & Bazaar with Optional Sand Museum Visit",
@@ -515,7 +662,34 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:07:25.642580+00:00"
+      "scraped_at": "2026-08-19T13:07:25.642580+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1956482",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1960009",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1960020",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:53:55.861611+00:00"
     },
     {
       "title": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
@@ -577,7 +751,34 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:07:47.789245+00:00"
+      "scraped_at": "2026-08-19T13:07:47.789245+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1836231",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1836308",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1836310",
+          "cutoff_hours": 0,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:54:07.265749+00:00"
     },
     {
       "title": "Discover Cairo, Great Pyramids & Quad Bike From Sharm By Bus",
@@ -642,7 +843,34 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:08:08.366968+00:00"
+      "scraped_at": "2026-08-19T13:08:08.366968+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1948837",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "1966991",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "2163143",
+          "cutoff_hours": 4,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 4
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:54:20.111597+00:00"
     },
     {
       "title": "Hurghada: Luxor Karnak, Hatshepsut & the Valley of the Kings",
@@ -708,7 +936,34 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:08:31.079188+00:00"
+      "scraped_at": "2026-08-19T13:08:31.079188+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1992492",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2007649",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2096120",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:54:33.420107+00:00"
     },
     {
       "title": "Luxor to Cairo: 2Day with Sleeper Train & Pyramids View Stay",
@@ -747,7 +1002,7 @@
         "Personal expenses & shopping",
         "Tips for the guide and driver"
       ],
-      "pickup_location": "",
+      "pickup_location": "Luxor",
       "transportation": "Train, Van, Car",
       "options": [
         {
@@ -766,7 +1021,29 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:08:55.058328+00:00"
+      "scraped_at": "2026-08-19T13:08:55.058328+00:00",
+      "option_schedules": [
+        {
+          "option_id": "2078262",
+          "cutoff_hours": 0,
+          "schedules": []
+        },
+        {
+          "option_id": "2078274",
+          "cutoff_hours": 0,
+          "schedules": []
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [],
+        "retail_prices": {},
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-19T13:54:43.952909+00:00"
     },
     {
       "title": "Marsa Alam : Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -803,7 +1080,7 @@
         "Personal expenses & shopping",
         "Tips for guide and driver"
       ],
-      "pickup_location": "",
+      "pickup_location": "Marsa Alam",
       "transportation": "Van, Bus / coach",
       "options": [
         {
@@ -868,7 +1145,7 @@
         "Tips for the guide and driver",
         "Additional entrance fees not mentioned"
       ],
-      "pickup_location": "",
+      "pickup_location": "Sharm El Sheikh",
       "transportation": "Van, Bus / coach, Car",
       "options": [
         {
@@ -926,7 +1203,7 @@
         "Personal expenses & shopping",
         "Tips for guide and driver"
       ],
-      "pickup_location": "",
+      "pickup_location": "Hurghada",
       "transportation": "Van, Car",
       "options": [
         {
@@ -981,7 +1258,7 @@
         "Any extras not mentioned in the program",
         "Rope activities & Climbing (optional)"
       ],
-      "pickup_location": "",
+      "pickup_location": "Hurghada",
       "transportation": "Van",
       "options": [
         {
@@ -999,9 +1276,8 @@
           "type": "Non-private"
         }
       ],
-      "details_loaded": false,
-      "scraped_at": "2026-08-19T12:56:02.410854+00:00",
-      "error": "failed after retries"
+      "details_loaded": true,
+      "scraped_at": "2026-08-19T12:56:02.410854+00:00"
     },
     {
       "title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
@@ -1045,7 +1321,7 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T12:56:21.248081+00:00"
+      "scraped_at": "2026-08-19T13:13:41.761047+00:00"
     },
     {
       "title": "Sharm Signature: Mosque, Cathedral, Farsha Café & Old Market",
@@ -1104,7 +1380,7 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T12:56:41.819543+00:00"
+      "scraped_at": "2026-08-19T13:14:01.824145+00:00"
     },
     {
       "title": "Sharm: 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
@@ -1160,7 +1436,7 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T12:57:02.792875+00:00"
+      "scraped_at": "2026-08-19T13:14:21.207220+00:00"
     },
     {
       "title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
@@ -1223,17 +1499,17 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T12:57:23.703219+00:00"
+      "scraped_at": "2026-08-19T13:14:41.580407+00:00"
     },
     {
       "title": "Hurghada: Full-Day Trip to Cairo by Plane",
-      "reference": "",
+      "reference": "T-1195745",
       "gyg_tour_id": "1195745",
       "rating": "4.8 of 5",
       "status": "Bookable",
       "public_url": "https://getyourguide.com/cairo-l92/hurghada-full-day-trip-to-cairo-by-plane-t1195745/",
       "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1195745",
-      "reference_code": "Non-Refundable",
+      "reference_code": "T-1195745",
       "product_title": "Hurghada: Full-Day Trip to Cairo by Plane",
       "short_description": "Fly from Hurghada to Cairo for a full day visiting the Giza Pyramids, the Sphinx, and your choice of museum, with lunch included and a carefully planned schedule.",
       "product_description": "See Cairo’s top highlights in one day—without the long bus journey—on a full-day fly-in tour from Hurghada. Your experience includes round-trip domestic flights, hotel transfers, a guided visit to the Giza Pyramids and the Sphinx, lunch, and a museum visit in Cairo.\n\nEarly start & flight details\nYour day starts very early with pickup from your Hurghada hotel and transfer to the airport for your domestic flight to Cairo. Flight times are set by the airline and may change; pickup and return times will be adjusted accordingly. You will meet your local guide in Cairo after landing.\n\nGiza Pyramids & Sphinx\nVisit the Giza Plateau to see the Great Pyramid of Khufu, the pyramids of Khafre and Menkaure, and the Great Sphinx. Your guide will share the history of the site and allow time for photos.\n\nThe Giza Plateau entry is included\nEntry inside a pyramid is not included unless you book the option that includes it (subject to availability on the day).\nMuseum visit (one museum per booking)\nAfter Giza, continue to your selected museum (depending on the option you choose at checkout and availability):\n\nEgyptian Museum (Tahrir Square), or\nGrand Egyptian Museum (GEM).\nPlease choose carefully—only one museum is included.\n\nLunch & optional stops\nLunch at a local Cairo restaurant is included. The exact timing depends on the day’s schedule. If time allows, there may be optional stops (e.g., shops). Shopping is optional and there is no obligation to buy. Any optional activities (such as a Nile boat ride) are not included unless stated and may cost extra.\n\nImportant: expectations for this tour (to avoid surprises)\nThis is a fast-paced, full-day program and involves:\n\nan early pickup and late return,\nairport procedures and possible waiting time,\nCairo traffic, and\na fair amount of walking at Giza and in the museum.\nTiming can change due to flight schedules, traffic, and security checks.\n\nWho it’s best for: Ideal for travelers who want to cover Cairo’s must-sees in one day by flight and are comfortable with a long, busy itinerary.",
@@ -1261,7 +1537,7 @@
         "Optional activities not mentioned in the program",
         "Tips for the guide and driver"
       ],
-      "pickup_location": "",
+      "pickup_location": "Hurghada",
       "transportation": "Airplane, Car, Van",
       "options": [
         {

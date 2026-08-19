@@ -84,8 +84,28 @@ def is_login_page(page: Page) -> bool:
         "log in again to continue",
         "there was an error with your session",
         "enter your email",
+        "enter your password",
     )
     return any(m in body for m in markers)
+
+
+def is_authenticated(page: Page) -> bool:
+    if is_login_page(page):
+        return False
+    try:
+        body = page.inner_text("body", timeout=4000).lower()
+    except Exception:
+        return False
+    return any(
+        marker in body
+        for marker in (
+            "manage products",
+            "create new product",
+            "product id:",
+            "bookings",
+            "performance",
+        )
+    )
 
 
 def _first_visible(page: Page, selectors: tuple[str, ...]):
@@ -101,31 +121,58 @@ def _first_visible(page: Page, selectors: tuple[str, ...]):
 
 def _fill_login_form(page: Page, email: str, password: str) -> None:
     page.wait_for_load_state("domcontentloaded", timeout=30000)
-    time.sleep(1.0)
+    time.sleep(1.2)
 
     email_input = _first_visible(page, EMAIL_SELECTORS)
+    if not email_input:
+        try:
+            email_input = page.get_by_placeholder(re.compile(r"enter your email", re.I)).first
+            email_input.wait_for(state="visible", timeout=10000)
+        except Exception:
+            email_input = None
+    if not email_input:
+        try:
+            email_input = page.get_by_label(re.compile(r"email", re.I)).first
+            email_input.wait_for(state="visible", timeout=5000)
+        except Exception:
+            pass
     if not email_input:
         raise RuntimeError("Email field not found on login page")
 
     password_input = _first_visible(page, PASSWORD_SELECTORS)
     if not password_input:
+        try:
+            password_input = page.get_by_placeholder(re.compile(r"enter your password", re.I)).first
+            password_input.wait_for(state="visible", timeout=10000)
+        except Exception:
+            password_input = None
+    if not password_input:
+        try:
+            password_input = page.get_by_label(re.compile(r"password", re.I)).first
+            password_input.wait_for(state="visible", timeout=5000)
+        except Exception:
+            pass
+    if not password_input:
         raise RuntimeError("Password field not found on login page")
 
-    email_input.click()
+    email_input.click(timeout=3000)
     email_input.fill("")
-    email_input.fill(email)
+    email_input.fill(email, timeout=5000)
     time.sleep(random.uniform(0.3, 0.7))
 
-    password_input.click()
+    password_input.click(timeout=3000)
     password_input.fill("")
-    password_input.fill(password)
-    time.sleep(random.uniform(0.3, 0.7))
+    password_input.fill(password, timeout=5000)
+    time.sleep(random.uniform(0.4, 0.8))
 
     login_btn = _first_visible(page, LOGIN_BUTTON_SELECTORS)
     if login_btn:
-        login_btn.click()
+        login_btn.click(timeout=5000)
     else:
-        page.keyboard.press("Enter")
+        try:
+            page.get_by_role("button", name=re.compile(r"^log in$", re.I)).click(timeout=5000)
+        except Exception:
+            page.keyboard.press("Enter")
 
 
 def _submit_2fa(page: Page, totp_secret: str) -> None:
@@ -163,6 +210,19 @@ def _submit_2fa(page: Page, totp_secret: str) -> None:
         print("Could not find 2FA field — enter code manually if prompted.")
 
 
+def _post_login_destination(page: Page) -> str:
+    from urllib.parse import unquote
+
+    match = re.search(r"[?&]redirect=([^&]+)", page.url or "", re.I)
+    if match:
+        redirect = unquote(match.group(1))
+        if redirect.startswith("/"):
+            return f"https://supplier.getyourguide.com{redirect}"
+        if redirect.startswith("http"):
+            return redirect
+    return LIST_URL
+
+
 def auto_login(page: Page, creds: dict[str, str]) -> bool:
     email = creds.get("email", "")
     password = creds.get("password", "")
@@ -176,28 +236,31 @@ def auto_login(page: Page, creds: dict[str, str]) -> bool:
     try:
         if not is_login_page(page):
             page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=60000)
-        else:
-            # stay on current login redirect URL
-            if "/auth/login" not in page.url.lower():
-                page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=60000)
+        time.sleep(1.0)
 
-        if not is_login_page(page):
+        if not is_login_page(page) and is_authenticated(page):
             print("Already logged in.")
             return True
 
         _fill_login_form(page, email, password)
+        print("Credentials submitted — waiting for portal...")
         time.sleep(random.uniform(3.0, 5.0))
 
-        if creds.get("totp_secret") and is_login_page(page):
-            body = page.inner_text("body", timeout=3000).lower()
-            if any(k in body for k in ("verification", "authenticator", "two-factor", "2fa", "security code")):
+        if creds.get("totp_secret"):
+            body = ""
+            try:
+                body = page.inner_text("body", timeout=4000).lower()
+            except Exception:
+                body = ""
+            if any(k in body for k in ("verification", "authenticator", "two-factor", "2fa", "security code", "one-time")):
                 _submit_2fa(page, creds["totp_secret"])
                 time.sleep(random.uniform(3.0, 5.0))
 
-        for _ in range(40):
+        destination = _post_login_destination(page)
+        for _ in range(45):
             if not is_login_page(page):
                 print("Auto-login succeeded.")
-                page.goto(LIST_URL, wait_until="domcontentloaded", timeout=60000)
+                page.goto(destination, wait_until="domcontentloaded", timeout=60000)
                 return True
             time.sleep(2)
 
@@ -230,7 +293,8 @@ def ensure_session(page: Page, context: BrowserContext, creds: Optional[dict[str
         )
 
     page.goto(LIST_URL, wait_until="domcontentloaded", timeout=90000)
-    if not is_login_page(page):
+    time.sleep(1.0)
+    if is_authenticated(page):
         print("Session OK — already logged in.")
         context.storage_state(path=STATE_FILE)
         return
@@ -243,6 +307,27 @@ def ensure_session(page: Page, context: BrowserContext, creds: Optional[dict[str
 
     wait_for_manual_login(page)
     context.storage_state(path=STATE_FILE)
+
+
+def ensure_logged_in(
+    page: Page,
+    context: Optional[BrowserContext] = None,
+    creds: Optional[dict[str, str]] = None,
+) -> None:
+    """Re-login when redirected to /auth/login during scraping."""
+    creds = creds if creds is not None else _load_credentials()
+    if is_authenticated(page):
+        return
+    if not creds.get("email"):
+        raise RuntimeError("Missing GYG credentials — cannot auto-login.")
+    print("Session expired — re-authenticating...")
+    if auto_login(page, creds) and not is_login_page(page):
+        if context:
+            context.storage_state(path=STATE_FILE)
+        return
+    wait_for_manual_login(page)
+    if context:
+        context.storage_state(path=STATE_FILE)
 
 
 def launch_browser_context(p: Playwright) -> BrowserContext:

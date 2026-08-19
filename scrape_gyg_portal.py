@@ -17,11 +17,13 @@ from build_gyg_products_from_portal import (
     build_api_product,
     scrape_product_details,
     scrape_product_list,
+    scrape_product_schedules,
 )
 from gyg_portal_auth import (
     STATE_FILE,
     ensure_session,
     human_pause,
+    is_authenticated,
     is_login_page,
     launch_firefox_context,
     save_session,
@@ -116,21 +118,62 @@ class BrowserSession:
 
     def scrape_one(self, tour_id: str) -> dict:
         assert self.page is not None
-        if is_login_page(self.page):
+        if is_login_page(self.page) or not is_authenticated(self.page):
             raise SessionLostError("login page before navigation")
-        details = scrape_product_details(self.page, tour_id)
-        if is_login_page(self.page):
+        details = scrape_product_details(self.page, tour_id, self.context, self.creds)
+        if is_login_page(self.page) or not is_authenticated(self.page):
             raise SessionLostError("redirected to login after scrape")
         if not details.get("details_loaded"):
             raise SessionLostError("product page did not load")
         return details
+
+    def scrape_schedules_one(self, tour_id: str, catalog_row: dict | None = None) -> dict:
+        assert self.page is not None
+        if is_login_page(self.page) or not is_authenticated(self.page):
+            raise SessionLostError("login page before navigation")
+        option_ids = [
+            str(opt.get("option_id"))
+            for opt in ((catalog_row or {}).get("options") or [])
+            if opt.get("option_id")
+        ]
+        schedule_data = scrape_product_schedules(
+            self.page,
+            tour_id,
+            self.context,
+            self.creds,
+            known_option_ids=option_ids,
+        )
+        if is_login_page(self.page):
+            raise SessionLostError("redirected to login after schedule scrape")
+        has_schedules = any(
+            opt.get("schedules")
+            for opt in (schedule_data.get("option_schedules") or [])
+        )
+        if not has_schedules:
+            raise SessionLostError("schedules did not load")
+        return schedule_data
+
+
+def _needs_schedule_scrape(row: dict) -> bool:
+    if not row.get("gyg_tour_id"):
+        return False
+    option_schedules = row.get("option_schedules") or []
+    if not option_schedules:
+        return True
+    return not any(opt.get("schedules") for opt in option_schedules)
 
 
 def pending_products(
     catalog: list[dict],
     rescrape_all: bool,
     missing_inclusions_only: bool = False,
+    schedules_only: bool = False,
 ) -> list[dict]:
+    if schedules_only:
+        return [
+            row for row in catalog
+            if row.get("gyg_tour_id") and (rescrape_all or _needs_schedule_scrape(row))
+        ]
     if missing_inclusions_only:
         return [
             row for row in catalog
@@ -145,6 +188,7 @@ def pending_products(
 def scrape_until_done(
     rescrape_all: bool = False,
     missing_inclusions_only: bool = False,
+    schedules_only: bool = False,
 ) -> None:
     creds = _load_credentials()
     if not creds.get("email"):
@@ -162,12 +206,16 @@ def scrape_until_done(
                 catalog_doc["products"] = catalog
                 save_progress(catalog_doc, catalog)
 
-            pending = pending_products(catalog, rescrape_all, missing_inclusions_only)
+            pending = pending_products(
+                catalog, rescrape_all, missing_inclusions_only, schedules_only
+            )
             if not pending:
                 print("Nothing to scrape.")
             else:
                 total = len(catalog)
-                if missing_inclusions_only:
+                if schedules_only:
+                    print(f"\nSchedules/pricing: {len(pending)} products to scrape\n")
+                elif missing_inclusions_only:
                     print(f"\nMissing inclusions: {len(pending)} products to enrich\n")
                 else:
                     done = total - len(pending)
@@ -175,23 +223,47 @@ def scrape_until_done(
 
                 for row in pending:
                     tour_id = str(row["gyg_tour_id"])
-                    title = row.get("title") or tour_id
-                    print(f"Scraping: {title} ({tour_id})")
+                    title = row.get("title") or row.get("product_title") or tour_id
+                    label = "Schedules" if schedules_only else "Scraping"
+                    print(f"{label}: {title} ({tour_id})")
 
                     success = False
+                    schedule_data: dict = {}
                     for attempt in range(1, MAX_RETRIES_PER_PRODUCT + 1):
                         try:
-                            details = session.scrape_one(tour_id)
-                            for i, existing in enumerate(catalog):
-                                if str(existing.get("gyg_tour_id")) == tour_id:
-                                    catalog[i] = {**existing, **details, "details_loaded": True}
-                                    catalog[i].pop("error", None)
-                                    break
+                            if schedules_only:
+                                schedule_data = session.scrape_schedules_one(tour_id, catalog_row=row)
+                                for i, existing in enumerate(catalog):
+                                    if str(existing.get("gyg_tour_id")) == tour_id:
+                                        catalog[i] = {
+                                            **existing,
+                                            **schedule_data,
+                                            "schedules_loaded": True,
+                                        }
+                                        catalog[i].pop("error", None)
+                                        break
+                            else:
+                                details = session.scrape_one(tour_id)
+                                for i, existing in enumerate(catalog):
+                                    if str(existing.get("gyg_tour_id")) == tour_id:
+                                        catalog[i] = {**existing, **details, "details_loaded": True}
+                                        catalog[i].pop("error", None)
+                                        break
                             save_progress(catalog_doc, catalog)
                             if session.context:
                                 save_session(session.context)
                             success = True
-                            print(f"  OK ({attempt})\n")
+                            summary = (
+                                schedule_data.get("schedule_summary", {})
+                                if schedules_only
+                                else {}
+                            )
+                            if schedules_only and summary:
+                                times = ", ".join(summary.get("departure_times") or [])
+                                prices = summary.get("retail_prices") or {}
+                                print(f"  OK ({attempt}) times=[{times}] prices={prices}\n")
+                            else:
+                                print(f"  OK ({attempt})\n")
                             break
                         except SessionLostError as exc:
                             print(f"  Attempt {attempt}: session lost ({exc})")
@@ -205,7 +277,10 @@ def scrape_until_done(
                     if not success:
                         for i, existing in enumerate(catalog):
                             if str(existing.get("gyg_tour_id")) == tour_id:
-                                catalog[i]["details_loaded"] = False
+                                if schedules_only:
+                                    catalog[i]["schedules_loaded"] = False
+                                else:
+                                    catalog[i]["details_loaded"] = False
                                 catalog[i]["error"] = "failed after retries"
                                 break
                         save_progress(catalog_doc, catalog)
@@ -231,10 +306,16 @@ def main() -> None:
         action="store_true",
         help="Re-scrape only products with empty inclusions (keeps existing catalog)",
     )
+    parser.add_argument(
+        "--schedules",
+        action="store_true",
+        help="Scrape Show schedules pricing/times for products missing schedules_loaded",
+    )
     args = parser.parse_args()
     scrape_until_done(
         rescrape_all=args.all or args.enrich,
         missing_inclusions_only=args.missing_inclusions,
+        schedules_only=args.schedules,
     )
 
 

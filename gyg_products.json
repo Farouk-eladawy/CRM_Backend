@@ -4,8 +4,8 @@
   "currency": "EUR",
   "source": {
     "portal_url": "https://supplier.getyourguide.com/products/list?limit=100",
-    "scraped_at": "2026-08-19T14:12:33.558522+00:00",
-    "catalog_count": 4
+    "scraped_at": "2026-08-19T14:31:20.871914+00:00",
+    "catalog_count": 22
   },
   "products": [
     {
@@ -51,7 +51,146 @@
           "type": "Non-private"
         }
       ],
-      "option_schedules": [],
+      "option_schedules": [
+        {
+          "option_id": "2201750",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 12500
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            }
+          ]
+        }
+      ],
       "live": true,
       "api_connected": false,
       "pilot": false,
@@ -62,11 +201,11 @@
       "rating": "Not rated",
       "public_url": "https://getyourguide.com/sharm-el-sheikh-l408/serabit-el-khadim-adventure-2-days-bedouin-desert-experience-t1441222/",
       "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1441222",
-      "daily_capacity": 15,
+      "daily_capacity": 100,
       "participants_min": 1,
-      "participants_max": 15,
-      "cutoff_hours": 2,
-      "cutoff_seconds": 7200,
+      "participants_max": 100,
+      "cutoff_hours": 5,
+      "cutoff_seconds": 18000,
       "closed_weekdays": [],
       "blockout_dates": [],
       "departure_times": [
@@ -75,17 +214,17 @@
       "categories": {
         "ADULT": {
           "enabled": true,
-          "retail_minor": 10000,
+          "retail_minor": 12500,
           "min_ticket_amount": 1,
-          "max_ticket_amount": 15,
+          "max_ticket_amount": 100,
           "age_from": 12,
           "age_to": 99
         },
         "CHILD": {
           "enabled": true,
-          "retail_minor": 7500,
+          "retail_minor": 10000,
           "min_ticket_amount": 0,
-          "max_ticket_amount": 15,
+          "max_ticket_amount": 100,
           "age_from": 4,
           "age_to": 11
         },
@@ -99,9 +238,9 @@
         }
       },
       "details_loaded": true,
-      "schedules_loaded": false,
+      "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:04:11.428769+00:00",
-      "schedules_scraped_at": "2026-08-19T14:11:25.081964+00:00"
+      "schedules_scraped_at": "2026-08-19T14:31:20.862027+00:00"
     },
     {
       "product_id": "CAI-CAI",
@@ -140,7 +279,134 @@
           "type": "Private"
         }
       ],
-      "option_schedules": [],
+      "option_schedules": [
+        {
+          "option_id": "2201866",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "CHILD": 3000,
+                "ADULT": 6000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 16, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            }
+          ]
+        }
+      ],
       "live": true,
       "api_connected": false,
       "pilot": false,
@@ -151,11 +417,11 @@
       "rating": "Not rated",
       "public_url": "https://getyourguide.com/cairo-l92/cairo-private-guided-tour-to-your-chosen-attraction-t1442388/",
       "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1442388",
-      "daily_capacity": 15,
+      "daily_capacity": 100,
       "participants_min": 1,
-      "participants_max": 15,
-      "cutoff_hours": 2,
-      "cutoff_seconds": 7200,
+      "participants_max": 100,
+      "cutoff_hours": 4,
+      "cutoff_seconds": 14400,
       "closed_weekdays": [],
       "blockout_dates": [],
       "departure_times": [
@@ -164,22 +430,22 @@
       "categories": {
         "ADULT": {
           "enabled": true,
-          "retail_minor": 10000,
+          "retail_minor": 6000,
           "min_ticket_amount": 1,
-          "max_ticket_amount": 15,
+          "max_ticket_amount": 100,
           "age_from": 12,
           "age_to": 99
         },
         "CHILD": {
           "enabled": true,
-          "retail_minor": 7500,
+          "retail_minor": 3000,
           "min_ticket_amount": 0,
-          "max_ticket_amount": 15,
+          "max_ticket_amount": 100,
           "age_from": 4,
           "age_to": 11
         },
         "INFANT": {
-          "enabled": true,
+          "enabled": false,
           "retail_minor": 0,
           "min_ticket_amount": 0,
           "max_ticket_amount": 5,
@@ -188,9 +454,9 @@
         }
       },
       "details_loaded": true,
-      "schedules_loaded": false,
+      "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:04:57.512910+00:00",
-      "schedules_scraped_at": "2026-08-19T14:11:41.964338+00:00"
+      "schedules_scraped_at": "2026-08-19T14:31:20.862555+00:00"
     },
     {
       "product_id": "LUX-LXR",
@@ -238,7 +504,284 @@
           "type": "Private"
         }
       ],
-      "option_schedules": [],
+      "option_schedules": [
+        {
+          "option_id": "2197340",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            }
+          ]
+        },
+        {
+          "option_id": "2197361",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            },
+            {
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3000,
+                "ADULT": 5000
+              },
+              "participants_min": 1,
+              "participants_max": 30,
+              "validity": "Aug 14, 2026 - No end date",
+              "name": "Price setupPrice per person"
+            }
+          ]
+        }
+      ],
       "live": true,
       "api_connected": false,
       "pilot": false,
@@ -249,11 +792,11 @@
       "rating": "Not rated",
       "public_url": "https://getyourguide.com/luxor-l109/luxor-private-customizable-tour-with-egyptologist-guide-t1439459/",
       "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1439459",
-      "daily_capacity": 15,
+      "daily_capacity": 100,
       "participants_min": 1,
-      "participants_max": 15,
-      "cutoff_hours": 2,
-      "cutoff_seconds": 7200,
+      "participants_max": 100,
+      "cutoff_hours": 4,
+      "cutoff_seconds": 14400,
       "closed_weekdays": [],
       "blockout_dates": [],
       "departure_times": [
@@ -262,17 +805,17 @@
       "categories": {
         "ADULT": {
           "enabled": true,
-          "retail_minor": 10000,
+          "retail_minor": 5000,
           "min_ticket_amount": 1,
-          "max_ticket_amount": 15,
+          "max_ticket_amount": 100,
           "age_from": 12,
           "age_to": 99
         },
         "CHILD": {
           "enabled": true,
-          "retail_minor": 7500,
+          "retail_minor": 3000,
           "min_ticket_amount": 0,
-          "max_ticket_amount": 15,
+          "max_ticket_amount": 100,
           "age_from": 4,
           "age_to": 11
         },
@@ -286,9 +829,9 @@
         }
       },
       "details_loaded": true,
-      "schedules_loaded": false,
+      "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:05:17.797163+00:00",
-      "schedules_scraped_at": "2026-08-19T14:12:08.144071+00:00"
+      "schedules_scraped_at": "2026-08-19T14:31:20.862555+00:00"
     },
     {
       "product_id": "PRIV-CAI",
@@ -334,7 +877,18 @@
           "type": "Private"
         }
       ],
-      "option_schedules": [],
+      "option_schedules": [
+        {
+          "option_id": "2199242",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "2204274",
+          "cutoff_hours": 4,
+          "schedules": []
+        }
+      ],
       "live": true,
       "api_connected": false,
       "pilot": false,
@@ -345,6 +899,1209 @@
       "rating": "Not rated",
       "public_url": "https://getyourguide.com/alexandria-l490/private-customizable-day-tour-to-alexandria-from-cairo-t1440408/",
       "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1440408",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 4,
+      "cutoff_seconds": 14400,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:05:38.768325+00:00",
+      "schedules_scraped_at": "2026-08-19T13:52:57.267903+00:00"
+    },
+    {
+      "product_id": "MOUN",
+      "gyg_tour_id": "1441127",
+      "reference_code": "T-1441127",
+      "product_title": "Mount Moses, St. Catherine Monastery & Stargazing Adventure",
+      "short_description": "Camp under the Sinai stars, enjoy a Bedouin dinner and stargazing, hike Mount Moses for sunrise, then visit St. Catherine’s Monastery and enjoy a traditional breakfast.",
+      "product_description": "Bedouin culture, stargazing, and one of Egypt’s most iconic spiritual landmarks.\n\nChoose between a Private or Shared experience and spend an incredible night in the heart of the Sinai mountains. Enjoy a traditional Bedouin dinner at the campsite, followed by an amazing stargazing experience with a local guide who will introduce you to the stars, constellations, and fascinating stories of the night sky.\n\nYou can enjoy the stargazing experience either before starting the Mount Moses hike or, depending on the conditions and timing, from the mountain itself. Then, begin your hike up Mount Moses during the night and reach the summit in time to witness the breathtaking sunrise over the Sinai mountains.\n\nDuring the experience, your guide will also share the stories and historical significance of the Prophet Elijah’s House and the Hanging Tree, giving you a deeper connection to the history, traditions, and legends of the area.\n\nAfter descending, enjoy a well-deserved breakfast before visiting the historic St. Catherine’s Monastery, one of the world’s oldest continuously operating Christian monasteries and a UNESCO World Heritage Site.\n\nThis experience is perfect for travelers looking for more than a traditional sightseeing tour — it combines adventure, nature, culture, astronomy, history, and a truly memorable night in Sinai.",
+      "highlights": [
+        "Stargazing Under the Sinai Sky with an explanation of stars and constellations",
+        "Learn the Story of Prophet Elijah’s House & the Hanging Tree",
+        "Sunrise Over the Sinai Mountains",
+        "Visit St. Catherine’s Monastery and discover its fascinating history",
+        "Private or Shared Tour Options to suit your travel style"
+      ],
+      "inclusions": [
+        "Private or shared transportation, depending on the selected option",
+        "Professional local guide",
+        "Mount Moses hiking experience",
+        "Stargazing session with explanation of stars and constellations",
+        "Overnight Bedouin camping",
+        "Traditional Bedouin dinner",
+        "Breakfast after the hike",
+        "Visit to St. Catherine’s Monastery",
+        "Guided explanation of Prophet Elijah’s House and the Hanging Tree"
+      ],
+      "exclusions": [
+        "Personal expenses",
+        "Tips and gratuities",
+        "Additional drinks or meals not mentioned in the itinerary",
+        "Any optional activities or services not mentioned in the tour"
+      ],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Mount Moses, St. Catherine Monastery & Stargazing Adventure",
+          "reference_code": "default",
+          "option_id": "2199990",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "2199990",
+          "cutoff_hours": 4,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "Not rated",
+      "public_url": "https://getyourguide.com/sharm-el-sheikh-l408/mount-moses-st-catherine-monastery-stargazing-adventure-t1441127/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1441127",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 4,
+      "cutoff_seconds": 14400,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:05:58.507968+00:00",
+      "schedules_scraped_at": "2026-08-19T13:53:05.954643+00:00"
+    },
+    {
+      "product_id": "CAIR-CAI",
+      "gyg_tour_id": "1361854",
+      "reference_code": "T-1361854",
+      "product_title": "From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake",
+      "short_description": "Escape Cairo for a full-day Fayoum adventure. Enjoy a thrilling 4x4 desert safari, visit Wadi El Rayan Waterfalls and Magic Lake, try sandboarding, and enjoy an authentic Egyptian countryside lunch.",
+      "product_description": "Escape the busy streets of Cairo and discover the natural beauty of Fayoum on a full-day adventure combining desert landscapes, exciting activities, local culture, and authentic Egyptian food.\n\nBegin your experience with a comfortable pickup from your hotel in Cairo or Giza. Travel in an air-conditioned vehicle toward Fayoum Oasis, one of Egypt’s most beautiful natural destinations, where golden desert dunes meet peaceful lakes and dramatic rock formations.\n\nUpon arrival, transfer to a 4x4 vehicle and begin an exciting desert safari across the sand dunes. Enjoy the changing landscapes as your experienced desert driver takes you through some of Fayoum’s most scenic areas.\n\nVisit the Wadi El Rayan Protected Area and admire its famous waterfalls. All required entrance fees to the protected area are included, allowing you to enjoy the experience without unexpected additional charges.\n\nContinue to the beautiful Magic Lake, surrounded by golden dunes and dramatic desert scenery. The lake is known for its changing colors throughout the day, depending on the sunlight and surrounding landscape.\n\nStop at Mudawara Mountain, one of Fayoum’s most impressive panoramic viewpoints. Take time to enjoy the scenery and capture memorable photographs overlooking the desert and nearby lakes.\n\nAdd more excitement to your adventure with a sandboarding experience on the soft desert dunes. No previous experience is required, making the activity suitable for beginners and adventure lovers.\n\nAfter your desert activities, enjoy an authentic Egyptian countryside lunch prepared using traditional local cooking methods. Choose between slow-cooked chicken or slow-cooked duck, served with Egyptian rice, seasonal vegetables, fresh salads, traditional baladi bread, and local side dishes.\n\nYou may also personalize your experience with optional activities, including a horse-riding experience, a dune buggy ride, or an upgrade to a fresh seafood meal. Optional activities are subject to availability and can be selected during booking or arranged before the tour.\n\nAfter lunch and some time to relax, travel back to Cairo or Giza with unforgettable memories and photographs from one of Egypt’s most beautiful natural destinations.",
+      "highlights": [
+        "Experience an exciting 4x4 desert safari across Fayoum’s sand dunes.",
+        "Visit the famous waterfalls inside Wadi El Rayan Protected Area.",
+        "Discover the beautiful Magic Lake and its surrounding desert scenery.",
+        "Enjoy panoramic views and photo opportunities at Mudawara Mountain.",
+        "Try sandboarding on the soft desert dunes."
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off from Cairo or Giza.",
+        "Transportation in an air-conditioned vehicle.",
+        "Professional Representative.",
+        "4x4 desert safari.",
+        "Experienced desert driver.",
+        "Entrance fees to Wadi El Rayan Protected Area.",
+        "Visit to Wadi El Rayan Waterfalls.",
+        "Visit to Magic Lake.",
+        "Stop at Mudawara Mountain.",
+        "Sandboarding equipment and experience.",
+        "Authentic Egyptian countryside lunch.",
+        "Choice of slow-cooked chicken or slow-cooked duck ( Seafood meal upgrade If option selected ).",
+        "Horse-riding experience ( If option selected )",
+        "Quad experience ( If option selected )",
+        "Egyptian rice, seasonal vegetables, salads, and baladi bread.",
+        "Bottled water during the tour."
+      ],
+      "exclusions": [
+        "Personal expenses",
+        "Tips (optional)"
+      ],
+      "pickup_location": "Cairo",
+      "transportation": "Jeep / SUV, Van",
+      "options_portal": [
+        {
+          "title": "Shared Tour: Wadi El Rayan, Magic Lake & Lake Qarun, Jeep",
+          "reference_code": "Option 1",
+          "option_id": "2078284",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Valley of the Whales, Magic Lake & Desert Safari with Quad",
+          "reference_code": "Option 2",
+          "option_id": "2078571",
+          "status": "Deactivated",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "2078284",
+          "cutoff_hours": 0,
+          "schedules": []
+        },
+        {
+          "option_id": "2078571",
+          "cutoff_hours": 6,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Cairo",
+      "city": "Cairo",
+      "location": "Cairo, Egypt",
+      "country": "EGY",
+      "rating": "5.0 of 5",
+      "public_url": "https://getyourguide.com/fayoum-l1724/fayoum-adventure-magic-lake-waterfalls-and-desert-safari-t1361854/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1361854",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 6,
+      "cutoff_seconds": 21600,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:06:19.163482+00:00",
+      "schedules_scraped_at": "2026-08-19T13:53:16.700442+00:00"
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1191624",
+      "reference_code": "T-1191624",
+      "product_title": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
+      "short_description": "Discover ancient Luxor on a full-day tour. Visit the Valley of the Kings, Hatshepsut Temple, and Karnak Temple with a professional guide. Optional: Tutankhamun’s Tomb or the Tomb of Ramses V and VI",
+      "product_description": "Full-Day Trip from Hurghada to Luxor\n\nThe trip starts early in the morning with pickup from the hotel in Hurghada by a comfortable, air-conditioned vehicle. Guests then travel through the desert road toward Luxor. During the journey, there is a short rest stop of approximately 30 minutes, where guests can use the bathroom or have a light drink before continuing the drive to Luxor.\n\nUpon arrival in Luxor, the tour guide will be waiting for the guests according to the language selected during booking. The tour begins with a visit to Karnak Temple, one of the largest and most important temple complexes in ancient Egypt. Guests will enjoy a guided explanation of the temple’s history, its massive columns, sacred halls, and impressive ancient architecture.\n\nAfter visiting Karnak Temple, guests continue to the West Bank of Luxor. There are two options for crossing: guests may either continue by bus, or choose to cross by boat for an additional optional fee. If the boat option is selected, guests can enjoy a pleasant Nile boat trip for approximately 30 minutes.\n\nAfter that, guests head to a local restaurant for lunch, then continue the tour toward the Valley of the Kings. On the way, there is a stop at the Colossi of Memnon for approximately 15 minutes, giving guests time to take photos and learn some historical information about the site.\n\nAt the Valley of the Kings, the package includes entrance to 3 tombs from the tombs open for visits. Guests also have the option, depending on their preference or pre-booked selection, to enter Tutankhamun’s Tomb or the Tomb of Ramses V and VI for an additional optional fee.\n\nAfter finishing the visit to the Valley of the Kings, the tour continues toward the Temple of Queen Hatshepsut. On the way, there is a rest stop of approximately 30 minutes at an alabaster or stone handicraft workshop, where guests are welcomed with a cold local drink. Guests will also have time to relax or use the bathroom.\n\nThe trip then continues to Hatshepsut Temple, a unique terraced temple set against the mountains and dedicated to one of the most famous queens in ancient Egyptian history.\n\nAt the end of the day, guests return comfortably to Hurghada by air-conditioned vehicle after enjoying a memorable day exploring the most important historical landmarks of Luxor.",
+      "highlights": [
+        "Discover the Valley of the Kings, home to Egypt’s most powerful pharaohs",
+        "Visit the iconic Temple of Queen Hatshepsut carved into the cliffs of Luxor",
+        "Explore the massive Karnak Temple complex with its towering columns",
+        "Enjoy a comfortable full-day tour from Hurghada in a small group",
+        "Optional entry to Tutankhamun’s Tomb or Ramses V & VI Tomb"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off from Hurghada",
+        "Air-conditioned transportation in a small group",
+        "Professional live tour guide",
+        "snacks, cold drinks, and water on your way back.",
+        "Entrance fees to the main sites (Valley of the Kings, Hatshepsut Temple, Karnak Temple)",
+        "Lunch at a local restaurant in Luxor",
+        "Entry ticket to Tutankhamun’s Tomb (if option selected)",
+        "Visit Tomb of Ramses V & VI (if option selected)"
+      ],
+      "exclusions": [
+        "Drinks during lunch",
+        "Personal expenses and tips"
+      ],
+      "pickup_location": "El Gouna",
+      "transportation": "Bus / coach",
+      "options_portal": [
+        {
+          "title": "Karnak, Hatshepsut,Valley of the Kings with King Tutankhamun",
+          "reference_code": "default",
+          "option_id": "1828226",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Small Group -Karnak, Hatshepsut, and the Valley of the Kings",
+          "reference_code": "default",
+          "option_id": "1828292",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Karnak, Hatshepsut, Valley of the Kings with Ramses V and VI",
+          "reference_code": "default",
+          "option_id": "2089103",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Exclusive Family Package -Karnak, Hatshepsut, Valley",
+          "reference_code": "default",
+          "option_id": "2163134",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "1828226",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1828292",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2089103",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2163134",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": true,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "5.0 of 5",
+      "public_url": "https://getyourguide.com/luxor-l109/hurghada-luxor-valley-of-the-kings-tutankhamun-tomb-trip-t1191624/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1191624",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "03:00:00",
+        "03:30:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:06:43.173552+00:00",
+      "schedules_scraped_at": "2026-08-19T13:53:30.078833+00:00"
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1195743",
+      "reference_code": "T-1195743",
+      "product_title": "Hurghada: Cairo Day Trip with Pyramids, Museum & Quad Bike",
+      "short_description": "Discover Cairo on a full-day trip from Hurghada, with travel by domestic flight or minivan depending on the option selected at booking.",
+      "product_description": "Enjoy a full-day trip from Hurghada to Cairo and explore Egypt’s most famous ancient landmarks. This tour is available with two transportation options: by domestic flight or by air-conditioned minivan/vehicle. The travel method depends on the option selected by the guest at the time of booking.\n\nYour day starts with pickup from your hotel in Hurghada. If you select the flight option, you will be transferred to Hurghada Airport for a domestic flight to Cairo. If you select the minivan option, you will travel by road in an air-conditioned vehicle, with rest stops along the way.\n\nUpon arrival in Cairo, meet your professional tour guide. The guide language will be based on the language option selected during booking. Start your sightseeing program at the famous Giza Plateau, home to the Great Pyramid of Khufu, the Pyramid of Khafre, the Pyramid of Menkaure, and the Great Sphinx. Your guide will explain the history of the area and give you time for photos.\n\nEntry to the Giza Plateau is included. Entry inside one of the pyramids is optional and available for an additional fee, depending on the guest’s preference and availability on the day.\n\nContinue to your museum visit. Depending on the selected option and availability, guests may visit either the Egyptian Museum in Tahrir Square or the Grand Egyptian Museum. The Egyptian Museum offers a classic collection of ancient Egyptian artifacts, while the Grand Egyptian Museum provides a modern museum experience with spacious galleries and updated displays.\n\nLunch is included at a local restaurant in Cairo. If time allows, an optional Nile boat trip may be offered for an additional fee. The program may also include short shopping stops at selected local shops, such as souvenir shops, perfume shops, papyrus galleries, or similar places. Shopping is completely optional.\n\nAt the end of the day, return to Hurghada by the transportation method selected at booking. Flight-option guests will transfer to Cairo Airport for the return flight to Hurghada, followed by hotel drop-off. Minivan-option guests will return by road to Hurghada, with arrival usually late in the evening or at night.\n\nThis tour is ideal for travelers who want to visit Cairo’s main highlights in one day, with the flexibility to choose between a faster flight option or a road-trip option by minivan.",
+      "highlights": [
+        "Choose between travel by domestic flight or an air-conditioned minivan",
+        "Visit the Pyramids of Giza and the Great Sphinx",
+        "Choose between the Grand Egyptian Museum or Egyptian Museum",
+        "Learn from a professional guide in the language selected at booking",
+        "Enjoy lunch at a local restaurant in Cairo"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off in Hurghada",
+        "Transportation, according to the selected option: domestic flight or air-conditioned minivan",
+        "Domestic flights between Hurghada and Cairo, if the flight option is selected",
+        "Road transportation between Hurghada and Cairo, if the minivan option is selected",
+        "Air-conditioned transportation during the Cairo tour",
+        "Professional tour guide in the selected language",
+        "Entry to the Giza Plateau",
+        "Visit to the Pyramids of Giza and the Great Sphinx",
+        "Museum visit according to the selected option",
+        "Lunch at a local restaurant"
+      ],
+      "exclusions": [
+        "Drinks during lunch",
+        "Personal expenses and souvenirs",
+        "Tips for the guide and driver"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Airplane, Car, Van",
+      "options_portal": [
+        {
+          "title": "Option 3 - Great Pyramids Visit & Quad Bike Adventure",
+          "reference_code": "default",
+          "option_id": "1835566",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "The Grand Egyptian Museum & Giza Pyramids By Plane",
+          "reference_code": "default",
+          "option_id": "1835585",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 1 - Egyptian Museum & Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "1835653",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2 - The Grand Egyptian Museum (GEM) and Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "2018631",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "1835566",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "1835585",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "1835653",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2018631",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/from-hurghada-full-day-trip-to-cairo-by-plane-t1195743/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1195743",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 4,
+      "cutoff_seconds": 14400,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:07:05.735009+00:00",
+      "schedules_scraped_at": "2026-08-19T13:53:43.611685+00:00"
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1279014",
+      "reference_code": "T-1279014",
+      "product_title": "Hurghada: City Tour & Bazaar with Optional Sand Museum Visit",
+      "short_description": "Discover Hurghada on a guided city tour featuring top landmarks and local culture. Explore vibrant bazaars and hidden gems, with the option to visit the unique Sand Museum for an added experience.",
+      "product_description": "Discover the real Hurghada on this guided city tour that combines culture, history, and local life. Start your experience with convenient hotel pickup in a comfortable air-conditioned vehicle, then explore some of the city’s most iconic landmarks.\n\nVisit the beautiful El Mina Mosque, admire the architecture of St. Shenouda Church, and experience the authentic atmosphere of the traditional fishing village. Continue to the lively Hurghada Marina promenade, where you can enjoy scenic views, take photos, and soak in the vibrant coastal vibe.\n\nStroll through local bazaars and markets, where you’ll find a variety of Egyptian products such as perfumes, spices, natural oils, and handmade souvenirs.\n\nYou can also choose to enhance your experience with an optional visit to the Sand Museum (Sand City), a unique open-air gallery featuring impressive sculptures inspired by ancient Egyptian history and famous global figures.\n\nThroughout the tour, a friendly and knowledgeable guide will share insights into Hurghada’s culture and daily life, ensuring a comfortable and engaging experience.\n\nFor added comfort, optional upgrades such as lunch at a local restaurant or a relaxing shisha stop are available.\nThe client can choose between the all options\nWhether you choose a shared or private option, this tour offers the perfect introduction to Hurghada beyond the beach.",
+      "highlights": [
+        "Clients can choose Private or shared tour options",
+        "Visit the mosque, church, marina & traditional fishing village",
+        "Enjoy shopping time at bazaars and local spice shops",
+        "Special price for families or groups of 4+ guests",
+        "Includes hotel pickup and return in shared transportation"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off",
+        "Air-conditioned transportation",
+        "Local English-speaking guide",
+        "Visit to mosque, church, fishing village, marina, and market",
+        "Bottled water",
+        "Optional lunch (add-on)",
+        "Optional Sand Museum Visit (if selected)"
+      ],
+      "exclusions": [
+        "Tips and personal expenses",
+        "Any extras not mentioned",
+        "Pickup and drop-off from Makadi Bay, Sahl Hasheesh, El Gouna, Safaga, and Soma Bay (available as an add-on)"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Hurghada: City Tour & Bazaar with Sand Museum Visit",
+          "reference_code": "default",
+          "option_id": "1956482",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Group Sightseeing and Shopping Tour",
+          "reference_code": "default",
+          "option_id": "1960009",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Exclusive Family Package – Sightseeing & Shopping Tour",
+          "reference_code": "default",
+          "option_id": "1960020",
+          "status": "Bookable",
+          "type": "Private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "1956482",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1960009",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1960020",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/hurghada-l403/hurghada-uncoveredcity-tour-bazaar-sand-museum-experience-t1279014/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1279014",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:07:25.642580+00:00",
+      "schedules_scraped_at": "2026-08-19T13:53:55.861611+00:00"
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1196475",
+      "reference_code": "T-1196475",
+      "product_title": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
+      "short_description": "A beginner-friendly Cairo day trip by bus, designed especially for travelers visiting Egypt for the first time",
+      "product_description": "This full-day Cairo trip from Hurghada is designed for travelers visiting Egypt for the first time and looking for a clear, well-organized introduction to the country’s most iconic landmarks. The tour is operated by bus or coach with hotel pickup and drop-off in Hurghada.\n\nYour journey starts late at night or very early in the morning, depending on your hotel location and the confirmed pickup schedule. Travel overnight to Cairo in an air-conditioned vehicle. Please note that this is a long-distance trip, and the drive between Hurghada and Cairo can take several hours each way, including rest stops and security checkpoints.\n\nUpon arrival in Cairo, you will meet your professional tour guide. The guide language will be based on the language option selected when booking. The sightseeing program is planned with a clear structure and a comfortable pace, making it suitable for first-time visitors.\n\nVisit the famous Giza Plateau, home to the Great Pyramid of Khufu, the Pyramid of Khafre, the Pyramid of Menkaure, and the Great Sphinx. Your guide will explain the history of the site in an easy-to-follow way, with time for photos and questions. Entry to the Giza Plateau is included. Entry inside one of the pyramids is optional, available for an additional fee, and can be decided on the day according to the guest’s preference.\n\nContinue to the Egyptian Museum in Tahrir Square, where you will explore highlights of ancient Egyptian civilization, including statues, treasures, and important royal artifacts. Guests may also have the option to choose the new Grand Egyptian Museum instead, depending on the selected option, availability, and the tour arrangement. Any museum upgrade or change may require an additional fee if it is not included in the booked option.\n\nDuring the day, enjoy lunch at a local restaurant in Cairo. There may also be time for an optional Nile boat trip, available for an additional fee and based on the guest’s preference.\n\nThe tour may include free time or short stops for shopping at selected local stores, such as souvenir shops, perfume shops, papyrus galleries, or similar places. Purchases are completely optional, and guests are not required to buy anything.\n\nAfter the sightseeing program, return by air-conditioned bus to Hurghada, with arrival back at your hotel expected late in the evening or at night, depending on traffic, road conditions, and hotel location.\n\nThis tour is ideal for travelers who want to visit Cairo’s main attractions in one day from Hurghada at a good value, while understanding that it involves a long round-trip journey by road.",
+      "highlights": [
+        "Designed especially for first-time visitors to Egypt",
+        "Comfortable overnight travel by air-conditioned bus",
+        "Visit the Giza Pyramids and the Great Sphinx",
+        "Guided highlights tour of the Egyptian Museum",
+        "Excellent value Cairo experience from Hurghada"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off in Hurghada",
+        "Roundtrip transportation by air-conditioned bus",
+        "Air-conditioned transfers within Cairo",
+        "Professional English-speaking tour guide",
+        "Entrance fees to the Pyramids area and the Egyptian Museum or Grand Egyptian Museum if selected",
+        "Lunch at a local restaurant",
+        "Small-group experience",
+        "Entry inside the Great Pyramid (if option selected)"
+      ],
+      "exclusions": [
+        "Drinks during lunch",
+        "Personal expenses",
+        "Gratuities (optional)"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Option 1 - Egyptian Museum & Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "1836231",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2 - The Grand Egyptian Museum (GEM) and Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "1836308",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 3 - Great Pyramids Visit & Quad Bike Adventure",
+          "reference_code": "default",
+          "option_id": "1836310",
+          "status": "Deactivated",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "1836231",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1836308",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "1836310",
+          "cutoff_hours": 0,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/hurghada-to-cairo-pyramids-museum-for-first-time-visitors-t1196475/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1196475",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:07:47.789245+00:00",
+      "schedules_scraped_at": "2026-08-19T13:54:07.265749+00:00"
+    },
+    {
+      "product_id": "DISC-SSH",
+      "gyg_tour_id": "1273778",
+      "reference_code": "T-31032026",
+      "product_title": "Discover Cairo, Great Pyramids & Quad Bike From Sharm By Bus",
+      "short_description": "Experience Cairo from Sharm on a long day trip with a unique photo-focused experience. Visit the Pyramids, capture stunning shots at top viewpoints, and enjoy a Nile ride and local lunch.",
+      "product_description": "Experience Cairo in a different way with this carefully designed day trip from Sharm El Sheikh, combining iconic highlights with a unique photo-focused experience.\n\nTravel comfortably by bus to Cairo, where your journey begins at the world-famous Giza Pyramids. Unlike standard tours, this experience is designed to help you capture unforgettable moments, with guided photo stops at the best panoramic viewpoints, including the perfect angles of the pyramids and the Sphinx.\n\nYour guide will not only share the history of ancient Egypt but will also assist you in finding the best spots and angles for memorable photos. Whether you are traveling solo, as a couple, or with friends, this experience ensures you leave with stunning memories.\n\nContinue your journey with a visit to the Egyptian Museum, home to thousands of ancient artifacts, including treasures of Tutankhamun.\n\nEnjoy a local lunch at a carefully selected restaurant before heading to the Nile for a relaxing boat ride, offering a different perspective of Cairo.\n\nFor those who want an even more premium experience, you can upgrade your tour to include a professional photographer who will capture and edit your best moments at the pyramids.",
+      "highlights": [
+        "Capture stunning photos at the Giza Pyramids viewpoints",
+        "Enjoy guided photo stops with expert local assistance",
+        "Visit the Museums and explore ancient treasures",
+        "Relax on a scenic Nile boat ride in Cairo",
+        "Upgrade with a professional photographer for edited photos"
+      ],
+      "inclusions": [
+        "Hotel pickup",
+        "Round-trip transportation by air-conditioned bus",
+        "Air-conditioned transfers within Cairo",
+        "Professional English-speaking tour guide",
+        "Lunch at a local restaurant",
+        "Guided visit to the Giza Plateau",
+        "Small-group experience",
+        "Entry inside the Great Pyramid (if add on selected)",
+        "Professional photographer (if option selected)",
+        "Nile boat ride (if add on selected)",
+        "Guided visit to the Egyptian Museum or the Grand Egyptian Museum (if option selected)"
+      ],
+      "exclusions": [
+        "Drinks during lunch",
+        "Personal expenses",
+        "Gratuities (optional)"
+      ],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Bus / coach, Car, Van",
+      "options_portal": [
+        {
+          "title": "Option 1 - Egyptian Museum & Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "1948837",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2 - The Grand Egyptian Museum (GEM) and Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "1966991",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 3 - Great Pyramids Visit & Quad Bike Adventure",
+          "reference_code": "default",
+          "option_id": "2163143",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "1948837",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "1966991",
+          "cutoff_hours": 4,
+          "schedules": []
+        },
+        {
+          "option_id": "2163143",
+          "cutoff_hours": 4,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "5.0 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/from-sharm-cairo-by-bus-pyramids-photo-experience-t1273778/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1273778",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 4,
+      "cutoff_seconds": 14400,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "00:25:00",
+        "00:40:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:08:08.366968+00:00",
+      "schedules_scraped_at": "2026-08-19T13:54:20.111597+00:00"
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1303745",
+      "reference_code": "T-1303745",
+      "product_title": "Hurghada: Luxor Karnak, Hatshepsut & the Valley of the Kings",
+      "short_description": "Discover the wonders of ancient Egypt on a full-day trip from Hurghada to Luxor. Visit Karnak Temple, explore the Temple of Hatshepsut, and uncover the tombs at the Valley of the Kings.",
+      "product_description": "Full-Day Trip from Hurghada to Luxor\n\nThe trip starts early in the morning with pickup from the hotel in Hurghada by a comfortable, air-conditioned vehicle. Guests then travel through the desert road toward Luxor. During the journey, there is a short rest stop of approximately 30 minutes, where guests can use the bathroom or have a light drink before continuing the drive to Luxor.\n\nUpon arrival in Luxor, the tour guide will be waiting for the guests according to the language selected during booking. The tour begins with a visit to Karnak Temple, one of the largest and most important temple complexes in ancient Egypt. Guests will enjoy a guided explanation of the temple’s history, its massive columns, sacred halls, and impressive ancient architecture.\n\nAfter visiting Karnak Temple, guests continue to the West Bank of Luxor. There are two options for crossing: guests may either continue by bus, or choose to cross by boat for an additional optional fee. If the boat option is selected, guests can enjoy a pleasant Nile boat trip for approximately 30 minutes.\n\nAfter that, guests head to a local restaurant for lunch, then continue the tour toward the Valley of the Kings. On the way, there is a stop at the Colossi of Memnon for approximately 15 minutes, giving guests time to take photos and learn some historical information about the site.\n\nAt the Valley of the Kings, the package includes entrance to 3 tombs from the tombs open for visits. Guests also have the option, depending on their preference or pre-booked selection, to enter Tutankhamun’s Tomb or the Tomb of Ramses V and VI for an additional optional fee.\n\nAfter finishing the visit to the Valley of the Kings, the tour continues toward the Temple of Queen Hatshepsut. On the way, there is a rest stop of approximately 30 minutes at an alabaster or stone handicraft workshop, where guests are welcomed with a cold local drink. Guests will also have time to relax or use the bathroom.\n\nThe trip then continues to Hatshepsut Temple, a unique terraced temple set against the mountains and dedicated to one of the most famous queens in ancient Egyptian history.\n\nAt the end of the day, guests return comfortably to Hurghada by air-conditioned vehicle after enjoying a memorable day exploring the most important historical landmarks of Luxor.",
+      "highlights": [
+        "Discover the Valley of the Kings, explore the tombs of Egypt’s greatest pharaohs",
+        "visit to the Tomb of Tutankhamun or the Tomb of Ramses V & VI",
+        "Admire the magnificent Karnak Temple, the largest religious complex ever built",
+        "Visit the Temple of Hatshepsut, one of Egypt’s most remarkable architectural",
+        "Enjoy a small-group tour with an expert Egyptologist guide and lunch included"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off from Hurghada",
+        "Round-trip transportation in an air-conditioned vehicle",
+        "Professional Egyptologist guide",
+        "Entry ticket to Karnak Temple",
+        "Entry ticket to the Valley of the Kings (3 standard tombs)",
+        "Entry ticket to the Temple of Hatshepsut",
+        "Visit to the Colossi of Memnon",
+        "Small-group tour experience",
+        "Entry to the Tomb of Tutankhamun (if selected)",
+        "Entry to the Tomb of Ramses V & VI (if selected)",
+        "snacks, cold drinks, and water on your way back.",
+        "Lunch at a local restaurant in Luxor"
+      ],
+      "exclusions": [
+        "Drinks during lunch",
+        "Personal expenses",
+        "Gratuities (optional)"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Van, Bus / coach, Car",
+      "options_portal": [
+        {
+          "title": "Karnak- Hatshepsut- Valley of the Kings,Ramses V & VI+ Meals",
+          "reference_code": "default",
+          "option_id": "1992492",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Karnak + Hatshepsut +Valley of the Kings,Tutankhamun + Meals",
+          "reference_code": "default",
+          "option_id": "2007649",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Karnak + Valley of the Kings + Hatshepsut + Meals",
+          "reference_code": "default",
+          "option_id": "2096120",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "1992492",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2007649",
+          "cutoff_hours": 2,
+          "schedules": []
+        },
+        {
+          "option_id": "2096120",
+          "cutoff_hours": 2,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": true,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "4.9 of 5",
+      "public_url": "https://getyourguide.com/luxor-l109/hurghada-tomb-raiders-of-luxor-secrets-of-ramses-v-and-vi-t1303745/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1303745",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "03:00:00",
+        "03:30:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:08:31.079188+00:00",
+      "schedules_scraped_at": "2026-08-19T13:54:33.420107+00:00"
+    },
+    {
+      "product_id": "LUX-CAI",
+      "gyg_tour_id": "1361847",
+      "reference_code": "T-1361847",
+      "product_title": "Luxor to Cairo: 2Day with Sleeper Train & Pyramids View Stay",
+      "short_description": "Explore Cairo on a 2-day trip from Luxor. Travel by overnight train, visit the Pyramids of Giza, and stay in a luxury apartment with views of the Pyramids.",
+      "product_description": "Experience Cairo on this unforgettable 2-day journey from Luxor, combining ancient history, culture, and a unique overnight stay with breathtaking panoramic views of the Pyramids.\n\nDay 1: Overnight Sleeper Train & Pyramids of Giza\nBoard the overnight sleeper train from Luxor to Cairo and enjoy a comfortable journey to Egypt’s vibrant capital. Upon arrival, head directly to the legendary Giza Plateau to explore the Great Pyramid of Khufu, the pyramids of Khafre and Menkaure, and the iconic Great Sphinx. Continue to the spectacular Grand Egyptian Museum (GEM), home to some of the world's most important ancient treasures.\n\nOptional: Entry inside the Great Pyramid is available for an additional fee.\n\nLater, check in to your luxury architectural apartment featuring a direct panoramic view of the Pyramids. In the evening, you may choose to join an optional Nile dinner cruise with live entertainment and traditional cuisine.\n\nDay 2: Design Your Own Cairo Experience\nAfter breakfast, enjoy a flexible day tailored to your interests. Accompanied by a professional guide, you may choose optional visits to Saqqara, Memphis, Dahshur, and the Citadel of Saladin, or explore Old Cairo and Islamic Cairo, including the Hanging Church, Amr Ibn Al-As Mosque, Khan El Khalili Bazaar, and the National Museum of Egyptian Civilization.\n\nAll visits on Day 2 are optional, allowing you complete freedom to customize your experience and pay only for the sites you wish to enter.\n\nIn the afternoon, transfer to the station for your return journey, taking home unforgettable memories of Cairo’s timeless wonders and spectacular pyramid views.\n\n⚠️ Important Note: This tour does not necessarily start on the same day the booking is made. Once your booking is received, we will contact you to arrange the sleeper train tickets and confirm the exact departure date and time. The tour may start on the same day or the following day, depending on train availability and schedule, and will be coordinated with you directly.",
+      "highlights": [
+        "Discover the Great Pyramid of Khufu, the Sphinx, and more at the Giza Plateau",
+        "Visit the Grand Egyptian Museum, home to some of the world's ancient treasures",
+        "Stay in a luxury apartment with a panoramic view of the Pyramids of Giza",
+        "Enjoy an optional Nile dinner cruise with live entertainment and local cuisine",
+        "Customize your second day with optional visits to Saqqara, Memphis, and more"
+      ],
+      "inclusions": [
+        "Overnight sleeper train from Luxor to Cairo",
+        "A visit to the Giza Pyramids and Great Sphinx",
+        "Overnight stay in a luxury apartment with pyramid view",
+        "Entrance fees to the Pyramids area and the Grand Egyptian Museum",
+        "Professional Egyptologist tour guide",
+        "1-night accommodation in Cairo",
+        "Breakfast & Lunch",
+        "Time to explore Cairo",
+        "Dinner Nile Cruise or Jetcar adventure (if add-on selected )",
+        "National Museum of Egyptian Civilization (if add-on selected )",
+        "The Citadel of Saladin (if add-on selected )",
+        "Saqqara, Memphis & Dahshur (if add-on selected )"
+      ],
+      "exclusions": [
+        "Personal expenses & shopping",
+        "Tips for the guide and driver"
+      ],
+      "pickup_location": "Luxor",
+      "transportation": "Train, Van, Car",
+      "options_portal": [
+        {
+          "title": "Day 1 Pyramids & GEM + luxury stay & Day 2 Customized night",
+          "reference_code": "default",
+          "option_id": "2078262",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Day 1 Pyramids & GEM Day 2 Memphis, Saqqara & Old Cairo",
+          "reference_code": "default",
+          "option_id": "2078274",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [
+        {
+          "option_id": "2078262",
+          "cutoff_hours": 0,
+          "schedules": []
+        },
+        {
+          "option_id": "2078274",
+          "cutoff_hours": 0,
+          "schedules": []
+        }
+      ],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Luxor",
+      "city": "Luxor",
+      "location": "Luxor, Egypt",
+      "country": "EGY",
+      "rating": "Not rated",
+      "public_url": "https://getyourguide.com/cairo-l92/luxor-to-cairo-2day-with-sleeper-train-pyramids-view-stay-t1361847/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1361847",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": true,
+      "scraped_at": "2026-08-19T13:08:55.058328+00:00",
+      "schedules_scraped_at": "2026-08-19T13:54:43.952909+00:00"
+    },
+    {
+      "product_id": "MAR-CAI",
+      "gyg_tour_id": "1361217",
+      "reference_code": "T-1361217",
+      "product_title": "Marsa Alam : Cairo 2-Day Tour with Luxury Pyramids View Stay",
+      "short_description": "Discover Cairo on an unforgettable trip from Marsa Alam. Visit Pyramids and Sphinx, explore the Grand Egyptian Museum, and spend the night in a luxury private apartment with a direct panoramic view",
+      "product_description": "Day 1: Giza Pyramids & Grand Egyptian Museum\nStart your journey with pickup from your hotel in Marsa Alam and travel comfortably to Cairo. Upon arrival, visit the legendary Giza Plateau, home to the Great Pyramid of Khufu, the pyramids of Khafre and Menkaure, and the iconic Great Sphinx.\n\nEnjoy a guided tour with your professional Egyptologist guide, learn the fascinating history of ancient Egypt, and take unforgettable photos at one of the world’s most famous landmarks.\n\nOptional: Entrance inside the Great Pyramid is available for an additional fee.\n\nContinue to the Grand Egyptian Museum, one of the world’s most impressive museums, where you’ll discover ancient Egyptian treasures in a modern and immersive setting.\n\nIn the afternoon, check in to your luxury private apartment with a direct panoramic view of the Pyramids. In the evening, you may choose to join an optional Nile dinner cruise with live entertainment.\n\nDay 2: Customize Your Cairo Experience\nAfter breakfast, enjoy a flexible second day in Cairo tailored to your interests.\n\nChoose from optional experiences such as:\nSaqqara, Memphis & Dahshur\nor\nOld Cairo & Islamic Cairo, including Amr Ibn Al-As Mosque, the Hanging Church, Khan El Khalili Bazaar\n\nAll optional visits can be arranged with your guide, giving you the freedom to design your day as you like.\n\nAt the end of the tour, relax on your return transfer to Marsa Alam with unforgettable memories of Cair",
+      "highlights": [
+        "Marvel at the Giza Pyramids and the Great Sphinx",
+        "Stay overnight in a luxury apartment with a full Pyramid view",
+        "Customize your second day in Cairo with optional visits",
+        "Enjoy comfortable round-trip transfer from Marsa Alam to Cairo",
+        "Customize your second day in Cairo with optional visits"
+      ],
+      "inclusions": [
+        "Transfer from Marsa Alam to Cairo and back",
+        "Visit to Giza Pyramids and Great Sphinx",
+        "Entrance fees to the Pyramids area and Grand Egyptian Museum",
+        "Professional Egyptologist tour guide",
+        "1-night accommodation in a luxury private apartment with Pyramid view",
+        "Breakfast on the Second day",
+        "Lunch at amazing restaurant",
+        "One room available per booing in a luxury private apartment",
+        "Time to explore Cairo",
+        "Optional add-ons available: Nile dinner cruise, NMEC, Citadel, Saqqara, Memphis & Dahshur"
+      ],
+      "exclusions": [
+        "Personal expenses & shopping",
+        "Tips for guide and driver"
+      ],
+      "pickup_location": "Marsa Alam",
+      "transportation": "Van, Bus / coach",
+      "options_portal": [
+        {
+          "title": "Day 1 Pyramids & GEM + luxury stay & Day 2 Customized night",
+          "reference_code": "Option 1",
+          "option_id": "2077243",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Day 1 Pyramids & GُEM Day 2 Memphis, Saqqara & Old Cairo",
+          "reference_code": "Option 2",
+          "option_id": "2077267",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "From Amarina Abu Soma (Safaga) 2-Day Tour with Pyramids View",
+          "reference_code": "default",
+          "option_id": "2160469",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Cairo",
+      "city": "Cairo",
+      "location": "Cairo, Egypt",
+      "country": "EGY",
+      "rating": "5.0 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/marsa-alam-cairo-2-day-tour-with-luxury-pyramids-view-stay-t1361217/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1361217",
       "daily_capacity": 15,
       "participants_min": 1,
       "participants_max": 15,
@@ -383,8 +2140,817 @@
       },
       "details_loaded": true,
       "schedules_loaded": false,
-      "scraped_at": "2026-08-19T13:05:38.768325+00:00",
-      "schedules_scraped_at": "2026-08-19T14:12:33.549549+00:00"
+      "scraped_at": "2026-08-19T13:09:17.869359+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "SHA-SSH",
+      "gyg_tour_id": "1344400",
+      "reference_code": "T-1344400",
+      "product_title": "Sharm El Sheikh: Cairo 2-Day with Luxury Pyramids View Stay",
+      "short_description": "Discover Cairo on a 2-day tour from Sharm El Sheikh. Explore the Giza Pyramids, stay overnight in a luxury apartment with a panoramic view of the pyramids, and visit the Grand Egyptian Museum.",
+      "product_description": "Experience Cairo on this unforgettable 2-day journey that combines ancient history, culture, and a unique overnight stay with a breathtaking panoramic view of the Pyramids.\n\nDay 1: Pyramids of Giza & Grand Egyptian Museum\n\nYour adventure begins with pickup from Sharm El Sheikh and transfer to Cairo. Upon arrival, head directly to the legendary Giza Plateau. Explore the world-famous Great Pyramid of Khufu, along with the pyramids of Khafre and Menkaure, and stand face-to-face with the iconic Great Sphinx.\n\nEnjoy a guided visit filled with fascinating history and plenty of time for memorable photos.\n\nOptional: Entrance inside the Great Pyramid is available for an additional fee.\n\nContinue your day with a visit to the magnificent Grand Egyptian Museum (GEM), one of the world's most impressive museums, showcasing ancient Egypt through modern exhibitions and immersive displays.\n\nIn the afternoon, transfer to your luxury architectural apartment, where you’ll spend the night enjoying a direct panoramic view of the Pyramids.\n\nIn the evening, you may choose to join an optional Nile dinner cruise featuring delicious cuisine, live entertainment, and a magical evening on the Nile.\n\nDay 2: Customize Your Cairo Experience\n\nEnjoy breakfast before starting a fully flexible day tailored to your interests.\n\nChoose from a variety of optional experiences with your professional guide, including:\n\nSaqqara, Memphis & Dahshur – Explore Egypt’s earliest pyramids and ancient capital.\nThe Citadel of Saladin.\nOld Cairo & Islamic Cairo Tour, including:\nMosque of Amr Ibn Al-As\nThe Hanging Church\nKhan El Khalili Bazaar\nNational Museum of Egyptian Civilization\n\nAll Day 2 visits are optional, giving you complete freedom to customize your experience. Entrance fees for optional attractions are paid directly by guests according to the sites they choose to visit.\n\nAt approximately 4:00 PM, begin your journey back to Sharm El Sheikh, taking home unforgettable memories of Cairo’s timeless wonders.",
+      "highlights": [
+        "Marvel at the iconic Giza Pyramids and the Great Sphinx",
+        "Stay overnight in a luxury apartment with a panoramic view of the Pyramids",
+        "Explore the Grand Egyptian Museum (GEM)",
+        "Customize your second day according to your interests",
+        "Travel comfortably between Sharm El Sheikh and Cairo"
+      ],
+      "inclusions": [
+        "Transfer from Sharm El Sheikh to Cairo and back",
+        "Visit to the Giza Pyramids and Great Sphinx",
+        "Entrance fees to the Pyramids Area and the Grand Egyptian Museum",
+        "Professional Egyptologist tour guide",
+        "Overnight stay in a luxury apartment with a pyramid view",
+        "Breakfast & Lunch",
+        "Free time to explore Cairo",
+        "Nile Dinner Cruise (if add-on selected)",
+        "National Museum of Egyptian Civilization (if add-on selected)",
+        "The Citadel of Saladin (if add-on selected)",
+        "Saqqara, Memphis & Dahshur (if add-on selected)"
+      ],
+      "exclusions": [
+        "Personal expenses",
+        "Tips for the guide and driver",
+        "Additional entrance fees not mentioned"
+      ],
+      "pickup_location": "Sharm El Sheikh",
+      "transportation": "Van, Bus / coach, Car",
+      "options_portal": [
+        {
+          "title": "Day 1 Pyramids & GEM + luxury stay & Day 2 Customized night✨",
+          "reference_code": "default",
+          "option_id": "2052572",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Day 1 Pyramids & GُEM Day 2 Memphis, Saqqara & Old Cairo ✨",
+          "reference_code": "default",
+          "option_id": "2052593",
+          "status": "Bookable",
+          "type": "Private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "5.0 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/sharm-el-sheikh-cairo-2-day-with-luxury-pyramids-view-stay-t1344400/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1344400",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T13:09:39.454042+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1289272",
+      "reference_code": "T-1289272",
+      "product_title": "Hurghada: Cairo 2-Day Tour with Luxury Pyramids View Stay",
+      "short_description": "Discover Cairo on a 2-day tour from Hurghada. Explore the Giza Pyramids, stay overnight in a luxury apartment with a view of the Pyramids, and visit the Grand Egyptian Museum.",
+      "product_description": "Cairo on this unforgettable 2-day journey, blending ancient history, culture, and a unique overnight stay with a full panoramic view of the Pyramids.\nDay 1: Pyramids of Giza & Grand Egyptian Museum\nYour adventure begins with arrival in Cairo, where you’ll head straight to the legendary Giza Plateau. Explore the world-famous Great Pyramid of Khufu, along with the pyramids of Khafre and Menkaure, and stand face-to-face with the iconic Great Sphinx. Enjoy a guided visit filled with fascinating history and plenty of time for stunning photos.\n\nOptional: Entrance inside the Great Pyramid is available for an additional fee.\n\nContinue your day with a visit to the magnificent Grand Egyptian Museum (GEM) – one of the most impressive museums in the world, showcasing ancient Egypt in a modern, immersive way.\n\nIn the afternoon, transfer to your luxury architectural apartment, where you’ll spend the night enjoying a direct, full panoramic view of the Pyramids — a truly unforgettable setting.\n\nIn the evening, you can choose to join an optional Nile dinner cruise, featuring delicious cuisine, live entertainment, and a magical sailing experience through the heart of Cairo.\n\nDay 2: Customize Your Cairo Experience\n\nStart your day with breakfast, then enjoy a fully flexible itinerary tailored to your interests.\n\nYou can choose between different optional experiences with the professional guide, such as:\n\nSaqqara, Memphis & Dahshur – discover Egypt’s earliest pyramids and ancient capital & The Citadel of Saladin\nor\nOld Cairo & Islamic Cairo Tour – including:\nMosque of Amr Ibn Al-As\nThe Hanging Church\nKhan El Khalili Bazaar\nNational Museum of Egyptian Civilization\n\nAll visits are optional, giving you the freedom to design your day exactly with your guide.\n\nAt the end of your journey, relax on your return to Hurghada, at 4:00 PM taking with you unforgettable memories of Cairo’s timeless wonders.",
+      "highlights": [
+        "Marvel at the iconic Giza Pyramids and the Great Sphinx",
+        "Stay overnight in a luxury apartment with a view of the Pyramids",
+        "Explore the Grand Egyptian Museum and see King Tutankhamun's treasures",
+        "Enjoy a comfortable transfer from Hurghada to Cairo and back",
+        "Experience the vibrant atmosphere of Cairo on a 2-day tour"
+      ],
+      "inclusions": [
+        "Transfer from Hurghada to Cairo",
+        "A visit to Giza Pyramids and Great Sphinx",
+        "Overnight stay in a luxury apartment with pyramid view",
+        "Entrance fees to the Pyramids area and the Grand Egyptian Museum",
+        "Professional Egyptologist tour guide",
+        "1-night accommodation in Cairo",
+        "Breakfast & Lunch",
+        "Time to explore Cairo",
+        "Dinner Nile Cruise or Jetcar adventure (if add on selected )",
+        "National Museum of Egyptian Civilization (if add on selected )",
+        "The Citadel of Saladin (if add on selected )",
+        "Saqqara, Memphis & Dahshur (if add on selected )"
+      ],
+      "exclusions": [
+        "Personal expenses & shopping",
+        "Tips for guide and driver"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Van, Car",
+      "options_portal": [
+        {
+          "title": "Day 1 Pyramids & GEM + luxury stay & Day 2 Customized night✨",
+          "reference_code": "default",
+          "option_id": "1971650",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Day 1 Pyramids & GُEM Day 2 Memphis, Saqqara & Old Cairo ✨",
+          "reference_code": "default",
+          "option_id": "1977169",
+          "status": "Bookable",
+          "type": "Private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "4.9 of 5",
+      "public_url": "https://getyourguide.com/hurghada-l403/cairo-2day-tour-from-hurghada-with-luxury-pyramids-view-stay-t1289272/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1289272",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T13:10:01.012061+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "HURG-HRG",
+      "gyg_tour_id": "1289286",
+      "reference_code": "T-1289286",
+      "product_title": "From Hurghada: Hidden Cairo , Pyramids & Cave Church",
+      "short_description": "Explore the hidden side of Cairo on an unforgettable journey from Hurghada. Start your day with a visit to the iconic Great Pyramids of Giza, one of the world’s most legendary wonders",
+      "product_description": "Step away from the ordinary and discover the hidden soul of Cairo on this unforgettable full-day journey from Hurghada. Designed for travelers seeking more than the typical tourist route, this experience offers a deeper exploration of the city’s rich history, vibrant culture, and spiritual heritage.\n\nYour day begins with a visit to the world-famous Great Pyramids of Giza, one of the most iconic wonders of the ancient world. Stand in awe before these timeless monuments and capture unforgettable moments at one of Egypt’s most legendary sites.\n\nAfter exploring the pyramids, enjoy the flexibility to design the rest of your day based on your interests. In coordination with your guide, you can choose to visit:\n\nThe Citadel of Salah El-Din and the magnificent Mosque of Muhammad Ali, where you can enjoy panoramic views of Cairo and admire stunning Ottoman architecture.\nThe historic Hanging Church, one of the oldest and most beautiful Coptic churches in Egypt, rich in spiritual significance and unique design.\n\nThis flexible itinerary allows you to tailor your experience, creating a personalized journey that matches your interests and pace.\n\nThroughout the day, you’ll uncover a side of Cairo that blends ancient wonders with cultural depth and spiritual heritage. Whether you choose history, architecture, or faith-based landmarks, this tour promises a rich and unforgettable experience filled with lasting memories.\n\nTo ensure a smooth and timely return to Hurghada, your day in Cairo will be carefully planned to conclude by around 4:00 PM, with departure scheduled between 4:00 and 4:30 PM.",
+      "highlights": [
+        "Explore the iconic Citadel of Salah El-Din & stunning panoramic views over Cairo",
+        "Discover the hidden Cave Church carved into Mokattam Mountain",
+        "Learn fascinating stories about Cairo’s history, culture, and spiritual heritage",
+        "Perfect mix of history, culture, and hidden gems in one tour",
+        "Visit the iconic Great Pyramids of Giza, one of the Seven Wonders of the Ancient"
+      ],
+      "inclusions": [
+        "Hotel pickup & drop-off from Hurghada",
+        "Air-conditioned transportation throughout the tour",
+        "Professional -speaking guide",
+        "Entrance fees to Pyramids area , The Citadel , Cave Church",
+        "Bottled water during the trip",
+        "Lunch at a local restaurant",
+        "Mineral water"
+      ],
+      "exclusions": [
+        "Personal expenses",
+        "Tipping (optional)",
+        "Any extras not mentioned in the program",
+        "Rope activities & Climbing (optional)"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "1- Pyramids , The Citadel & Mohamed Ali Mosque",
+          "reference_code": "default",
+          "option_id": "1971684",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "2- The Pyramids ,Cave Church & Free Time",
+          "reference_code": "default",
+          "option_id": "1978781",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "5.0 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/from-hurghada-hidden-cairo-citadel-cave-church-tour-t1289286/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1289286",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T12:56:02.410854+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "RAS",
+      "gyg_tour_id": "1286076",
+      "reference_code": "T-1286076",
+      "product_title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
+      "short_description": "Escape to the breathtaking beauty of Ras Mohamed on this half-day adventure. Swim and snorkel in crystal-clear waters, explore vibrant coral reefs, - all in just a few unforgettable hours.",
+      "product_description": "the heart of the Red Sea. Perfect for travelers with limited time, this experience combines relaxation, adventure, and breathtaking scenery in just a few hours.\n\nStart your journey with a comfortable pickup from your hotel and head toward one of Egypt’s most famous marine reserves. Once inside the park, you’ll be surrounded by stunning landscapes, crystal-clear turquoise waters, and some of the most vibrant coral reefs in the world.\n\nEnjoy multiple stops for swimming and snorkeling, where you can explore the underwater paradise filled with colorful fish and diverse marine life. Whether you’re a beginner or an experienced snorkeler, the calm, clear waters make it easy to enjoy every moment.\n\nTake in the beauty of iconic locations within the park, capture incredible photos, and relax as you soak up the peaceful atmosphere of this protected natural haven. Your guide will ensure a smooth and enjoyable experience from start to finish.\n\nAfter an exciting and refreshing adventure, you’ll head back to your hotel with unforgettable memories of Ras Mohamed’s unique beauty.\n\nThis half-day tour is the perfect choice for those looking to experience the best of the Red Sea in a short time—without compromising on quality or adventure.",
+      "highlights": [
+        "Explore the stunning Ras Mohamed National Park in just half a day",
+        "Swim and snorkel in crystal-clear waters of the Red Sea",
+        "Visit some of the most iconic spots inside the park",
+        "Enjoy a perfect mix of relaxation and adventure",
+        "Discover vibrant coral reefs and colorful marine life"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off in an air-conditioned vehicle",
+        "Certified snorkeling guide",
+        "Allah's Gate visit",
+        "Mangrove Rock and Magic Lake visit",
+        "National Park entry fees",
+        "Snorkeling equipment if selected from (Add on Options)"
+      ],
+      "exclusions": [
+        "No exclusions added"
+      ],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
+          "reference_code": "default",
+          "option_id": "1966980",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/sharm-el-sheikh-l408/the-hidden-paradise-escape-ras-mohamed-half-day-adventure-t1286076/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1286076",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T13:13:41.761047+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "SHA-SSH",
+      "gyg_tour_id": "1278978",
+      "reference_code": "T-1278978",
+      "product_title": "Sharm Signature: Mosque, Cathedral, Farsha Café & Old Market",
+      "short_description": "Explore Sharm El-Sheikh’s highlights, from stunning mosques , a magnificent cathedral as per availability & the vibrant Old Market. Discover the city’s culture and spiritual harmony while wandering",
+      "product_description": "Discover the best of Sharm El-Sheikh on this enriching city tour that perfectly blends culture, history, and local charm. Begin your journey with a visit to the stunning Al Mustafa Mosque, one of the most beautiful landmarks in the city, admired for its grand Islamic architecture and peaceful atmosphere. Continue to the iconic El Sahaba Mosque, located in the heart of the Old Market, where traditional design meets vibrant local life.\n\nOptional Farsha Café Stop: At the end of the tour, guests may choose to be dropped off at Farsha Café. Table reservations are the responsibility of the guest and are subject to the café's availability and policies. After spending time at the café, guests are responsible for arranging and covering their own transportation back to their hotel.\n\nAfter exploring these magnificent sites, enjoy free time to wander through the lively Old Market. Stroll along colorful streets filled with traditional bazaars, where you can shop for unique souvenirs, aromatic spices, handmade crafts, and local products. Immerse yourself in the authentic Egyptian atmosphere, interact with friendly locals, and capture unforgettable photos.\n\nThe experience also includes a visit to the heavenly cathedral, one of the largest and most beautifully decorated churches in the region, known for its impressive artwork and spiritual ambiance.",
+      "highlights": [
+        "Visit the stunning Al Mustafa Mosque, one of Sharm’s most iconic landmarks",
+        "Explore the beautiful El Sahaba Mosque in the heart of the Old Market",
+        "Discover the magnificent Heavenly Cathedral, famous for its unique artwork",
+        "Wander through the vibrant Old Market and enjoy free time for shopping",
+        "Experience the perfect blend of culture, religion, and local life"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off",
+        "Transportation in a air-conditioned car",
+        "Local guide",
+        "Bottled water",
+        "Old Market visit",
+        "Fanar area visit",
+        "Sahaba mosque visit",
+        "Capture amazing photos at Sharm’s top cultural spots",
+        "Heavenly cathedral visit",
+        "Sea food meal (add-on)",
+        "Shisha (If Old MArket with Panorama Cafee Option Selected)",
+        "Soft Drink (If Old MArket with Panorama Cafee Option Selected)",
+        "Bottle of water (If Panorama Cafee Option Selected)"
+      ],
+      "exclusions": [
+        "Tips and personal expenses",
+        "Any extras not mentioned"
+      ],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Option 1: Mosque, Cathedral & Old Market Tour",
+          "reference_code": "default",
+          "option_id": "1956426",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2 : Old Market Tour With Panorama Café",
+          "reference_code": "default",
+          "option_id": "1959982",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/sharm-el-sheikh-l408/sharm-signature-experience-mosque-cathedral-old-market-t1278978/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1278978",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T13:14:01.824145+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "SHA-SSH",
+      "gyg_tour_id": "1278027",
+      "reference_code": "T-1278027",
+      "product_title": "Sharm: 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
+      "short_description": "Explore Dahab’s stunning 3 Pools with a beach quad ride, camel experience, and delicious lunch included in this all-in-one adventure from Sharm El Sheikh. and the clients can choose between 2 options",
+      "product_description": "Escape the busy city of Sharm El Sheikh and discover the natural beauty of Dahab on this full-day adventure to the famous 3 Pools.\n\nYour journey begins with a comfortable hotel pickup in an air-conditioned vehicle, followed by a scenic drive through the Sinai desert toward the charming coastal town of Dahab. Upon arrival, head to the stunning 3 Pools area, known for its crystal-clear waters, colorful coral reefs, and peaceful atmosphere—perfect for relaxation and snorkeling.\n\nExperience the thrill of riding a quad bike along the beach, enjoying breathtaking sea views and fresh coastal air. Then, take a step into Bedouin traditions with a relaxing camel ride along the shoreline, offering a unique and authentic desert-meets-sea experience.\n\nAfter your activities, unwind and enjoy a delicious lunch at a local seaside restaurant, where you can relax and take in the beautiful surroundings.\n\nWhether you’re looking for adventure, culture, or pure relaxation, this Dahab 3 Pools tour offers the perfect combination of all three in one unforgettable day.\n\nYou will also have free time to enjoy snorkeling in the clear waters of the 3 Pools, where you can explore vibrant marine life and colorful coral reefs.",
+      "highlights": [
+        "Discover the stunning 3 Pools in Dahab with crystal-clear waters",
+        "Enjoy an exciting quad bike ride along the beautiful beach coast",
+        "Experience a traditional camel ride with amazing sea views",
+        "Relax and savor a delicious lunch at a local seaside restaurant",
+        "Travel comfortably from Sharm El Sheikh with hotel transfers included"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off in an air-conditioned vehicle",
+        "Professional guide throughout the trip",
+        "Entry to Dahab 3 Pools area",
+        "Salama Canyon Visit By Jeep",
+        "Quad bike ride on the beach & between mountains (if option selected)",
+        "Camel ride experience",
+        "Lunch at a local seaside restaurant",
+        "Bottled water during the trip",
+        "Snorkeling stop at the 3 Pools (Snorkeling Equipment not included) add on selection"
+      ],
+      "exclusions": [
+        "Personal expenses",
+        "Any extras not mentioned in the program",
+        "Drinks at the Restaurant"
+      ],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Option 1 - 3 Pools Tour, Camel, Red Canyon & Lunch",
+          "reference_code": "default",
+          "option_id": "1955072",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2 Quad Bike Adventure,3 Pools, Camel,Red Canyon&Lunch",
+          "reference_code": "default",
+          "option_id": "1960029",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/dahab-l884/from-sharm-3-pools-dahab-tour-quad-camel-ride-lunch-t1278027/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1278027",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T13:14:21.207220+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "SHA-SSH",
+      "gyg_tour_id": "1195076",
+      "reference_code": "T-1195076",
+      "product_title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
+      "short_description": "Enjoy an exciting desert escape from Sharm El-Sheikh by 4x4 Jeep across the Sinai. Explore the stunning Colored Canyon, visit the famous Blue Hole for relaxation, snorkeling and perfect mix atmosphere",
+      "product_description": "Discover two stunning wonders of the Sinai Peninsula in one exhilarating day on our jeep tour to the Colored Canyon and Blue Hole National Park, departing from Sharm El Sheikh. This unforgettable adventure begins with an early morning pickup in a comfortable, air-conditioned minivan, taking you on a scenic journey to the charming town of Dahab.\n\nUpon arrival, you will switch to a 4x4 jeep for the off-road adventure to the iconic Colored Canyon. Wander through a mesmerizing 800-meter gorge filled with vibrant sandstone cliffs displaying shades of yellow, purple, red, and gold. This natural labyrinth promises breathtaking views at every turn.\n\nNext, visit the serene Blue Hole National Park, where you can relax on the beach and experience exceptional snorkeling among an array of colorful coral reefs and marine life. Dive into an underwater paradise teeming with vibrant fish and unique species.\n\nAfter a day of exploration, enjoy a delicious BBQ lunch at the beach camp, surrounded by stunning views of the sea and mountains. Take a moment to breathe in the fresh air before embarking on a camel ride along the coast, capturing memorable photos along the way.\n\nYour adventure continues with an adrenaline-pumping quad bike ride along Dahab's coastline. Feel the rush as you navigate the scenic terrain, making the most of your time in this beautiful region.\n\nFinally, return by jeep to Dahab City for a brief shopping stop, where you can pick up unique souvenirs before concluding your tour back in Sharm El Sheikh. Join us for a day of natural beauty, adventure, and unforgettable memories. and clients can choose between the two options of including blue hole area with entrance ticket or without entered the blue hole\n\nThe gusts will not choose the blue hole option they will have a free time equal two hours they can spent in shopping or in the Bedouin tent after lunch",
+      "highlights": [
+        "Visit the world-famous Blue Hole, ideal for swimming and snorkeling",
+        "Walk inside the breathtaking Colored Canyon with unique rock formations",
+        "Free time in Dahab to relax by the sea or explore local bazaars",
+        "Perfect blend of adventure, nature, and authentic Bedouin lunch atmosphere"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off of in air-conditioned transportation",
+        "Professional canyon and snorkeling guide",
+        "Jeep adventure safari",
+        "Visit to Colored Canyon and canyon history description",
+        "Lunch in a Bedouin Tent on the beach in Dahab",
+        "Camel ride along the sea",
+        "Shopping stop at Dahab city",
+        "Bottle of water",
+        "Blue Hole and Abu Galum (if option selected)",
+        "ATV ride along the sea and mountains in Dahab (if option selected)"
+      ],
+      "exclusions": [
+        "Gratuities",
+        "Snorkeling Equipment",
+        "Drinks at the Restaurant"
+      ],
+      "pickup_location": "Sharm El-Sheikh",
+      "transportation": "Van",
+      "options_portal": [
+        {
+          "title": "Option 1 - Colored Canyon without Blue Hole & Abu Galum",
+          "reference_code": "default",
+          "option_id": "1833849",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2-Colored Canyon with Blue Hole & Abu Galum ATV Quad",
+          "reference_code": "default",
+          "option_id": "1833865",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 3 - Colored Canyon with ATV Quad without Blue Hole",
+          "reference_code": "default",
+          "option_id": "1872433",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Sharm",
+      "city": "Sharm",
+      "location": "Sharm, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/dahab-l884/sharm-el-sheikh-jeep-adventure-to-blue-hole-canyon-dahab-t1195076/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1195076",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "08:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T13:14:41.580407+00:00",
+      "schedules_scraped_at": null
+    },
+    {
+      "product_id": "HUR-HRG",
+      "gyg_tour_id": "1195745",
+      "reference_code": "T-1195745",
+      "product_title": "Hurghada: Full-Day Trip to Cairo by Plane",
+      "short_description": "Fly from Hurghada to Cairo for a full day visiting the Giza Pyramids, the Sphinx, and your choice of museum, with lunch included and a carefully planned schedule.",
+      "product_description": "See Cairo’s top highlights in one day—without the long bus journey—on a full-day fly-in tour from Hurghada. Your experience includes round-trip domestic flights, hotel transfers, a guided visit to the Giza Pyramids and the Sphinx, lunch, and a museum visit in Cairo.\n\nEarly start & flight details\nYour day starts very early with pickup from your Hurghada hotel and transfer to the airport for your domestic flight to Cairo. Flight times are set by the airline and may change; pickup and return times will be adjusted accordingly. You will meet your local guide in Cairo after landing.\n\nGiza Pyramids & Sphinx\nVisit the Giza Plateau to see the Great Pyramid of Khufu, the pyramids of Khafre and Menkaure, and the Great Sphinx. Your guide will share the history of the site and allow time for photos.\n\nThe Giza Plateau entry is included\nEntry inside a pyramid is not included unless you book the option that includes it (subject to availability on the day).\nMuseum visit (one museum per booking)\nAfter Giza, continue to your selected museum (depending on the option you choose at checkout and availability):\n\nEgyptian Museum (Tahrir Square), or\nGrand Egyptian Museum (GEM).\nPlease choose carefully—only one museum is included.\n\nLunch & optional stops\nLunch at a local Cairo restaurant is included. The exact timing depends on the day’s schedule. If time allows, there may be optional stops (e.g., shops). Shopping is optional and there is no obligation to buy. Any optional activities (such as a Nile boat ride) are not included unless stated and may cost extra.\n\nImportant: expectations for this tour (to avoid surprises)\nThis is a fast-paced, full-day program and involves:\n\nan early pickup and late return,\nairport procedures and possible waiting time,\nCairo traffic, and\na fair amount of walking at Giza and in the museum.\nTiming can change due to flight schedules, traffic, and security checks.\n\nWho it’s best for: Ideal for travelers who want to cover Cairo’s must-sees in one day by flight and are comfortable with a long, busy itinerary.",
+      "highlights": [
+        "Domestic flight from Hurghada to Cairo",
+        "Visit the Giza Pyramids and the Sphinx",
+        "Choose between the Grand Egyptian Museum or Egyptian Museum",
+        "Lunch included at a local restaurant",
+        "Well organized full-day Cairo itinerary"
+      ],
+      "inclusions": [
+        "Hotel pickup and drop-off in Hurghada",
+        "Domestic round-trip flights between Hurghada and Cairo",
+        "Transportation in air-conditioned vehicles in Cairo",
+        "Entrance fees to the Giza Pyramids and the Sphinx",
+        "Choice of museum entrance: Grand Egyptian Museum or Egyptian Museum",
+        "Lunch at a local restaurant in Cairo",
+        "Professional English-speaking guide",
+        "Bottled water during the tour",
+        "Entry inside the Pyramids ( if option selected)"
+      ],
+      "exclusions": [
+        "Drinks during lunch",
+        "Personal expenses and souvenirs",
+        "Optional activities not mentioned in the program",
+        "Tips for the guide and driver"
+      ],
+      "pickup_location": "Hurghada",
+      "transportation": "Airplane, Car, Van",
+      "options_portal": [
+        {
+          "title": "Option 1 - The Egyptian Museum and Giza Pyramids",
+          "reference_code": "EGM & Giza Pyramids",
+          "option_id": "1835791",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 2 - The Grand Egyptian Museum (GEM) and Giza Pyramids",
+          "reference_code": "default",
+          "option_id": "1835815",
+          "status": "Bookable",
+          "type": "Non-private"
+        },
+        {
+          "title": "Option 3 - Giza Pyramids Tour with Optional Museum Visit",
+          "reference_code": "default",
+          "option_id": "1835820",
+          "status": "Bookable",
+          "type": "Non-private"
+        }
+      ],
+      "option_schedules": [],
+      "live": true,
+      "api_connected": false,
+      "pilot": false,
+      "destination_name": "Hurghada",
+      "city": "Hurghada",
+      "location": "Hurghada, Egypt",
+      "country": "EGY",
+      "rating": "4.8 of 5",
+      "public_url": "https://getyourguide.com/cairo-l92/hurghada-full-day-trip-to-cairo-by-plane-t1195745/",
+      "supplier_url": "https://supplier.getyourguide.com/products/details?tour_id=1195745",
+      "daily_capacity": 15,
+      "participants_min": 1,
+      "participants_max": 15,
+      "cutoff_hours": 2,
+      "cutoff_seconds": 7200,
+      "closed_weekdays": [],
+      "blockout_dates": [],
+      "departure_times": [
+        "04:00:00"
+      ],
+      "categories": {
+        "ADULT": {
+          "enabled": true,
+          "retail_minor": 10000,
+          "min_ticket_amount": 1,
+          "max_ticket_amount": 15,
+          "age_from": 12,
+          "age_to": 99
+        },
+        "CHILD": {
+          "enabled": true,
+          "retail_minor": 7500,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 15,
+          "age_from": 4,
+          "age_to": 11
+        },
+        "INFANT": {
+          "enabled": true,
+          "retail_minor": 0,
+          "min_ticket_amount": 0,
+          "max_ticket_amount": 5,
+          "age_from": 0,
+          "age_to": 3
+        }
+      },
+      "details_loaded": true,
+      "schedules_loaded": false,
+      "scraped_at": "2026-08-19T12:57:48.296319+00:00",
+      "schedules_scraped_at": null
     }
   ]
 }

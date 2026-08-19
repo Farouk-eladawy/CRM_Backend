@@ -381,6 +381,85 @@ def _parse_schedule_panel(text: str) -> dict:
     return schedule
 
 
+EXTRACT_SCHEDULES_JS = """
+async () => {
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  await new Promise(r => { const f=()=>document.body?.innerText?.includes('Option ID')||document.body?.innerText?.includes('Product Id:')?r():setTimeout(f,400); f(); });
+  document.querySelectorAll('iframe').forEach(f=>{ if(f.getBoundingClientRect().width>280) f.style.display='none'; });
+  function parsePanel(text) {
+    const result = {};
+    const rp = text.match(/Retail price\\s*(.+?)(?:Minimum participants|Validity|Hide schedule|Weekday|Date range:|Pricing:|$)/is);
+    if (rp) {
+      const retail = {};
+      for (const m of rp[1].matchAll(/(Infant|Child|Adult|Senior)\\s*€([\\d.,]+)/gi))
+        retail[m[1].toUpperCase()] = Math.round(parseFloat(m[2].replace(',',''))*100);
+      if (Object.keys(retail).length) result.retail_prices = retail;
+    }
+    if (!result.retail_prices) {
+      const range = text.match(/Pricing:\\s*€([\\d.,]+)\\s*-\\s*€([\\d.,]+)/i);
+      if (range) result.retail_prices = { INFANT: Math.round(parseFloat(range[1].replace(',',''))*100), ADULT: Math.round(parseFloat(range[2].replace(',',''))*100) };
+    }
+    const part = text.match(/Participants\\s*(\\d+)\\s*-\\s*(\\d+)/i);
+    if (part) { result.participants_min = +part[1]; result.participants_max = +part[2]; }
+    const times = [];
+    for (const day of ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']) {
+      const dm = text.match(new RegExp(day + '\\\\s*(\\\\d{1,2}:\\\\d{2})', 'i'));
+      if (dm) { const [h,m]=dm[1].split(':'); times.push(String(+h).padStart(2,'0')+':'+m+':00'); }
+    }
+    if (times.length) result.departure_times = [...new Set(times)].sort();
+    let val = text.match(/Validity\\s*(.+?)(?:Hide schedule|monday|Date range:|Pricing:|$)/is);
+    if (!val) val = text.match(/Date range:\\s*\\n?\\s*(.+?)(?:\\nParticipants:|\\nPricing:|$)/is);
+    if (val) result.validity = val[1].trim().slice(0,120);
+    const nm = text.match(/^(.+?)(?:Price setup|Participants|Date range:|Pricing:)/s);
+    if (nm && nm[1].trim().length<120) result.name = nm[1].trim();
+    return result;
+  }
+  function parseCutoff(t){ const m=t.match(/Cut-off time:\\s*\\n?\\s*(\\d+)\\s*hours?/i); return m?+m[1]:0; }
+  function getOptionId(t){ const m=t.match(/Option ID\\s*\\n\\s*(\\d+)/); return m?m[1]:''; }
+  const options=[];
+  let btns=[...document.querySelectorAll('button')].filter(b=>/^Show schedules$/i.test((b.innerText||'').trim()));
+  for (let idx=0; idx<btns.length; idx++) {
+    btns=[...document.querySelectorAll('button')].filter(b=>/^Show schedules$/i.test((b.innerText||'').trim()));
+    const btn = btns[idx];
+    if (!btn) continue;
+    let block=btn, blockText='';
+    for (let i=0;i<15;i++){ block=block.parentElement; if(!block) break; blockText=block.innerText||''; if(blockText.includes('Option ID')) break; }
+    btn.scrollIntoView({block:'center'}); btn.click(); await sleep(900);
+    const avail=[...document.querySelectorAll('button')].find(b=>/^Availability & Pricing$/i.test((b.innerText||'').trim()));
+    if (avail) { avail.click(); await sleep(700); }
+    const schedules=[];
+    const seen = new Set();
+    for (let a=0;a<12;a++){
+      const showOne=[...document.querySelectorAll('button')].find(b=>/^Show schedule$/i.test((b.innerText||'').trim()));
+      if(!showOne) break;
+      showOne.scrollIntoView({block:'center'}); showOne.click(); await sleep(700);
+      const hideOne=[...document.querySelectorAll('button')].find(b=>/^Hide schedule$/i.test((b.innerText||'').trim()));
+      let panelText='';
+      if(hideOne){ let p=hideOne.parentElement; for(let i=0;i<6&&p;i++){ panelText=p.innerText||''; if(/Participants:|Pricing:|Retail price|Monday/i.test(panelText)) break; p=p.parentElement; } }
+      const parsed=parsePanel(panelText);
+      const key = JSON.stringify(parsed);
+      if(Object.keys(parsed).length && !seen.has(key)){ seen.add(key); schedules.push(parsed); }
+      if(hideOne){ hideOne.click(); await sleep(300); }
+      else break;
+    }
+    const hideSched=[...document.querySelectorAll('button')].find(b=>/^Hide schedules$/i.test((b.innerText||'').trim()));
+    if(hideSched){ hideSched.click(); await sleep(300); }
+    options.push({ option_id:getOptionId(blockText), cutoff_hours:parseCutoff(blockText), schedules });
+  }
+  return options;
+}
+"""
+
+
+def extract_schedules_via_js(page) -> list[dict]:
+    """Browser-DOM schedule extraction (works when Playwright locators fail)."""
+    try:
+        result = page.evaluate(EXTRACT_SCHEDULES_JS)
+        return list(result or [])
+    except Exception:
+        return []
+
+
 def _parse_cutoff_hours(text: str) -> int:
     match = re.search(r"Cut-off time:\s*\n?\s*(\d+)\s*hours?", text, re.I)
     if match:
@@ -542,62 +621,15 @@ def _collect_schedules_in_open_panel(page) -> list[dict]:
 
 
 def extract_schedules_from_page(page, known_option_ids: list[str] | None = None) -> list[dict]:
-    """Expand Show schedules / schedule rows and parse pricing + times."""
-    dismiss_support_chat(page)
-    try:
-        page.locator("text=Options").first.scroll_into_view_if_needed(timeout=3000)
-    except Exception:
-        pass
-    time.sleep(0.4)
-
-    options_out: list[dict] = []
-    option_ids = [oid for oid in (known_option_ids or []) if oid]
-    show_schedules_buttons = page.get_by_role("button", name=re.compile(r"^Show schedules$", re.I)).all()
-
-    if option_ids and len(option_ids) == len(show_schedules_buttons):
-        pairs = list(zip(option_ids, show_schedules_buttons))
-    else:
-        pairs = [( "", btn) for btn in show_schedules_buttons]
-
-    for idx, (option_id_hint, schedules_btn) in enumerate(pairs):
-        try:
-            if not schedules_btn.is_visible():
-                continue
-            option_text = _option_block_for_button(page, schedules_btn)
-            option_id = option_id_hint or _extract_option_id(option_text)
-            cutoff_hours = _parse_cutoff_hours(option_text)
-            dismiss_support_chat(page)
-            if option_id:
-                _open_option_availability(page, option_id)
-            schedules_btn.scroll_into_view_if_needed(timeout=2000)
-            schedules_btn.click(timeout=3000)
-            time.sleep(0.8)
-            try:
-                avail = page.get_by_role("button", name=re.compile(r"^Availability & Pricing$", re.I)).first
-                if avail.count() and avail.is_visible(timeout=500):
-                    avail.click(timeout=1500)
-                    time.sleep(0.5)
-            except Exception:
-                pass
-            schedules = _collect_schedules_in_open_panel(page)
-
-            hide_schedules = page.get_by_role("button", name=re.compile(r"^Hide schedules$", re.I)).first
-            try:
-                if hide_schedules.count() and hide_schedules.is_visible(timeout=500):
-                    hide_schedules.click(timeout=1500)
-                    time.sleep(0.3)
-            except Exception:
-                pass
-
-            if option_id or schedules:
-                options_out.append({
-                    "option_id": option_id or f"option_{idx + 1}",
-                    "cutoff_hours": cutoff_hours,
-                    "schedules": schedules,
-                })
-        except Exception:
-            continue
-    return options_out
+    """Expand Show schedules / schedule rows and parse pricing + times (JS DOM clicks)."""
+    via_js = extract_schedules_via_js(page)
+    if known_option_ids:
+        id_map = {str(o.get("option_id")): o for o in via_js if o.get("option_id")}
+        return [
+            id_map.get(oid) or {"option_id": oid, "cutoff_hours": 0, "schedules": []}
+            for oid in known_option_ids
+        ]
+    return via_js
 
 
 def _summarize_schedule_data(option_schedules: list[dict]) -> dict:

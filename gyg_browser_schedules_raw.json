@@ -1,144 +1,30 @@
 {
-  "extracted_at": "2026-08-19T14:38:45.192512+00:00",
+  "extracted_at": "2026-08-20T13:30:00+00:00",
+  "extraction_method": "Browser Tab: Edit option → Availability & Pricing → Edit schedule (full retail tiers + times)",
   "products": [
     {
       "gyg_tour_id": "1441222",
+      "product_title": "Serabit El-Khadim Bedouin Camp & 4x4 Desert Safari Adventure",
       "option_schedules": [
         {
           "option_id": "2201750",
           "cutoff_hours": 5,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
+              "name": "all year",
+              "validity": "Aug 16, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "departure_times": ["06:00:00"],
+              "departure_weekdays": ["tuesday", "thursday", "sunday"],
+              "retail_prices": {"INFANT": 0, "CHILD": 15000, "ADULT": 22500},
+              "pricing_tiers": [
+                {"participants": "1-2", "retail_prices": {"INFANT": 0, "CHILD": 15000, "ADULT": 22500}},
+                {"participants": "3-4", "retail_prices": {"INFANT": 0, "CHILD": 12500, "ADULT": 17500}},
+                {"participants": "5-100", "retail_prices": {"INFANT": 0, "CHILD": 10000, "ADULT": 12500}}
+              ],
+              "addons": [{"name": "20 min camel ride", "retail_price": 2000}],
+              "extracted_via": "Edit option → Availability & Pricing → Edit schedule"
             }
           ]
         }
@@ -146,130 +32,26 @@
     },
     {
       "gyg_tour_id": "1442388",
+      "product_title": "Cairo: Private Guided Tour to Your Chosen Attraction",
       "option_schedules": [
         {
           "option_id": "2201866",
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
+              "name": "Scheduled all year",
+              "validity": "Aug 16, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "departure_times": ["08:00:00"],
+              "departure_weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+              "retail_prices": {"CHILD": 9000, "ADULT": 18000},
+              "pricing_tiers": [
+                {"participants": "1", "retail_prices": {"CHILD": 9000, "ADULT": 18000}},
+                {"participants": "2", "retail_prices": {"CHILD": 4000, "ADULT": 8000}},
+                {"participants": "3-100", "retail_prices": {"CHILD": 3000, "ADULT": 6000}}
+              ],
+              "extracted_via": "Edit option → Availability & Pricing → Edit schedule"
             }
           ]
         }
@@ -277,142 +59,28 @@
     },
     {
       "gyg_tour_id": "1439459",
+      "product_title": "Luxor: Private Customizable Tour with Egyptologist Guide",
       "option_schedules": [
         {
           "option_id": "2197340",
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
+              "name": "Scheduled all year",
+              "validity": "Aug 14, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "departure_times": ["07:30:00"],
+              "departure_weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+              "retail_prices": {"INFANT": 0, "CHILD": 9000, "ADULT": 18000},
+              "pricing_tiers": [
+                {"participants": "1", "retail_prices": {"INFANT": 0, "CHILD": 9000, "ADULT": 18000}},
+                {"participants": "2", "retail_prices": {"INFANT": 0, "CHILD": 4500, "ADULT": 9000}},
+                {"participants": "3", "retail_prices": {"INFANT": 0, "CHILD": 3500, "ADULT": 7000}},
+                {"participants": "4", "retail_prices": {"INFANT": 0, "CHILD": 3000, "ADULT": 6000}},
+                {"participants": "5-100", "retail_prices": {"INFANT": 0, "CHILD": 2500, "ADULT": 5000}}
+              ],
+              "extracted_via": "Edit option → Availability & Pricing → Edit schedule"
             }
           ]
         },
@@ -421,136 +89,21 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
+              "name": "Copy of Scheduled all year",
+              "validity": "Aug 14, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "departure_times": ["07:30:00"],
+              "departure_weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+              "retail_prices": {"INFANT": 0, "CHILD": 9000, "ADULT": 18000},
+              "pricing_tiers": [
+                {"participants": "1", "retail_prices": {"INFANT": 0, "CHILD": 9000, "ADULT": 18000}},
+                {"participants": "2", "retail_prices": {"INFANT": 0, "CHILD": 4500, "ADULT": 9000}},
+                {"participants": "3", "retail_prices": {"INFANT": 0, "CHILD": 7000, "ADULT": 7000}},
+                {"participants": "4", "retail_prices": {"INFANT": 0, "CHILD": 3000, "ADULT": 6000}},
+                {"participants": "5-30", "retail_prices": {"INFANT": 0, "CHILD": 5000, "ADULT": 5000}}
+              ],
+              "extracted_via": "Edit option → Availability & Pricing → Edit schedule"
             }
           ]
         }
@@ -564,14 +117,12 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "CHILD": 6000,
-                "ADULT": 12000
-              },
+              "retail_prices": {"CHILD": 6000, "ADULT": 12000},
               "participants_min": 1,
               "participants_max": 9,
               "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "name": "Price setupPrice per person",
+              "needs_edit_reextract": true
             }
           ]
         },
@@ -580,13 +131,12 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "ADULT": 10000
-              },
+              "retail_prices": {"ADULT": 10000},
               "participants_min": 1,
               "participants_max": 9,
               "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "name": "Price setupPrice per person",
+              "needs_edit_reextract": true
             }
           ]
         }
@@ -600,15 +150,12 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 30000,
-                "ADULT": 50000
-              },
+              "retail_prices": {"INFANT": 0, "CHILD": 30000, "ADULT": 50000},
               "participants_min": 1,
               "participants_max": 100,
               "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "name": "Price setupPrice per person",
+              "needs_edit_reextract": true
             }
           ]
         }
@@ -622,15 +169,12 @@
           "cutoff_hours": 0,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 20000
-              },
+              "retail_prices": {"INFANT": 0, "CHILD": 10000, "ADULT": 20000},
               "participants_min": 1,
               "participants_max": 1,
               "validity": "Jun 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "name": "Price setupPrice per person",
+              "needs_edit_reextract": true
             }
           ]
         },
@@ -639,15 +183,12 @@
           "cutoff_hours": 6,
           "schedules": [
             {
-              "retail_prices": {
-                "ADULT": 17500,
-                "CHILD": 14500,
-                "INFANT": 0
-              },
+              "retail_prices": {"ADULT": 17500, "CHILD": 14500, "INFANT": 0},
               "participants_min": 1,
               "participants_max": 200,
               "validity": "Jun 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "name": "Price setupPrice per person",
+              "needs_edit_reextract": true
             }
           ]
         }
@@ -658,23 +199,156 @@
       "option_schedules": [
         {
           "option_id": "1828226",
-          "cutoff_hours": 0,
-          "schedules": []
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 11000, "ADULT": 15000},
+              "participants_min": 1,
+              "participants_max": 500,
+              "validity": "Apr 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
         },
         {
           "option_id": "1828292",
-          "cutoff_hours": 0,
-          "schedules": []
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 8000, "ADULT": 10000},
+              "participants_min": 1,
+              "participants_max": 500,
+              "validity": "Apr 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
         },
         {
           "option_id": "2089103",
-          "cutoff_hours": 0,
-          "schedules": []
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 10000, "ADULT": 14000},
+              "participants_min": 1,
+              "participants_max": 100,
+              "validity": "Apr 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
         },
         {
           "option_id": "2163134",
-          "cutoff_hours": 0,
-          "schedules": []
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 7000, "ADULT": 9000},
+              "participants_min": 1,
+              "participants_max": 9,
+              "validity": "Apr 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1195743",
+      "option_schedules": [
+        {
+          "option_id": "1835566",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 5000, "ADULT": 8000},
+              "participants_min": 1,
+              "participants_max": 200,
+              "validity": "May 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        },
+        {
+          "option_id": "1835585",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 20000, "CHILD": 29400, "ADULT": 31500},
+              "participants_min": 1,
+              "participants_max": 200,
+              "validity": "May 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        },
+        {
+          "option_id": "1835653",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 8000, "ADULT": 10000},
+              "participants_min": 1,
+              "participants_max": 200,
+              "validity": "May 3, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        },
+        {
+          "option_id": "2018631",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 10000, "ADULT": 15000},
+              "participants_min": 1,
+              "participants_max": 200,
+              "validity": "May 5, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1279014",
+      "option_schedules": [
+        {
+          "option_id": "1956482",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 3500, "ADULT": 4500},
+              "participants_min": 1,
+              "participants_max": 50,
+              "validity": "Apr 8, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        },
+        {
+          "option_id": "1960009",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"INFANT": 0, "CHILD": 2500, "ADULT": 3200},
+              "participants_min": 1,
+              "participants_max": 50,
+              "validity": "Apr 8, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
+        },
+        {
+          "option_id": "1960020",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "retail_prices": {"CHILD": 1500, "ADULT": 1500},
+              "participants_min": 1,
+              "participants_max": 10,
+              "validity": "Jul 21, 2026 - No end date",
+              "needs_edit_reextract": true
+            }
+          ]
         }
       ]
     }

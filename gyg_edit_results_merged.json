@@ -418,7 +418,7 @@
       "option_schedules": [
         {
           "option_id": "2078284",
-          "cutoff_hours": 6,
+          "cutoff_hours": 0,
           "schedules": [
             {
               "name": "all year",
@@ -785,7 +785,7 @@
         },
         {
           "option_id": "1835653",
-          "cutoff_hours": 4,
+          "cutoff_hours": 2,
           "schedules": [
             {
               "name": "The Egyptian Museum & Giza By bus",
@@ -824,7 +824,7 @@
         },
         {
           "option_id": "2018631",
-          "cutoff_hours": 4,
+          "cutoff_hours": 2,
           "schedules": [
             {
               "name": "GEM and Giza Pyramids By van",
@@ -1084,7 +1084,7 @@
         },
         {
           "option_id": "1836310",
-          "cutoff_hours": 2,
+          "cutoff_hours": 0,
           "schedules": [
             {
               "name": "Great Pyramids Visit & Quad Bike",
@@ -1480,6 +1480,884 @@
                     "INFANT": 0,
                     "CHILD": 75000,
                     "ADULT": 80000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1361217",
+      "product_title": "Marsa Alam : Cairo 2-Day Tour with Luxury Pyramids View Stay",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "2077243",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "all year",
+              "validity": "Jun 13, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 35000,
+                "ADULT": 71500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 35000,
+                    "ADULT": 71500
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 28000,
+                    "ADULT": 45000
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "2077267",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Copy of all year",
+              "validity": "Jun 13, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 35000,
+                "ADULT": 73000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 35000,
+                    "ADULT": 73000
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 20000,
+                    "ADULT": 44500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "2160469",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Safaga",
+              "validity": "Jul 26, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 20000,
+                "ADULT": 37000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 20000,
+                    "ADULT": 37000
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 15000,
+                    "ADULT": 23000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1344400",
+      "product_title": "Sharm El Sheikh: Cairo 2-Day with Luxury Pyramids View Stay",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "2052572",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "May 31, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 19000,
+                "ADULT": 26000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 19000,
+                    "ADULT": 26000
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "2052593",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "May 31, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 22500,
+                "ADULT": 35000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 22500,
+                    "ADULT": 35000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1289272",
+      "product_title": "Hurghada: Cairo 2-Day Tour with Luxury Pyramids View Stay",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1971650",
+          "cutoff_hours": 3,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 24000,
+                "ADULT": 26800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 24000,
+                    "ADULT": 26800
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1977169",
+          "cutoff_hours": 3,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 25000,
+                "ADULT": 29000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 25000,
+                    "ADULT": 29000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1289286",
+      "product_title": "From Hurghada: Hidden Cairo , Pyramids & Cave Church",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1971684",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 6000,
+                "ADULT": 8500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 6000,
+                    "ADULT": 8500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1978781",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "Copy of all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 6500,
+                "ADULT": 9000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 6500,
+                    "ADULT": 9000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1286076",
+      "product_title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1966980",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Ras Mohamed Half Day",
+              "validity": "Apr 13, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 1800,
+                "ADULT": 2600
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 1800,
+                    "ADULT": 2600
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1278978",
+      "product_title": "Sharm Signature: Mosque, Cathedral, Farsha Café & Old Market",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1956426",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "City Tour",
+              "validity": "Apr 7, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "13:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 1500,
+                "ADULT": 2200
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 1500,
+                    "ADULT": 2200
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1959982",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "Copy of City Tour",
+              "validity": "Apr 7, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "13:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2800,
+                "ADULT": 3800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2800,
+                    "ADULT": 3800
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2400,
+                    "ADULT": 3500
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1278027",
+      "product_title": "Sharm: 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1955072",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "3 pools Dahab Tour",
+              "validity": "Apr 4, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2200,
+                "ADULT": 2800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2200,
+                    "ADULT": 2800
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1960029",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Copy of 3 pools Dahab Tour",
+              "validity": "Apr 4, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2600,
+                "ADULT": 4000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2600,
+                    "ADULT": 4000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1195076",
+      "product_title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1833849",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Blue Hole & Abu Galum",
+              "validity": "Jan 18, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2200,
+                "ADULT": 2900
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2200,
+                    "ADULT": 2900
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1833865",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Blue Hole & Abu Galum ATV Quad",
+              "validity": "Jan 18, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 700,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 4400,
+                "ADULT": 5800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 4400,
+                    "ADULT": 5800
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1872433",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Blue Hole & Abu Galum With ATV Quad",
+              "validity": "Jul 16, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2400,
+                "ADULT": 3500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2400,
+                    "ADULT": 3500
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gyg_tour_id": "1195745",
+      "product_title": "Hurghada: Full-Day Trip to Cairo by Plane",
+      "verified_edit": true,
+      "option_schedules": [
+        {
+          "option_id": "1835791",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "EGM & Pyramids",
+              "validity": "Aug 20, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 15000,
+                "CHILD": 25500,
+                "ADULT": 26500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 15000,
+                    "CHILD": 25500,
+                    "ADULT": 26500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1835815",
+          "cutoff_hours": 0,
+          "schedules": [
+            {
+              "name": "GEM & Pyramids",
+              "validity": "Aug 20, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 15000,
+                "CHILD": 27000,
+                "ADULT": 28500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 15000,
+                    "CHILD": 27000,
+                    "ADULT": 28500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1835820",
+          "cutoff_hours": 0,
+          "schedules": [
+            {
+              "name": "Cairo Giza",
+              "validity": "Aug 20, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 15000,
+                "CHILD": 23000,
+                "ADULT": 24400
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 15000,
+                    "CHILD": 23000,
+                    "ADULT": 24400
                   }
                 }
               ]

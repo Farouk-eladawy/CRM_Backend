@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-08-19T14:31:20.863536+00:00",
+  "scraped_at": "2026-08-20T15:10:26.230051+00:00",
   "source": "https://supplier.getyourguide.com/products/list?limit=100",
   "count": 22,
   "products": [
@@ -59,146 +59,67 @@
           "cutoff_hours": 5,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
+              "name": "all year",
+              "validity": "Aug 16, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
+              "departure_times": [
+                "06:00:00"
+              ],
+              "departure_weekdays": [
+                "tuesday",
+                "thursday",
+                "sunday"
+              ],
               "retail_prices": {
                 "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
+                "CHILD": 15000,
+                "ADULT": 22500
               },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 10000,
-                "ADULT": 12500
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "pricing_tiers": [
+                {
+                  "participants": "1-2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 15000,
+                    "ADULT": 22500
+                  }
+                },
+                {
+                  "participants": "3-4",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 12500,
+                    "ADULT": 17500
+                  }
+                },
+                {
+                  "participants": "5-100",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 10000,
+                    "ADULT": 12500
+                  }
+                }
+              ],
+              "addons": [
+                {
+                  "name": "20 min camel ride",
+                  "retail_price": 2000
+                }
+              ]
             }
           ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
+        "departure_times": [
+          "06:00:00"
+        ],
         "retail_prices": {
           "INFANT": 0,
-          "CHILD": 10000,
-          "ADULT": 12500
+          "CHILD": 15000,
+          "ADULT": 22500
         },
         "participants_min": 1,
         "participants_max": 100,
@@ -206,7 +127,7 @@
         "cutoff_hours": 5
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T14:31:20.862027+00:00",
+      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00",
       "schedule_error": "Login timeout"
     },
     {
@@ -259,133 +180,60 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
+              "name": "Scheduled all year",
+              "validity": "Aug 16, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
               "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
+                "CHILD": 9000,
+                "ADULT": 18000
               },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "CHILD": 3000,
-                "ADULT": 6000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 16, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "CHILD": 9000,
+                    "ADULT": 18000
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "CHILD": 4000,
+                    "ADULT": 8000
+                  }
+                },
+                {
+                  "participants": "3-100",
+                  "retail_prices": {
+                    "CHILD": 3000,
+                    "ADULT": 6000
+                  }
+                }
+              ]
             }
           ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
+        "departure_times": [
+          "08:00:00"
+        ],
         "retail_prices": {
-          "CHILD": 3000,
-          "ADULT": 6000
+          "CHILD": 9000,
+          "ADULT": 18000
         },
         "participants_min": 1,
         "participants_max": 100,
@@ -393,7 +241,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T14:31:20.862555+00:00",
+      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00",
       "schedule_error": "Login timeout"
     },
     {
@@ -455,136 +303,69 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
+              "name": "Scheduled all year",
+              "validity": "Aug 14, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
+              "departure_times": [
+                "07:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
               "retail_prices": {
                 "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
+                "CHILD": 9000,
+                "ADULT": 18000
               },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 2500,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 100,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 9000,
+                    "ADULT": 18000
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 4500,
+                    "ADULT": 9000
+                  }
+                },
+                {
+                  "participants": "3",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 3500,
+                    "ADULT": 7000
+                  }
+                },
+                {
+                  "participants": "4",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 3000,
+                    "ADULT": 6000
+                  }
+                },
+                {
+                  "participants": "5-100",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2500,
+                    "ADULT": 5000
+                  }
+                }
+              ]
             }
           ]
         },
@@ -593,146 +374,81 @@
           "cutoff_hours": 4,
           "schedules": [
             {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
+              "name": "Copy of Scheduled all year",
+              "validity": "Aug 14, 2026 - No end date",
               "participants_min": 1,
               "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
+              "departure_times": [
+                "07:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
               "retail_prices": {
                 "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
+                "CHILD": 9000,
+                "ADULT": 18000
               },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
-            },
-            {
-              "retail_prices": {
-                "INFANT": 0,
-                "CHILD": 3000,
-                "ADULT": 5000
-              },
-              "participants_min": 1,
-              "participants_max": 30,
-              "validity": "Aug 14, 2026 - No end date",
-              "name": "Price setupPrice per person"
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 9000,
+                    "ADULT": 18000
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 4500,
+                    "ADULT": 9000
+                  }
+                },
+                {
+                  "participants": "3",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 7000
+                  }
+                },
+                {
+                  "participants": "4",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 3000,
+                    "ADULT": 6000
+                  }
+                },
+                {
+                  "participants": "5-30",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 5000,
+                    "ADULT": 5000
+                  }
+                }
+              ]
             }
           ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
+        "departure_times": [
+          "07:30:00"
+        ],
         "retail_prices": {
           "INFANT": 0,
-          "CHILD": 3000,
-          "ADULT": 5000
+          "CHILD": 9000,
+          "ADULT": 18000
         },
         "participants_min": 1,
         "participants_max": 100,
@@ -740,7 +456,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T14:31:20.862555+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
     },
     {
       "title": "Private Customizable Day Tour to Alexandria from Cairo",
@@ -797,24 +513,106 @@
         {
           "option_id": "2199242",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Aug 14, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 9,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "CHILD": 15000,
+                "ADULT": 29000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "CHILD": 15000,
+                    "ADULT": 29000
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "CHILD": 8000,
+                    "ADULT": 15000
+                  }
+                },
+                {
+                  "participants": "3-9",
+                  "retail_prices": {
+                    "CHILD": 6000,
+                    "ADULT": 12000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2204274",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Aug 14, 2026 - No end date",
+              "participants_min": 4,
+              "participants_max": 9,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "ADULT": 10000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "1-9",
+                  "retail_prices": {
+                    "ADULT": 10000
+                  }
+                }
+              ],
+              "price_model": "per_participant"
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "08:00:00"
+        ],
+        "retail_prices": {
+          "CHILD": 15000,
+          "ADULT": 29000
+        },
         "participants_min": 1,
         "participants_max": 15,
         "min_participants_per_booking": 1,
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:52:57.267903+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
     },
     {
       "title": "Mount Moses, St. Catherine Monastery & Stargazing Adventure",
@@ -869,19 +667,59 @@
         {
           "option_id": "2199990",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Catherine Monastery Tour",
+              "validity": "Aug 16, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "14:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 30000,
+                "ADULT": 50000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 30000,
+                    "ADULT": 50000
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "14:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 30000,
+          "ADULT": 50000
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 100,
         "min_participants_per_booking": 1,
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:53:05.954643+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229053+00:00"
     },
     {
       "title": "From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake",
@@ -948,24 +786,106 @@
         {
           "option_id": "2078284",
           "cutoff_hours": 0,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "all year",
+              "validity": "Jun 14, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 1,
+              "departure_times": [
+                "07:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 20000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 10000,
+                    "ADULT": 20000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2078571",
           "cutoff_hours": 6,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Copy of all year",
+              "validity": "Jun 14, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "07:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 16000,
+                "ADULT": 19500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 16000,
+                    "ADULT": 19500
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 14500,
+                    "ADULT": 17500
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "07:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 16000,
+          "ADULT": 20000
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 200,
         "min_participants_per_booking": 1,
         "cutoff_hours": 6
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:53:16.700442+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
@@ -1038,34 +958,208 @@
         {
           "option_id": "1828226",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "with entry fees & Tutankhamun Tomb",
+              "validity": "Apr 6, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "04:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 11000,
+                "ADULT": 15000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 11000,
+                    "ADULT": 15000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1828292",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "without Tutankhamun Tomb",
+              "validity": "Apr 6, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "04:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 8000,
+                "ADULT": 10000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 8000,
+                    "ADULT": 10000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2089103",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Ramses V and VI",
+              "validity": "Apr 6, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "04:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 14000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 10000,
+                    "ADULT": 14000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2163134",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Exclusive Family Package without Tutankhamun Tomb",
+              "validity": "Apr 6, 2026 - No end date",
+              "participants_min": 5,
+              "participants_max": 9,
+              "departure_times": [
+                "04:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 7000,
+                "ADULT": 9000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 9000
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 9000
+                  }
+                },
+                {
+                  "participants": "3",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 10000
+                  }
+                },
+                {
+                  "participants": "4",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 10000
+                  }
+                },
+                {
+                  "participants": "5+",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 10000
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "04:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 11000,
+          "ADULT": 15000
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 500,
         "min_participants_per_booking": 1,
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:53:30.078833+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Hurghada: Cairo Day Trip with Pyramids, Museum & Quad Bike",
@@ -1141,34 +1235,179 @@
         {
           "option_id": "1835566",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "EGM & Pyramids",
+              "validity": "May 6, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 5000,
+                "ADULT": 8000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 5000,
+                    "ADULT": 8000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1835585",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "GEM and Giza Pyramids",
+              "validity": "May 6, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 20000,
+                "CHILD": 29400,
+                "ADULT": 31500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 20000,
+                    "CHILD": 29400,
+                    "ADULT": 31500
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1835653",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "The Egyptian Museum & Giza By bus",
+              "validity": "May 4, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 8000,
+                "ADULT": 10000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 8000,
+                    "ADULT": 10000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2018631",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "GEM and Giza Pyramids By van",
+              "validity": "May 6, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 15000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 10000,
+                    "ADULT": 15000
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "01:00:00",
+          "04:00:00",
+          "04:05:00"
+        ],
+        "retail_prices": {
+          "INFANT": 20000,
+          "CHILD": 29400,
+          "ADULT": 31500
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 200,
         "min_participants_per_booking": 1,
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:53:43.611685+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Hurghada: City Tour & Bazaar with Optional Sand Museum Visit",
@@ -1234,29 +1473,149 @@
         {
           "option_id": "1956482",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "City Tour with Sand Museum",
+              "validity": "Apr 9, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "10:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 3500,
+                "ADULT": 4500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 3500,
+                    "ADULT": 4500
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1960009",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Share City Tour",
+              "validity": "Apr 9, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "10:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2500,
+                "ADULT": 3200
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2500,
+                    "ADULT": 3200
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1960020",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Jul 22, 2026 - No end date",
+              "participants_min": 5,
+              "participants_max": 10,
+              "departure_times": [
+                "10:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "CHILD": 1500,
+                "ADULT": 1500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "CHILD": 1500,
+                    "ADULT": 1500
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "CHILD": 1500,
+                    "ADULT": 1500
+                  }
+                },
+                {
+                  "participants": "3+",
+                  "retail_prices": {
+                    "CHILD": 1900,
+                    "ADULT": 1900
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "10:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 3500,
+          "ADULT": 4500
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 50,
         "min_participants_per_booking": 1,
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:53:55.861611+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
@@ -1323,29 +1682,137 @@
         {
           "option_id": "1836231",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Egyptian Museum with Giza Pyramids",
+              "validity": "Apr 11, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 8000,
+                "ADULT": 10000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 8000,
+                    "ADULT": 10000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1836308",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "GEM with Giza Pyramids",
+              "validity": "Apr 11, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 15000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 10000,
+                    "ADULT": 15000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1836310",
-          "cutoff_hours": 0,
-          "schedules": []
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "Great Pyramids Visit & Quad Bike",
+              "validity": "Jul 28, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 5000,
+                "ADULT": 8000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 5000,
+                    "ADULT": 8000
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "00:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 10000,
+          "ADULT": 15000
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 200,
         "min_participants_per_booking": 1,
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:54:07.265749+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Discover Cairo, Great Pyramids & Quad Bike From Sharm By Bus",
@@ -1415,29 +1882,137 @@
         {
           "option_id": "1948837",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Copy of All year",
+              "validity": "Mar 29, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 7000,
+                "ADULT": 8500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 7000,
+                    "ADULT": 8500
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "1966991",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Copy of Copy of All year",
+              "validity": "Mar 29, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 8000,
+                "ADULT": 9600
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 8000,
+                    "ADULT": 9600
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2163143",
           "cutoff_hours": 4,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "all year",
+              "validity": "Jul 27, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 6500,
+                "ADULT": 7800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 6500,
+                    "ADULT": 7800
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "00:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 8000,
+          "ADULT": 9600
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 200,
         "min_participants_per_booking": 1,
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:54:20.111597+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Hurghada: Luxor Karnak, Hatshepsut & the Valley of the Kings",
@@ -1508,29 +2083,137 @@
         {
           "option_id": "1992492",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 27, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "05:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 10000,
+                "ADULT": 13000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 10000,
+                    "ADULT": 13000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2007649",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 27, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "05:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 11000,
+                "ADULT": 14000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 11000,
+                    "ADULT": 14000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2096120",
           "cutoff_hours": 2,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 27, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 100,
+              "departure_times": [
+                "05:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 8000,
+                "ADULT": 9500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 8000,
+                    "ADULT": 9500
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "05:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 11000,
+          "ADULT": 14000
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 100,
         "min_participants_per_booking": 1,
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:54:33.420107+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Luxor to Cairo: 2Day with Sleeper Train & Pyramids View Stay",
@@ -1593,24 +2276,130 @@
         {
           "option_id": "2078262",
           "cutoff_hours": 0,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "All year",
+              "validity": "Jun 14, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "17:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 70000,
+                "ADULT": 76000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 70000,
+                    "ADULT": 76000
+                  }
+                },
+                {
+                  "participants": "2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 45000,
+                    "ADULT": 50000
+                  }
+                },
+                {
+                  "participants": "3",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 40000,
+                    "ADULT": 45000
+                  }
+                },
+                {
+                  "participants": "4",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 39000,
+                    "ADULT": 42000
+                  }
+                },
+                {
+                  "participants": "5+",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 38000,
+                    "ADULT": 40000
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "option_id": "2078274",
           "cutoff_hours": 0,
-          "schedules": []
+          "schedules": [
+            {
+              "name": "Copy of All year",
+              "validity": "Jun 14, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "17:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 75000,
+                "ADULT": 80000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 75000,
+                    "ADULT": 80000
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "schedule_summary": {
-        "departure_times": [],
-        "retail_prices": {},
+        "departure_times": [
+          "17:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 75000,
+          "ADULT": 80000
+        },
         "participants_min": 1,
-        "participants_max": 15,
+        "participants_max": 50,
         "min_participants_per_booking": 1,
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-19T13:54:43.952909+00:00"
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Marsa Alam : Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -1673,7 +2462,166 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:09:17.869359+00:00"
+      "scraped_at": "2026-08-19T13:09:17.869359+00:00",
+      "option_schedules": [
+        {
+          "option_id": "2077243",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "all year",
+              "validity": "Jun 13, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 35000,
+                "ADULT": 71500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 35000,
+                    "ADULT": 71500
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 28000,
+                    "ADULT": 45000
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "2077267",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Copy of all year",
+              "validity": "Jun 13, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 35000,
+                "ADULT": 73000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 35000,
+                    "ADULT": 73000
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 20000,
+                    "ADULT": 44500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "2160469",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Safaga",
+              "validity": "Jul 26, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 50,
+              "departure_times": [
+                "00:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 20000,
+                "ADULT": 37000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 20000,
+                    "ADULT": 37000
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 15000,
+                    "ADULT": 23000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "00:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 35000,
+          "ADULT": 73000
+        },
+        "participants_min": 1,
+        "participants_max": 50,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 4
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Sharm El Sheikh: Cairo 2-Day with Luxury Pyramids View Stay",
@@ -1731,7 +2679,103 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:09:39.454042+00:00"
+      "scraped_at": "2026-08-19T13:09:39.454042+00:00",
+      "option_schedules": [
+        {
+          "option_id": "2052572",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "May 31, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 19000,
+                "ADULT": 26000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 19000,
+                    "ADULT": 26000
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "2052593",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "May 31, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 22500,
+                "ADULT": 35000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 22500,
+                    "ADULT": 35000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "01:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 22500,
+          "ADULT": 35000
+        },
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 4
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Hurghada: Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -1789,7 +2833,103 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:10:01.012061+00:00"
+      "scraped_at": "2026-08-19T13:10:01.012061+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1971650",
+          "cutoff_hours": 3,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 24000,
+                "ADULT": 26800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 24000,
+                    "ADULT": 26800
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1977169",
+          "cutoff_hours": 3,
+          "schedules": [
+            {
+              "name": "Scheduled all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 8,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 25000,
+                "ADULT": 29000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 25000,
+                    "ADULT": 29000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "01:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 25000,
+          "ADULT": 29000
+        },
+        "participants_min": 1,
+        "participants_max": 15,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 3
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "From Hurghada: Hidden Cairo , Pyramids & Cave Church",
@@ -1844,7 +2984,103 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T12:56:02.410854+00:00"
+      "scraped_at": "2026-08-19T12:56:02.410854+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1971684",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 6000,
+                "ADULT": 8500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 6000,
+                    "ADULT": 8500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1978781",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "Copy of all year",
+              "validity": "Apr 15, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "01:30:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 6500,
+                "ADULT": 9000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 6500,
+                    "ADULT": 9000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "01:30:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 6500,
+          "ADULT": 9000
+        },
+        "participants_min": 1,
+        "participants_max": 200,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
@@ -1888,7 +3124,64 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:13:41.761047+00:00"
+      "scraped_at": "2026-08-19T13:13:41.761047+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1966980",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Ras Mohamed Half Day",
+              "validity": "Apr 13, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 1800,
+                "ADULT": 2600
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 1800,
+                    "ADULT": 2600
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "08:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 1800,
+          "ADULT": 2600
+        },
+        "participants_min": 1,
+        "participants_max": 200,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 5
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Sharm Signature: Mosque, Cathedral, Farsha Café & Old Market",
@@ -1947,7 +3240,111 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:14:01.824145+00:00"
+      "scraped_at": "2026-08-19T13:14:01.824145+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1956426",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "City Tour",
+              "validity": "Apr 7, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "13:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 1500,
+                "ADULT": 2200
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 1500,
+                    "ADULT": 2200
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1959982",
+          "cutoff_hours": 2,
+          "schedules": [
+            {
+              "name": "Copy of City Tour",
+              "validity": "Apr 7, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "13:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2800,
+                "ADULT": 3800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "tier1",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2800,
+                    "ADULT": 3800
+                  }
+                },
+                {
+                  "participants": "tier2",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2400,
+                    "ADULT": 3500
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "13:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 2800,
+          "ADULT": 3800
+        },
+        "participants_min": 1,
+        "participants_max": 200,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 2
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
     },
     {
       "title": "Sharm: 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
@@ -2003,7 +3400,103 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:14:21.207220+00:00"
+      "scraped_at": "2026-08-19T13:14:21.207220+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1955072",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "3 pools Dahab Tour",
+              "validity": "Apr 4, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2200,
+                "ADULT": 2800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2200,
+                    "ADULT": 2800
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1960029",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Copy of 3 pools Dahab Tour",
+              "validity": "Apr 4, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2600,
+                "ADULT": 4000
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2600,
+                    "ADULT": 4000
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "08:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 2600,
+          "ADULT": 4000
+        },
+        "participants_min": 1,
+        "participants_max": 500,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 5
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
     },
     {
       "title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
@@ -2066,7 +3559,142 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T13:14:41.580407+00:00"
+      "scraped_at": "2026-08-19T13:14:41.580407+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1833849",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Blue Hole & Abu Galum",
+              "validity": "Jan 18, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 500,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2200,
+                "ADULT": 2900
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2200,
+                    "ADULT": 2900
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1833865",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Blue Hole & Abu Galum ATV Quad",
+              "validity": "Jan 18, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 700,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 4400,
+                "ADULT": 5800
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 4400,
+                    "ADULT": 5800
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1872433",
+          "cutoff_hours": 5,
+          "schedules": [
+            {
+              "name": "Blue Hole & Abu Galum With ATV Quad",
+              "validity": "Jul 16, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "08:00:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 0,
+                "CHILD": 2400,
+                "ADULT": 3500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 0,
+                    "CHILD": 2400,
+                    "ADULT": 3500
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "08:00:00"
+        ],
+        "retail_prices": {
+          "INFANT": 0,
+          "CHILD": 4400,
+          "ADULT": 5800
+        },
+        "participants_min": 1,
+        "participants_max": 700,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 5
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
     },
     {
       "title": "Hurghada: Full-Day Trip to Cairo by Plane",
@@ -2130,7 +3758,146 @@
         }
       ],
       "details_loaded": true,
-      "scraped_at": "2026-08-19T12:57:48.296319+00:00"
+      "scraped_at": "2026-08-19T12:57:48.296319+00:00",
+      "option_schedules": [
+        {
+          "option_id": "1835791",
+          "cutoff_hours": 4,
+          "schedules": [
+            {
+              "name": "EGM & Pyramids",
+              "validity": "Aug 20, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 15000,
+                "CHILD": 25500,
+                "ADULT": 26500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 15000,
+                    "CHILD": 25500,
+                    "ADULT": 26500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1835815",
+          "cutoff_hours": 0,
+          "schedules": [
+            {
+              "name": "GEM & Pyramids",
+              "validity": "Aug 20, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 15000,
+                "CHILD": 27000,
+                "ADULT": 28500
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 15000,
+                    "CHILD": 27000,
+                    "ADULT": 28500
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "option_id": "1835820",
+          "cutoff_hours": 0,
+          "schedules": [
+            {
+              "name": "Cairo Giza",
+              "validity": "Aug 20, 2026 - No end date",
+              "participants_min": 1,
+              "participants_max": 200,
+              "departure_times": [
+                "04:00:00",
+                "04:05:00"
+              ],
+              "departure_weekdays": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "retail_prices": {
+                "INFANT": 15000,
+                "CHILD": 23000,
+                "ADULT": 24400
+              },
+              "pricing_tiers": [
+                {
+                  "participants": "all",
+                  "retail_prices": {
+                    "INFANT": 15000,
+                    "CHILD": 23000,
+                    "ADULT": 24400
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "schedule_summary": {
+        "departure_times": [
+          "04:00:00",
+          "04:05:00"
+        ],
+        "retail_prices": {
+          "INFANT": 15000,
+          "CHILD": 27000,
+          "ADULT": 28500
+        },
+        "participants_min": 1,
+        "participants_max": 200,
+        "min_participants_per_booking": 1,
+        "cutoff_hours": 4
+      },
+      "schedules_loaded": true,
+      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
     }
   ]
 }

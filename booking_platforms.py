@@ -147,7 +147,7 @@ def _default_platform_settings(platform_id: str) -> dict:
             "basic_pass_sandbox": "",
             "basic_user_production": "",
             "basic_pass_production": "",
-            "supplier_id": "fts-travels",
+            "supplier_id": "S707722",
             "currency": "EUR",
             "ip_allowlist": [],
             "async_airtable": True,
@@ -244,7 +244,7 @@ def get_gyg_dashboard_config() -> dict:
         "basic_pass_sandbox": settings.get("basic_pass_sandbox") or "",
         "basic_user_production": settings.get("basic_user_production") or "",
         "basic_pass_production": settings.get("basic_pass_production") or "",
-        "supplier_id": settings.get("supplier_id") or "fts-travels",
+        "supplier_id": settings.get("supplier_id") or "S707722",
         "currency": settings.get("currency") or "EUR",
         "ip_allowlist": settings.get("ip_allowlist") or [],
         "async_airtable": bool(settings.get("async_airtable", True)),
@@ -345,7 +345,7 @@ def load_gyg_products() -> dict:
     path = get_data_path("gyg_products.json")
     if not os.path.isfile(path):
         return {
-            "supplier_id": "fts-travels",
+            "supplier_id": "S707722",
             "supplier_name": "FTS Travels",
             "currency": "EUR",
             "products": [],
@@ -354,14 +354,14 @@ def load_gyg_products() -> dict:
         data = json.load(handle)
     if not isinstance(data, dict):
         return {
-            "supplier_id": "fts-travels",
+            "supplier_id": "S707722",
             "supplier_name": "FTS Travels",
             "currency": "EUR",
             "products": [],
         }
     data.setdefault("products", [])
     data.setdefault("currency", "EUR")
-    data.setdefault("supplier_id", "fts-travels")
+    data.setdefault("supplier_id", "S707722")
     data.setdefault("supplier_name", "FTS Travels")
     return data
 
@@ -506,7 +506,7 @@ def save_platform_settings(platform_id: str, incoming: dict) -> dict:
             merged["ingest_mode"] = str(incoming.get("ingest_mode"))
         if "supplier_id" in incoming:
             if platform_id == "getyourguide":
-                merged["supplier_id"] = str(incoming.get("supplier_id") or "fts-travels").strip() or "fts-travels"
+                merged["supplier_id"] = str(incoming.get("supplier_id") or "S707722").strip() or "S707722"
             else:
                 try:
                     merged["supplier_id"] = int(incoming.get("supplier_id") or 0)
@@ -599,7 +599,7 @@ def register_booking_platforms_routes(app, agent=None):
                     "health": _gyg_health(),
                     "products": gyg_products.get("products") or [],
                     "currency": gyg_products.get("currency") or "EUR",
-                    "supplier_id": gyg_products.get("supplier_id") or "fts-travels",
+                    "supplier_id": gyg_products.get("supplier_id") or "S707722",
                     "supplier_name": gyg_products.get("supplier_name") or "FTS Travels",
                     "base_url": "/gyg/1",
                     "endpoints": [

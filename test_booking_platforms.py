@@ -36,7 +36,7 @@ class BookingPlatformsHelperTests(unittest.TestCase):
         self.assertEqual(settings["viator"]["ingest_mode"], "api")
         self.assertEqual(settings["getyourguide"]["ingest_mode"], "api")
         self.assertEqual(settings["getyourguide"]["currency"], "EUR")
-        self.assertEqual(settings["getyourguide"]["supplier_id"], "fts-travels")
+        self.assertEqual(settings["getyourguide"]["supplier_id"], "S707722")
 
     def test_save_keeps_existing_secret_when_masked(self):
         import booking_platforms as bp
@@ -95,7 +95,7 @@ class BookingPlatformsHelperTests(unittest.TestCase):
     def test_gyg_product_live_flag_roundtrip(self):
         import booking_platforms as bp
         catalog = {
-            "supplier_id": "fts-travels",
+            "supplier_id": "S707722",
             "currency": "EUR",
             "products": [{
                 "product_id": "SERA",

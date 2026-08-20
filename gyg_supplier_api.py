@@ -222,7 +222,7 @@ def load_gyg_config(override: Optional[dict] = None) -> dict:
         "basic_pass_sandbox": "",
         "basic_user_production": "",
         "basic_pass_production": "",
-        "supplier_id": "fts-travels",
+        "supplier_id": "S707722",
         "environment": "sandbox",
         "currency": "EUR",
         "ip_allowlist": [],
@@ -274,7 +274,7 @@ class ProductCatalog:
         self.products_file = products_file
         self.products: list[dict] = []
         self.currency = "EUR"
-        self.supplier_id = "fts-travels"
+        self.supplier_id = "S707722"
         self.supplier_name = "FTS Travels"
         self.reload()
 
@@ -289,7 +289,7 @@ class ProductCatalog:
         with open(path, "r", encoding="utf-8") as handle:
             raw = json.load(handle)
         self.currency = str(raw.get("currency") or "EUR")
-        self.supplier_id = str(raw.get("supplier_id") or "fts-travels")
+        self.supplier_id = str(raw.get("supplier_id") or "S707722")
         self.supplier_name = str(raw.get("supplier_name") or "FTS Travels")
         self.products = list(raw.get("products") or [])
 

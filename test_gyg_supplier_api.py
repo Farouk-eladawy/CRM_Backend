@@ -13,7 +13,7 @@ from gyg_supplier_api import GYGStore, create_test_app, _basic_auth_header
 
 TEST_USER = "gyg-test-user"
 TEST_PASS = "gyg-test-pass"
-SUPPLIER_ID = "fts-travels"
+SUPPLIER_ID = "S707722"
 PRODUCT_ID = "LUXOR-HRG"
 SLOT_DT = "2026-12-10T03:00:00+02:00"
 

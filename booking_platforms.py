@@ -28,7 +28,10 @@ except Exception:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 _LOCK = threading.Lock()
 PLATFORMS_FILE = "booking_platforms.json"
-SECRET_KEYS = ("api_key", "api_key_sandbox", "api_key_production")
+SECRET_KEYS = (
+    "api_key", "api_key_sandbox", "api_key_production",
+    "basic_pass", "basic_pass_sandbox", "basic_pass_production",
+)
 
 PLATFORM_CATALOG = [
     {
@@ -135,6 +138,20 @@ def _default_platform_settings(platform_id: str) -> dict:
             "ip_allowlist": [],
             "async_airtable": True,
         })
+    if platform_id == "getyourguide":
+        base.update({
+            "environment": "sandbox",
+            "basic_user": "",
+            "basic_pass": "",
+            "basic_user_sandbox": "",
+            "basic_pass_sandbox": "",
+            "basic_user_production": "",
+            "basic_pass_production": "",
+            "supplier_id": "fts-travels",
+            "currency": "EUR",
+            "ip_allowlist": [],
+            "async_airtable": True,
+        })
     if platform_id == "tiqets":
         base.update({
             "api_key": "",
@@ -213,6 +230,25 @@ def get_viator_dashboard_config() -> dict:
         "currency": settings.get("currency") or "USD",
         "ip_allowlist": settings.get("ip_allowlist") or [],
         "async_airtable": bool(settings.get("async_airtable", True)),
+    }
+
+
+def get_gyg_dashboard_config() -> dict:
+    settings = get_all_platform_settings().get("getyourguide") or {}
+    return {
+        "enabled": bool(settings.get("enabled", True)),
+        "environment": settings.get("environment") or "sandbox",
+        "basic_user": settings.get("basic_user") or "",
+        "basic_pass": settings.get("basic_pass") or "",
+        "basic_user_sandbox": settings.get("basic_user_sandbox") or "",
+        "basic_pass_sandbox": settings.get("basic_pass_sandbox") or "",
+        "basic_user_production": settings.get("basic_user_production") or "",
+        "basic_pass_production": settings.get("basic_pass_production") or "",
+        "supplier_id": settings.get("supplier_id") or "fts-travels",
+        "currency": settings.get("currency") or "EUR",
+        "ip_allowlist": settings.get("ip_allowlist") or [],
+        "async_airtable": bool(settings.get("async_airtable", True)),
+        "products_file": "gyg_products.json",
     }
 
 
@@ -305,6 +341,81 @@ def save_viator_products(products: list, currency: str = "USD") -> dict:
     return current
 
 
+def load_gyg_products() -> dict:
+    path = get_data_path("gyg_products.json")
+    if not os.path.isfile(path):
+        return {
+            "supplier_id": "fts-travels",
+            "supplier_name": "FTS Travels",
+            "currency": "EUR",
+            "products": [],
+        }
+    with open(path, "r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if not isinstance(data, dict):
+        return {
+            "supplier_id": "fts-travels",
+            "supplier_name": "FTS Travels",
+            "currency": "EUR",
+            "products": [],
+        }
+    data.setdefault("products", [])
+    data.setdefault("currency", "EUR")
+    data.setdefault("supplier_id", "fts-travels")
+    data.setdefault("supplier_name", "FTS Travels")
+    return data
+
+
+_GYG_API_BOOL_FIELDS = ("live", "api_connected", "pilot")
+_GYG_API_INT_FIELDS = (
+    "daily_capacity", "cutoff_hours", "cutoff_seconds",
+    "participants_min", "participants_max",
+)
+_GYG_API_LIST_FIELDS = ("departure_times", "closed_weekdays", "blockout_dates")
+_GYG_API_DICT_FIELDS = ("categories",)
+
+
+def save_gyg_products(products: list, currency: str = "EUR") -> dict:
+    """Persist Supplier-API operational fields. Marketing content stays scrape/portal-owned."""
+    path = get_data_path("gyg_products.json")
+    current = load_gyg_products()
+    by_id = {
+        str(p.get("product_id") or ""): p
+        for p in (current.get("products") or [])
+        if p.get("product_id")
+    }
+    for incoming in products or []:
+        code = str(incoming.get("product_id") or "").strip()
+        if not code or code not in by_id:
+            continue
+        row = by_id[code]
+        for field in _GYG_API_BOOL_FIELDS:
+            if field in incoming:
+                row[field] = bool(incoming.get(field))
+        for field in _GYG_API_INT_FIELDS:
+            if field in incoming:
+                row[field] = _as_nonneg_int(incoming.get(field), row.get(field) or 0)
+        if "cutoff_hours" in incoming and "cutoff_seconds" not in incoming:
+            row["cutoff_seconds"] = int(row.get("cutoff_hours") or 0) * 3600
+        for field in _GYG_API_LIST_FIELDS:
+            if field in incoming and isinstance(incoming.get(field), list):
+                row[field] = incoming.get(field)
+        for field in _GYG_API_DICT_FIELDS:
+            if field in incoming and isinstance(incoming.get(field), dict):
+                row[field] = incoming.get(field)
+    current["currency"] = currency or current.get("currency") or "EUR"
+    updated = []
+    for product in current.get("products") or []:
+        code = str(product.get("product_id") or "")
+        updated.append(by_id.get(code, product) if code else product)
+    current["products"] = updated
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        json.dump(current, handle, indent=2, ensure_ascii=False)
+    os.replace(tmp, path)
+    return current
+
+
 def _merge_secrets(existing: dict, incoming: dict) -> dict:
     merged = dict(existing)
     for key, value in (incoming or {}).items():
@@ -345,6 +456,39 @@ def _sync_viator_into_config_json(viator_settings: dict) -> None:
     os.replace(tmp, config_path)
 
 
+def _sync_gyg_into_config_json(gyg_settings: dict) -> None:
+    config_path = os.path.join(SCRIPT_DIR, get_data_path("config.json"))
+    if not os.path.isfile(config_path):
+        return
+    try:
+        with open(config_path, "r", encoding="utf-8") as handle:
+            cfg = json.load(handle)
+    except Exception as exc:
+        LOGGER.warning("Could not read config.json for GYG sync: %s", exc)
+        return
+    if not isinstance(cfg, dict):
+        return
+    section = cfg.get("gyg_supplier")
+    if not isinstance(section, dict):
+        section = {}
+        cfg["gyg_supplier"] = section
+    for key in (
+        "enabled", "environment", "basic_user", "basic_pass",
+        "basic_user_sandbox", "basic_pass_sandbox",
+        "basic_user_production", "basic_pass_production",
+        "supplier_id", "currency", "ip_allowlist", "async_airtable",
+    ):
+        if key in gyg_settings and gyg_settings.get(key) not in (None,):
+            if key in SECRET_KEYS and _is_masked(gyg_settings.get(key)):
+                continue
+            section[key] = gyg_settings[key]
+    section["products_file"] = "gyg_products.json"
+    tmp = config_path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        json.dump(cfg, handle, indent=2, ensure_ascii=False)
+    os.replace(tmp, config_path)
+
+
 def save_platform_settings(platform_id: str, incoming: dict) -> dict:
     allowed = {p["id"] for p in PLATFORM_CATALOG}
     if platform_id not in allowed:
@@ -361,20 +505,33 @@ def save_platform_settings(platform_id: str, incoming: dict) -> dict:
         if "ingest_mode" in incoming and incoming.get("ingest_mode"):
             merged["ingest_mode"] = str(incoming.get("ingest_mode"))
         if "supplier_id" in incoming:
-            try:
-                merged["supplier_id"] = int(incoming.get("supplier_id") or 0)
-            except (TypeError, ValueError):
-                merged["supplier_id"] = 0
+            if platform_id == "getyourguide":
+                merged["supplier_id"] = str(incoming.get("supplier_id") or "fts-travels").strip() or "fts-travels"
+            else:
+                try:
+                    merged["supplier_id"] = int(incoming.get("supplier_id") or 0)
+                except (TypeError, ValueError):
+                    merged["supplier_id"] = 0
         platforms[platform_id] = merged
         _save_raw(data)
         if platform_id == "viator":
             _sync_viator_into_config_json(merged)
+        elif platform_id == "getyourguide":
+            _sync_gyg_into_config_json(merged)
         return merged
 
 
 def _viator_health() -> dict:
     try:
         from viator_supplier_api import get_service
+        return get_service().health()
+    except Exception as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+def _gyg_health() -> dict:
+    try:
+        from gyg_supplier_api import get_service
         return get_service().health()
     except Exception as exc:
         return {"status": "error", "message": str(exc)}
@@ -391,6 +548,16 @@ def _reload_viator_runtime() -> None:
         LOGGER.warning("Could not reload Viator runtime config: %s", exc)
 
 
+def _reload_gyg_runtime() -> None:
+    try:
+        from gyg_supplier_api import get_service, load_gyg_config
+        service = get_service()
+        service.config = load_gyg_config()
+        service.catalog.reload()
+    except Exception as exc:
+        LOGGER.warning("Could not reload GYG runtime config: %s", exc)
+
+
 def register_booking_platforms_routes(app, agent=None):
     @app.route("/api/booking_platforms", methods=["GET", "OPTIONS"])
     def api_booking_platforms_get():
@@ -398,7 +565,8 @@ def register_booking_platforms_routes(app, agent=None):
             return jsonify({"status": "ok"}), 200
         try:
             settings = get_all_platform_settings()
-            products = load_viator_products()
+            viator_products = load_viator_products()
+            gyg_products = load_gyg_products()
             platforms = []
             for meta in PLATFORM_CATALOG:
                 pid = meta["id"]
@@ -411,8 +579,8 @@ def register_booking_platforms_routes(app, agent=None):
                 "platforms": platforms,
                 "viator": {
                     "health": _viator_health(),
-                    "products": products.get("products") or [],
-                    "currency": products.get("currency") or "USD",
+                    "products": viator_products.get("products") or [],
+                    "currency": viator_products.get("currency") or "USD",
                     "base_url": "/viator",
                     "endpoints": [
                         {"name": "Health", "method": "GET", "path": "/viator/health"},
@@ -425,6 +593,25 @@ def register_booking_platforms_routes(app, agent=None):
                         {"name": "Calendar v2", "method": "POST", "path": "/viator/v2/availability/calendar"},
                         {"name": "Availability Check v2", "method": "POST", "path": "/viator/v2/availability/check"},
                         {"name": "Reserve v2", "method": "POST", "path": "/viator/v2/reserve"},
+                    ],
+                },
+                "getyourguide": {
+                    "health": _gyg_health(),
+                    "products": gyg_products.get("products") or [],
+                    "currency": gyg_products.get("currency") or "EUR",
+                    "supplier_id": gyg_products.get("supplier_id") or "fts-travels",
+                    "supplier_name": gyg_products.get("supplier_name") or "FTS Travels",
+                    "base_url": "/gyg/1",
+                    "endpoints": [
+                        {"name": "Health", "method": "GET", "path": "/gyg/health"},
+                        {"name": "Products list", "method": "GET", "path": "/gyg/1/suppliers/{supplierId}/products/"},
+                        {"name": "Product details", "method": "GET", "path": "/gyg/1/products/{productId}"},
+                        {"name": "Pricing categories", "method": "GET", "path": "/gyg/1/products/{productId}/pricing-categories/"},
+                        {"name": "Availabilities", "method": "GET", "path": "/gyg/1/get-availabilities/"},
+                        {"name": "Reserve", "method": "POST", "path": "/gyg/1/reserve/"},
+                        {"name": "Cancel reservation", "method": "POST", "path": "/gyg/1/cancel-reservation/"},
+                        {"name": "Book", "method": "POST", "path": "/gyg/1/book/"},
+                        {"name": "Cancel booking", "method": "POST", "path": "/gyg/1/cancel-booking/"},
                     ],
                 },
             }), 200
@@ -446,6 +633,11 @@ def register_booking_platforms_routes(app, agent=None):
                 _reload_viator_runtime()
             elif platform_id == "viator":
                 _reload_viator_runtime()
+            elif platform_id == "getyourguide" and isinstance(body.get("products"), list):
+                products = save_gyg_products(body.get("products") or [], saved.get("currency") or "EUR")
+                _reload_gyg_runtime()
+            elif platform_id == "getyourguide":
+                _reload_gyg_runtime()
             return jsonify({
                 "status": "success",
                 "platform": platform_id,

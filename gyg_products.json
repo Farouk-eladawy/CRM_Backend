@@ -4,12 +4,12 @@
   "currency": "EUR",
   "source": {
     "portal_url": "https://supplier.getyourguide.com/products/list?limit=100",
-    "scraped_at": "2026-08-20T15:10:26.245787+00:00",
+    "scraped_at": "2026-08-20T15:13:57.863616+00:00",
     "catalog_count": 22
   },
   "products": [
     {
-      "product_id": "SERA",
+      "product_id": "SERA-1441222",
       "gyg_tour_id": "1441222",
       "reference_code": "T-1441222",
       "product_title": "Serabit El-Khadim Bedouin Camp & 4x4 Desert Safari Adventure",
@@ -159,10 +159,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:04:11.428769+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "CAI-CAI",
+      "product_id": "CAI-CAI-1442388",
       "gyg_tour_id": "1442388",
       "reference_code": "T-1442388",
       "product_title": "Cairo: Private Guided Tour to Your Chosen Attraction",
@@ -300,10 +301,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:04:57.512910+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "LUX-LXR",
+      "product_id": "LUX-LXR-1439459",
       "gyg_tour_id": "1439459",
       "reference_code": "T-1439459",
       "product_title": "Luxor: Private Customizable Tour with Egyptologist Guide",
@@ -541,10 +543,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:05:17.797163+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "PRIV-CAI",
+      "product_id": "PRIV-CAI-1440408",
       "gyg_tour_id": "1440408",
       "reference_code": "T-1440408",
       "product_title": "Private Customizable Day Tour to Alexandria from Cairo",
@@ -725,10 +728,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:05:38.768325+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "MOUN",
+      "product_id": "MOUN-1441127",
       "gyg_tour_id": "1441127",
       "reference_code": "T-1441127",
       "product_title": "Mount Moses, St. Catherine Monastery & Stargazing Adventure",
@@ -859,10 +863,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:05:58.507968+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229053+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "CAIR-CAI",
+      "product_id": "CAIR-CAI-1361854",
       "gyg_tour_id": "1361854",
       "reference_code": "T-1361854",
       "product_title": "From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake",
@@ -1052,10 +1057,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:06:19.163482+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1191624",
       "gyg_tour_id": "1191624",
       "reference_code": "T-1191624",
       "product_title": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
@@ -1353,10 +1359,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:06:43.173552+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1195743",
       "gyg_tour_id": "1195743",
       "reference_code": "T-1195743",
       "product_title": "Hurghada: Cairo Day Trip with Pyramids, Museum & Quad Bike",
@@ -1628,10 +1635,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:07:05.735009+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1279014",
       "gyg_tour_id": "1279014",
       "reference_code": "T-1279014",
       "product_title": "Hurghada: City Tour & Bazaar with Optional Sand Museum Visit",
@@ -1863,10 +1871,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:07:25.642580+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1196475",
       "gyg_tour_id": "1196475",
       "reference_code": "T-1196475",
       "product_title": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
@@ -2000,7 +2009,7 @@
         },
         {
           "option_id": "1836310",
-          "cutoff_hours": 2,
+          "cutoff_hours": 0,
           "schedules": [
             {
               "name": "Great Pyramids Visit & Quad Bike",
@@ -2087,10 +2096,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:07:47.789245+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "DISC-SSH",
+      "product_id": "DISC-SSH-1273778",
       "gyg_tour_id": "1273778",
       "reference_code": "T-31032026",
       "product_title": "Discover Cairo, Great Pyramids & Quad Bike From Sharm By Bus",
@@ -2314,10 +2324,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:08:08.366968+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1303745",
       "gyg_tour_id": "1303745",
       "reference_code": "T-1303745",
       "product_title": "Hurghada: Luxor Karnak, Hatshepsut & the Valley of the Kings",
@@ -2542,10 +2553,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:08:31.079188+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "LUX-CAI",
+      "product_id": "LUX-CAI-1361847",
       "gyg_tour_id": "1361847",
       "reference_code": "T-1361847",
       "product_title": "Luxor to Cairo: 2Day with Sleeper Train & Pyramids View Stay",
@@ -2755,10 +2767,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:08:55.058328+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "MAR-CAI",
+      "product_id": "MAR-CAI-1361217",
       "gyg_tour_id": "1361217",
       "reference_code": "T-1361217",
       "product_title": "Marsa Alam : Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -3004,10 +3017,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:09:17.869359+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "SHA-SSH",
+      "product_id": "SHA-SSH-1344400",
       "gyg_tour_id": "1344400",
       "reference_code": "T-1344400",
       "product_title": "Sharm El Sheikh: Cairo 2-Day with Luxury Pyramids View Stay",
@@ -3185,10 +3199,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:09:39.454042+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1289272",
       "gyg_tour_id": "1289272",
       "reference_code": "T-1289272",
       "product_title": "Hurghada: Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -3366,10 +3381,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:10:01.012061+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HURG-HRG",
+      "product_id": "HURG-HRG-1289286",
       "gyg_tour_id": "1289286",
       "reference_code": "T-1289286",
       "product_title": "From Hurghada: Hidden Cairo , Pyramids & Cave Church",
@@ -3544,10 +3560,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T12:56:02.410854+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "RAS",
+      "product_id": "RAS-1286076",
       "gyg_tour_id": "1286076",
       "reference_code": "T-1286076",
       "product_title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
@@ -3672,10 +3689,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:13:41.761047+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "SHA-SSH",
+      "product_id": "SHA-SSH-1278978",
       "gyg_tour_id": "1278978",
       "reference_code": "T-1278978",
       "product_title": "Sharm Signature: Mosque, Cathedral, Farsha Café & Old Market",
@@ -3862,10 +3880,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:14:01.824145+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "SHA-SSH",
+      "product_id": "SHA-SSH-1278027",
       "gyg_tour_id": "1278027",
       "reference_code": "T-1278027",
       "product_title": "Sharm: 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
@@ -4041,10 +4060,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:14:21.207220+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "SHA-SSH",
+      "product_id": "SHA-SSH-1195076",
       "gyg_tour_id": "1195076",
       "reference_code": "T-1195076",
       "product_title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
@@ -4266,10 +4286,11 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T13:14:41.580407+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     },
     {
-      "product_id": "HUR-HRG",
+      "product_id": "HUR-HRG-1195745",
       "gyg_tour_id": "1195745",
       "reference_code": "T-1195745",
       "product_title": "Hurghada: Full-Day Trip to Cairo by Plane",
@@ -4496,7 +4517,8 @@
       "details_loaded": true,
       "schedules_loaded": true,
       "scraped_at": "2026-08-19T12:57:48.296319+00:00",
-      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
+      "status": "Bookable"
     }
   ]
 }

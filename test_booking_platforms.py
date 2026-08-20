@@ -34,7 +34,9 @@ class BookingPlatformsHelperTests(unittest.TestCase):
         self.assertIn("tiqets", settings)
         self.assertTrue(settings["viator"]["enabled"])
         self.assertEqual(settings["viator"]["ingest_mode"], "api")
-        self.assertEqual(settings["getyourguide"]["ingest_mode"], "email")
+        self.assertEqual(settings["getyourguide"]["ingest_mode"], "api")
+        self.assertEqual(settings["getyourguide"]["currency"], "EUR")
+        self.assertEqual(settings["getyourguide"]["supplier_id"], "fts-travels")
 
     def test_save_keeps_existing_secret_when_masked(self):
         import booking_platforms as bp
@@ -89,6 +91,51 @@ class BookingPlatformsHelperTests(unittest.TestCase):
         self.assertTrue(row["start_times_mode"])
         self.assertEqual(row["options"][0]["supplier_option_code"], "TG1")
         self.assertEqual(row["age_bands"]["Adult"]["min_age"], 13)
+
+    def test_gyg_product_live_flag_roundtrip(self):
+        import booking_platforms as bp
+        catalog = {
+            "supplier_id": "fts-travels",
+            "currency": "EUR",
+            "products": [{
+                "product_id": "SERA",
+                "gyg_tour_id": "1441222",
+                "product_title": "Serabit",
+                "live": True,
+                "api_connected": False,
+                "daily_capacity": 100,
+                "cutoff_hours": 5,
+                "schedules_loaded": True,
+            }],
+        }
+        with self._patch_paths():
+            path = os.path.join(self.data_dir, "gyg_products.json")
+            with open(path, "w", encoding="utf-8") as handle:
+                json.dump(catalog, handle)
+            saved = bp.save_gyg_products([{
+                "product_id": "SERA",
+                "live": False,
+                "api_connected": True,
+                "daily_capacity": 40,
+                "cutoff_hours": 6,
+                "departure_times": ["07:00:00"],
+                "categories": {
+                    "ADULT": {"enabled": True, "retail_minor": 19900, "age_from": 12, "age_to": 99},
+                },
+                "product_title": "SHOULD_NOT_SAVE",
+            }])
+        row = saved["products"][0]
+        self.assertFalse(row["live"])
+        self.assertTrue(row["api_connected"])
+        self.assertEqual(row["daily_capacity"], 40)
+        self.assertEqual(row["cutoff_hours"], 6)
+        self.assertEqual(row["cutoff_seconds"], 21600)
+        self.assertEqual(row["departure_times"], ["07:00:00"])
+        self.assertEqual(row["categories"]["ADULT"]["retail_minor"], 19900)
+        # Marketing content must not be overwritten from the UI save path.
+        self.assertEqual(row["product_title"], "Serabit")
+        self.assertTrue(row["schedules_loaded"])
+        self.assertEqual(row["gyg_tour_id"], "1441222")
 
 
 if __name__ == "__main__":

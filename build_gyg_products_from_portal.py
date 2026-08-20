@@ -25,9 +25,11 @@ USER_DATA_DIR = os.path.join(ROOT, "gyg_browser_data")
 
 
 def _slug_product_id(title: str, gyg_tour_id: str) -> str:
+    """Stable unique productId for GYG API mapping. Always include tour id to avoid collisions."""
     words = re.sub(r"[^a-zA-Z0-9]+", " ", title or "").strip().upper().split()
+    gyg = str(gyg_tour_id or "").strip()
     if not words:
-        return f"GYG-{gyg_tour_id}"
+        return f"GYG-{gyg}" if gyg else "GYG-UNKNOWN"
     if words[0] in {"FROM", "HURGHADA", "SHARM", "CAIRO", "LUXOR", "MARSA"} and len(words) > 1:
         prefix = words[1][:4] if words[0] == "FROM" else words[0][:3]
     else:
@@ -47,7 +49,8 @@ def _slug_product_id(title: str, gyg_tour_id: str) -> str:
     elif "alexandria" in lower:
         dest = "ALX"
     core = prefix + (f"-{dest}" if dest else "")
-    return re.sub(r"-+", "-", core).strip("-")[:24] or f"GYG-{gyg_tour_id}"
+    core = re.sub(r"-+", "-", core).strip("-")[:18] or "GYG"
+    return f"{core}-{gyg}" if gyg else core
 
 
 def _city_from_title(title: str, public_url: str = "") -> str:

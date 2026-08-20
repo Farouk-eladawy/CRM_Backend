@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-08-20T15:10:26.230051+00:00",
+  "scraped_at": "2026-08-20T15:13:57.853061+00:00",
   "source": "https://supplier.getyourguide.com/products/list?limit=100",
   "count": 22,
   "products": [
@@ -127,7 +127,7 @@
         "cutoff_hours": 5
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00",
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
       "schedule_error": "Login timeout"
     },
     {
@@ -241,7 +241,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00",
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00",
       "schedule_error": "Login timeout"
     },
     {
@@ -456,7 +456,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Private Customizable Day Tour to Alexandria from Cairo",
@@ -612,7 +612,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.228056+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Mount Moses, St. Catherine Monastery & Stargazing Adventure",
@@ -719,7 +719,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229053+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake",
@@ -885,7 +885,7 @@
         "cutoff_hours": 6
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip",
@@ -1159,7 +1159,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada: Cairo Day Trip with Pyramids, Museum & Quad Bike",
@@ -1407,7 +1407,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada: City Tour & Bazaar with Optional Sand Museum Visit",
@@ -1615,7 +1615,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada to Cairo: Pyramids & Museum for First-Time Visitors",
@@ -1759,7 +1759,7 @@
         },
         {
           "option_id": "1836310",
-          "cutoff_hours": 2,
+          "cutoff_hours": 0,
           "schedules": [
             {
               "name": "Great Pyramids Visit & Quad Bike",
@@ -1812,7 +1812,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Discover Cairo, Great Pyramids & Quad Bike From Sharm By Bus",
@@ -2012,7 +2012,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada: Luxor Karnak, Hatshepsut & the Valley of the Kings",
@@ -2213,7 +2213,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Luxor to Cairo: 2Day with Sleeper Train & Pyramids View Stay",
@@ -2399,7 +2399,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Marsa Alam : Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -2621,7 +2621,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Sharm El Sheikh: Cairo 2-Day with Luxury Pyramids View Stay",
@@ -2775,7 +2775,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada: Cairo 2-Day Tour with Luxury Pyramids View Stay",
@@ -2929,7 +2929,7 @@
         "cutoff_hours": 3
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "From Hurghada: Hidden Cairo , Pyramids & Cave Church",
@@ -3080,7 +3080,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Ras Mohamed Half-Day Adventure The Hidden Paradise Escape",
@@ -3181,7 +3181,7 @@
         "cutoff_hours": 5
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Sharm Signature: Mosque, Cathedral, Farsha Café & Old Market",
@@ -3344,7 +3344,7 @@
         "cutoff_hours": 2
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.229114+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Sharm: 3 Pools Dahab Tour, Quad, Camel, Red Canyon & Lunch",
@@ -3496,7 +3496,7 @@
         "cutoff_hours": 5
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Sharm El-Sheikh: Jeep Adventure to Blue Hole, Canyon & Dahab",
@@ -3694,7 +3694,7 @@
         "cutoff_hours": 5
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     },
     {
       "title": "Hurghada: Full-Day Trip to Cairo by Plane",
@@ -3897,7 +3897,7 @@
         "cutoff_hours": 4
       },
       "schedules_loaded": true,
-      "schedules_scraped_at": "2026-08-20T15:10:26.230051+00:00"
+      "schedules_scraped_at": "2026-08-20T15:13:57.852063+00:00"
     }
   ]
 }

@@ -1085,6 +1085,7 @@ def _friendly_template_title(template_name):
         "collect_info": "Collection Template Sent",
         "new_collect": "Collection Template Sent",
         "welcome_plane": "Welcome Plane Template Sent",
+        "3omra": "Umrah Campaign Template Sent",
     }
     return mapping.get(name, f"{str(template_name or 'Template').strip()} Sent")
 
@@ -28311,6 +28312,12 @@ Rules:
             return status_code, payload, saved, create_status_code, create_payload_response
         
         # --- FRONTEND DASHBOARD APIs ---
+        try:
+            from religious_wa_campaigns import register_routes as register_religious_wa_campaigns
+            register_religious_wa_campaigns(app, self)
+        except Exception as _rwc_err:
+            logging.warning("Religious WhatsApp campaign routes not registered: %s", _rwc_err)
+
         @app.route('/api/quality_reviews/generate_reply', methods=['POST', 'OPTIONS'])
         def generate_quality_reply():
             if request.method == 'OPTIONS':

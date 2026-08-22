@@ -377,6 +377,15 @@ def run(agent, payload: dict = None) -> dict:
                     body = str(meta.get("body") or meta.get("error") or "")[:300]
                 status_txt = "sent" if (ok or uncertain) else "error"
                 header = f"[Campaign 3omra] Template '{TEMPLATE_NAME}'"
+                if ok or uncertain:
+                    try:
+                        from religious_wa_campaigns import format_wa_template_chat_message
+                        header = format_wa_template_chat_message(
+                            TEMPLATE_NAME,
+                            header_image=HEADER_MEDIA_URL,
+                        )
+                    except Exception:
+                        pass
                 if not ok:
                     header += f" FAILED - {body}" if not uncertain else " UNCERTAIN (not retried)"
                 chat_db.add_message(

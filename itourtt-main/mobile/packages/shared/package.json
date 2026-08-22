@@ -1,0 +1,19 @@
+{
+  "name": "@itour/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "axios": "^1.13.0",
+    "zustand": "^5.0.0",
+    "react-native-encrypted-storage": "^4.0.0",
+    "@react-native-community/geolocation": "^3.4.0",
+    "@react-native-community/netinfo": "^11.0.0",
+    "date-fns": "^4.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.74.0"
+  }
+}

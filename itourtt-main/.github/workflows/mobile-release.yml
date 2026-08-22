@@ -1,0 +1,102 @@
+name: Mobile Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'App to release'
+        required: true
+        type: choice
+        options:
+          - driver
+          - rep
+          - supplier
+          - guest
+      platform:
+        description: 'Platform'
+        required: true
+        type: choice
+        options:
+          - android
+          - ios
+          - both
+      track:
+        description: 'Release track'
+        required: true
+        type: choice
+        options:
+          - internal
+          - beta
+          - production
+
+jobs:
+  release-android:
+    name: Release Android
+    if: inputs.platform == 'android' || inputs.platform == 'both'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: mobile/yarn.lock
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - run: yarn install --frozen-lockfile
+      - name: Decode keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > apps/${{ inputs.app }}/android/app/release.keystore
+      - name: Build Android AAB
+        working-directory: mobile/apps/${{ inputs.app }}/android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew bundleRelease
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          packageName: com.itour.${{ inputs.app }}
+          releaseFiles: mobile/apps/${{ inputs.app }}/android/app/build/outputs/bundle/release/*.aab
+          track: ${{ inputs.track }}
+
+  release-ios:
+    name: Release iOS
+    if: inputs.platform == 'ios' || inputs.platform == 'both'
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: mobile/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - name: Install CocoaPods
+        working-directory: mobile/apps/${{ inputs.app }}/ios
+        run: pod install
+      - name: Build & Archive
+        uses: yukiarrr/ios-build-action@v1.12.0
+        with:
+          project-path: mobile/apps/${{ inputs.app }}/ios/${{ inputs.app }}.xcodeproj
+          workspace-path: mobile/apps/${{ inputs.app }}/ios/${{ inputs.app }}.xcworkspace
+          p12-base64: ${{ secrets.IOS_P12_BASE64 }}
+          mobileprovision-base64: ${{ secrets.IOS_MOBILEPROVISION_BASE64 }}
+          certificate-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          export-method: app-store
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: output.ipa
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}

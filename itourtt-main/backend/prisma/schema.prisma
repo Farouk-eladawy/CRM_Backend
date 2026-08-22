@@ -1,0 +1,2394 @@
+// iTour Transport & Traffic – Prisma Schema
+// Source of truth: 01-database-schema.md + CLAUDE.md
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  DISPATCHER
+  ACCOUNTANT
+  AGENT_MANAGER
+  VIEWER
+  REP
+  DRIVER
+  SUPPLIER
+  B2C_CLIENT
+}
+
+enum ServiceType {
+  ARR
+  DEP
+  DAY_TOUR
+  ONE_WAY_TRANSFER
+  RETURN
+  // Legacy — no longer selectable anywhere. Kept so historical jobs still read.
+  // See SELECTABLE_SERVICE_TYPES in common/utils/service-type.util.ts.
+  TWO_WAY_TRANSFER
+  CITY_TO_CITY
+}
+
+enum JobStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum BookingStatus {
+  NEW
+  UPDATED
+  CANCELLED
+}
+
+enum PortalJobStatus {
+  PENDING
+  IN_PROGRESS
+  IN_PLACE
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum NotificationType {
+  JOB_ASSIGNED
+  JOB_UPDATED
+  GENERAL
+  FLIGHT_DELAY
+}
+
+enum VehicleOwnership {
+  OWNED
+  RENTED
+  CONTRACTED
+}
+
+enum Currency {
+  EGP
+  USD
+  EUR
+  GBP
+  SAR
+}
+
+enum InvoiceStatus {
+  DRAFT
+  POSTED
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CHECK
+}
+
+enum DocumentType {
+  TAX_CARD
+  COMMERCIAL_REGISTER
+  ID_COPY
+  CONTRACT
+  OTHER
+}
+
+enum InvoiceCycleType {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum WaTriggerType {
+  JOB_CREATED
+  DRIVER_ASSIGNED
+  SCHEDULED
+}
+
+enum JournalType {
+  SALE
+  PURCHASE
+  CASH
+  BANK
+  GENERAL
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum LocationType {
+  AIRPORT
+  ZONE
+  HOTEL
+}
+
+enum BookingChannel {
+  ONLINE
+  B2B
+  B2C
+}
+
+// Where a traffic-job extra originated: the public B2C booking, or manual operator entry.
+enum JobExtraSource {
+  B2C
+  MANUAL
+}
+
+enum InvoiceType {
+  TRANSFER
+  DRIVER_TIP
+}
+
+enum B2CPaymentMethod {
+  ONLINE
+  PAY_ON_ARRIVAL
+}
+
+enum B2CPaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum B2CPaymentGateway {
+  STRIPE
+  EGYPT_BANK
+  DUBAI_BANK
+  GETPAYIN
+}
+
+enum TransferType {
+  PRIVATE
+  SHARED
+}
+
+enum GuestBookingStatus {
+  CONFIRMED
+  CANCELLED
+  CONVERTED
+}
+
+// Leg of a 2-way (return) B2C booking. Two GuestBookings sharing a groupRef.
+enum BookingLeg {
+  OUTBOUND
+  RETURN
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
+// ─────────────────────────────────────────────
+// ROLES & GRANULAR PERMISSIONS
+// ─────────────────────────────────────────────
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  isSystem    Boolean  @default(false) @map("is_system")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users       User[]
+  permissions RolePermissionV2[]
+
+  @@map("roles")
+}
+
+model RolePermissionV2 {
+  id            String   @id @default(uuid())
+  roleId        String   @map("role_id")
+  permissionKey String   @map("permission_key")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionKey])
+  @@index([roleId])
+  @@map("role_permissions_v2")
+}
+
+// ─────────────────────────────────────────────
+// USERS & AUTH
+// ─────────────────────────────────────────────
+
+model User {
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  phone               String?   @unique
+  passwordHash        String    @map("password_hash")
+  name                String
+  role                UserRole  @default(VIEWER)
+  roleId              String?   @map("role_id")
+  isActive            Boolean   @default(true) @map("is_active")
+  refreshToken        String?   @map("refresh_token")
+  sessionId           String?   @map("session_id")
+  sessionExpiresAt    DateTime? @map("session_expires_at")
+  twoFactorEnabled       Boolean  @default(false) @map("two_factor_enabled")
+  twoFactorSecret        String?  @map("two_factor_secret")
+  twoFactorRecoveryCodes String[] @default([]) @map("two_factor_recovery_codes")
+  passwordResetToken  String?   @map("password_reset_token")
+  passwordResetExpiry DateTime? @map("password_reset_expiry")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
+
+  roleRef              Role?               @relation(fields: [roleId], references: [id])
+  createdJobs          TrafficJob[]        @relation("JobCreatedBy")
+  unlockedJobs         TrafficJob[]        @relation("JobDispatchUnlockedBy")
+  driverUnlockedJobs   TrafficJob[]        @relation("JobDriverUnlockedBy")
+  repUnlockedJobs      TrafficJob[]        @relation("JobRepUnlockedBy")
+  supplierUnlockedJobs TrafficJob[]        @relation("JobSupplierUnlockedBy")
+  editUnlockedJobs     TrafficJob[]        @relation("JobEditUnlockedBy")
+  assignments          TrafficAssignment[] @relation("AssignedBy")
+  rep                  Rep?
+  driver               Driver?
+  supplier             Supplier?
+  activityLogs         ActivityLog[]
+  notifications        UserNotification[]
+  deviceTokens         DeviceToken[]
+  repScoresGiven       RepJobScore[]       @relation("RepScoreScoredBy")
+  driverScoresGiven    DriverJobScore[]    @relation("DriverScoreScoredBy")
+  preferences          UserPreference[]
+  b2cBookings          GuestBooking[]      @relation("B2CClientBookings")
+  b2cInvoices          B2CInvoice[]        @relation("B2CClientInvoices")
+  sessions             UserSession[]
+
+  @@map("users")
+}
+
+/// Per-device login session log. Powers the admin "Active sessions" view and the
+/// REP/DRIVER single-device lock (a new device is blocked while an active session
+/// exists). "Active" = endedAt is null AND lastSeenAt within the idle window.
+model UserSession {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  sessionId  String    @unique @map("session_id") // mirrors the JWT `sid`
+  deviceName String?   @map("device_name")
+  ipAddress  String?   @map("ip_address")
+  userAgent  String?   @map("user_agent")
+  startedAt  DateTime  @default(now()) @map("started_at")
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at")
+  endedAt    DateTime? @map("ended_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, endedAt])
+  @@map("user_sessions")
+}
+
+model UserPreference {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  key       String
+  value     Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@map("user_preferences")
+}
+
+// ─────────────────────────────────────────────
+// LOCATION TREE: Country → Airport → City → Zone → Hotel
+// ─────────────────────────────────────────────
+
+model Country {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  code      String    @unique @db.VarChar(3)
+  latitude  Decimal?  @db.Decimal(10, 7)
+  longitude Decimal?  @db.Decimal(10, 7)
+  placeId   String?   @map("google_place_id")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  airports Airport[]
+
+  @@map("countries")
+}
+
+model Airport {
+  id        String    @id @default(uuid())
+  name      String
+  code      String    @unique @db.VarChar(10)
+  countryId String    @map("country_id")
+  latitude  Decimal?  @db.Decimal(10, 7)
+  longitude Decimal?  @db.Decimal(10, 7)
+  placeId   String?   @map("google_place_id")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  country Country @relation(fields: [countryId], references: [id])
+  cities  City[]
+
+  jobsOrigin          TrafficJob[]        @relation("JobOriginAirport")
+  jobsDestination     TrafficJob[]        @relation("JobDestAirport")
+  guestBookingsOrigin GuestBooking[]      @relation("GuestBookingOriginAirport")
+  guestBookingsDest   GuestBooking[]      @relation("GuestBookingDestAirport")
+  fromTariffs         DriverPriceTariff[] @relation("TariffFromAirport")
+  toTariffs           DriverPriceTariff[] @relation("TariffToAirport")
+  fromFees            DriverTripFee[]     @relation("FeeFromAirport")
+  toFees              DriverTripFee[]     @relation("FeeToAirport")
+
+  @@index([countryId])
+  @@map("airports")
+}
+
+model City {
+  id        String    @id @default(uuid())
+  name      String
+  airportId String    @map("airport_id")
+  latitude  Decimal?  @db.Decimal(10, 7)
+  longitude Decimal?  @db.Decimal(10, 7)
+  placeId   String?   @map("google_place_id")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  airport Airport   @relation(fields: [airportId], references: [id])
+  zones   Zone[]
+  page    CityPage?
+
+  @@index([airportId])
+  @@map("cities")
+}
+
+model Zone {
+  id            String    @id @default(uuid())
+  name          String
+  cityId        String    @map("city_id")
+  latitude      Decimal?  @db.Decimal(10, 7)
+  longitude     Decimal?  @db.Decimal(10, 7)
+  placeId       String?   @map("google_place_id")
+  isActive      Boolean   @default(true) @map("is_active")
+  // Auto-created from a B2C Google Places pick; flagged for admin review.
+  isAutoCreated Boolean   @default(false) @map("is_auto_created")
+  reviewedAt    DateTime? @map("reviewed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  city     City      @relation(fields: [cityId], references: [id])
+  hotels   Hotel[]
+  repZones RepZone[]
+
+  supplierPricesFrom SupplierTripPrice[] @relation("FromZone")
+  supplierPricesTo   SupplierTripPrice[] @relation("ToZone")
+  jobsFrom           TrafficJob[]        @relation("JobFromZone")
+  jobsTo             TrafficJob[]        @relation("JobToZone")
+  jobsOrigin         TrafficJob[]        @relation("JobOriginZone")
+  jobsDestination    TrafficJob[]        @relation("JobDestZone")
+  driverFeesFrom     DriverTripFee[]     @relation("FeeFromZone")
+  driverFeesTo       DriverTripFee[]     @relation("FeeToZone")
+  driverTariffsFrom  DriverPriceTariff[] @relation("TariffFromZone")
+  driverTariffsTo    DriverPriceTariff[] @relation("TariffToZone")
+  customerPricesFrom CustomerPriceItem[] @relation("CustomerPriceFromZone")
+  customerPricesTo   CustomerPriceItem[] @relation("CustomerPriceToZone")
+  agentPricesFrom    AgentPriceItem[]    @relation("AgentPriceFromZone")
+  agentPricesTo      AgentPriceItem[]    @relation("AgentPriceToZone")
+  publicPricesFrom   PublicPriceItem[]   @relation("PublicPriceFromZone")
+  publicPricesTo     PublicPriceItem[]   @relation("PublicPriceToZone")
+  guestBookingsFrom  GuestBooking[]      @relation("GuestBookingFromZone")
+  guestBookingsTo    GuestBooking[]      @relation("GuestBookingToZone")
+  serviceTypesFrom   JobServiceType[]    @relation("ServiceTypeFromZone")
+  serviceTypesTo     JobServiceType[]    @relation("ServiceTypeToZone")
+
+  @@index([cityId])
+  @@map("zones")
+}
+
+model Hotel {
+  id            String    @id @default(uuid())
+  name          String
+  zoneId        String    @map("zone_id")
+  address       String?
+  stars         Int?
+  latitude      Decimal?  @db.Decimal(10, 7)
+  longitude     Decimal?  @db.Decimal(10, 7)
+  placeId       String?   @map("google_place_id")
+  isActive      Boolean   @default(true) @map("is_active")
+  // Auto-created from a B2C Google Places pick; flagged for admin review.
+  isAutoCreated Boolean   @default(false) @map("is_auto_created")
+  reviewedAt    DateTime? @map("reviewed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  zone Zone @relation(fields: [zoneId], references: [id])
+
+  jobsOrigin      TrafficJob[]   @relation("JobOriginHotel")
+  jobsDestination TrafficJob[]   @relation("JobDestHotel")
+  guestBookings   GuestBooking[]
+
+  @@index([zoneId])
+  @@map("hotels")
+}
+
+// ─────────────────────────────────────────────
+// VEHICLES & OPERATIONS
+// ─────────────────────────────────────────────
+
+model VehicleType {
+  id              String        @id @default(uuid())
+  name            String        @unique
+  seatCapacity    Int           @map("seat_capacity")
+  imageUrl        String?       @map("image_url")
+  description     String?
+  // B2C display amenities
+  wifi            Boolean       @default(false)
+  airConditioning Boolean       @default(false) @map("air_conditioning")
+  transmission    Transmission?
+  luggageCapacity Int?          @map("luggage_capacity")
+  gpsTracked      Boolean       @default(false) @map("gps_tracked")
+  isActive        Boolean       @default(true) @map("is_active")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  vehicles         Vehicle[]
+  supplierPrices   SupplierTripPrice[]
+  customerPrices   CustomerPriceItem[]
+  agentPrices      AgentPriceItem[]
+  publicPrices     PublicPriceItem[]
+  guestBookings    GuestBooking[]
+  requestedByJobs  TrafficJob[]          @relation("JobRequestedVehicleType")
+  supplierCarTypes SupplierCarType[]
+  driverTariffs    DriverPriceTariff[]
+  driverTripFees   DriverTripFee[]
+  allowedForExtras B2cExtraVehicleType[]
+
+  @@map("vehicle_types")
+}
+
+model Vehicle {
+  id              String           @id @default(uuid())
+  plateNumber     String           @unique @map("plate_number")
+  vehicleTypeId   String           @map("vehicle_type_id")
+  ownership       VehicleOwnership @default(OWNED)
+  color           String?
+  carBrand        String?          @map("car_brand")
+  carModel        String?          @map("car_model")
+  makeYear        Int?             @map("make_year")
+  luggageCapacity Int?             @map("luggage_capacity")
+  supplierId      String?          @map("supplier_id")
+  isActive        Boolean          @default(true) @map("is_active")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  deletedAt       DateTime?        @map("deleted_at")
+
+  vehicleType    VehicleType         @relation(fields: [vehicleTypeId], references: [id])
+  supplier       Supplier?           @relation(fields: [supplierId], references: [id])
+  driverVehicles DriverVehicle[]
+  assignments    TrafficAssignment[]
+  compliance     VehicleCompliance?
+
+  @@index([vehicleTypeId])
+  @@index([supplierId])
+  @@map("vehicles")
+}
+
+model VehicleCompliance {
+  id        String @id @default(uuid())
+  vehicleId String @unique @map("vehicle_id")
+
+  // License
+  licenseExpiryDate DateTime? @map("license_expiry_date") @db.Date
+  licenseCopyUrl    String?   @map("license_copy_url")
+
+  // Insurance
+  hasInsurance        Boolean   @default(false) @map("has_insurance")
+  insuranceExpiryDate DateTime? @map("insurance_expiry_date") @db.Date
+  insuranceDocUrl     String?   @map("insurance_doc_url")
+
+  // Financial
+  annualPayment              Decimal?  @map("annual_payment") @db.Decimal(15, 2)
+  annualPaymentCurrency      Currency? @map("annual_payment_currency")
+  gpsSubscription            Decimal?  @map("gps_subscription") @db.Decimal(15, 2)
+  gpsSubscriptionCurrency    Currency? @map("gps_subscription_currency")
+  tourismSupportFund         Decimal?  @map("tourism_support_fund") @db.Decimal(15, 2)
+  tourismSupportFundCurrency Currency? @map("tourism_support_fund_currency")
+  registrationFees           Decimal?  @map("registration_fees") @db.Decimal(15, 2)
+  registrationFeesCurrency   Currency? @map("registration_fees_currency")
+  temporaryPermitDate        DateTime? @map("temporary_permit_date") @db.Date
+
+  // Audit
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  vehicle         Vehicle                 @relation(fields: [vehicleId], references: [id])
+  depositPayments VehicleDepositPayment[]
+
+  @@map("vehicle_compliance")
+}
+
+model VehicleDepositPayment {
+  id            String   @id @default(uuid())
+  complianceId  String   @map("compliance_id")
+  amount        Decimal  @db.Decimal(15, 2)
+  currency      Currency @default(EGP)
+  paidAt        DateTime @map("paid_at")
+  createdByName String   @map("created_by_name")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  compliance VehicleCompliance @relation(fields: [complianceId], references: [id])
+
+  @@map("vehicle_deposit_payments")
+}
+
+model Driver {
+  id                String    @id @default(uuid())
+  name              String
+  mobileNumber      String    @map("mobile_number")
+  licenseNumber     String?   @map("license_number")
+  attachmentUrl     String?   @map("attachment_url")
+  licenseExpiryDate DateTime? @map("license_expiry_date") @db.Date
+  supplierId        String?   @map("supplier_id")
+  userId            String?   @unique @map("user_id")
+  isActive          Boolean   @default(true) @map("is_active")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  supplier        Supplier?            @relation(fields: [supplierId], references: [id])
+  user            User?                @relation(fields: [userId], references: [id])
+  driverVehicles  DriverVehicle[]
+  assignments     TrafficAssignment[]
+  tripFees        DriverTripFee[]
+  notifications   DriverNotification[]
+  driverJobScores DriverJobScore[]
+
+  @@index([supplierId])
+  @@map("drivers")
+}
+
+model DriverVehicle {
+  id           String    @id @default(uuid())
+  driverId     String    @map("driver_id")
+  vehicleId    String    @map("vehicle_id")
+  isPrimary    Boolean   @default(false) @map("is_primary")
+  assignedAt   DateTime  @default(now()) @map("assigned_at")
+  unassignedAt DateTime? @map("unassigned_at")
+
+  driver  Driver  @relation(fields: [driverId], references: [id])
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@unique([driverId, vehicleId])
+  @@index([driverId])
+  @@index([vehicleId])
+  @@map("driver_vehicles")
+}
+
+model Rep {
+  id            String    @id @default(uuid())
+  name          String
+  mobileNumber  String    @map("mobile_number")
+  attachmentUrl String?   @map("attachment_url")
+  feePerFlight  Decimal   @default(0) @map("fee_per_flight") @db.Decimal(15, 2)
+  userId        String?   @unique @map("user_id")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  user          User?               @relation(fields: [userId], references: [id])
+  repZones      RepZone[]
+  assignments   TrafficAssignment[]
+  repFees       RepFee[]
+  repJobScores  RepJobScore[]
+  guestSurveys  GuestSurvey[]
+  notifications RepNotification[]
+
+  @@map("reps")
+}
+
+model RepZone {
+  id     String @id @default(uuid())
+  repId  String @map("rep_id")
+  zoneId String @map("zone_id")
+
+  rep  Rep  @relation(fields: [repId], references: [id])
+  zone Zone @relation(fields: [zoneId], references: [id])
+
+  @@unique([repId, zoneId])
+  @@map("rep_zones")
+}
+
+// ─────────────────────────────────────────────
+// AGENTS
+// ─────────────────────────────────────────────
+
+model Agent {
+  id           String    @id @default(uuid())
+  legalName    String    @map("legal_name")
+  tradeName    String?   @map("trade_name")
+  taxId        String?   @map("tax_id")
+  address      String?
+  city         String?
+  country      String?
+  phone        String?
+  email        String?
+  disputeEmail String?   @map("dispute_email")
+  currency     Currency  @default(EGP)
+  refPattern   String?   @map("ref_pattern")
+  refExample   String?   @map("ref_example")
+  isActive     Boolean   @default(true) @map("is_active")
+  // Stable marker for the single seeded "website" agent. Its display name tracks
+  // WebsiteSettings.siteName; this flag lets the convert flow find it reliably.
+  isB2cWebsite Boolean   @default(false) @map("is_b2c_website")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  documents    AgentDocument[]
+  creditTerms  AgentCreditTerms?
+  invoiceCycle AgentInvoiceCycle?
+  trafficJobs  TrafficJob[]
+  invoices     AgentInvoice[]
+  priceItems   AgentPriceItem[]
+
+  @@map("agents")
+}
+
+model AgentDocument {
+  id           String       @id @default(uuid())
+  agentId      String       @map("agent_id")
+  documentType DocumentType @map("document_type")
+  fileUrl      String       @map("file_url")
+  fileName     String       @map("file_name")
+  expiresAt    DateTime?    @map("expires_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@map("agent_documents")
+}
+
+model AgentCreditTerms {
+  id          String   @id @default(uuid())
+  agentId     String   @unique @map("agent_id")
+  creditLimit Decimal  @map("credit_limit") @db.Decimal(15, 2)
+  creditDays  Int      @map("credit_days")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@map("agent_credit_terms")
+}
+
+model AgentInvoiceCycle {
+  id         String           @id @default(uuid())
+  agentId    String           @unique @map("agent_id")
+  cycleType  InvoiceCycleType @map("cycle_type")
+  dayOfWeek  Int?             @map("day_of_week")
+  dayOfMonth Int?             @map("day_of_month")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@map("agent_invoice_cycles")
+}
+
+model AgentPriceItem {
+  id               String      @id @default(uuid())
+  agentId          String      @map("agent_id")
+  serviceType      ServiceType @default(ARR) @map("service_type")
+  fromZoneId       String      @map("from_zone_id")
+  toZoneId         String      @map("to_zone_id")
+  vehicleTypeId    String      @map("vehicle_type_id")
+  price            Decimal     @db.Decimal(15, 2)
+  driverTip        Decimal     @default(0) @map("driver_tip") @db.Decimal(15, 2)
+  boosterSeatPrice Decimal     @default(0) @map("booster_seat_price") @db.Decimal(15, 2)
+  babySeatPrice    Decimal     @default(0) @map("baby_seat_price") @db.Decimal(15, 2)
+  wheelChairPrice  Decimal     @default(0) @map("wheel_chair_price") @db.Decimal(15, 2)
+  currency         Currency    @default(EGP)
+  effectiveFrom    DateTime?   @map("effective_from") @db.Date
+  effectiveTo      DateTime?   @map("effective_to") @db.Date
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  agent       Agent       @relation(fields: [agentId], references: [id])
+  fromZone    Zone        @relation("AgentPriceFromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone        @relation("AgentPriceToZone", fields: [toZoneId], references: [id])
+  vehicleType VehicleType @relation(fields: [vehicleTypeId], references: [id])
+
+  @@unique([agentId, serviceType, fromZoneId, toZoneId, vehicleTypeId])
+  @@index([agentId])
+  @@map("agent_price_items")
+}
+
+// ─────────────────────────────────────────────
+// CUSTOMERS (B2B Travel Agencies)
+// ─────────────────────────────────────────────
+
+model Customer {
+  id            String    @id @default(uuid())
+  legalName     String    @map("legal_name")
+  tradeName     String?   @map("trade_name")
+  taxId         String?   @map("tax_id")
+  address       String?
+  city          String?
+  country       String?
+  phone         String?
+  email         String?
+  contactPerson String?   @map("contact_person")
+  currency      Currency  @default(EGP)
+  creditLimit   Decimal?  @map("credit_limit") @db.Decimal(15, 2)
+  creditDays    Int?      @map("credit_days")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  trafficJobs     TrafficJob[]
+  invoices        AgentInvoice[]
+  priceItems      CustomerPriceItem[]
+  importTemplates CustomerImportTemplate[]
+
+  @@map("customers")
+}
+
+model CustomerPriceItem {
+  id            String      @id @default(uuid())
+  customerId    String      @map("customer_id")
+  serviceType   ServiceType @default(ARR) @map("service_type")
+  fromZoneId    String      @map("from_zone_id")
+  toZoneId      String      @map("to_zone_id")
+  vehicleTypeId String      @map("vehicle_type_id")
+  transferPrice Decimal     @map("transfer_price") @db.Decimal(15, 2)
+  driverTip     Decimal     @default(0) @map("driver_tip") @db.Decimal(15, 2)
+  currency      Currency    @default(EGP)
+  effectiveFrom DateTime?   @map("effective_from") @db.Date
+  effectiveTo   DateTime?   @map("effective_to") @db.Date
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  fromZone    Zone        @relation("CustomerPriceFromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone        @relation("CustomerPriceToZone", fields: [toZoneId], references: [id])
+  vehicleType VehicleType @relation(fields: [vehicleTypeId], references: [id])
+
+  @@unique([customerId, serviceType, fromZoneId, toZoneId, vehicleTypeId])
+  @@index([customerId])
+  @@map("customer_price_items")
+}
+
+// ─────────────────────────────────────────────
+// CUSTOMER IMPORT TEMPLATES (AI Job Import)
+// ─────────────────────────────────────────────
+
+model CustomerImportTemplate {
+  id            String      @id @default(uuid())
+  customerId    String      @map("customer_id")
+  serviceType   ServiceType @map("service_type")
+  fileType      String      @map("file_type")
+  fileName      String      @map("file_name")
+  filePath      String      @map("file_path")
+  fieldMappings Json?       @map("field_mappings")
+  sampleData    Json?       @map("sample_data")
+  notes         String?
+  isActive      Boolean     @default(true) @map("is_active")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@unique([customerId, serviceType])
+  @@index([customerId])
+  @@map("customer_import_templates")
+}
+
+// ─────────────────────────────────────────────
+// JOB IMPORT LOGS (Audit Trail)
+// ─────────────────────────────────────────────
+
+model JobImportLog {
+  id             String   @id @default(uuid())
+  customerId     String   @map("customer_id")
+  fileName       String   @map("file_name")
+  fileType       String   @map("file_type")
+  jobsExtracted  Int      @map("jobs_extracted")
+  jobsImported   Int      @map("jobs_imported")
+  jobsRejected   Int      @map("jobs_rejected")
+  rawAiResponse  Json?    @map("raw_ai_response")
+  importedJobIds String[] @map("imported_job_ids")
+  importedById   String   @map("imported_by_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([customerId])
+  @@index([importedById])
+  @@map("job_import_logs")
+}
+
+// ─────────────────────────────────────────────
+// PUBLIC PRICE LIST (B2C)
+// ─────────────────────────────────────────────
+
+model PublicPriceItem {
+  id               String       @id @default(uuid())
+  serviceType      ServiceType  @default(ARR) @map("service_type")
+  transferType     TransferType @default(PRIVATE) @map("transfer_type")
+  fromZoneId       String       @map("from_zone_id")
+  toZoneId         String       @map("to_zone_id")
+  vehicleTypeId    String       @map("vehicle_type_id")
+  price            Decimal      @db.Decimal(15, 2)
+  driverTip        Decimal      @default(0) @map("driver_tip") @db.Decimal(15, 2)
+  boosterSeatPrice Decimal      @default(0) @map("booster_seat_price") @db.Decimal(15, 2)
+  babySeatPrice    Decimal      @default(0) @map("baby_seat_price") @db.Decimal(15, 2)
+  wheelChairPrice  Decimal      @default(0) @map("wheel_chair_price") @db.Decimal(15, 2)
+  currency         Currency     @default(EGP)
+  effectiveFrom    DateTime?    @map("effective_from") @db.Date
+  effectiveTo      DateTime?    @map("effective_to") @db.Date
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  fromZone    Zone        @relation("PublicPriceFromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone        @relation("PublicPriceToZone", fields: [toZoneId], references: [id])
+  vehicleType VehicleType @relation(fields: [vehicleTypeId], references: [id])
+
+  @@unique([serviceType, transferType, fromZoneId, toZoneId, vehicleTypeId])
+  @@map("public_price_items")
+}
+
+// B2C public-site booking extras (managed catalog, one global price each).
+model B2cExtra {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  price        Decimal  @default(0) @db.Decimal(15, 2)
+  currency     Currency @default(EGP)
+  imageUrl     String?  @map("image_url")
+  isActive     Boolean  @default(true) @map("is_active")
+  // Whether this extra occupies a physical seat (counts against vehicle capacity).
+  occupiesSeat Boolean  @default(false) @map("occupies_seat")
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  jobUsages           TrafficJobExtra[]
+  // If non-empty, this extra can only be carried by these vehicle types (e.g. cargo
+  // gear that needs a van). Empty = available on any vehicle.
+  allowedVehicleTypes B2cExtraVehicleType[]
+
+  @@map("b2c_extras")
+}
+
+// Restricts a catalog extra to specific vehicle types (cargo-space requirement).
+model B2cExtraVehicleType {
+  extraId       String      @map("extra_id")
+  vehicleTypeId String      @map("vehicle_type_id")
+  extra         B2cExtra    @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  vehicleType   VehicleType @relation(fields: [vehicleTypeId], references: [id], onDelete: Cascade)
+
+  @@id([extraId, vehicleTypeId])
+  @@index([vehicleTypeId])
+  @@map("b2c_extra_vehicle_types")
+}
+
+// A single extra attached to a traffic job. Snapshots the catalog name/price so the
+// job's history survives catalog edits or deletion (extraId is nulled on delete).
+model TrafficJobExtra {
+  id           String         @id @default(uuid())
+  trafficJobId String         @map("traffic_job_id")
+  extraId      String?        @map("extra_id")
+  name         String
+  qty          Int            @default(1)
+  unitAmount   Decimal        @default(0) @map("unit_amount") @db.Decimal(15, 2)
+  currency     Currency       @default(EGP)
+  source       JobExtraSource @default(MANUAL)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id], onDelete: Cascade)
+  extra      B2cExtra?  @relation(fields: [extraId], references: [id], onDelete: SetNull)
+
+  @@index([trafficJobId])
+  @@map("traffic_job_extras")
+}
+
+// ─────────────────────────────────────────────
+// GUEST BOOKINGS (B2C)
+// ─────────────────────────────────────────────
+
+model GuestBooking {
+  id                   String             @id @default(uuid())
+  bookingRef           String             @unique @map("booking_ref")
+  guestName            String             @map("guest_name")
+  guestEmail           String             @map("guest_email")
+  guestPhone           String             @map("guest_phone")
+  guestCountry         String?            @map("guest_country")
+  serviceType          ServiceType        @map("service_type")
+  jobDate              DateTime           @map("job_date") @db.Date
+  pickupTime           DateTime?          @map("pickup_time")
+  fromZoneId           String             @map("from_zone_id")
+  toZoneId             String             @map("to_zone_id")
+  hotelId              String?            @map("hotel_id")
+  originAirportId      String?            @map("origin_airport_id")
+  destinationAirportId String?            @map("destination_airport_id")
+  flightNo             String?            @map("flight_no")
+  carrier              String?
+  terminal             String?
+  paxCount             Int                @map("pax_count")
+  vehicleTypeId        String             @map("vehicle_type_id")
+  extras               Json?
+  notes                String?
+  // Precise pickup/dropoff point picked via Google Places (optional — pricing
+  // still resolves to a zone; this gives the driver the exact coordinate).
+  pickupPlaceId        String?            @map("pickup_place_id")
+  pickupLat            Decimal?           @map("pickup_lat") @db.Decimal(10, 7)
+  pickupLng            Decimal?           @map("pickup_lng") @db.Decimal(10, 7)
+  pickupAddress        String?            @map("pickup_address")
+  dropoffPlaceId       String?            @map("dropoff_place_id")
+  dropoffLat           Decimal?           @map("dropoff_lat") @db.Decimal(10, 7)
+  dropoffLng           Decimal?           @map("dropoff_lng") @db.Decimal(10, 7)
+  dropoffAddress       String?            @map("dropoff_address")
+  // 2-way return grouping: OUTBOUND + RETURN bookings share one groupRef.
+  groupRef             String?            @map("group_ref")
+  legType              BookingLeg?        @map("leg_type")
+  subtotal             Decimal            @db.Decimal(15, 2)
+  taxAmount            Decimal            @default(0) @map("tax_amount") @db.Decimal(15, 2)
+  total                Decimal            @db.Decimal(15, 2)
+  currency             Currency           @default(EGP)
+  exchangeRate         Decimal            @default(1) @map("exchange_rate") @db.Decimal(10, 4)
+  paymentMethod        B2CPaymentMethod   @map("payment_method")
+  paymentStatus        B2CPaymentStatus   @default(PENDING) @map("payment_status")
+  paymentGateway       B2CPaymentGateway? @map("payment_gateway")
+  paymentReference     String?            @map("payment_reference")
+  bookingStatus        GuestBookingStatus @default(CONFIRMED) @map("booking_status")
+  trafficJobId         String?            @unique @map("traffic_job_id")
+  b2cClientId          String?            @map("b2c_client_id")
+  amendedAt            DateTime?          @map("amended_at")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  fromZone            Zone                 @relation("GuestBookingFromZone", fields: [fromZoneId], references: [id])
+  toZone              Zone                 @relation("GuestBookingToZone", fields: [toZoneId], references: [id])
+  hotel               Hotel?               @relation(fields: [hotelId], references: [id])
+  originAirport       Airport?             @relation("GuestBookingOriginAirport", fields: [originAirportId], references: [id])
+  destinationAirport  Airport?             @relation("GuestBookingDestAirport", fields: [destinationAirportId], references: [id])
+  vehicleType         VehicleType          @relation(fields: [vehicleTypeId], references: [id])
+  b2cClient           User?                @relation("B2CClientBookings", fields: [b2cClientId], references: [id])
+  trafficJob          TrafficJob?          @relation("GuestBookingJob", fields: [trafficJobId], references: [id])
+  paymentTransactions PaymentTransaction[]
+  invoice             B2CInvoice?
+
+  @@index([bookingRef])
+  @@index([bookingStatus])
+  @@index([paymentStatus])
+  @@index([jobDate])
+  @@index([groupRef])
+  @@map("guest_bookings")
+}
+
+model PaymentTransaction {
+  id                   String            @id @default(uuid())
+  guestBookingId       String            @map("guest_booking_id")
+  gateway              B2CPaymentGateway
+  gatewayTransactionId String?           @map("gateway_transaction_id")
+  amount               Decimal           @db.Decimal(15, 2)
+  currency             Currency          @default(EGP)
+  status               B2CPaymentStatus  @default(PENDING)
+  rawResponse          Json?             @map("raw_response")
+  createdAt            DateTime          @default(now()) @map("created_at")
+
+  guestBooking GuestBooking @relation(fields: [guestBookingId], references: [id])
+
+  @@index([guestBookingId])
+  @@map("payment_transactions")
+}
+
+// B2C guest invoices. One per guest booking, created when the booking is paid.
+// Fields are kept compatible with Odoo account.move / res.partner so a CSV/XLSX
+// export can be added later without a schema change.
+enum B2CInvoiceStatus {
+  ISSUED
+  PAID
+  REFUNDED
+  CANCELLED
+}
+
+model B2CInvoice {
+  id             String           @id @default(uuid())
+  invoiceNumber  String           @unique @map("invoice_number")
+  guestBookingId String           @unique @map("guest_booking_id")
+  b2cClientId    String?          @map("b2c_client_id")
+  issuedAt       DateTime         @default(now()) @map("issued_at")
+  currency       Currency         @default(EGP)
+  subtotal       Decimal          @db.Decimal(15, 2)
+  taxAmount      Decimal          @default(0) @map("tax_amount") @db.Decimal(15, 2)
+  total          Decimal          @db.Decimal(15, 2)
+  status         B2CInvoiceStatus @default(ISSUED)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+
+  guestBooking GuestBooking @relation(fields: [guestBookingId], references: [id])
+  b2cClient    User?        @relation("B2CClientInvoices", fields: [b2cClientId], references: [id])
+
+  @@index([b2cClientId])
+  @@index([invoiceNumber])
+  @@map("b2c_invoices")
+}
+
+// ─────────────────────────────────────────────
+// SUPPLIERS
+// ─────────────────────────────────────────────
+
+enum SupplierType {
+  COMPANY
+  INDIVIDUAL
+}
+
+model Supplier {
+  id           String       @id @default(uuid())
+  supplierType SupplierType @default(COMPANY) @map("supplier_type")
+  legalName    String       @map("legal_name")
+  tradeName    String?      @map("trade_name")
+  taxId        String?      @map("tax_id")
+  address      String?
+  city         String?
+  country      String?
+  phone        String?
+  email        String?
+
+  // Individual supplier fields
+  mobileNumber    String? @map("mobile_number")
+  nationalIdImage String? @map("national_id_image")
+
+  userId    String?   @unique @map("user_id")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  user          User?               @relation(fields: [userId], references: [id])
+  vehicles      Vehicle[]
+  drivers       Driver[]
+  tripPrices    SupplierTripPrice[]
+  supplierCosts SupplierCost[]
+  carTypes      SupplierCarType[]
+  assignments   TrafficAssignment[] @relation("AssignmentSupplier")
+
+  @@map("suppliers")
+}
+
+model SupplierCarType {
+  id            String   @id @default(uuid())
+  supplierId    String   @map("supplier_id")
+  vehicleTypeId String   @map("vehicle_type_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  supplier    Supplier            @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  vehicleType VehicleType         @relation(fields: [vehicleTypeId], references: [id], onDelete: Cascade)
+  assignments TrafficAssignment[]
+
+  @@unique([supplierId, vehicleTypeId])
+  @@map("supplier_car_types")
+}
+
+model SupplierTripPrice {
+  id            String      @id @default(uuid())
+  supplierId    String      @map("supplier_id")
+  serviceType   ServiceType @default(ARR) @map("service_type")
+  fromZoneId    String      @map("from_zone_id")
+  toZoneId      String      @map("to_zone_id")
+  vehicleTypeId String      @map("vehicle_type_id")
+  price         Decimal     @db.Decimal(15, 2)
+  driverTip     Decimal     @default(0) @map("driver_tip") @db.Decimal(15, 2)
+  currency      Currency    @default(EGP)
+  effectiveFrom DateTime?   @map("effective_from") @db.Date
+  effectiveTo   DateTime?   @map("effective_to") @db.Date
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  supplier    Supplier    @relation(fields: [supplierId], references: [id])
+  fromZone    Zone        @relation("FromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone        @relation("ToZone", fields: [toZoneId], references: [id])
+  vehicleType VehicleType @relation(fields: [vehicleTypeId], references: [id])
+
+  @@unique([supplierId, serviceType, fromZoneId, toZoneId, vehicleTypeId])
+  @@index([supplierId])
+  @@map("supplier_trip_prices")
+}
+
+// ─────────────────────────────────────────────
+// TRAFFIC JOBS
+// ─────────────────────────────────────────────
+
+model TrafficJob {
+  id               String         @id @default(uuid())
+  internalRef      String         @unique @map("internal_ref")
+  bookingChannel   BookingChannel @default(ONLINE) @map("booking_channel")
+  agentId          String?        @map("agent_id")
+  agentRef         String?        @map("agent_ref")
+  customerJobId    String?        @map("customer_job_id")
+  customerId       String?        @map("customer_id")
+  serviceType      ServiceType    @map("service_type")
+  jobServiceTypeId String?        @map("job_service_type_id")
+  jobDate          DateTime       @map("job_date") @db.Date
+  status           JobStatus      @default(PENDING)
+  bookingStatus    BookingStatus  @default(NEW) @map("booking_status")
+  adultCount       Int            @map("adult_count")
+  childCount       Int            @default(0) @map("child_count")
+  paxCount         Int            @map("pax_count")
+
+  // Origin – exactly one must be set (validated in service layer)
+  originAirportId String? @map("origin_airport_id")
+  originZoneId    String? @map("origin_zone_id")
+  originHotelId   String? @map("origin_hotel_id")
+
+  // Destination – exactly one must be set (validated in service layer)
+  destinationAirportId String? @map("destination_airport_id")
+  destinationZoneId    String? @map("destination_zone_id")
+  destinationHotelId   String? @map("destination_hotel_id")
+
+  // Resolved zones for pricing (auto-computed from origin/destination)
+  fromZoneId String? @map("from_zone_id")
+  toZoneId   String? @map("to_zone_id")
+
+  // Deprecated – kept for backward compatibility
+  hotelId String? @map("hotel_id")
+
+  clientName   String?   @map("client_name")
+  clientMobile String?   @map("client_mobile")
+  printSign    Boolean   @default(false) @map("print_sign")
+  pickUpTime   DateTime? @map("pick_up_time")
+  notes        String?
+
+  // Precise pickup/dropoff coordinate from a B2C Google Places pick (optional).
+  pickupPlaceId  String?  @map("pickup_place_id")
+  pickupLat      Decimal? @map("pickup_lat") @db.Decimal(10, 7)
+  pickupLng      Decimal? @map("pickup_lng") @db.Decimal(10, 7)
+  pickupAddress  String?  @map("pickup_address")
+  dropoffPlaceId String?  @map("dropoff_place_id")
+  dropoffLat     Decimal? @map("dropoff_lat") @db.Decimal(10, 7)
+  dropoffLng     Decimal? @map("dropoff_lng") @db.Decimal(10, 7)
+  dropoffAddress String?  @map("dropoff_address")
+  // Links the two legs of a 2-way (return) booking for ops visibility.
+  groupRef       String?  @map("group_ref")
+
+  // Collection (Online bookings – driver collects from passenger)
+  collectionRequired     Boolean   @default(false) @map("collection_required")
+  collectionAmount       Decimal?  @map("collection_amount") @db.Decimal(15, 2)
+  collectionCurrency     Currency  @default(EGP) @map("collection_currency")
+  collectionCollected    Boolean   @default(false) @map("collection_collected")
+  collectionCollectedAt  DateTime? @map("collection_collected_at")
+  collectionReceiptNo    String?   @map("collection_receipt_no")
+  collectionLiquidatedAt DateTime? @map("collection_liquidated_at")
+
+  // Transfer price (quoted by agent)
+  transferPrice          Decimal? @map("transfer_price") @db.Decimal(15, 2)
+  transferPriceCurrency  Currency @default(EGP) @map("transfer_price_currency")
+  requestedVehicleTypeId String?  @map("requested_vehicle_type_id")
+
+  // Job price (final price for invoicing)
+  priceAmount   Decimal?  @map("price_amount") @db.Decimal(15, 2)
+  priceCurrency Currency? @default(EGP) @map("price_currency")
+
+  // Customer rep meeting fields (B2B)
+  custRepName         String?   @map("cust_rep_name")
+  custRepMobile       String?   @map("cust_rep_mobile")
+  custRepMeetingPoint String?   @map("cust_rep_meeting_point")
+  custRepMeetingTime  DateTime? @map("cust_rep_meeting_time")
+
+  // Dispatch 48-hour lock override
+  dispatchUnlockedAt   DateTime? @map("dispatch_unlocked_at")
+  dispatchUnlockedById String?   @map("dispatch_unlocked_by_id")
+
+  // Driver portal 48-hour lock override
+  driverUnlockedAt   DateTime? @map("driver_unlocked_at")
+  driverUnlockedById String?   @map("driver_unlocked_by_id")
+
+  // Rep portal 48-hour lock override
+  repUnlockedAt   DateTime? @map("rep_unlocked_at")
+  repUnlockedById String?   @map("rep_unlocked_by_id")
+
+  // Supplier portal 48-hour lock override
+  supplierUnlockedAt   DateTime? @map("supplier_unlocked_at")
+  supplierUnlockedById String?   @map("supplier_unlocked_by_id")
+
+  // B2B edit 1-week lock override
+  editUnlockedAt   DateTime? @map("edit_unlocked_at")
+  editUnlockedById String?   @map("edit_unlocked_by_id")
+
+  createdById String    @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  agent                Agent?          @relation(fields: [agentId], references: [id])
+  customer             Customer?       @relation(fields: [customerId], references: [id])
+  dispatchUnlockedBy   User?           @relation("JobDispatchUnlockedBy", fields: [dispatchUnlockedById], references: [id])
+  driverUnlockedBy     User?           @relation("JobDriverUnlockedBy", fields: [driverUnlockedById], references: [id])
+  repUnlockedBy        User?           @relation("JobRepUnlockedBy", fields: [repUnlockedById], references: [id])
+  supplierUnlockedBy   User?           @relation("JobSupplierUnlockedBy", fields: [supplierUnlockedById], references: [id])
+  editUnlockedBy       User?           @relation("JobEditUnlockedBy", fields: [editUnlockedById], references: [id])
+  originAirport        Airport?        @relation("JobOriginAirport", fields: [originAirportId], references: [id])
+  originZone           Zone?           @relation("JobOriginZone", fields: [originZoneId], references: [id])
+  originHotel          Hotel?          @relation("JobOriginHotel", fields: [originHotelId], references: [id])
+  destinationAirport   Airport?        @relation("JobDestAirport", fields: [destinationAirportId], references: [id])
+  destinationZone      Zone?           @relation("JobDestZone", fields: [destinationZoneId], references: [id])
+  destinationHotel     Hotel?          @relation("JobDestHotel", fields: [destinationHotelId], references: [id])
+  fromZone             Zone?           @relation("JobFromZone", fields: [fromZoneId], references: [id])
+  toZone               Zone?           @relation("JobToZone", fields: [toZoneId], references: [id])
+  requestedVehicleType VehicleType?    @relation("JobRequestedVehicleType", fields: [requestedVehicleTypeId], references: [id])
+  createdBy            User            @relation("JobCreatedBy", fields: [createdById], references: [id])
+  jobServiceType       JobServiceType? @relation(fields: [jobServiceTypeId], references: [id])
+
+  flight              TrafficFlight?
+  assignment          TrafficAssignment?
+  jobExtras           TrafficJobExtra[]
+  driverFees          DriverTripFee[]
+  repFees             RepFee[]
+  supplierCosts       SupplierCost[]
+  invoiceLines        InvoiceLine[]
+  repNotifications    RepNotification[]
+  driverNotifications DriverNotification[]
+  noShowEvidence      NoShowEvidence[]
+  inPlaceEvidence     InPlaceEvidence[]
+  completedEvidence   CompletedEvidence[]
+  inProgressEvidence  InProgressEvidence[]
+  repJobScore         RepJobScore?
+  guestSurvey         GuestSurvey?
+  driverJobScore      DriverJobScore?
+  whatsappLogs        WhatsappNotificationLog[]
+  userNotifications   UserNotification[]
+  guestBooking        GuestBooking?             @relation("GuestBookingJob")
+
+  @@unique([customerJobId])
+  @@index([jobDate])
+  @@index([agentId])
+  @@index([customerId])
+  @@index([status])
+  @@index([bookingChannel])
+  @@index([serviceType])
+  @@index([fromZoneId])
+  @@index([toZoneId])
+  @@index([requestedVehicleTypeId])
+  @@index([deletedAt])
+  @@index([createdById])
+  @@index([jobDate, status])
+  @@index([jobDate, deletedAt])
+  @@map("traffic_jobs")
+}
+
+model TrafficFlight {
+  id            String    @id @default(uuid())
+  trafficJobId  String    @unique @map("traffic_job_id")
+  flightNo      String    @map("flight_no")
+  carrier       String?
+  terminal      String?
+  arrivalTime   DateTime? @map("arrival_time")
+  departureTime DateTime? @map("departure_time")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@map("traffic_flights")
+}
+
+model TrafficAssignment {
+  id                  String          @id @default(uuid())
+  trafficJobId        String          @unique @map("traffic_job_id")
+  vehicleId           String?         @map("vehicle_id")
+  driverId            String?         @map("driver_id")
+  repId               String?         @map("rep_id")
+  supplierId          String?         @map("supplier_id")
+  supplierCarTypeId   String?         @map("supplier_car_type_id")
+  assignedById        String          @map("assigned_by_id")
+  driverStatus        PortalJobStatus @default(PENDING) @map("driver_status")
+  repStatus           PortalJobStatus @default(PENDING) @map("rep_status")
+  supplierStatus      PortalJobStatus @default(PENDING) @map("supplier_status")
+  supplierNotes       String?         @map("supplier_notes")
+  externalDriverName  String?         @map("external_driver_name")
+  externalDriverPhone String?         @map("external_driver_phone")
+  remarks             String?
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+
+  trafficJob       TrafficJob        @relation(fields: [trafficJobId], references: [id])
+  vehicle          Vehicle?          @relation(fields: [vehicleId], references: [id])
+  driver           Driver?           @relation(fields: [driverId], references: [id])
+  rep              Rep?              @relation(fields: [repId], references: [id])
+  supplier         Supplier?         @relation("AssignmentSupplier", fields: [supplierId], references: [id])
+  supplierCarType  SupplierCarType?  @relation(fields: [supplierCarTypeId], references: [id])
+  assignedBy       User              @relation("AssignedBy", fields: [assignedById], references: [id])
+  statusChangeLogs StatusChangeLog[]
+
+  @@index([driverId])
+  @@index([repId])
+  @@index([vehicleId])
+  @@index([supplierId])
+  @@index([supplierCarTypeId])
+  @@index([assignedById])
+  @@index([driverId, trafficJobId])
+  @@index([repId, trafficJobId])
+  @@map("traffic_assignments")
+}
+
+model StatusChangeLog {
+  id             String          @id @default(uuid())
+  assignmentId   String          @map("assignment_id")
+  changedBy      String          @map("changed_by")
+  changedById    String          @map("changed_by_id")
+  previousStatus PortalJobStatus @map("previous_status")
+  newStatus      PortalJobStatus @map("new_status")
+  gpsLatitude    Decimal?        @map("gps_latitude") @db.Decimal(10, 7)
+  gpsLongitude   Decimal?        @map("gps_longitude") @db.Decimal(10, 7)
+  gpsMapLink     String?         @map("gps_map_link")
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  assignment TrafficAssignment @relation(fields: [assignmentId], references: [id])
+
+  @@index([assignmentId])
+  @@map("status_change_logs")
+}
+
+// Claimed once per (job, day) so only ONE backend replica executes a nightly cron.
+model CronRunLock {
+  id        String   @id @default(uuid())
+  jobName   String   @map("job_name")
+  runDate   DateTime @map("run_date") @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([jobName, runDate])
+  @@map("cron_run_locks")
+}
+
+// ─────────────────────────────────────────────
+// ACTIVITY LOG
+// ─────────────────────────────────────────────
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  userName  String   @map("user_name")
+  action    String // CREATE, UPDATE, DELETE
+  entity    String // e.g. "TrafficJob", "Agent", "Invoice"
+  entityId  String?  @map("entity_id")
+  summary   String // Human-readable: "Created traffic job TJ-00123"
+  details      Json? // Submitted/new values (request body)
+  previousData Json?  @map("previous_data") // Snapshot of the record BEFORE an update/delete
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+// ─────────────────────────────────────────────
+// FINANCE
+// ─────────────────────────────────────────────
+
+model DriverTripFee {
+  id            String   @id @default(uuid())
+  driverId      String   @map("driver_id")
+  trafficJobId  String   @map("traffic_job_id")
+  fromZoneId    String?  @map("from_zone_id")
+  toZoneId      String?  @map("to_zone_id")
+  fromAirportId String?  @map("from_airport_id")
+  toAirportId   String?  @map("to_airport_id")
+  vehicleTypeId String?  @map("vehicle_type_id")
+  tariffId      String?  @map("tariff_id")
+  amount        Decimal  @db.Decimal(15, 2)
+  tariffAmount  Decimal? @map("tariff_amount") @db.Decimal(15, 2)
+  currency      Currency @default(EGP)
+  isPosted      Boolean  @default(false) @map("is_posted")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  driver      Driver             @relation(fields: [driverId], references: [id])
+  trafficJob  TrafficJob         @relation(fields: [trafficJobId], references: [id])
+  fromZone    Zone?              @relation("FeeFromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone?              @relation("FeeToZone", fields: [toZoneId], references: [id])
+  fromAirport Airport?           @relation("FeeFromAirport", fields: [fromAirportId], references: [id])
+  toAirport   Airport?           @relation("FeeToAirport", fields: [toAirportId], references: [id])
+  vehicleType VehicleType?       @relation(fields: [vehicleTypeId], references: [id])
+  tariff      DriverPriceTariff? @relation(fields: [tariffId], references: [id])
+
+  @@index([driverId])
+  @@index([trafficJobId])
+  @@index([driverId, trafficJobId])
+  @@map("driver_trip_fees")
+}
+
+model DriverPriceTariff {
+  id            String   @id @default(uuid())
+  fromZoneId    String?  @map("from_zone_id")
+  toZoneId      String?  @map("to_zone_id")
+  fromAirportId String?  @map("from_airport_id")
+  toAirportId   String?  @map("to_airport_id")
+  vehicleTypeId String   @map("vehicle_type_id")
+  amount        Decimal  @db.Decimal(15, 2)
+  currency      Currency @default(EGP)
+  notes         String?
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  jobServiceTypeId String? @map("job_service_type_id")
+
+  fromZone       Zone?           @relation("TariffFromZone", fields: [fromZoneId], references: [id])
+  toZone         Zone?           @relation("TariffToZone", fields: [toZoneId], references: [id])
+  fromAirport    Airport?        @relation("TariffFromAirport", fields: [fromAirportId], references: [id])
+  toAirport      Airport?        @relation("TariffToAirport", fields: [toAirportId], references: [id])
+  vehicleType    VehicleType     @relation(fields: [vehicleTypeId], references: [id])
+  jobServiceType JobServiceType? @relation(fields: [jobServiceTypeId], references: [id])
+  fees           DriverTripFee[]
+
+  @@index([fromZoneId, toZoneId])
+  @@index([vehicleTypeId])
+  @@index([jobServiceTypeId])
+  @@map("driver_price_tariffs")
+}
+
+model JobServiceType {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  fromZoneId String?  @map("from_zone_id")
+  toZoneId   String?  @map("to_zone_id")
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  fromZone    Zone?               @relation("ServiceTypeFromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone?               @relation("ServiceTypeToZone", fields: [toZoneId], references: [id])
+  tariffs     DriverPriceTariff[]
+  trafficJobs TrafficJob[]
+
+  @@map("job_service_types")
+}
+
+model RepFee {
+  id           String   @id @default(uuid())
+  repId        String   @map("rep_id")
+  trafficJobId String   @map("traffic_job_id")
+  amount       Decimal  @db.Decimal(15, 2)
+  currency     Currency @default(EGP)
+  isPosted     Boolean  @default(false) @map("is_posted")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  rep        Rep        @relation(fields: [repId], references: [id])
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@index([repId])
+  @@index([trafficJobId])
+  @@index([repId, trafficJobId])
+  @@map("rep_fees")
+}
+
+model SupplierCost {
+  id           String   @id @default(uuid())
+  supplierId   String   @map("supplier_id")
+  trafficJobId String   @map("traffic_job_id")
+  amount       Decimal  @db.Decimal(15, 2)
+  currency     Currency @default(EGP)
+  isPosted     Boolean  @default(false) @map("is_posted")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  supplier   Supplier   @relation(fields: [supplierId], references: [id])
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@index([supplierId])
+  @@index([trafficJobId])
+  @@index([supplierId, trafficJobId])
+  @@map("supplier_costs")
+}
+
+model AgentInvoice {
+  id            String        @id @default(uuid())
+  agentId       String?       @map("agent_id")
+  customerId    String?       @map("customer_id")
+  invoiceNumber String        @unique @map("invoice_number")
+  invoiceType   InvoiceType?  @map("invoice_type")
+  invoiceDate   DateTime      @map("invoice_date") @db.Date
+  dueDate       DateTime      @map("due_date") @db.Date
+  currency      Currency      @default(EGP)
+  subtotal      Decimal       @db.Decimal(15, 2)
+  taxAmount     Decimal       @map("tax_amount") @db.Decimal(15, 2)
+  total         Decimal       @db.Decimal(15, 2)
+  exchangeRate  Decimal       @default(1) @map("exchange_rate") @db.Decimal(10, 4)
+  status        InvoiceStatus @default(DRAFT)
+  postedAt      DateTime?     @map("posted_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  agent    Agent?        @relation(fields: [agentId], references: [id])
+  customer Customer?     @relation(fields: [customerId], references: [id])
+  lines    InvoiceLine[]
+  payments Payment[]
+
+  @@index([agentId])
+  @@index([customerId])
+  @@index([status])
+  @@index([status, dueDate])
+  @@map("agent_invoices")
+}
+
+model InvoiceLine {
+  id           String   @id @default(uuid())
+  invoiceId    String   @map("invoice_id")
+  trafficJobId String?  @map("traffic_job_id")
+  description  String
+  quantity     Int      @default(1)
+  unitPrice    Decimal  @map("unit_price") @db.Decimal(15, 2)
+  taxRate      Decimal  @default(0) @map("tax_rate") @db.Decimal(5, 2)
+  taxAmount    Decimal  @default(0) @map("tax_amount") @db.Decimal(15, 2)
+  lineTotal    Decimal  @map("line_total") @db.Decimal(15, 2)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  invoice    AgentInvoice @relation(fields: [invoiceId], references: [id])
+  trafficJob TrafficJob?  @relation(fields: [trafficJobId], references: [id])
+
+  @@index([invoiceId])
+  @@index([trafficJobId])
+  @@map("invoice_lines")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  agentInvoiceId String        @map("agent_invoice_id")
+  amount         Decimal       @db.Decimal(15, 2)
+  currency       Currency      @default(EGP)
+  exchangeRate   Decimal       @default(1) @map("exchange_rate") @db.Decimal(10, 4)
+  paymentMethod  PaymentMethod @map("payment_method")
+  paymentDate    DateTime      @map("payment_date") @db.Date
+  reference      String?
+  isPosted       Boolean       @default(false) @map("is_posted")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  agentInvoice AgentInvoice @relation(fields: [agentInvoiceId], references: [id])
+
+  @@index([agentInvoiceId])
+  @@index([paymentDate])
+  @@map("payments")
+}
+
+// ─────────────────────────────────────────────
+// ACCOUNTING (ODOO READY)
+// ─────────────────────────────────────────────
+
+model Account {
+  id          String      @id @default(uuid())
+  code        String      @unique
+  name        String
+  accountType AccountType @map("account_type")
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  journalLines JournalLine[]
+
+  @@map("accounts")
+}
+
+model JournalEntry {
+  id          String      @id @default(uuid())
+  entryNumber String      @unique @map("entry_number")
+  entryDate   DateTime    @map("entry_date") @db.Date
+  journalType JournalType @map("journal_type")
+  description String?
+  isPosted    Boolean     @default(false) @map("is_posted")
+  postedAt    DateTime?   @map("posted_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  lines JournalLine[]
+
+  @@index([entryDate])
+  @@map("journal_entries")
+}
+
+model JournalLine {
+  id             String   @id @default(uuid())
+  journalEntryId String   @map("journal_entry_id")
+  accountId      String   @map("account_id")
+  debit          Decimal  @default(0) @db.Decimal(15, 2)
+  credit         Decimal  @default(0) @db.Decimal(15, 2)
+  currency       Currency @default(EGP)
+  exchangeRate   Decimal  @default(1) @map("exchange_rate") @db.Decimal(10, 4)
+  partnerType    String?  @map("partner_type")
+  partnerId      String?  @map("partner_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id])
+  account      Account      @relation(fields: [accountId], references: [id])
+
+  @@index([journalEntryId])
+  @@index([accountId])
+  @@map("journal_lines")
+}
+
+// ─────────────────────────────────────────────
+// SYSTEM SETTINGS (singleton)
+// ─────────────────────────────────────────────
+
+model SystemSettings {
+  id               String   @id @default(uuid())
+  theme            String   @default("dark")
+  primaryColor     String   @default("#3b82f6") @map("primary_color")
+  accentColor      String   @default("#8b5cf6") @map("accent_color")
+  sidebarColor     String   @default("#41004c") @map("sidebar_color")
+  fontFamily       String   @default("Geist") @map("font_family")
+  language         String   @default("en")
+  googleMapsApiKey String?  @map("google_maps_api_key")
+  innerBgImageUrl  String?  @map("inner_bg_image_url")
+  loginBgImageUrl  String?  @map("login_bg_image_url")
+  loginLogoUrl     String?  @map("login_logo_url")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+// ─────────────────────────────────────────────
+// COMPANY SETTINGS (singleton)
+// ─────────────────────────────────────────────
+
+model CompanySettings {
+  id               String   @id @default(uuid())
+  companyName      String   @default("iTour TT") @map("company_name")
+  logoUrl          String?  @map("logo_url")
+  faviconUrl       String?  @map("favicon_url")
+  reportHeaderHtml String?  @map("report_header_html")
+  reportFooterHtml String?  @map("report_footer_html")
+  licenseKey       String?  @map("license_key")
+  installId        String?  @map("install_id")         // stable per-deployment id (heartbeat)
+  licenseLastCheck DateTime? @map("license_last_check") // last successful online license check
+  // Single mailbox that receives all automated system notifications (e.g. job updates).
+  systemNotificationEmail String? @map("system_notification_email")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("company_settings")
+}
+
+// ─────────────────────────────────────────────
+// WHATSAPP SETTINGS (singleton)
+// ─────────────────────────────────────────────
+
+model WhatsappTemplate {
+  id           String        @id @default(uuid())
+  name         String
+  triggerType  WaTriggerType @map("trigger_type")
+  isEnabled    Boolean       @default(false) @map("is_enabled")
+  templateBody String        @map("template_body")
+  daysBefore   Int?          @map("days_before")
+  sendHour     Int?          @map("send_hour")
+  sendMinute   Int?          @map("send_minute")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  logs WhatsappNotificationLog[]
+
+  @@map("whatsapp_templates")
+}
+
+model WhatsappSettings {
+  id               String   @id @default(uuid())
+  isEnabled        Boolean  @default(false) @map("is_enabled")
+  twilioAccountSid String?  @map("twilio_account_sid")
+  twilioAuthToken  String?  @map("twilio_auth_token")
+  whatsappFrom     String?  @map("whatsapp_from")
+  mediaUrl         String?  @map("media_url")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("whatsapp_settings")
+}
+
+// ─────────────────────────────────────────────
+// EMAIL SETTINGS
+// ─────────────────────────────────────────────
+
+model EmailSettings {
+  id                  String   @id @default(uuid())
+  smtpHost            String?  @map("smtp_host")
+  smtpPort            Int      @default(587) @map("smtp_port")
+  smtpSecure          Boolean  @default(false) @map("smtp_secure")
+  smtpUser            String?  @map("smtp_user")
+  smtpPass            String?  @map("smtp_pass")
+  fromAddress         String   @default("noreply@itour.local") @map("from_address")
+  notifyDispatchEmail String?  @map("notify_dispatch_email")
+  notifyTrafficEmail  String?  @map("notify_traffic_email")
+  // Dispute Notification
+  disputeTo           String?  @map("dispute_to")
+  disputeCc1          String?  @map("dispute_cc1")
+  disputeCc2          String?  @map("dispute_cc2")
+  disputeCc3          String?  @map("dispute_cc3")
+  disputeSubject      String?  @map("dispute_subject")
+  disputeBody         String?  @map("dispute_body")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("email_settings")
+}
+
+// ─────────────────────────────────────────────
+// WHATSAPP NOTIFICATION LOG
+// ─────────────────────────────────────────────
+
+enum WhatsappNotificationStatus {
+  SENT
+  FAILED
+}
+
+model WhatsappNotificationLog {
+  id             String                     @id @default(uuid())
+  trafficJobId   String                     @map("traffic_job_id")
+  recipientPhone String                     @map("recipient_phone")
+  templateId     String?                    @map("template_id")
+  templateName   String?                    @map("template_name")
+  messageSid     String?                    @map("message_sid")
+  status         WhatsappNotificationStatus
+  errorMessage   String?                    @map("error_message")
+  sentAt         DateTime                   @default(now()) @map("sent_at")
+
+  trafficJob TrafficJob        @relation(fields: [trafficJobId], references: [id])
+  template   WhatsappTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@unique([trafficJobId, recipientPhone, templateId])
+  @@index([trafficJobId])
+  @@index([status])
+  @@index([trafficJobId, status])
+  @@map("whatsapp_notification_logs")
+}
+
+// ─────────────────────────────────────────────
+// ROLE PERMISSIONS
+// ─────────────────────────────────────────────
+
+model RolePermission {
+  id        String   @id @default(uuid())
+  role      UserRole
+  module    String
+  canView   Boolean  @default(false) @map("can_view")
+  canCreate Boolean  @default(false) @map("can_create")
+  canEdit   Boolean  @default(false) @map("can_edit")
+  canDelete Boolean  @default(false) @map("can_delete")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([role, module])
+  @@map("role_permissions")
+}
+
+// ─────────────────────────────────────────────
+// REP NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model RepNotification {
+  id           String           @id @default(uuid())
+  repId        String           @map("rep_id")
+  title        String
+  message      String
+  type         NotificationType @default(GENERAL)
+  isRead       Boolean          @default(false) @map("is_read")
+  trafficJobId String?          @map("traffic_job_id")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  rep        Rep         @relation(fields: [repId], references: [id])
+  trafficJob TrafficJob? @relation(fields: [trafficJobId], references: [id])
+
+  @@map("rep_notifications")
+}
+
+// ─────────────────────────────────────────────
+// DRIVER NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model DriverNotification {
+  id           String           @id @default(uuid())
+  driverId     String           @map("driver_id")
+  title        String
+  message      String
+  type         NotificationType @default(GENERAL)
+  isRead       Boolean          @default(false) @map("is_read")
+  trafficJobId String?          @map("traffic_job_id")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  driver     Driver      @relation(fields: [driverId], references: [id])
+  trafficJob TrafficJob? @relation(fields: [trafficJobId], references: [id])
+
+  @@map("driver_notifications")
+}
+
+// ─────────────────────────────────────────────
+// USER NOTIFICATIONS (dashboard users)
+// ─────────────────────────────────────────────
+
+model UserNotification {
+  id           String           @id @default(uuid())
+  userId       String           @map("user_id")
+  title        String
+  message      String
+  type         NotificationType @default(GENERAL)
+  isRead       Boolean          @default(false) @map("is_read")
+  trafficJobId String?          @map("traffic_job_id")
+  metadata     Json?
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  user       User        @relation(fields: [userId], references: [id])
+  trafficJob TrafficJob? @relation(fields: [trafficJobId], references: [id])
+
+  @@index([userId])
+  @@map("user_notifications")
+}
+
+// ─────────────────────────────────────────────
+// NO-SHOW EVIDENCE
+// ─────────────────────────────────────────────
+
+model NoShowEvidence {
+  id            String   @id @default(uuid())
+  trafficJobId  String   @map("traffic_job_id")
+  imageUrls     String[] @map("image_urls")
+  gpsLatitude   Decimal?  @map("gps_latitude") @db.Decimal(10, 7)
+  gpsLongitude  Decimal?  @map("gps_longitude") @db.Decimal(10, 7)
+  gpsMapLink    String?   @map("gps_map_link")
+  submittedBy   String   @map("submitted_by")
+  submittedById String   @map("submitted_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@unique([trafficJobId, submittedBy])
+  @@map("no_show_evidence")
+}
+
+// ─────────────────────────────────────────────
+// IN-PLACE EVIDENCE
+// ─────────────────────────────────────────────
+
+model InPlaceEvidence {
+  id            String   @id @default(uuid())
+  trafficJobId  String   @map("traffic_job_id")
+  imageUrls     String[] @map("image_urls")
+  gpsLatitude   Decimal?  @map("gps_latitude") @db.Decimal(10, 7)
+  gpsLongitude  Decimal?  @map("gps_longitude") @db.Decimal(10, 7)
+  gpsMapLink    String?   @map("gps_map_link")
+  submittedBy   String   @map("submitted_by")
+  submittedById String   @map("submitted_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@unique([trafficJobId, submittedBy])
+  @@map("in_place_evidence")
+}
+
+// ─────────────────────────────────────────────
+// COMPLETED EVIDENCE
+// ─────────────────────────────────────────────
+
+model CompletedEvidence {
+  id            String   @id @default(uuid())
+  trafficJobId  String   @map("traffic_job_id")
+  imageUrls     String[] @map("image_urls")
+  gpsLatitude   Decimal?  @map("gps_latitude") @db.Decimal(10, 7)
+  gpsLongitude  Decimal?  @map("gps_longitude") @db.Decimal(10, 7)
+  gpsMapLink    String?   @map("gps_map_link")
+  submittedBy   String   @map("submitted_by")
+  submittedById String   @map("submitted_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@unique([trafficJobId, submittedBy])
+  @@map("completed_evidence")
+}
+
+// ─────────────────────────────────────────────
+// IN-PROGRESS EVIDENCE
+// ─────────────────────────────────────────────
+
+model InProgressEvidence {
+  id            String   @id @default(uuid())
+  trafficJobId  String   @map("traffic_job_id")
+  imageUrls     String[] @map("image_urls")
+  gpsLatitude   Decimal?  @map("gps_latitude") @db.Decimal(10, 7)
+  gpsLongitude  Decimal?  @map("gps_longitude") @db.Decimal(10, 7)
+  gpsMapLink    String?   @map("gps_map_link")
+  submittedBy   String   @map("submitted_by")
+  submittedById String   @map("submitted_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+
+  @@unique([trafficJobId, submittedBy])
+  @@map("in_progress_evidence")
+}
+
+// ─────────────────────────────────────────────
+// REP JOB SCORING
+// ─────────────────────────────────────────────
+
+model RepJobScore {
+  id           String   @id @default(uuid())
+  trafficJobId String   @unique @map("traffic_job_id")
+  repId        String   @map("rep_id")
+  attendance   Boolean  @default(false) // 20 pts — In Place evidence
+  appearance   Boolean  @default(false) // 15 pts — In Place evidence
+  work         Boolean  @default(false) // 15 pts — Completed status
+  survey       Boolean  @default(false) // 15 pts — Guest survey submitted
+  review       Boolean  @default(false) // 35 pts — manual
+  scoredById   String   @map("scored_by_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+  rep        Rep        @relation(fields: [repId], references: [id])
+  scoredBy   User       @relation("RepScoreScoredBy", fields: [scoredById], references: [id])
+
+  @@map("rep_job_scores")
+}
+
+// ─────────────────────────────────────────────
+// ARRIVAL GUEST SURVEY (native, filled by rep per ARR job)
+// ─────────────────────────────────────────────
+
+model GuestSurvey {
+  id            String @id @default(uuid())
+  trafficJobId  String @unique @map("traffic_job_id")
+  repId         String @map("rep_id")
+  submittedById String @map("submitted_by_id")
+
+  ageRange         String  @map("age_range") // "20-30" | "30-45" | "45-60"
+  noOfAdults       Int     @map("no_of_adults")
+  flightNo         String  @map("flight_no")
+  noOfInfants      Int     @default(0) @map("no_of_infants")
+  stayLength       String? @map("stay_length")
+  jobReference     String  @map("job_reference")
+  repeaterGuest    String  @map("repeater_guest") // "YES" | "NO"
+  guestNationality String  @map("guest_nationality")
+  noOfChildren     Int     @default(0) @map("no_of_children")
+  localTravelAgent String? @map("local_travel_agent")
+  hotelName        String  @map("hotel_name")
+  email            String?
+  generalComment   String  @map("general_comment")
+  contactNumber    String  @map("contact_number") // WhatsApp / Viber / Telegram
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+  rep        Rep        @relation(fields: [repId], references: [id])
+
+  @@index([repId])
+  @@index([createdAt])
+  @@map("guest_surveys")
+}
+
+model DriverJobScore {
+  id             String   @id @default(uuid())
+  trafficJobId   String   @unique @map("traffic_job_id")
+  driverId       String   @map("driver_id")
+  attendance     Boolean  @default(false) // 30 pts — manual
+  appearance     Boolean  @default(false) // 20 pts — manual
+  carCleanliness Boolean  @default(false) @map("car_cleanliness") // 10 pts — manual
+  maintenance    Boolean  @default(false) // 10 pts — manual
+  work           Boolean  @default(false) // 20 pts — auto from COMPLETED status
+  scoredById     String   @map("scored_by_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  trafficJob TrafficJob @relation(fields: [trafficJobId], references: [id])
+  driver     Driver     @relation(fields: [driverId], references: [id])
+  scoredBy   User       @relation("DriverScoreScoredBy", fields: [scoredById], references: [id])
+
+  @@map("driver_job_scores")
+}
+
+// ─────────────────────────────────────────────
+// DEVICE TOKENS (FCM push notifications)
+// ─────────────────────────────────────────────
+
+model DeviceToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String
+  platform  String // 'ios' | 'android'
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, token])
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+// ─────────────────────────────────────────────
+// WEBSITE SETTINGS (B2C CMS - singleton)
+// ─────────────────────────────────────────────
+
+model WebsiteSettings {
+  id String @id @default(uuid())
+
+  // ── Site Identity ──
+  siteName       String  @default("iTour Transfers") @map("site_name")
+  siteLogoUrl    String? @map("site_logo_url")
+  siteFaviconUrl String? @map("site_favicon_url")
+
+  // ── Typography ──
+  fontFamily String @default("Inter") @map("font_family")
+
+  // ── Color Theme ──
+  primaryColor     String @default("#3b82f6") @map("primary_color")
+  accentColor      String @default("#8b5cf6") @map("accent_color")
+  heroGradientFrom String @default("#1a1a2e") @map("hero_gradient_from")
+  heroGradientTo   String @default("#0f3460") @map("hero_gradient_to")
+  navBgColor       String @default("#1a1a2e") @map("nav_bg_color")
+  footerBgColor    String @default("#1a1a2e") @map("footer_bg_color")
+
+  // ── Header/Footer Presets ──
+  headerPreset String @default("default") @map("header_preset")
+  footerPreset String @default("default") @map("footer_preset")
+
+  // ── Hero Section Content ──
+  heroTitle    String  @default("Book Your Airport Transfer") @map("hero_title")
+  heroSubtitle String  @default("Safe, comfortable, and reliable private transfers across Egypt.") @map("hero_subtitle")
+  heroCta1Text String  @default("Book Now") @map("hero_cta1_text")
+  heroCta2Text String  @default("Track a Booking") @map("hero_cta2_text")
+  heroImageUrl String? @map("hero_image_url")
+
+  // ── Features Section ──
+  featuresEnabled Boolean @default(true) @map("features_enabled")
+  featuresTitle   String  @default("Why Choose Us?") @map("features_title")
+  featuresJson    Json?   @map("features_json")
+
+  // ── Contact Info ──
+  contactEmail    String? @map("contact_email")
+  contactPhone    String? @map("contact_phone")
+  contactWhatsapp String? @map("contact_whatsapp")
+  socialFacebook  String? @map("social_facebook")
+  socialInstagram String? @map("social_instagram")
+  socialTwitter   String? @map("social_twitter")
+
+  // ── Internal Booking Notifications ──
+  // Comma-separated recipients for operations alerts on new / amended / cancelled
+  // B2C bookings, and for finance alerts when a B2C booking is paid. Internal
+  // only — never returned by the public website-settings endpoint.
+  opsNotificationEmails     String? @map("ops_notification_emails")
+  financeNotificationEmails String? @map("finance_notification_emails")
+
+  // ── Bank Payment ──
+  bankPaymentEnabled Boolean @default(false) @map("bank_payment_enabled")
+  bankPaymentMessage String  @default("Bank payment integration coming soon!") @map("bank_payment_message")
+
+  // ── Payment Method Master Switches ──
+  onlinePaymentEnabled Boolean @default(true) @map("online_payment_enabled")
+  cashOnArrivalEnabled Boolean @default(true) @map("cash_on_arrival_enabled")
+
+  // ── Booking Widget Master Switches ──
+  enableTwoWayTab     Boolean @default(false) @map("enable_two_way_tab")
+  enableCityToCityTab Boolean @default(false) @map("enable_city_to_city_tab")
+  enableMapSelector   Boolean @default(false) @map("enable_map_selector")
+  // Conversational "AI Mode" booking tab (free-text → structured search).
+  enableAiMode        Boolean @default(false) @map("enable_ai_mode")
+  // CSV of tab keys controlling order/visibility, e.g. "TWO_WAY,ARR,DEP,CITY".
+  bookingTabsOrder    String  @default("ARR,DEP") @map("booking_tabs_order")
+
+  // ── SEO ──
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+
+  // ── Menu Links ──
+  navLinksJson Json? @map("nav_links_json")
+
+  // ── Audit ──
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("website_settings")
+}
+
+// ─────────────────────────────────────────────
+// GOOGLE DRIVE INTEGRATION SETTINGS
+// ─────────────────────────────────────────────
+
+model GoogleDriveSettings {
+  id String @id @default(uuid())
+
+  enabled           Boolean @default(false)
+  oauthClientId     String? @map("oauth_client_id")
+  oauthClientSecret String? @map("oauth_client_secret")
+  oauthRefreshToken String? @map("oauth_refresh_token") @db.Text
+  rootFolderId      String? @map("root_folder_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("google_drive_settings")
+}
+
+// ─────────────────────────────────────────────
+// B2C WEBSITE CONTENT (CMS)
+// City landing pages, blog, and per-page SEO for the public site.
+// ─────────────────────────────────────────────
+
+/// Rich-CMS landing page for a City (1:1 with the location-tree City record).
+model CityPage {
+  id          String  @id @default(uuid())
+  cityId      String  @unique @map("city_id")
+  slug        String  @unique
+  isPublished Boolean @default(false) @map("is_published")
+  showInMenu  Boolean @default(true) @map("show_in_menu")
+  menuOrder   Int     @default(0) @map("menu_order")
+
+  // ── Content ──
+  heroHeadline String? @map("hero_headline")
+  heroImageUrl String? @map("hero_image_url")
+  introText    String? @map("intro_text") @db.Text
+  contentHtml  String? @map("content_html") @db.Text // rich HTML body (WordPress-style)
+  bodyJson     Json?   @map("body_json") // [{ heading, body }]
+  faqJson      Json?   @map("faq_json") // [{ question, answer }]
+
+  // ── SEO ──
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  city         City                  @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  translations CityPageTranslation[]
+
+  @@index([isPublished, showInMenu])
+  @@map("city_pages")
+}
+
+model BlogCategory {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  posts BlogPost[] @relation("BlogPostCategories")
+
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  excerpt       String?   @db.Text
+  coverImageUrl String?   @map("cover_image_url")
+  contentJson   Json?     @map("content_json") // tiptap document JSON (for re-editing)
+  contentHtml   String?   @map("content_html") @db.Text // rendered HTML (for B2C display)
+  author        String?
+  status        String    @default("DRAFT") // DRAFT | PUBLISHED
+  publishedAt   DateTime? @map("published_at")
+  tags          String[]  @default([])
+
+  // ── SEO ──
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  categories   BlogCategory[]        @relation("BlogPostCategories")
+  translations BlogPostTranslation[]
+
+  @@index([status, publishedAt])
+  @@map("blog_posts")
+}
+
+/// Per-page meta title/description for static B2C pages, keyed by a stable pageKey.
+model PageSeo {
+  id              String   @id @default(uuid())
+  pageKey         String   @unique @map("page_key") // home | book | booking-lookup | blog | destinations | ...
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  translations PageSeoTranslation[]
+
+  @@map("page_seo")
+}
+
+/// CMS-managed static content pages for the B2C site (Terms, Privacy, About …).
+/// WordPress-style: admins create pages, place them in the nav and/or footer
+/// menus, and set per-page SEO. The B2C site fetches a published page by slug
+/// via GET /public/pages/:slug and the menus via GET /public/pages.
+model StaticPage {
+  id          String  @id @default(uuid())
+  slug        String  @unique // terms-and-conditions | privacy-policy | about-us | …
+  title       String
+  content     String  @default("") @db.Text // rendered HTML for B2C display
+  isPublished Boolean @default(false) @map("is_published")
+
+  // ── Menu placement ──
+  showInNav    Boolean @default(false) @map("show_in_nav")
+  showInFooter Boolean @default(false) @map("show_in_footer")
+  menuOrder    Int     @default(0) @map("menu_order")
+
+  // ── SEO ──
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  translations StaticPageTranslation[]
+
+  @@map("static_pages")
+}
+
+// ─────────────────────────────────────────────
+// B2C CONTENT TRANSLATIONS (i18n)
+// ─────────────────────────────────────────────
+
+/// Non-English locales supported by the B2C site. English is the base content
+/// stored on the parent rows; translations only ever exist for these locales.
+enum Locale {
+  ar
+  de
+  fr
+  it
+  nl
+  ru
+}
+
+/// Per-locale translation of a destination landing page. Any null field falls
+/// back to the English base on the parent CityPage.
+model CityPageTranslation {
+  id              String   @id @default(uuid())
+  cityPageId      String   @map("city_page_id")
+  locale          Locale
+  heroHeadline    String?  @map("hero_headline")
+  introText       String?  @map("intro_text") @db.Text
+  contentHtml     String?  @map("content_html") @db.Text
+  faqJson         Json?    @map("faq_json")
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  cityPage CityPage @relation(fields: [cityPageId], references: [id], onDelete: Cascade)
+
+  @@unique([cityPageId, locale])
+  @@index([cityPageId, locale])
+  @@map("city_page_translations")
+}
+
+/// Per-locale translation of a blog post. Any null field falls back to English.
+model BlogPostTranslation {
+  id              String   @id @default(uuid())
+  blogPostId      String   @map("blog_post_id")
+  locale          Locale
+  title           String?
+  excerpt         String?  @db.Text
+  contentHtml     String?  @map("content_html") @db.Text
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  blogPost BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+
+  @@unique([blogPostId, locale])
+  @@index([blogPostId, locale])
+  @@map("blog_post_translations")
+}
+
+/// Per-locale translation of a static page's SEO meta. Falls back to English.
+model PageSeoTranslation {
+  id              String   @id @default(uuid())
+  pageSeoId       String   @map("page_seo_id")
+  locale          Locale
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  pageSeo PageSeo @relation(fields: [pageSeoId], references: [id], onDelete: Cascade)
+
+  @@unique([pageSeoId, locale])
+  @@index([pageSeoId, locale])
+  @@map("page_seo_translations")
+}
+
+/// Per-locale translation of a CMS static page. Any null field falls back to
+/// the English base on the parent StaticPage.
+model StaticPageTranslation {
+  id              String   @id @default(uuid())
+  staticPageId    String   @map("static_page_id")
+  locale          Locale
+  title           String?
+  content         String?  @map("content") @db.Text
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  staticPage StaticPage @relation(fields: [staticPageId], references: [id], onDelete: Cascade)
+
+  @@unique([staticPageId, locale])
+  @@index([staticPageId, locale])
+  @@map("static_page_translations")
+}
+
+/// Inbound contact-form submissions from the B2C site. Stored for the team to
+/// review in admin; also emailed to the configured contact address on receipt.
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  ipAddress String?  @map("ip_address")
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([isRead, createdAt])
+  @@map("contact_messages")
+}

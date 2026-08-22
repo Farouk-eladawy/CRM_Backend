@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Android
+**/android/app/build/
+**/android/.gradle/
+**/android/local.properties
+**/android/app/google-services.json
+**/android/app/release.keystore
+
+# iOS
+**/ios/Pods/
+**/ios/build/
+**/ios/GoogleService-Info.plist
+*.xcworkspace
+*.xcuserdata
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Metro
+.metro-health-check*
+
+# Env
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

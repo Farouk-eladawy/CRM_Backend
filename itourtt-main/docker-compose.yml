@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: itour_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-itour}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-itour_secure_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-itour_db}
+      TZ: Africa/Cairo
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-itour}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: itour_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-itour}:${POSTGRES_PASSWORD:-itour_secure_2026}@postgres:5432/${POSTGRES_DB:-itour_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      NODE_ENV: ${NODE_ENV:-development}
+      TZ: Africa/Cairo
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://fulvago.itourtt.cloud,https://itourtt.cloud}
+      GETPAYIN_BASE_URL: ${GETPAYIN_BASE_URL:-https://pay.getpayin.com}
+      GETPAYIN_AUTH_TOKEN: ${GETPAYIN_AUTH_TOKEN}
+      GETPAYIN_HASH_TOKEN: ${GETPAYIN_HASH_TOKEN}
+      B2C_SITE_URL: ${B2C_SITE_URL:-https://transfera.ae}
+      # MG License Server (ilicense.tech) — Ed25519 verify + daily heartbeat.
+      LICENSE_SERVER_URL: ${LICENSE_SERVER_URL:-https://ilicense.tech}
+      LICENSE_PUBLIC_KEY: ${LICENSE_PUBLIC_KEY}
+      APP_HOST: ${APP_HOST:-fulvago.itourtt.cloud}
+    ports:
+      - '${BACKEND_PORT:-3001}:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+    container_name: itour_frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+    ports:
+      - '${FRONTEND_PORT:-3000}:3000'
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  uploads:

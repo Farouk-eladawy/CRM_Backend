@@ -1,0 +1,60 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build debug APK"
+  lane :build_debug do
+    gradle(
+      project_dir: "android",
+      task: "assembleDebug"
+    )
+  end
+
+  desc "Build release APK"
+  lane :build_release do
+    gradle(
+      project_dir: "android",
+      task: "assembleRelease"
+    )
+  end
+
+  desc "Build release AAB and upload to Play Store"
+  lane :deploy do |options|
+    track = options[:track] || "internal"
+    gradle(
+      project_dir: "android",
+      task: "bundleRelease"
+    )
+    upload_to_play_store(
+      track: track,
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
+
+platform :ios do
+  desc "Build for testing"
+  lane :build_debug do
+    build_app(
+      workspace: "ios/iTourBooking.xcworkspace",
+      scheme: "iTourBooking",
+      configuration: "Debug",
+      export_method: "development"
+    )
+  end
+
+  desc "Build and deploy to TestFlight"
+  lane :deploy do
+    build_app(
+      workspace: "ios/iTourBooking.xcworkspace",
+      scheme: "iTourBooking",
+      configuration: "Release",
+      export_method: "app-store"
+    )
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

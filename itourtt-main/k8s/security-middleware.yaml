@@ -1,0 +1,35 @@
+# Traefik middlewares for transport + header hardening.
+# Applied to the production ingress via the
+# `traefik.ingress.kubernetes.io/router.middlewares` annotation (see ingress.yaml).
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: itour-production
+spec:
+  # Force every plaintext HTTP request to HTTPS (301).
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: security-headers
+  namespace: itour-production
+spec:
+  headers:
+    # HSTS: tell browsers to only ever use HTTPS for 1 year, incl. subdomains.
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+    forceSTSHeader: true
+    # Misc hardening headers.
+    contentTypeNosniff: true          # X-Content-Type-Options: nosniff
+    browserXssFilter: true            # X-XSS-Protection: 1; mode=block
+    referrerPolicy: strict-origin-when-cross-origin
+    customResponseHeaders:
+      X-Frame-Options: SAMEORIGIN
+      Permissions-Policy: "geolocation=(self), microphone=(), camera=()"
+      X-Permitted-Cross-Domain-Policies: none

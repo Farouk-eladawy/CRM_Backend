@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.next/
+.env
+.env.*
+*.log
+.DS_Store
+coverage/
+.turbo/
+backend/uploads/
+backend/generated/
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
+!nginx/ssl/.gitkeep
+*:Zone.Identifier

@@ -1,0 +1,8 @@
+# Android
+json_key_file("") # Path to Google Play service account JSON
+package_name("com.itour.driver")
+
+# iOS
+app_identifier("com.itour.driver")
+apple_id("") # Your Apple ID email
+team_id("") # Your App Store Connect Team ID

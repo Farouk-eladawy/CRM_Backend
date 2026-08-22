@@ -1,0 +1,49 @@
+{
+  "name": "itour-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "apps/*"
+    ]
+  },
+  "scripts": {
+    "driver:android": "cd apps/driver && npx react-native run-android",
+    "driver:ios": "cd apps/driver && npx react-native run-ios",
+    "rep:android": "cd apps/rep && npx react-native run-android",
+    "rep:ios": "cd apps/rep && npx react-native run-ios",
+    "supplier:android": "cd apps/supplier && npx react-native run-android",
+    "supplier:ios": "cd apps/supplier && npx react-native run-ios",
+    "guest:android": "cd apps/guest && npx react-native run-android",
+    "guest:ios": "cd apps/guest && npx react-native run-ios",
+    "lint": "eslint packages apps --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit -p tsconfig.base.json",
+    "test": "jest --config jest.config.js",
+    "test:shared": "jest --config packages/shared/jest.config.js",
+    "test:ui": "jest --config packages/ui/jest.config.js",
+    "test:driver": "jest --config apps/driver/jest.config.js",
+    "test:rep": "jest --config apps/rep/jest.config.js",
+    "test:supplier": "jest --config apps/supplier/jest.config.js",
+    "test:guest": "jest --config apps/guest/jest.config.js",
+    "test:ci": "jest --config jest.config.js --ci --coverage",
+    "clean": "yarn workspaces foreach run clean",
+    "build:android:driver": "cd apps/driver/android && ./gradlew assembleRelease",
+    "build:android:rep": "cd apps/rep/android && ./gradlew assembleRelease",
+    "build:android:supplier": "cd apps/supplier/android && ./gradlew assembleRelease",
+    "build:android:guest": "cd apps/guest/android && ./gradlew assembleRelease"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.0",
+    "@types/react": "^19.0.0",
+    "@types/react-native": "^0.73.0",
+    "eslint": "^9.0.0",
+    "@react-native/eslint-config": "^0.76.0",
+    "prettier": "^3.0.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.0",
+    "@testing-library/react-native": "^12.4.0",
+    "@testing-library/jest-native": "^5.4.0",
+    "react-test-renderer": "^19.0.0"
+  }
+}

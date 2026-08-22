@@ -261,5 +261,14 @@
       "booking_status_allow": ["Active", "Confirmed"],
       "booking_status_skip": ["Canceled", "Cancelled", "CXL"]
     }
+  },
+  "nocodb": {
+    "enabled": false,
+    "api_url": "https://focused-blessing-production-8e9e.up.railway.app",
+    "api_token": "",
+    "base_id": "",
+    "bookings_table_id": "",
+    "public_url": "https://focused-blessing-production-8e9e.up.railway.app",
+    "_note": "Create admin + import List CSV, then set api_token and table ids."
   }
 }

@@ -80,6 +80,13 @@ import cloudinary.uploader
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(SCRIPT_DIR, 'agent_log.txt')
 
+# Optional .env beside ai_agent.py — overrides nothing already in os.environ.
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(SCRIPT_DIR, ".env"))
+except Exception:
+    pass
+
 # Webhook Deduplication Cache
 processed_webhook_message_ids = set()
 
@@ -28357,12 +28364,32 @@ Rules:
                 logging.error(f"Error in /api/system/status: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        def _transport_cfg():
+            tc = (self.config.get("transport") or {}) if isinstance(self.config, dict) else {}
+            return tc if isinstance(tc, dict) else {}
+
         def _transport_api_base():
-            base = str(os.environ.get("TRANSPORT_API_URL") or "").strip().rstrip("/")
+            base = str(
+                os.environ.get("TRANSPORT_API_URL")
+                or _transport_cfg().get("api_url")
+                or ""
+            ).strip().rstrip("/")
             return base
 
         def _transport_partner_key():
-            return str(os.environ.get("TRANSPORT_PARTNER_KEY") or os.environ.get("PARTNER_API_KEY") or "").strip()
+            return str(
+                os.environ.get("TRANSPORT_PARTNER_KEY")
+                or os.environ.get("PARTNER_API_KEY")
+                or _transport_cfg().get("partner_key")
+                or ""
+            ).strip()
+
+        def _transport_frontend_url():
+            return str(
+                os.environ.get("TRANSPORT_FRONTEND_URL")
+                or _transport_cfg().get("frontend_url")
+                or "https://transport.ftstravels.com"
+            ).strip()
 
         @app.route('/api/transport/config', methods=['GET', 'OPTIONS'])
         def api_transport_config():
@@ -28370,7 +28397,7 @@ Rules:
                 return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
             try:
                 api_base = _transport_api_base()
-                frontend_url = str(os.environ.get("TRANSPORT_FRONTEND_URL") or "https://transport.ftstravels.com").strip()
+                frontend_url = _transport_frontend_url()
                 return _apply_api_cors_headers(jsonify({
                     "status": "success",
                     "data": {

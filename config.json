@@ -239,5 +239,10 @@
   ],
   "auto_reply_draft_locations": [
     "Religious"
-  ]
+  ],
+  "transport": {
+    "api_url": "https://transport-ftstravels.up.railway.app",
+    "partner_key": "bcff8d934792f84875739cf30f13178a0b73d0fed529995a6177ccb5eefbe07b",
+    "frontend_url": "https://transport.ftstravels.com"
+  }
 }

@@ -28357,6 +28357,81 @@ Rules:
                 logging.error(f"Error in /api/system/status: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        def _transport_api_base():
+            base = str(os.environ.get("TRANSPORT_API_URL") or "").strip().rstrip("/")
+            return base
+
+        def _transport_partner_key():
+            return str(os.environ.get("TRANSPORT_PARTNER_KEY") or os.environ.get("PARTNER_API_KEY") or "").strip()
+
+        @app.route('/api/transport/config', methods=['GET', 'OPTIONS'])
+        def api_transport_config():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                api_base = _transport_api_base()
+                frontend_url = str(os.environ.get("TRANSPORT_FRONTEND_URL") or "https://transport.ftstravels.com").strip()
+                return _apply_api_cors_headers(jsonify({
+                    "status": "success",
+                    "data": {
+                        "configured": bool(api_base and _transport_partner_key()),
+                        "api_url": api_base or None,
+                        "frontend_url": frontend_url,
+                    }
+                }))
+            except Exception as e:
+                logging.error(f"Error in /api/transport/config: {e}", exc_info=True)
+                return _apply_api_cors_headers(jsonify({"status": "error", "message": str(e)}), 500)
+
+        @app.route('/api/transport/health', methods=['GET', 'OPTIONS'])
+        def api_transport_health():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                api_base = _transport_api_base()
+                if not api_base:
+                    return _apply_api_cors_headers(jsonify({
+                        "status": "error",
+                        "message": "TRANSPORT_API_URL is not configured",
+                    }), 503)
+                resp = requests.get(f"{api_base}/api/health", timeout=15)
+                payload = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {"raw": resp.text[:500]}
+                return _apply_api_cors_headers(jsonify({
+                    "status": "success" if resp.ok else "error",
+                    "http_status": resp.status_code,
+                    "data": payload,
+                }), resp.status_code if resp.ok else 502)
+            except Exception as e:
+                logging.error(f"Error in /api/transport/health: {e}", exc_info=True)
+                return _apply_api_cors_headers(jsonify({"status": "error", "message": str(e)}), 502)
+
+        @app.route('/api/transport/reference', methods=['GET', 'OPTIONS'])
+        def api_transport_reference():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                api_base = _transport_api_base()
+                partner_key = _transport_partner_key()
+                if not api_base or not partner_key:
+                    return _apply_api_cors_headers(jsonify({
+                        "status": "error",
+                        "message": "TRANSPORT_API_URL / TRANSPORT_PARTNER_KEY not configured",
+                    }), 503)
+                resp = requests.get(
+                    f"{api_base}/api/partner/reference",
+                    headers={"X-Partner-Key": partner_key},
+                    timeout=30,
+                )
+                payload = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {"raw": resp.text[:500]}
+                return _apply_api_cors_headers(jsonify({
+                    "status": "success" if resp.ok else "error",
+                    "http_status": resp.status_code,
+                    "data": payload,
+                }), resp.status_code if resp.ok else 502)
+            except Exception as e:
+                logging.error(f"Error in /api/transport/reference: {e}", exc_info=True)
+                return _apply_api_cors_headers(jsonify({"status": "error", "message": str(e)}), 502)
+
         # --- CREATE WITH AI (PI TOOL) INTEGRATION ---
         def _create_with_pi_parse_actor(payload=None):
             """Extract actor dict from JSON body, multipart form, query string, or headers."""

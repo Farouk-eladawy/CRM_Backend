@@ -451,6 +451,8 @@ def _should_suppress_internal_error_alert(record):
         "504" in message_text or "gateway time-out" in message_text or "gateway timeout" in message_text
     ):
         return True
+    if "database is locked" in message_text or "database is busy" in message_text:
+        return True
     return False
 
 
@@ -11589,6 +11591,7 @@ Conversation:
         import os
         import importlib.util
         import sys
+        import sqlite3
 
         script_name = os.path.basename(str(script_name or "").strip())
         if not script_name:
@@ -11609,7 +11612,13 @@ Conversation:
         if not hasattr(module, "run"):
             return {"status": "error", "message": "Script missing 'run' function"}
 
-        result = module.run(self, payload or {})
+        try:
+            result = module.run(self, payload or {})
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower() or "busy" in str(e).lower():
+                logging.warning("Automation script %s hit sqlite lock: %s", script_name, e)
+                return {"status": "error", "message": "database is busy, retry shortly", "retryable": True}
+            raise
         try:
             if isinstance(result, dict) and result.get("sent"):
                 chat_id = str(result.get("chat_id") or (payload or {}).get("chat_id") or "").strip()
@@ -13364,9 +13373,17 @@ Conversation:
             for attempt in range(1, max_attempts + 1):
                 try:
                     response = requests.post(url, headers=headers, json=payload, timeout=20)
-                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                except requests.exceptions.ReadTimeout as e:
+                    # The request likely already reached Meta. Retrying here duplicates the WhatsApp.
                     logging.warning(
-                        f"WhatsApp send attempt {attempt}/{max_attempts} timed out for {recipient_phone}: {e}"
+                        "WhatsApp send read-timeout for %s — not retrying to avoid duplicate delivery: %s",
+                        recipient_phone,
+                        e,
+                    )
+                    return False, {"status_code": 504, "body": str(e), "phone_number_id": phone_number_id, "uncertain": True}
+                except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as e:
+                    logging.warning(
+                        f"WhatsApp send attempt {attempt}/{max_attempts} connection failed for {recipient_phone}: {e}"
                     )
                     if attempt < max_attempts:
                         time.sleep(min(6.0, 1.5 * attempt))
@@ -29949,14 +29966,25 @@ Prefer the MarkItDown Extraction section below when present.
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             try:
+                import sqlite3
                 payload = request.get_json(silent=True) or {}
                 script_name = str(payload.get('script_name') or '').strip()
                 if not script_name:
                     return jsonify({"status": "error", "message": "Missing script_name"}), 400
                 result = self.run_automation_script(script_name, payload)
                 if str(result.get("status") or "").lower() == "error":
-                    return jsonify(result), 400 if "Missing" in str(result.get("message") or "") or "not found" in str(result.get("message") or "").lower() or "missing" in str(result.get("message") or "").lower() else 500
+                    msg = str(result.get("message") or "")
+                    if result.get("retryable") or "database is busy" in msg.lower() or "database is locked" in msg.lower():
+                        logging.warning("Automation script %s deferred: %s", script_name, msg)
+                        return jsonify(result), 503
+                    return jsonify(result), 400 if "Missing" in msg or "not found" in msg.lower() or "missing" in msg.lower() else 500
                 return jsonify(result), 200
+            except sqlite3.OperationalError as e:
+                if "locked" in str(e).lower() or "busy" in str(e).lower():
+                    logging.warning("Error running dynamic script (sqlite busy): %s", e)
+                    return jsonify({"status": "error", "message": "database is busy, retry shortly", "retryable": True}), 503
+                logging.error(f"Error running dynamic script: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
             except Exception as e:
                 logging.error(f"Error running dynamic script: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500

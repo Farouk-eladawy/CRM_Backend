@@ -20,9 +20,17 @@ _FACEBOOK_REFERRAL_KV_RE = re.compile(
     re.IGNORECASE,
 )
 
-def _get_db():
-    conn = sqlite3.connect(DB_FILE, timeout=15.0)
+def _connect(timeout=30.0):
+    conn = sqlite3.connect(DB_FILE, timeout=float(timeout or 30.0))
+    try:
+        conn.execute("PRAGMA busy_timeout = 30000;")
+    except Exception:
+        pass
     return conn
+
+
+def _get_db():
+    return _connect()
 
 
 def _get_cairo_timezone():
@@ -1939,7 +1947,7 @@ def set_setting(key, value):
         conn.commit()
 
 def get_or_create_conversation(source, sender_identifier, contact_name="", airtable_record_id="", location="Unknown", thread_id="", receiving_phone_id="", sales_inbox=None, email_account_id=None):
-    with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+    with _connect(30.0) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         

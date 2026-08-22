@@ -327,6 +327,9 @@ class TransportAirtableSync:
                     return name, phone
             except Exception as e:
                 logging.warning("transport_sync: driver link fetch failed: %s", e)
+        if isinstance(linked, list) and linked:
+            # Linked field present but driver row not resolved — omit raw record ids from notes.
+            pass
         raw = str(self.agent.get_field_value(fields, FieldIds.DRIVER_NAME_PHONE) or "").strip()
         if raw:
             return raw, ""
@@ -542,6 +545,8 @@ class TransportAirtableSync:
         if not table:
             raise RuntimeError("Main List table not connected")
 
+        cap = max(1, min(int(max_records or 50), 500))
+
         if booking_nr:
             safe = str(booking_nr).replace("'", "\\'")
             field_name = "Booking Nr."
@@ -549,7 +554,24 @@ class TransportAirtableSync:
             records = table.all(formula=formula, max_records=5)
             return list(records or [])
 
-        records = table.all(max_records=max(1, min(int(max_records or 50), 500)))
+        formula_parts: List[str] = []
+        if date_from and date_to and date_from == date_to:
+            formula_parts.append(f"IS_SAME({{Date Trip}}, '{date_from}', 'day')")
+        else:
+            if date_from:
+                formula_parts.append(f"IS_AFTER({{Date Trip}}, '{date_from}')")
+            if date_to:
+                formula_parts.append(f"IS_BEFORE({{Date Trip}}, '{date_to}')")
+        formula = "AND(" + ",".join(formula_parts) + ")" if len(formula_parts) > 1 else (formula_parts[0] if formula_parts else None)
+
+        if formula:
+            try:
+                records = table.all(formula=formula, max_records=cap)
+                return list(records or [])
+            except Exception as e:
+                logging.warning("transport_sync: Airtable date formula failed, falling back to scan: %s", e)
+
+        records = table.all(max_records=cap)
         out: List[Dict[str, Any]] = []
         for rec in records or []:
             fields = rec.get("fields") or {}

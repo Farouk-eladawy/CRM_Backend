@@ -18,7 +18,8 @@
       "faq": "FAQ",
       "trip_details": "Trip_Details",
       "trips_catalog": "Trips",
-      "religious_leads": "tbl4ytPM8h3SJmKF6"
+      "religious_leads": "tbl4ytPM8h3SJmKF6",
+      "drivers": "Add Driver Name & Phone copy"
     },
     "views": {
       "main_view": "Grid view",
@@ -243,6 +244,22 @@
   "transport": {
     "api_url": "https://transport-ftstravels.up.railway.app",
     "partner_key": "bcff8d934792f84875739cf30f13178a0b73d0fed529995a6177ccb5eefbe07b",
-    "frontend_url": "https://transport.ftstravels.com"
+    "frontend_url": "https://transport.ftstravels.com",
+    "sync": {
+      "enabled": true,
+      "payment_method": "ONLINE",
+      "default_service_type": "DAY_TOUR",
+      "agency_keywords": [
+        "GetYourGuide",
+        "Headout",
+        "Viator",
+        "Tiqets",
+        "Tripadvisor",
+        "Expedia",
+        "GYG"
+      ],
+      "booking_status_allow": ["Active", "Confirmed"],
+      "booking_status_skip": ["Canceled", "Cancelled", "CXL"]
+    }
   }
 }

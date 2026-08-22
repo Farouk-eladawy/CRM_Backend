@@ -28459,6 +28459,48 @@ Rules:
                 logging.error(f"Error in /api/transport/reference: {e}", exc_info=True)
                 return _apply_api_cors_headers(jsonify({"status": "error", "message": str(e)}), 502)
 
+        @app.route('/api/transport/sync/preview', methods=['POST', 'OPTIONS'])
+        @app.route('/api/transport/sync/run', methods=['POST', 'OPTIONS'])
+        def api_transport_sync():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                from transport_sync import TransportAirtableSync
+                body = request.get_json(silent=True) or {}
+                dry_run = request.path.endswith('/preview') or bool(body.get('dry_run'))
+                syncer = TransportAirtableSync(self)
+                result = syncer.run(
+                    dry_run=dry_run,
+                    max_records=int(body.get('max_records') or 25),
+                    date_from=str(body.get('date_trip_from') or body.get('date_from') or '').strip() or None,
+                    date_to=str(body.get('date_trip_to') or body.get('date_to') or '').strip() or None,
+                    booking_nr=str(body.get('booking_nr') or '').strip() or None,
+                    force=bool(body.get('force')),
+                )
+                return _apply_api_cors_headers(jsonify(result)), 200
+            except Exception as e:
+                logging.error("Error in transport sync: %s", e, exc_info=True)
+                return _apply_api_cors_headers(jsonify({"status": "error", "message": str(e)}), 500)
+
+        @app.route('/api/transport/sync/status', methods=['GET', 'OPTIONS'])
+        def api_transport_sync_status():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(jsonify({"status": "ok"})), 200
+            try:
+                from transport_sync import TransportAirtableSync
+                syncer = TransportAirtableSync(self)
+                state = syncer.load_state()
+                return _apply_api_cors_headers(jsonify({
+                    "status": "success",
+                    "configured": bool(syncer.api_base() and syncer.partner_key()),
+                    "last_run": state.get("last_run"),
+                    "mapped_count": len(state.get("mappings") or {}),
+                    "sync_config": syncer.sync_cfg(),
+                })), 200
+            except Exception as e:
+                logging.error("Error in transport sync status: %s", e, exc_info=True)
+                return _apply_api_cors_headers(jsonify({"status": "error", "message": str(e)}), 500)
+
         # --- CREATE WITH AI (PI TOOL) INTEGRATION ---
         def _create_with_pi_parse_actor(payload=None):
             """Extract actor dict from JSON body, multipart form, query string, or headers."""

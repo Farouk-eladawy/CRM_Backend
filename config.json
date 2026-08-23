@@ -271,13 +271,21 @@
   },
   "nocodb": {
     "enabled": false,
-    "api_url": "https://focused-blessing-production-8e9e.up.railway.app",
-    "api_token": "nc_pat_aRtAiUW8BYLgAUqhN7VrBPzFlwObQVL10pXTfrXY",
-    "base_id": "pxyf1kow6ujnklf",
-    "bookings_table_id": "mjn4ehdvagbltzd",
-    "public_url": "https://focused-blessing-production-8e9e.up.railway.app",
-    "_note": "Create API token in NocoDB UI, then: python tools/migrate_airtable_to_nocodb_api.py discover",
+    "_deprecated": "Replaced by Baserow on Railway — data cleared, do not use",
+    "api_url": "",
+    "api_token": "",
+    "base_id": "",
+    "bookings_table_id": "",
+    "public_url": "",
     "bookings_table": "List",
-    "list_table_id": "mjn4ehdvagbltzd"
+    "list_table_id": ""
+  },
+  "baserow": {
+    "enabled": false,
+    "api_url": "https://focused-blessing-production-8e9e.up.railway.app",
+    "api_token": "",
+    "database_id": 0,
+    "public_url": "https://focused-blessing-production-8e9e.up.railway.app",
+    "_note": "After Railway deploy: create token, then python tools/migrate_airtable_to_baserow.py discover"
   }
 }

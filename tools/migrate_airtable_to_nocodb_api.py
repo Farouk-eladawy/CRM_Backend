@@ -277,6 +277,24 @@ class NocoDbApi:
                 return col
         return None
 
+    def find_link_column(self, source_table_id: str, target_table_id: str, title: str) -> Optional[dict]:
+        table = self.get_table(source_table_id)
+        by_title = self.get_column_by_title(source_table_id, title)
+        if by_title and str(by_title.get("uidt") or "") == "LinkToAnotherRecord":
+            return by_title
+        for col in table.get("columns") or []:
+            if str(col.get("uidt") or "") != "LinkToAnotherRecord":
+                continue
+            opts = col.get("colOptions") or {}
+            related = str(
+                opts.get("fk_related_model_id")
+                or opts.get("fk_target_model_id")
+                or ""
+            )
+            if related == target_table_id:
+                return col
+        return None
+
     def create_link_column(
         self,
         source_table_id: str,
@@ -453,7 +471,7 @@ def record_to_row(
 
 def build_record_map(nc: NocoDbApi, table_id: str) -> Dict[str, int]:
     mapping: Dict[str, int] = {}
-    for row in nc.fetch_all_records(table_id, fields=["airtable_record_id"]):
+    for row in nc.fetch_all_records(table_id):
         rid = str(row.get("airtable_record_id") or "")
         noco_id = row.get("Id")
         if rid and noco_id is not None:
@@ -538,16 +556,21 @@ def cmd_link_relations(
 
             existing_col = nc.get_column_by_title(source_tid, field_name)
             if existing_col and str(existing_col.get("uidt") or "") != "LinkToAnotherRecord":
-                nc.delete_column(str(existing_col["id"]))
+                try:
+                    nc.delete_column(str(existing_col["id"]))
+                except RuntimeError:
+                    pass
                 existing_col = None
                 time.sleep(0.2)
 
-            if not existing_col or str(existing_col.get("uidt") or "") != "LinkToAnotherRecord":
-                nc.create_link_column(source_tid, target_tid, field_name, rel_type)
-                time.sleep(0.3)
-                link_col = nc.get_column_by_title(source_tid, field_name)
-            else:
-                link_col = existing_col
+            link_col = nc.find_link_column(source_tid, target_tid, field_name)
+            if not link_col:
+                try:
+                    nc.create_link_column(source_tid, target_tid, field_name, rel_type)
+                    time.sleep(0.3)
+                except RuntimeError as exc:
+                    print(f"    create link column note: {exc}")
+                link_col = nc.find_link_column(source_tid, target_tid, field_name)
 
             if not link_col:
                 print(f"    failed to create link column {field_name}")

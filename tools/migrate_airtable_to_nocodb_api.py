@@ -7,7 +7,8 @@ Usage (from OpenClaw_Version):
   python tools/migrate_airtable_to_nocodb_api.py reset --yes
   python tools/migrate_airtable_to_nocodb_api.py migrate --tables List --dry-run
   python tools/migrate_airtable_to_nocodb_api.py migrate --config-tables
-  python tools/migrate_airtable_to_nocodb_api.py migrate --all-tables --max-records 100
+  python tools/migrate_airtable_to_nocodb_api.py migrate --link-deps --skip-existing
+  python tools/migrate_airtable_to_nocodb_api.py link-relations --tables List
 """
 from __future__ import annotations
 
@@ -29,6 +30,17 @@ STATE_PATH = ROOT / "nocodb_migration_state.json"
 BULK_CHUNK = 50
 CREATE_BATCH = 25
 ADD_COLUMN_DELAY = 0.05
+
+# Tables linked from List (migrate these before link-relations)
+LIST_LINK_TARGETS = [
+    "Add Driver Name & Phone copy",
+    "Add Guide Name & Phone",
+    "Add Representative Name & Phone",
+    "Add Supplier Name & Phone",
+    "Conversations",
+    "Grand_Tickets",
+    "Products_Catalog",
+]
 
 SKIP_AIRTABLE_TYPES = {"button"}
 NON_INSERT_AIRTABLE_TYPES = {
@@ -129,12 +141,25 @@ def select_dtxp(field: dict) -> Optional[str]:
     return ",".join(names)
 
 
-def airtable_field_to_column(field: dict, used_names: set[str]) -> dict:
+def unique_title(title: str, used_titles: set[str]) -> str:
+    base = str(title or "Field").strip() or "Field"
+    if base not in used_titles:
+        used_titles.add(base)
+        return base
+    i = 2
+    while f"{base} ({i})" in used_titles:
+        i += 1
+    unique = f"{base} ({i})"
+    used_titles.add(unique)
+    return unique
+
+
+def airtable_field_to_column(field: dict, used_names: set[str], used_titles: set[str]) -> dict:
     at_type = str(field.get("type") or "singleLineText")
     uidt = AIRTABLE_TO_NOCO.get(at_type, "SingleLineText")
     if at_type in ("singleSelect", "multipleSelects"):
         uidt = "SingleLineText"
-    title = str(field.get("name") or "Field")
+    title = unique_title(str(field.get("name") or "Field"), used_titles)
     col: dict = {
         "column_name": safe_column_name(title, used_names),
         "title": title,
@@ -243,6 +268,66 @@ class NocoDbApi:
                 return t
         return None
 
+    def delete_column(self, column_id: str) -> None:
+        self._req("DELETE", f"/api/v1/db/meta/columns/{column_id}")
+
+    def get_column_by_title(self, table_id: str, title: str) -> Optional[dict]:
+        for col in self.get_table(table_id).get("columns") or []:
+            if str(col.get("title") or "") == title:
+                return col
+        return None
+
+    def create_link_column(
+        self,
+        source_table_id: str,
+        target_table_id: str,
+        title: str,
+        relation_type: str = "mm",
+    ) -> dict:
+        body = {
+            "title": title,
+            "uidt": "LinkToAnotherRecord",
+            "parentId": target_table_id,
+            "childId": source_table_id,
+            "type": relation_type,
+        }
+        return self._req("POST", f"/api/v2/meta/tables/{source_table_id}/columns", json=body)
+
+    def fetch_all_records(self, table_id: str, fields: Optional[List[str]] = None) -> List[dict]:
+        rows: List[dict] = []
+        offset = 0
+        limit = 100
+        while True:
+            params: dict = {"limit": limit, "offset": offset}
+            if fields:
+                params["fields"] = ",".join(fields)
+            data = self._req("GET", f"/api/v2/tables/{table_id}/records", params=params)
+            batch = list(data.get("list") or [])
+            if not batch:
+                break
+            rows.extend(batch)
+            page = data.get("pageInfo") or {}
+            if page.get("isLastPage"):
+                break
+            offset += limit
+        return rows
+
+    def link_records(
+        self,
+        source_table_id: str,
+        link_column_id: str,
+        source_row_id: int,
+        target_row_ids: List[int],
+    ) -> None:
+        if not target_row_ids:
+            return
+        payload = [{"Id": rid} for rid in target_row_ids]
+        self._req(
+            "POST",
+            f"/api/v2/tables/{source_table_id}/links/{link_column_id}/records/{source_row_id}",
+            json=payload,
+        )
+
 
 class AirtableBase:
     def __init__(self, api_key: str, base_id: str):
@@ -295,6 +380,7 @@ def config_table_names(cfg: dict) -> List[str]:
 
 def build_columns_from_airtable(fields: List[dict]) -> List[dict]:
     used: set[str] = set()
+    used_titles: set[str] = set()
     cols = [{
         "column_name": "airtable_record_id",
         "title": "airtable_record_id",
@@ -302,10 +388,11 @@ def build_columns_from_airtable(fields: List[dict]) -> List[dict]:
         "pk": True,
     }]
     used.add("airtable_record_id")
+    used_titles.add("airtable_record_id")
     for field in fields:
         if str(field.get("type") or "") in SKIP_AIRTABLE_TYPES:
             continue
-        cols.append(airtable_field_to_column(field, used))
+        cols.append(airtable_field_to_column(field, used, used_titles))
     return cols
 
 
@@ -364,7 +451,142 @@ def record_to_row(
     return row
 
 
+def build_record_map(nc: NocoDbApi, table_id: str) -> Dict[str, int]:
+    mapping: Dict[str, int] = {}
+    for row in nc.fetch_all_records(table_id, fields=["airtable_record_id"]):
+        rid = str(row.get("airtable_record_id") or "")
+        noco_id = row.get("Id")
+        if rid and noco_id is not None:
+            mapping[rid] = int(noco_id)
+    return mapping
+
+
+def airtable_id_to_table_name(schema: List[dict]) -> Dict[str, str]:
+    return {str(t["id"]): str(t["name"]) for t in schema}
+
+
+def link_relation_type(field: dict) -> str:
+    opts = field.get("options") or {}
+    if opts.get("prefersSingleRecordLink"):
+        return "bt"
+    return "mm"
+
+
 def cmd_discover(nc: NocoDbApi) -> int:
+    for b in nc.list_bases():
+        bid = b.get("id")
+        print(f"Base: {b.get('title')}  id={bid}")
+        for t in nc.list_tables(bid):
+            print(f"  Table: {t.get('title')}  id={t.get('id')}")
+    return 0
+
+
+def cmd_link_relations(
+    nc: NocoDbApi,
+    at: AirtableBase,
+    base_id: str,
+    table_names: List[str],
+    state: dict,
+    dry_run: bool,
+) -> int:
+    schema = at.fetch_schema()
+    at_id_to_name = airtable_id_to_table_name(schema)
+    schema_by_name = {t["name"]: t for t in schema}
+    tracked = state.get("tables") or {}
+
+    record_maps: Dict[str, Dict[str, int]] = {}
+    for name, info in tracked.items():
+        tid = str((info or {}).get("nocodb_table_id") or "")
+        if not tid:
+            continue
+        print(f"Building record map for {name}...")
+        record_maps[name] = build_record_map(nc, tid)
+        print(f"  {len(record_maps[name])} records")
+
+    for table_name in table_names:
+        if table_name not in tracked:
+            print(f"Skip {table_name}: not migrated yet")
+            continue
+        source_tid = str(tracked[table_name]["nocodb_table_id"])
+        at_table = schema_by_name.get(table_name) or {}
+        link_fields = [
+            f for f in (at_table.get("fields") or [])
+            if f.get("type") == "multipleRecordLinks"
+        ]
+        if not link_fields:
+            print(f"No link fields on {table_name}")
+            continue
+
+        print(f"\n== Link relations: {table_name} ({len(link_fields)} fields) ==")
+        source_map = record_maps.get(table_name) or {}
+
+        for field in link_fields:
+            field_name = str(field["name"])
+            target_at_id = str((field.get("options") or {}).get("linkedTableId") or "")
+            target_name = at_id_to_name.get(target_at_id)
+            if not target_name or target_name not in tracked:
+                print(f"  skip {field_name}: target '{target_name}' not migrated")
+                continue
+
+            target_tid = str(tracked[target_name]["nocodb_table_id"])
+            target_map = record_maps.get(target_name) or {}
+            rel_type = link_relation_type(field)
+            print(f"  {field_name} -> {target_name} ({rel_type})")
+
+            if dry_run:
+                continue
+
+            existing_col = nc.get_column_by_title(source_tid, field_name)
+            if existing_col and str(existing_col.get("uidt") or "") != "LinkToAnotherRecord":
+                nc.delete_column(str(existing_col["id"]))
+                existing_col = None
+                time.sleep(0.2)
+
+            if not existing_col or str(existing_col.get("uidt") or "") != "LinkToAnotherRecord":
+                nc.create_link_column(source_tid, target_tid, field_name, rel_type)
+                time.sleep(0.3)
+                link_col = nc.get_column_by_title(source_tid, field_name)
+            else:
+                link_col = existing_col
+
+            if not link_col:
+                print(f"    failed to create link column {field_name}")
+                continue
+            link_col_id = str(link_col["id"])
+
+            linked = 0
+            skipped = 0
+            records = at.fetch_records(table_name, max_records=0)
+            for rec in records:
+                at_source_id = str(rec.get("id") or "")
+                source_noco_id = source_map.get(at_source_id)
+                if not source_noco_id:
+                    skipped += 1
+                    continue
+                raw_links = (rec.get("fields") or {}).get(field_name)
+                if not raw_links:
+                    continue
+                if not isinstance(raw_links, list):
+                    raw_links = [raw_links]
+                target_ids = []
+                for at_target_id in raw_links:
+                    noco_target = target_map.get(str(at_target_id))
+                    if noco_target:
+                        target_ids.append(noco_target)
+                if not target_ids:
+                    continue
+                try:
+                    nc.link_records(source_tid, link_col_id, source_noco_id, target_ids)
+                    linked += 1
+                except RuntimeError as exc:
+                    print(f"    link error {at_source_id}: {exc}")
+                if linked and linked % 500 == 0:
+                    print(f"    linked {linked} rows...")
+                    time.sleep(0.1)
+            print(f"    done: {linked} rows linked, {skipped} source rows missing")
+
+    print("\nLink relations complete.")
+    return 0
     for b in nc.list_bases():
         bid = b.get("id")
         print(f"Base: {b.get('title')}  id={bid}")
@@ -447,6 +669,7 @@ def migrate_one_table(
     max_records: int,
     dry_run: bool,
     recreate: bool,
+    skip_existing: bool,
     state: dict,
 ) -> dict:
     airtable_table = at.table_by_name(table_name)
@@ -454,6 +677,16 @@ def migrate_one_table(
     field_types = {str(f["name"]): str(f.get("type") or "singleLineText") for f in fields}
 
     existing = nc.find_table_by_title(base_id, table_name)
+    prior = (state.get("tables") or {}).get(table_name) or {}
+    if existing and skip_existing and not recreate:
+        print(f"  skip '{table_name}' (already in NocoDB)")
+        return {
+            "nocodb_table_id": str(existing["id"]),
+            "records_synced": prior.get("records_synced", 0),
+            "last_sync": prior.get("last_sync"),
+            "field_count": prior.get("field_count"),
+        }
+
     if existing and recreate:
         nc.delete_table(str(existing["id"]))
         existing = None
@@ -527,6 +760,7 @@ def cmd_migrate(
     max_records: int,
     dry_run: bool,
     recreate: bool,
+    skip_existing: bool,
     cfg: dict,
 ) -> int:
     state = load_state()
@@ -551,7 +785,7 @@ def cmd_migrate(
     for table_name in table_names:
         print(f"\n== {table_name} ==")
         info = migrate_one_table(
-            nc, at, base_id, table_name, max_records, dry_run, recreate, state
+            nc, at, base_id, table_name, max_records, dry_run, recreate, skip_existing, state
         )
         if not dry_run:
             state["tables"][table_name] = info
@@ -573,6 +807,8 @@ def cmd_migrate(
 
 
 def resolve_table_names(args: argparse.Namespace, cfg: dict, at: AirtableBase) -> List[str]:
+    if getattr(args, "link_deps", False):
+        return list(LIST_LINK_TARGETS)
     if args.all_tables:
         return [t["name"] for t in at.fetch_schema()]
     if args.config_tables:
@@ -601,6 +837,12 @@ def main() -> int:
     p_migrate.add_argument("--max-records", type=int, default=0, help="Per table (0=all)")
     p_migrate.add_argument("--dry-run", action="store_true")
     p_migrate.add_argument("--recreate", action="store_true", help="Delete existing same-named NocoDB table first")
+    p_migrate.add_argument("--skip-existing", action="store_true", help="Skip tables already present in NocoDB")
+    p_migrate.add_argument("--link-deps", action="store_true", help="Migrate List link target tables")
+
+    p_links = sub.add_parser("link-relations", help="Convert link fields to NocoDB relations")
+    p_links.add_argument("--tables", nargs="*", default=["List"])
+    p_links.add_argument("--dry-run", action="store_true")
 
     args = parser.parse_args()
     cfg = load_config()
@@ -642,8 +884,12 @@ def main() -> int:
         names = resolve_table_names(args, cfg, at)
         return cmd_migrate(
             nc, at, nc_base_id, names,
-            args.max_records, args.dry_run, args.recreate, cfg,
+            args.max_records, args.dry_run, args.recreate, args.skip_existing, cfg,
         )
+
+    if args.cmd == "link-relations":
+        names = args.tables or ["List"]
+        return cmd_link_relations(nc, at, nc_base_id, names, state, args.dry_run)
 
     return 1
 

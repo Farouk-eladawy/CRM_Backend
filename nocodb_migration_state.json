@@ -202,10 +202,52 @@
   "last_sync": "2026-08-23T12:55:56.216050Z",
   "tables": {
     "List": {
-      "nocodb_table_id": "m3wnrmmtjcbllkp",
-      "records_synced": 50,
-      "last_sync": "2026-08-23T13:59:06Z",
+      "nocodb_table_id": "mjn4ehdvagbltzd",
+      "records_synced": 34352,
+      "last_sync": "2026-08-23T14:36:48Z",
       "field_count": 154
+    },
+    "Add Driver Name & Phone copy": {
+      "nocodb_table_id": "mvzb1wjxmbtgcoe",
+      "records_synced": 603,
+      "last_sync": "2026-08-23T14:56:38Z",
+      "field_count": 48
+    },
+    "Add Guide Name & Phone": {
+      "nocodb_table_id": "muod0dy6dikxxrf",
+      "records_synced": 422,
+      "last_sync": "2026-08-23T14:56:47Z",
+      "field_count": 24
+    },
+    "Add Representative Name & Phone": {
+      "nocodb_table_id": "m5x18r9lvcxd6kk",
+      "records_synced": 16,
+      "last_sync": "2026-08-23T14:56:49Z",
+      "field_count": 24
+    },
+    "Add Supplier Name & Phone": {
+      "nocodb_table_id": "mmh4wl1k9yc7ptr",
+      "records_synced": 11,
+      "last_sync": "2026-08-23T14:56:52Z",
+      "field_count": 27
+    },
+    "Conversations": {
+      "nocodb_table_id": "ma3qoj37rwzc6lf",
+      "records_synced": 0,
+      "last_sync": "2026-08-23T14:56:58Z",
+      "field_count": 35
+    },
+    "Grand_Tickets": {
+      "nocodb_table_id": "ms2hobvtrg19xu0",
+      "records_synced": 18465,
+      "last_sync": "2026-08-23T15:03:13Z",
+      "field_count": 27
+    },
+    "Products_Catalog": {
+      "nocodb_table_id": "mf7sdbuoqg358xm",
+      "records_synced": 2,
+      "last_sync": "2026-08-23T15:03:14Z",
+      "field_count": 23
     }
   },
   "airtable_base_id": "appTp5YgSp9DV2HYc",

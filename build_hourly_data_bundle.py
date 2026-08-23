@@ -33,6 +33,7 @@ SECRET_FILES = [
 STATE_FILES = [
     "learned_corrections.json",
     "hajj_tahseen_followup_state.json",
+    "hajj_5ads_followup_state.json",
     "religious_15day_followup_state.json",
     "religious_umrah_8day_followup_state.json",
     "religious_umrah_10day_followup_state.json",

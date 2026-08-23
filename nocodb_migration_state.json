@@ -199,5 +199,15 @@
       "synced_at": "2026-08-23T12:55:55.915364Z"
     }
   },
-  "last_sync": "2026-08-23T12:55:56.216050Z"
+  "last_sync": "2026-08-23T12:55:56.216050Z",
+  "tables": {
+    "List": {
+      "nocodb_table_id": "m3wnrmmtjcbllkp",
+      "records_synced": 50,
+      "last_sync": "2026-08-23T13:59:06Z",
+      "field_count": 154
+    }
+  },
+  "airtable_base_id": "appTp5YgSp9DV2HYc",
+  "nocodb_base_id": "pxyf1kow6ujnklf"
 }

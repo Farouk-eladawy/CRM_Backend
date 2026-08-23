@@ -274,9 +274,10 @@
     "api_url": "https://focused-blessing-production-8e9e.up.railway.app",
     "api_token": "nc_pat_aRtAiUW8BYLgAUqhN7VrBPzFlwObQVL10pXTfrXY",
     "base_id": "pxyf1kow6ujnklf",
-    "bookings_table_id": "m94dcdlr44y4j5m",
+    "bookings_table_id": "m3wnrmmtjcbllkp",
     "public_url": "https://focused-blessing-production-8e9e.up.railway.app",
     "_note": "Create API token in NocoDB UI, then: python tools/migrate_airtable_to_nocodb_api.py discover",
-    "bookings_table": "Bookings"
+    "bookings_table": "List",
+    "list_table_id": "m3wnrmmtjcbllkp"
   }
 }

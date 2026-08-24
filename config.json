@@ -281,11 +281,10 @@
     "list_table_id": ""
   },
   "baserow": {
-    "enabled": false,
+    "enabled": true,
     "api_url": "https://focused-blessing-production-8e9e.up.railway.app",
-    "api_token": "",
+    "api_token": "KAjk1buySvbHXaITBIqpoYYkqW17ioEL",
     "database_id": 0,
-    "public_url": "https://focused-blessing-production-8e9e.up.railway.app",
-    "_note": "After Railway deploy: create token, then python tools/migrate_airtable_to_baserow.py discover"
+    "public_url": "https://focused-blessing-production-8e9e.up.railway.app"
   }
 }

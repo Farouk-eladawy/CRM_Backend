@@ -2,15 +2,16 @@
 Migrate Airtable -> Baserow (simpler than NocoDB path).
 
 Setup:
-  1. Baserow Cloud (baserow.io) OR self-host (Docker/Railway)
+  1. Baserow on Railway (or Cloud)
   2. Create workspace + database
-  3. Database settings -> Create token (full database access)
-  4. config.json -> baserow.api_url, api_token, database_id
+  3. For migration (creates tables/fields): set admin_email + admin_password in config.json
+     OR jwt_token from POST /api/user/token-auth/
+  4. Optional api_token for row-only scripts after migration
 
 Usage:
   python tools/migrate_airtable_to_baserow.py discover
-  python tools/migrate_airtable_to_baserow.py migrate --tables List
   python tools/migrate_airtable_to_baserow.py migrate --link-deps
+  python tools/migrate_airtable_to_baserow.py migrate --tables List
   python tools/migrate_airtable_to_baserow.py migrate --all-tables --skip-existing
 """
 from __future__ import annotations
@@ -111,13 +112,31 @@ def flatten_value(value: Any) -> Any:
 
 
 class BaserowApi:
-    def __init__(self, api_url: str, token: str):
+    def __init__(self, api_url: str, token: str, auth_scheme: str = "Token"):
         self.base_url = api_url.rstrip("/")
         self.session = requests.Session()
         self.session.headers.update({
-            "Authorization": f"Token {token}",
+            "Authorization": f"{auth_scheme} {token}",
             "Content-Type": "application/json",
         })
+
+    @classmethod
+    def from_config(cls, br_cfg: dict) -> "BaserowApi":
+        api_url = str(br_cfg.get("api_url") or "https://api.baserow.io").strip()
+        jwt = str(br_cfg.get("jwt_token") or "").strip()
+        if jwt:
+            return cls(api_url, jwt, auth_scheme="JWT")
+        email = str(br_cfg.get("admin_email") or "").strip()
+        password = str(br_cfg.get("admin_password") or "").strip()
+        if email and password:
+            jwt = obtain_jwt(api_url, email, password)
+            return cls(api_url, jwt, auth_scheme="JWT")
+        token = str(br_cfg.get("api_token") or "").strip()
+        if not token:
+            raise RuntimeError(
+                "Set baserow.jwt_token OR admin_email+admin_password OR api_token in config.json"
+            )
+        return cls(api_url, token, auth_scheme="Token")
 
     def _req(self, method: str, path: str, **kwargs) -> Any:
         url = f"{self.base_url}{path}"
@@ -174,6 +193,39 @@ class BaserowApi:
             if str(t.get("name") or "") == name:
                 return t
         return None
+
+    def list_token_tables(self) -> List[dict]:
+        data = self._req("GET", "/api/database/tables/all-tables/")
+        return list(data) if isinstance(data, list) else list(data.get("results") or data)
+
+
+def obtain_jwt(api_url: str, email: str, password: str) -> str:
+    url = f"{api_url.rstrip('/')}/api/user/token-auth/"
+    resp = requests.post(url, json={"email": email, "password": password}, timeout=60)
+    if not resp.ok:
+        raise RuntimeError(f"Baserow login failed HTTP {resp.status_code}: {resp.text[:400]}")
+    token = (resp.json() or {}).get("token")
+    if not token:
+        raise RuntimeError("Baserow login: no JWT token in response")
+    return str(token)
+
+
+def resolve_database_id(br: BaserowApi, br_cfg: dict) -> int:
+    configured = int(br_cfg.get("database_id") or 0)
+    if configured:
+        return configured
+    for app in br.list_applications():
+        if str(app.get("type") or "") == "database" and app.get("id"):
+            return int(app["id"])
+    try:
+        tables = br.list_token_tables()
+        if tables and tables[0].get("database_id"):
+            return int(tables[0]["database_id"])
+    except RuntimeError:
+        pass
+    raise RuntimeError(
+        "Could not detect database_id. Open your database in Baserow; URL contains /database/ID/ — set baserow.database_id in config.json"
+    )
 
 
 class AirtableSource:
@@ -311,12 +363,17 @@ def migrate_table(
     return {"baserow_table_id": tid, "records_synced": inserted}
 
 
-def cmd_discover(br: BaserowApi, database_id: int) -> int:
+def cmd_discover(br: BaserowApi, database_id: int, cfg: dict) -> int:
+    print("Applications:")
     for app in br.list_applications():
-        print(f"App: {app.get('name')} id={app.get('id')} type={app.get('type')}")
+        print(f"  {app.get('name')} id={app.get('id')} type={app.get('type')}")
     print(f"\nTables in database {database_id}:")
     for t in br.list_tables(database_id):
         print(f"  {t.get('name')} id={t.get('id')}")
+    br_cfg = cfg.setdefault("baserow", {})
+    br_cfg["database_id"] = database_id
+    save_config(cfg)
+    print(f"\nSaved database_id={database_id} to config.json")
     return 0
 
 
@@ -382,24 +439,29 @@ def main() -> int:
     p.add_argument("--recreate", action="store_true")
 
     args = parser.parse_args()
-    cfg = load_config()
     br_cfg = cfg.get("baserow") or {}
-    api_url = str(br_cfg.get("api_url") or "https://api.baserow.io").strip()
-    token = str(br_cfg.get("api_token") or "").strip()
-    database_id = int(br_cfg.get("database_id") or 0)
-
-    if not token:
-        print("Set baserow.api_token in config.json (Database -> Settings -> Tokens)", file=sys.stderr)
+    try:
+        br = BaserowApi.from_config(br_cfg)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
         return 2
-
-    br = BaserowApi(api_url, token)
     at = AirtableSource(cfg)
+
+    database_id = 0
+    db_err = ""
+    try:
+        database_id = resolve_database_id(br, br_cfg)
+    except RuntimeError as exc:
+        db_err = str(exc)
+        if args.cmd != "discover":
+            print(db_err, file=sys.stderr)
+            return 2
 
     if args.cmd == "discover":
         if not database_id:
-            print("Set baserow.database_id in config.json first", file=sys.stderr)
+            print(db_err or "Could not detect database_id", file=sys.stderr)
             return 2
-        return cmd_discover(br, database_id)
+        return cmd_discover(br, database_id, cfg)
 
     if args.cmd == "migrate":
         if not database_id:

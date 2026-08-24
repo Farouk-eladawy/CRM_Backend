@@ -34,6 +34,11 @@
       "baserow_table_id": 12,
       "records_synced": 603,
       "airtable_table_id": "tblUJidvg0lqTZ3Ev"
+    },
+    "List": {
+      "baserow_table_id": 15,
+      "records_synced": 5900,
+      "airtable_table_id": "tblJodXmOWKiYqiXS"
     }
   },
   "_note": "Fresh start for Baserow migration."

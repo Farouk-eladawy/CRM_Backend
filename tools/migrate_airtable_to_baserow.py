@@ -21,7 +21,7 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import requests
 
@@ -31,7 +31,8 @@ sys.path.insert(0, str(ROOT))
 from airtable_fields import TABLE_NAME  # noqa: E402
 
 STATE_PATH = ROOT / "baserow_migration_state.json"
-BATCH_SIZE = 200
+BATCH_SIZE = 50
+MAX_RETRIES = 6
 
 LIST_LINK_TARGETS = [
     "Add Driver Name & Phone copy",
@@ -74,13 +75,37 @@ AIRTABLE_TO_BASEROW = {
 
 SKIP_AIRTABLE_TYPES = {"button"}
 
+# Airtable formula/rollup/lookup/system — Baserow has its own; skip on import.
+AUTO_COMPUTED_TYPES = {
+    "formula",
+    "rollup",
+    "lookup",
+    "multipleLookupValues",
+    "count",
+    "autonumber",
+    "createdTime",
+    "lastModifiedTime",
+    "createdBy",
+    "lastModifiedBy",
+    "button",
+    "externalSyncSource",
+}
+
 # Store Airtable selects as text — schema choices often miss values used in rows.
 SELECT_AS_TEXT = {"singleSelect", "multipleSelects"}
 
+# Numbers imported as text to avoid decimal-place validation mismatches.
+NUMERIC_AS_TEXT = {"number", "currency", "percent", "rating"}
+
 # Store as text to avoid strict Baserow validation during bulk import.
 STORE_AS_TEXT = {
-    "createdTime", "lastModifiedTime", "createdBy", "lastModifiedBy",
-    "phoneNumber", "email", "url",
+    "createdTime",
+    "lastModifiedTime",
+    "createdBy",
+    "lastModifiedBy",
+    "phoneNumber",
+    "email",
+    "url",
 }
 
 
@@ -123,11 +148,15 @@ def flatten_value(value: Any) -> Any:
 def format_for_baserow(value: Any, at_type: str) -> Any:
     if value is None:
         return None
-    if at_type in STORE_AS_TEXT:
+    if at_type in AUTO_COMPUTED_TYPES:
+        return None
+    if at_type in NUMERIC_AS_TEXT or at_type in SELECT_AS_TEXT or at_type in STORE_AS_TEXT:
         if at_type in ("createdBy", "lastModifiedBy") and isinstance(value, dict):
             return value.get("email") or value.get("name") or json.dumps(value, ensure_ascii=False)
+        if isinstance(value, (int, float)):
+            return str(value)
         return flatten_value(value)
-    if at_type in ("date", "dateTime", "createdTime", "lastModifiedTime"):
+    if at_type in ("date", "dateTime"):
         s = str(value).strip()
         if not s:
             return None
@@ -138,13 +167,26 @@ def format_for_baserow(value: Any, at_type: str) -> Any:
 
 
 class BaserowApi:
-    def __init__(self, api_url: str, token: str, auth_scheme: str = "Token"):
+    def __init__(
+        self,
+        api_url: str,
+        token: str,
+        auth_scheme: str = "Token",
+        reauth: Optional[Callable[[], str]] = None,
+    ):
         self.base_url = api_url.rstrip("/")
+        self._auth_scheme = auth_scheme
+        self._reauth = reauth
         self.session = requests.Session()
         self.session.headers.update({
-            "Authorization": f"{auth_scheme} {token}",
             "Content-Type": "application/json",
         })
+        self._set_token(token, auth_scheme)
+
+    def _set_token(self, token: str, auth_scheme: Optional[str] = None) -> None:
+        scheme = auth_scheme or self._auth_scheme
+        self._auth_scheme = scheme
+        self.session.headers["Authorization"] = f"{scheme} {token}"
 
     @classmethod
     def from_config(cls, br_cfg: dict) -> "BaserowApi":
@@ -156,7 +198,11 @@ class BaserowApi:
         password = str(br_cfg.get("admin_password") or "").strip()
         if email and password:
             jwt = obtain_jwt(api_url, email, password)
-            return cls(api_url, jwt, auth_scheme="JWT")
+
+            def reauth() -> str:
+                return obtain_jwt(api_url, email, password)
+
+            return cls(api_url, jwt, auth_scheme="JWT", reauth=reauth)
         token = str(br_cfg.get("api_token") or "").strip()
         if not token:
             raise RuntimeError(
@@ -166,12 +212,20 @@ class BaserowApi:
 
     def _req(self, method: str, path: str, **kwargs) -> Any:
         url = f"{self.base_url}{path}"
-        resp = self.session.request(method, url, timeout=180, **kwargs)
-        if not resp.ok:
-            raise RuntimeError(f"Baserow {method} {path} -> HTTP {resp.status_code}: {resp.text[:800]}")
-        if resp.status_code == 204 or not resp.content:
-            return None
-        return resp.json()
+        for attempt in range(2):
+            resp = self.session.request(method, url, timeout=180, **kwargs)
+            if resp.status_code == 401 and self._reauth and attempt == 0:
+                print("    refreshing expired JWT...")
+                self._set_token(self._reauth(), "JWT")
+                continue
+            if not resp.ok:
+                raise RuntimeError(
+                    f"Baserow {method} {path} -> HTTP {resp.status_code}: {resp.text[:800]}"
+                )
+            if resp.status_code == 204 or not resp.content:
+                return None
+            return resp.json()
+        raise RuntimeError(f"Baserow {method} {path} -> auth refresh failed")
 
     def list_applications(self) -> List[dict]:
         data = self._req("GET", "/api/applications/")
@@ -195,27 +249,55 @@ class BaserowApi:
         self._req("DELETE", f"/api/database/tables/{table_id}/")
 
     def batch_create_rows(self, table_id: int, rows: List[dict]) -> Any:
-        return self._req(
-            "POST",
-            f"/api/database/rows/table/{table_id}/batch/?user_field_names=true",
-            json={"items": rows},
-        )
+        path = f"/api/database/rows/table/{table_id}/batch/?user_field_names=true"
+        body = {"items": rows}
+        delay = 2.0
+        last_err: Optional[Exception] = None
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                return self._req("POST", path, json=body)
+            except RuntimeError as exc:
+                last_err = exc
+                msg = str(exc)
+                retryable = any(
+                    x in msg
+                    for x in (
+                        "HTTP 500",
+                        "HTTP 502",
+                        "HTTP 503",
+                        "HTTP 409",
+                        "HTTP 429",
+                        "HTTP 401",
+                    )
+                )
+                if not retryable or attempt >= MAX_RETRIES:
+                    raise
+                print(f"    retry batch ({attempt}/{MAX_RETRIES}) after error: {msg[:120]}")
+                time.sleep(delay)
+                delay = min(delay * 2, 60)
+        raise last_err  # type: ignore[misc]
 
-    def list_all_rows(self, table_id: int) -> List[dict]:
-        rows: List[dict] = []
+    def existing_airtable_ids(self, table_id: int) -> set[str]:
+        ids: set[str] = set()
         page = 1
         while True:
             data = self._req(
                 "GET",
                 f"/api/database/rows/table/{table_id}/",
-                params={"user_field_names": "true", "size": 200, "page": page},
+                params={
+                    "user_field_names": "true",
+                    "size": 200,
+                    "page": page,
+                },
             )
-            batch = list(data.get("results") or [])
-            rows.extend(batch)
+            for row in data.get("results") or []:
+                rid = row.get("airtable_record_id")
+                if rid:
+                    ids.add(str(rid))
             if not data.get("next"):
                 break
             page += 1
-        return rows
+        return ids
 
     def find_table_by_name(self, database_id: int, name: str) -> Optional[dict]:
         for t in self.list_tables(database_id):
@@ -311,7 +393,7 @@ def field_body_from_airtable(
     field: dict, link_table_ids: Dict[str, int], used_names: set[str]
 ) -> Optional[dict]:
     at_type = str(field.get("type") or "singleLineText")
-    if at_type in SKIP_AIRTABLE_TYPES:
+    if at_type in SKIP_AIRTABLE_TYPES or at_type in AUTO_COMPUTED_TYPES:
         return None
     name = unique_field_name(str(field.get("name") or "Field"), used_names)
     if at_type == "multipleRecordLinks":
@@ -323,7 +405,7 @@ def field_body_from_airtable(
             "type": "link_row",
             "link_row_table_id": link_table_ids[linked_id],
         }
-    if at_type in SELECT_AS_TEXT or at_type in STORE_AS_TEXT:
+    if at_type in SELECT_AS_TEXT or at_type in STORE_AS_TEXT or at_type in NUMERIC_AS_TEXT:
         return {"name": name, "type": "text"}
     br_type = AIRTABLE_TO_BASEROW.get(at_type, "text")
     body: dict = {"name": name, "type": br_type}
@@ -378,8 +460,13 @@ def migrate_table(
     used_names: set[str] = set(existing_names)
     field_name_map: Dict[str, str] = {}
     added = 0
+    skipped_computed = 0
     for field in fields:
         at_name = str(field.get("name") or "Field")
+        at_type = str(field.get("type") or "")
+        if at_type in AUTO_COMPUTED_TYPES:
+            skipped_computed += 1
+            continue
         body = field_body_from_airtable(field, link_table_ids, used_names)
         if not body:
             continue
@@ -394,31 +481,48 @@ def migrate_table(
             time.sleep(0.05)
         except RuntimeError as exc:
             print(f"    field skip {br_name}: {exc}")
+    if skipped_computed:
+        print(f"  skipped {skipped_computed} auto-computed Airtable fields (formula/rollup/lookup/system)")
     if added:
         print(f"  added {added} fields")
 
     records = at.fetch_records(table_name, max_records=max_records)
-    field_names = {str(f["name"]) for f in fields}
     rows: List[dict] = []
     for rec in records:
         row: dict = {"airtable_record_id": rec.get("id")}
         for k, v in (rec.get("fields") or {}).items():
-            if k not in field_names:
+            if k not in field_name_map:
                 continue
             at_type = next((f.get("type") for f in fields if f.get("name") == k), "singleLineText")
             if at_type == "multipleRecordLinks":
                 continue  # links in phase 2
-            out_key = field_name_map.get(k, k)
-            row[out_key] = format_for_baserow(v, at_type)
+            out_key = field_name_map[k]
+            val = format_for_baserow(v, at_type)
+            if val is not None and val != "":
+                row[out_key] = val
         rows.append(row)
 
-    inserted = 0
+    existing_ids = br.existing_airtable_ids(tid)
+    if existing_ids:
+        before = len(rows)
+        rows = [r for r in rows if str(r.get("airtable_record_id") or "") not in existing_ids]
+        print(f"  resume: {len(existing_ids)} rows already in Baserow, {before - len(rows)} skipped, {len(rows)} to insert")
+
+    inserted = len(existing_ids)
+    total_target = inserted + len(rows)
     for i in range(0, len(rows), BATCH_SIZE):
         chunk = rows[i : i + BATCH_SIZE]
         br.batch_create_rows(tid, chunk)
         inserted += len(chunk)
-        print(f"    inserted {inserted}/{len(rows)}")
-        time.sleep(0.2)
+        print(f"    inserted {inserted}/{total_target}")
+        if state is not None and table_name:
+            state.setdefault("tables", {})[table_name] = {
+                "baserow_table_id": tid,
+                "records_synced": inserted,
+                "airtable_table_id": at_id,
+            }
+            save_state(state)
+        time.sleep(0.35)
 
     return {"baserow_table_id": tid, "records_synced": inserted}
 

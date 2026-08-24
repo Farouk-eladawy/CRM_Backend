@@ -74,6 +74,15 @@ AIRTABLE_TO_BASEROW = {
 
 SKIP_AIRTABLE_TYPES = {"button"}
 
+# Store Airtable selects as text — schema choices often miss values used in rows.
+SELECT_AS_TEXT = {"singleSelect", "multipleSelects"}
+
+# Store as text to avoid strict Baserow validation during bulk import.
+STORE_AS_TEXT = {
+    "createdTime", "lastModifiedTime", "createdBy", "lastModifiedBy",
+    "phoneNumber", "email", "url",
+}
+
 
 def load_config() -> dict:
     with open(ROOT / "config.json", encoding="utf-8") as f:
@@ -109,6 +118,23 @@ def flatten_value(value: Any) -> Any:
     if isinstance(value, dict):
         return json.dumps(value, ensure_ascii=False)
     return value
+
+
+def format_for_baserow(value: Any, at_type: str) -> Any:
+    if value is None:
+        return None
+    if at_type in STORE_AS_TEXT:
+        if at_type in ("createdBy", "lastModifiedBy") and isinstance(value, dict):
+            return value.get("email") or value.get("name") or json.dumps(value, ensure_ascii=False)
+        return flatten_value(value)
+    if at_type in ("date", "dateTime", "createdTime", "lastModifiedTime"):
+        s = str(value).strip()
+        if not s:
+            return None
+        if "T" in s:
+            return s.split("T")[0]
+        return s[:10] if len(s) >= 10 else s
+    return flatten_value(value)
 
 
 class BaserowApi:
@@ -164,6 +190,9 @@ class BaserowApi:
 
     def create_field(self, table_id: int, body: dict) -> dict:
         return self._req("POST", f"/api/database/fields/table/{table_id}/", json=body)
+
+    def delete_table(self, table_id: int) -> None:
+        self._req("DELETE", f"/api/database/tables/{table_id}/")
 
     def batch_create_rows(self, table_id: int, rows: List[dict]) -> Any:
         return self._req(
@@ -265,11 +294,26 @@ class AirtableSource:
         return list(table.all(**kwargs))
 
 
-def field_body_from_airtable(field: dict, link_table_ids: Dict[str, int]) -> Optional[dict]:
+def unique_field_name(title: str, used: set[str]) -> str:
+    base = str(title or "Field").strip() or "Field"
+    if base not in used:
+        used.add(base)
+        return base
+    i = 2
+    while f"{base} ({i})" in used:
+        i += 1
+    unique = f"{base} ({i})"
+    used.add(unique)
+    return unique
+
+
+def field_body_from_airtable(
+    field: dict, link_table_ids: Dict[str, int], used_names: set[str]
+) -> Optional[dict]:
     at_type = str(field.get("type") or "singleLineText")
     if at_type in SKIP_AIRTABLE_TYPES:
         return None
-    name = str(field.get("name") or "Field")
+    name = unique_field_name(str(field.get("name") or "Field"), used_names)
     if at_type == "multipleRecordLinks":
         linked_id = str((field.get("options") or {}).get("linkedTableId") or "")
         if linked_id not in link_table_ids:
@@ -279,6 +323,8 @@ def field_body_from_airtable(field: dict, link_table_ids: Dict[str, int]) -> Opt
             "type": "link_row",
             "link_row_table_id": link_table_ids[linked_id],
         }
+    if at_type in SELECT_AS_TEXT or at_type in STORE_AS_TEXT:
+        return {"name": name, "type": "text"}
     br_type = AIRTABLE_TO_BASEROW.get(at_type, "text")
     body: dict = {"name": name, "type": br_type}
     if br_type == "single_select":
@@ -304,13 +350,18 @@ def migrate_table(
 
     existing = br.find_table_by_name(database_id, table_name)
     if existing and recreate:
-        # Baserow has no simple delete in this script; user deletes from UI if needed
-        print(f"  note: table '{table_name}' exists (id={existing['id']}); not auto-deleted")
+        tid_old = int(existing["id"])
+        print(f"  deleting existing table '{table_name}' id={tid_old}")
+        br.delete_table(tid_old)
+        existing = None
     if existing and skip_existing and not recreate:
-        print(f"  skip '{table_name}' (exists id={existing['id']})")
-        tid = int(existing["id"])
-        link_table_ids[at_id] = tid
-        return state.get("tables", {}).get(table_name) or {"baserow_table_id": tid}
+        prev = state.get("tables", {}).get(table_name) or {}
+        if int(prev.get("records_synced") or 0) > 0:
+            print(f"  skip '{table_name}' (exists id={existing['id']}, {prev.get('records_synced')} rows)")
+            tid = int(existing["id"])
+            link_table_ids[at_id] = tid
+            return prev
+        print(f"  resume '{table_name}' (exists id={existing['id']}, no rows synced yet)")
 
     if not existing:
         created = br.create_table(database_id, table_name)
@@ -324,17 +375,25 @@ def migrate_table(
 
     link_table_ids[at_id] = tid
     existing_names = {f.get("name") for f in br.list_fields(tid)}
+    used_names: set[str] = set(existing_names)
+    field_name_map: Dict[str, str] = {}
     added = 0
     for field in fields:
-        body = field_body_from_airtable(field, link_table_ids)
-        if not body or body["name"] in existing_names:
+        at_name = str(field.get("name") or "Field")
+        body = field_body_from_airtable(field, link_table_ids, used_names)
+        if not body:
+            continue
+        br_name = body["name"]
+        field_name_map[at_name] = br_name
+        if br_name in existing_names:
             continue
         try:
             br.create_field(tid, body)
             added += 1
+            existing_names.add(br_name)
             time.sleep(0.05)
         except RuntimeError as exc:
-            print(f"    field skip {body['name']}: {exc}")
+            print(f"    field skip {br_name}: {exc}")
     if added:
         print(f"  added {added} fields")
 
@@ -349,7 +408,8 @@ def migrate_table(
             at_type = next((f.get("type") for f in fields if f.get("name") == k), "singleLineText")
             if at_type == "multipleRecordLinks":
                 continue  # links in phase 2
-            row[k] = flatten_value(v)
+            out_key = field_name_map.get(k, k)
+            row[out_key] = format_for_baserow(v, at_type)
         rows.append(row)
 
     inserted = 0
@@ -439,6 +499,7 @@ def main() -> int:
     p.add_argument("--recreate", action="store_true")
 
     args = parser.parse_args()
+    cfg = load_config()
     br_cfg = cfg.get("baserow") or {}
     try:
         br = BaserowApi.from_config(br_cfg)

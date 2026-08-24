@@ -1,4 +1,40 @@
 {
-  "tables": {},
+  "tables": {
+    "Products_Catalog": {
+      "baserow_table_id": 4,
+      "records_synced": 2,
+      "airtable_table_id": "tblTr0v9wGmN9Bwdg"
+    },
+    "Add Guide Name & Phone": {
+      "baserow_table_id": 8,
+      "records_synced": 422,
+      "airtable_table_id": "tblNs1p6J23nhSBm6"
+    },
+    "Grand_Tickets": {
+      "baserow_table_id": 5,
+      "records_synced": 18465,
+      "airtable_table_id": "tblD0FduWq7fCTHBM"
+    },
+    "Add Representative Name & Phone": {
+      "baserow_table_id": 9,
+      "records_synced": 16,
+      "airtable_table_id": "tblPczNyohkeovdqp"
+    },
+    "Add Supplier Name & Phone": {
+      "baserow_table_id": 10,
+      "records_synced": 11,
+      "airtable_table_id": "tblPQ3QCo9nNTXC2O"
+    },
+    "Conversations": {
+      "baserow_table_id": 11,
+      "records_synced": 0,
+      "airtable_table_id": "tbl6pMRC6rSxCsHWD"
+    },
+    "Add Driver Name & Phone copy": {
+      "baserow_table_id": 12,
+      "records_synced": 603,
+      "airtable_table_id": "tblUJidvg0lqTZ3Ev"
+    }
+  },
   "_note": "Fresh start for Baserow migration."
 }

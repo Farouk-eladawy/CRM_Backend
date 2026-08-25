@@ -34,7 +34,7 @@
       "baserow_table_id": 11,
       "records_synced": 0,
       "airtable_table_id": "tbl6pMRC6rSxCsHWD",
-      "complete": false
+      "complete": true
     },
     "Add Driver Name & Phone copy": {
       "baserow_table_id": 12,
@@ -44,9 +44,345 @@
     },
     "List": {
       "baserow_table_id": 15,
-      "records_synced": 11800,
+      "records_synced": 6000,
       "airtable_table_id": "tblJodXmOWKiYqiXS",
       "complete": false
+    },
+    "MPC": {
+      "baserow_table_id": 18,
+      "records_synced": 339,
+      "airtable_table_id": "tblrUZwBNOSUM34N4",
+      "complete": true
+    },
+    "Ticket Imports": {
+      "baserow_table_id": 19,
+      "records_synced": 71,
+      "airtable_table_id": "tblBrZejwXX9SuouH",
+      "complete": true
+    },
+    "Hotel For Extra Transfer": {
+      "baserow_table_id": 20,
+      "records_synced": 86,
+      "airtable_table_id": "tblQfCi0sp2HDrOpO",
+      "complete": true
+    },
+    "Notifications_Product": {
+      "baserow_table_id": 21,
+      "records_synced": 3,
+      "airtable_table_id": "tblmfLbuY6BwG3zop",
+      "complete": true
+    },
+    "Product's": {
+      "baserow_table_id": 22,
+      "records_synced": 491,
+      "airtable_table_id": "tblhc07pFaQv3hwJ9",
+      "complete": true
+    },
+    "Template": {
+      "baserow_table_id": 23,
+      "records_synced": 8937,
+      "airtable_table_id": "tblmqvKdWC3OG0Xgo",
+      "complete": true
+    },
+    "Reservation close": {
+      "baserow_table_id": 24,
+      "records_synced": 102,
+      "airtable_table_id": "tbl4kqB1Rb2UDU5Ed",
+      "complete": true
+    },
+    "Hurghada": {
+      "baserow_table_id": 25,
+      "records_synced": 182,
+      "airtable_table_id": "tblxDJRXH7jGIbxMD",
+      "complete": true
+    },
+    "Sharm Elsheikh": {
+      "baserow_table_id": 26,
+      "records_synced": 57,
+      "airtable_table_id": "tblWapxdMkRv84uGv",
+      "complete": true
+    },
+    "Cairo": {
+      "baserow_table_id": 27,
+      "records_synced": 37,
+      "airtable_table_id": "tblIy2fbfOK775ieB",
+      "complete": true
+    },
+    "Makadi Bay": {
+      "baserow_table_id": 28,
+      "records_synced": 8,
+      "airtable_table_id": "tblzt1t1Hqh0YH3Kq",
+      "complete": true
+    },
+    "El Gouna": {
+      "baserow_table_id": 29,
+      "records_synced": 1,
+      "airtable_table_id": "tblE7r1kF56QMCdRi",
+      "complete": true
+    },
+    "Safaga": {
+      "baserow_table_id": 30,
+      "records_synced": 3,
+      "airtable_table_id": "tblGVTwRXH7C3ee8I",
+      "complete": true
+    },
+    "Marsa Alam": {
+      "baserow_table_id": 31,
+      "records_synced": 23,
+      "airtable_table_id": "tblvSSleXD40k36C6",
+      "complete": true
+    },
+    "Luxor": {
+      "baserow_table_id": 32,
+      "records_synced": 81,
+      "airtable_table_id": "tblUqySP8TGMFAOZS",
+      "complete": true
+    },
+    "Monitor reservations": {
+      "baserow_table_id": 33,
+      "records_synced": 769,
+      "airtable_table_id": "tblZSUa5j41upnMN9",
+      "complete": true
+    },
+    "Aegypten-Ausfluege Requests": {
+      "baserow_table_id": 34,
+      "records_synced": 630,
+      "airtable_table_id": "tblsKRViJ1sNNVNh7",
+      "complete": true
+    },
+    "Guides": {
+      "baserow_table_id": 35,
+      "records_synced": 30,
+      "airtable_table_id": "tblLKRBNXOwHvrTDW",
+      "complete": true
+    },
+    "Agencies": {
+      "baserow_table_id": 36,
+      "records_synced": 3,
+      "airtable_table_id": "tbl1cPQS6io8xmy6b",
+      "complete": true
+    },
+    "Trip Options": {
+      "baserow_table_id": 37,
+      "records_synced": 12,
+      "airtable_table_id": "tbljlN1XrPTGHwD5F",
+      "complete": true
+    },
+    "Destinations": {
+      "baserow_table_id": 38,
+      "records_synced": 6,
+      "airtable_table_id": "tblQFgo17KkdOl1ir",
+      "complete": true
+    },
+    "Trip Names": {
+      "baserow_table_id": 39,
+      "records_synced": 156,
+      "airtable_table_id": "tbljGe1lJarVbwJ7n",
+      "complete": true
+    },
+    "Management Option": {
+      "baserow_table_id": 40,
+      "records_synced": 713,
+      "airtable_table_id": "tbl5Jw7KQQdAUiPtr",
+      "complete": true
+    },
+    "Add-on": {
+      "baserow_table_id": 41,
+      "records_synced": 3,
+      "airtable_table_id": "tblDn7AMU1s187gBv",
+      "complete": true
+    },
+    "Trip Name Correction": {
+      "baserow_table_id": 42,
+      "records_synced": 156,
+      "airtable_table_id": "tblankt0CJZfg8hWH",
+      "complete": true
+    },
+    "Trips prices": {
+      "baserow_table_id": 43,
+      "records_synced": 60,
+      "airtable_table_id": "tbl7CDvc3evabOcku",
+      "complete": true
+    },
+    "Destination Name Correction": {
+      "baserow_table_id": 44,
+      "records_synced": 41,
+      "airtable_table_id": "tblx9NO6sN0l1rRCc",
+      "complete": true
+    },
+    "Review": {
+      "baserow_table_id": 45,
+      "records_synced": 8,
+      "airtable_table_id": "tblxg2EAldnmpF3vb",
+      "complete": true
+    },
+    "FTS2025 {Offer}": {
+      "baserow_table_id": 46,
+      "records_synced": 1,
+      "airtable_table_id": "tblsFbvXwNC7OE5wU",
+      "complete": true
+    },
+    "Trips Prices Select": {
+      "baserow_table_id": 47,
+      "records_synced": 57,
+      "airtable_table_id": "tblTZq2rSUywyZMlE",
+      "complete": true
+    },
+    "Imported table 2": {
+      "baserow_table_id": 48,
+      "records_synced": 51,
+      "airtable_table_id": "tbl9vsl5Kx7nZDAE9",
+      "complete": true
+    },
+    "Ramadan template": {
+      "baserow_table_id": 49,
+      "records_synced": 49,
+      "airtable_table_id": "tblJWD736ZzI18sDR",
+      "complete": true
+    },
+    "Sales CRM": {
+      "baserow_table_id": 50,
+      "records_synced": 4,
+      "airtable_table_id": "tblZd3P7cug8HSib0",
+      "complete": true
+    },
+    "Flights": {
+      "baserow_table_id": 51,
+      "records_synced": 14,
+      "airtable_table_id": "tbl51a6Xjz0h98pbL",
+      "complete": true
+    },
+    "Consultation Bookings": {
+      "baserow_table_id": 52,
+      "records_synced": 8,
+      "airtable_table_id": "tblgTE0pBM4WHFKwY",
+      "complete": true
+    },
+    "Donations": {
+      "baserow_table_id": 53,
+      "records_synced": 1,
+      "airtable_table_id": "tblK5U1NbGXV3kHrp",
+      "complete": true
+    },
+    "Hajj": {
+      "baserow_table_id": 54,
+      "records_synced": 144,
+      "airtable_table_id": "tblGvQFWzgarcUNWz",
+      "complete": true
+    },
+    "Hurghada Ägypten Ausflüge": {
+      "baserow_table_id": 55,
+      "records_synced": 28,
+      "airtable_table_id": "tblJsoBJGmEMhO2kI",
+      "complete": true
+    },
+    "Tours": {
+      "baserow_table_id": 56,
+      "records_synced": 3,
+      "airtable_table_id": "tblAtv2fhpVQlkQXb",
+      "complete": true
+    },
+    "Audio Guide": {
+      "baserow_table_id": 57,
+      "records_synced": 2,
+      "airtable_table_id": "tblpTDgEfyrXIyIYv",
+      "complete": true
+    },
+    "Audio_Content": {
+      "baserow_table_id": 58,
+      "records_synced": 30,
+      "airtable_table_id": "tbljG3ptO7PpsVAqu",
+      "complete": true
+    },
+    "Audio_Content copy": {
+      "baserow_table_id": 59,
+      "records_synced": 2,
+      "airtable_table_id": "tblIkZyYb1rJcpaKS",
+      "complete": true
+    },
+    "Leads CRM": {
+      "baserow_table_id": 60,
+      "records_synced": 1645,
+      "airtable_table_id": "tblvd7NIXb3fwOD0B",
+      "complete": true
+    },
+    "Offer": {
+      "baserow_table_id": 61,
+      "records_synced": 268,
+      "airtable_table_id": "tbl4KMNGtwnoM7kGI",
+      "complete": true
+    },
+    "GYG Analytics": {
+      "baserow_table_id": 62,
+      "records_synced": 23,
+      "airtable_table_id": "tblFexvvhBrSXEdjB",
+      "complete": true
+    },
+    "Nile_GYG_Analytics": {
+      "baserow_table_id": 63,
+      "records_synced": 0,
+      "airtable_table_id": "tblS8qF3E9zsVycoM",
+      "complete": true
+    },
+    "Sales_Performance_Reviews": {
+      "baserow_table_id": 64,
+      "records_synced": 1,
+      "airtable_table_id": "tbl0JKjTfJRMqxqZ8",
+      "complete": true
+    },
+    "Users": {
+      "baserow_table_id": 65,
+      "records_synced": 2,
+      "airtable_table_id": "tblDSPqfs0tgfocM6",
+      "complete": true
+    },
+    "Messages": {
+      "baserow_table_id": 66,
+      "records_synced": 1,
+      "airtable_table_id": "tblfCdupMYBqFdgwj",
+      "complete": true
+    },
+    "Bookings": {
+      "baserow_table_id": 67,
+      "records_synced": 1,
+      "airtable_table_id": "tblFYNoBBzJTlJ7Bl",
+      "complete": true
+    },
+    "Websites": {
+      "baserow_table_id": 68,
+      "records_synced": 1,
+      "airtable_table_id": "tblZ6diYfr61ILvIv",
+      "complete": true
+    },
+    "User Trip Referrals": {
+      "baserow_table_id": 69,
+      "records_synced": 0,
+      "airtable_table_id": "tblcpdqfj36XHMv0V",
+      "complete": true
+    },
+    "Manage_User": {
+      "baserow_table_id": 70,
+      "records_synced": 4,
+      "airtable_table_id": "tblbuxYQeilDdDDJQ",
+      "complete": true
+    },
+    "Trips Scraped": {
+      "baserow_table_id": 71,
+      "records_synced": 0,
+      "airtable_table_id": "tbl0EFc1nxyJpSgYC",
+      "complete": true
+    },
+    "Contacts": {
+      "baserow_table_id": 72,
+      "records_synced": 0,
+      "airtable_table_id": "tblpMJoamYjHqOIlf",
+      "complete": true
+    },
+    "Tito Sunny": {
+      "baserow_table_id": 73,
+      "records_synced": 2204,
+      "airtable_table_id": "tbl3DJBzGrDIlBnU1",
+      "complete": true
     }
   },
   "_note": "Fresh start for Baserow migration."

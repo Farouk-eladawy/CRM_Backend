@@ -42,12 +42,6 @@
       "airtable_table_id": "tblUJidvg0lqTZ3Ev",
       "complete": true
     },
-    "List": {
-      "baserow_table_id": 15,
-      "records_synced": 12100,
-      "airtable_table_id": "tblJodXmOWKiYqiXS",
-      "complete": false
-    },
     "MPC": {
       "baserow_table_id": 18,
       "records_synced": 339,

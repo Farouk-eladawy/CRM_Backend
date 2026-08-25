@@ -31,8 +31,8 @@ sys.path.insert(0, str(ROOT))
 from airtable_fields import TABLE_NAME  # noqa: E402
 
 STATE_PATH = ROOT / "baserow_migration_state.json"
-BATCH_SIZE = 50
-MAX_RETRIES = 6
+BATCH_SIZE = 25
+MAX_RETRIES = 8
 
 LIST_LINK_TARGETS = [
     "Add Driver Name & Phone copy",

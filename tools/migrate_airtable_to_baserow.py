@@ -438,12 +438,18 @@ def migrate_table(
         existing = None
     if existing and skip_existing and not recreate:
         prev = state.get("tables", {}).get(table_name) or {}
-        if int(prev.get("records_synced") or 0) > 0:
-            print(f"  skip '{table_name}' (exists id={existing['id']}, {prev.get('records_synced')} rows)")
+        synced = int(prev.get("records_synced") or 0)
+        # Only skip tables explicitly marked complete (full sync finished).
+        # Incomplete tables (e.g. List stopped mid-run) always resume via airtable_id dedupe.
+        if prev.get("complete") and synced > 0:
+            print(f"  skip '{table_name}' (complete id={existing['id']}, {synced} rows)")
             tid = int(existing["id"])
             link_table_ids[at_id] = tid
             return prev
-        print(f"  resume '{table_name}' (exists id={existing['id']}, no rows synced yet)")
+        if synced > 0:
+            print(f"  resume '{table_name}' (exists id={existing['id']}, {synced} rows in state)")
+        else:
+            print(f"  resume '{table_name}' (exists id={existing['id']}, no rows synced yet)")
 
     if not existing:
         created = br.create_table(database_id, table_name)
@@ -520,11 +526,23 @@ def migrate_table(
                 "baserow_table_id": tid,
                 "records_synced": inserted,
                 "airtable_table_id": at_id,
+                "complete": False,
             }
             save_state(state)
         time.sleep(0.35)
 
-    return {"baserow_table_id": tid, "records_synced": inserted}
+    result = {
+        "baserow_table_id": tid,
+        "records_synced": inserted,
+        "airtable_table_id": at_id,
+        "complete": len(rows) == 0 or inserted >= total_target,
+    }
+    if state is not None and table_name:
+        state.setdefault("tables", {})[table_name] = result
+        save_state(state)
+    if result["complete"]:
+        print(f"  complete '{table_name}' ({inserted} rows)")
+    return result
 
 
 def cmd_discover(br: BaserowApi, database_id: int, cfg: dict) -> int:

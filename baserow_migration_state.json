@@ -1,7 +1,7 @@
 {
   "tables": {
     "Products_Catalog": {
-      "baserow_table_id": 4,
+      "baserow_table_id": 83,
       "records_synced": 2,
       "airtable_table_id": "tblTr0v9wGmN9Bwdg",
       "complete": true
@@ -44,7 +44,7 @@
     },
     "List": {
       "baserow_table_id": 15,
-      "records_synced": 6000,
+      "records_synced": 12100,
       "airtable_table_id": "tblJodXmOWKiYqiXS",
       "complete": false
     },

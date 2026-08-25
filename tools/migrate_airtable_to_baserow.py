@@ -212,20 +212,28 @@ class BaserowApi:
 
     def _req(self, method: str, path: str, **kwargs) -> Any:
         url = f"{self.base_url}{path}"
-        for attempt in range(2):
-            resp = self.session.request(method, url, timeout=180, **kwargs)
-            if resp.status_code == 401 and self._reauth and attempt == 0:
-                print("    refreshing expired JWT...")
-                self._set_token(self._reauth(), "JWT")
+        delay = 2.0
+        for attempt in range(1, MAX_RETRIES + 1):
+            for auth_try in range(2):
+                resp = self.session.request(method, url, timeout=180, **kwargs)
+                if resp.status_code == 401 and self._reauth and auth_try == 0:
+                    print("    refreshing expired JWT...")
+                    self._set_token(self._reauth(), "JWT")
+                    continue
+                break
+            if resp.ok:
+                if resp.status_code == 204 or not resp.content:
+                    return None
+                return resp.json()
+            msg = f"Baserow {method} {path} -> HTTP {resp.status_code}: {resp.text[:800]}"
+            retryable = resp.status_code in (500, 502, 503, 409, 429) and attempt < MAX_RETRIES
+            if retryable:
+                print(f"    retry {method} ({attempt}/{MAX_RETRIES}) after error: {msg[:120]}")
+                time.sleep(delay)
+                delay = min(delay * 2, 60)
                 continue
-            if not resp.ok:
-                raise RuntimeError(
-                    f"Baserow {method} {path} -> HTTP {resp.status_code}: {resp.text[:800]}"
-                )
-            if resp.status_code == 204 or not resp.content:
-                return None
-            return resp.json()
-        raise RuntimeError(f"Baserow {method} {path} -> auth refresh failed")
+            raise RuntimeError(msg)
+        raise RuntimeError(f"Baserow {method} {path} -> max retries exceeded")
 
     def list_applications(self) -> List[dict]:
         data = self._req("GET", "/api/applications/")
@@ -389,6 +397,17 @@ def unique_field_name(title: str, used: set[str]) -> str:
     return unique
 
 
+def resolve_field_name(at_name: str, existing_names: set[str], used_names: set[str]) -> Optional[str]:
+    """Reuse an existing Baserow column name on resume (avoids creating Foo (2))."""
+    raw = str(at_name or "Field")
+    base = raw.strip() or "Field"
+    for candidate in (raw, base):
+        if candidate in existing_names:
+            used_names.add(candidate)
+            return candidate
+    return None
+
+
 def field_body_from_airtable(
     field: dict, link_table_ids: Dict[str, int], used_names: set[str]
 ) -> Optional[dict]:
@@ -472,6 +491,10 @@ def migrate_table(
         at_type = str(field.get("type") or "")
         if at_type in AUTO_COMPUTED_TYPES:
             skipped_computed += 1
+            continue
+        existing_br = resolve_field_name(at_name, existing_names, used_names)
+        if existing_br:
+            field_name_map[at_name] = existing_br
             continue
         body = field_body_from_airtable(field, link_table_ids, used_names)
         if not body:

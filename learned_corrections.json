@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-08-24T10:38:01.062134",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "You’ll be travelling by car/vehicle, not by boat. 😊🚗\n\nWe look forward to seeing you tomorrow and hope you have a wonderful day! 🌊☀️",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-08-24T10:39:55.962217",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nإذا ترغب بالتحدث مع فريق الكواليتي، اكتب: جودة\n\nمع خالص التحية،\nفرح",
     "corrected": "Don’t worry 😊 Your pickup will be at the pickup point shown on your booking, at Cleopatra Hotel.\n\nThe guide/driver will contact you via WhatsApp before leaving with the vehicle to confirm the pickup and coordinate with you.\n\nSo there is no need to change your date. Everything is confirmed for tomorrow at 08:00 AM. 🚙✨",
@@ -597,6 +591,12 @@
     "timestamp": "2026-08-25T09:12:35.727484",
     "original": "تفضل حضرتك تفاصيل برنامج العمرة المتاح لشهر سبتمبر 🕋\n\n*عمرة اقتصادي ٨ أيام — موعد الرحلة ٢٣ سبتمبر* ✅\n💰 السعر: ٣٤٬٧٥٠ جنيه شامل التأشيرة والطيران والإقامة والانتقالات — يعني الرقم ده هو كل اللي هتدفعه، مفيش مصاريف مفاجأة.\n\nسعر الفرد حسب الغرفة:\n• الرباعية: ٣٤٬٧٥٠ جنيه\n• الثلاثية: ٣٥٬٤٥٠ جنيه\n• الثنائية: ٣٦٬٩٥٠ جنيه\n\n✈️ الطيران على الخطوط السعودية أو مصر للطيران — القاهرة / جدة / القاهرة\n\n🏨 الإقامة في مكة: فندق منازل العين في امتداد شارع أجياد — باصات متوفرة طوال اليوم توصّلك الحرم في حوالي ٥ دقايق\n🕌 المدينة المنورة: زيارة للحرم النبوي من غير مبيت\n\n📌 رحلة ٢ سبتمبر كان آخر معاد للحجز فيها ٢٠ أغسطس، فالمتاح حاليًا رحلة ٢٣ سبتمبر.\n📋 نظام الدفع في العمرة: ٥٠٪ عند الحجز و٥٠٪ قبل السفر بأسبوعين.\n\nتحب أحجز لحضرتك في رحلة ٢٣ سبتمبر؟ قولّي عدد المسافرين وهجهزلك التفاصيل 😊",
     "corrected": "اهلا بيك ياافندم معاك هنادي من شركة اف تي اس 🌸",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-25T09:13:28.740939",
+    "original": "شكراً لحضرتك على رقم الواتساب ✅  \nتم تسجيل بيانات حضرتك: **عمرة رجب — ٣ أفراد**، ورقم التواصل **01016556966**.  \nهيتواصل مع حضرتك فريق المبيعات في أقرب وقت على نفس الرقم لمتابعة التفاصيل وتأكيد الحجز إن شاء الله 🕋  \n\nلو في أي استفسار تاني أنا في خدمتك في أي وقت.",
+    "corrected": "تم التواصل واتساب 🌸",
     "context": "UI Manual Edit"
   }
 ]

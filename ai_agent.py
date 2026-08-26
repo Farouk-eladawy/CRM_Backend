@@ -9838,11 +9838,7 @@ Conversation:
         # -------------------------------------------
 
         if self._current_chat_id:
-            try:
-                import threading
-                threading.Thread(target=self.update_sales_state_from_recent_messages, args=(self._current_chat_id,), daemon=True).start()
-            except Exception:
-                pass
+            # Sales chat AI scoring runs only on demand via POST /api/sales/customer/<chat_id>/analyze
             try:
                 if getattr(self, "automation_engine", None):
                     event_payload = {

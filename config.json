@@ -40,14 +40,14 @@
         "max_tokens": 4000
       },
       "deepseek_flash": {
-        "api_key": "sk-8da3c199aeb44d87b57b541ddb9a67e7",
+        "api_key": "sk-3f4f335b48e04bcb92443acb8c73551e",
         "model": "deepseek-v4-flash",
         "api_url": "https://api.deepseek.com/v1/chat/completions",
         "temperature": 0.3,
         "max_tokens": 4000
       },
       "deepseek_pro": {
-        "api_key": "sk-8da3c199aeb44d87b57b541ddb9a67e7",
+        "api_key": "sk-3f4f335b48e04bcb92443acb8c73551e",
         "model": "deepseek-v4-pro",
         "api_url": "https://api.deepseek.com/v1/chat/completions",
         "temperature": 0.3,

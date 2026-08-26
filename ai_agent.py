@@ -4730,7 +4730,7 @@ class AIAgent:
             return before + "\n\n" + o + "\n\n" + s
         return self._ensure_signature_once(t + "\n\n" + o, s, chat_id=chat_id, location=location)
 
-    def query_ai(self, prompt, system_role="assistant", image_url=None, location=None, chat_id=None):
+    def query_ai(self, prompt, system_role="assistant", image_url=None, location=None, chat_id=None, usage_department=None, usage_source=None):
         ai_section = self.config.get('ai', {})
         
         # Determine providers and order based on config structure
@@ -4885,6 +4885,21 @@ class AIAgent:
                 response.raise_for_status()
                 result = response.json()
                 content = result['choices'][0]['message']['content']
+                try:
+                    self._record_ai_usage_from_result(
+                        result=result,
+                        prompt=prompt,
+                        content=content,
+                        provider_name=provider_name,
+                        model=payload.get("model"),
+                        system_role=system_role,
+                        location=location,
+                        chat_id=chat_id,
+                        usage_department=usage_department,
+                        usage_source=usage_source,
+                    )
+                except Exception:
+                    pass
                 return content
             except Exception as e:
                 last_error = f"Provider {provider_name} failed: {e}"
@@ -4897,6 +4912,113 @@ class AIAgent:
             # Return a specific internal marker instead of sending a message to the user
             return "[AI_PROVIDER_FAILED_SILENTLY]"
         return ""
+
+    def _ai_usage_department(self, location=None, system_role="assistant", usage_department=None):
+        explicit = str(usage_department or "").strip()
+        if explicit:
+            return explicit
+        loc = str(location or "").strip()
+        if loc:
+            if loc.lower() == "religious":
+                return "Religious"
+            return loc
+        role = str(system_role or "").strip().lower()
+        if role in ("structured_mediator",):
+            return "Internal Assistant"
+        if role in ("analyzer", "translator", "optimizer"):
+            return "Internal Tools"
+        return "Unassigned"
+
+    def _ai_usage_source(self, system_role="assistant", usage_source=None):
+        explicit = str(usage_source or "").strip()
+        if explicit:
+            return explicit
+        role = str(system_role or "").strip().lower()
+        mapping = {
+            "assistant": "customer_auto_reply",
+            "structured_mediator": "internal_assistant",
+            "analyzer": "analysis",
+            "translator": "translation",
+            "optimizer": "optimizer",
+        }
+        return mapping.get(role, role or "other")
+
+    def _record_ai_usage_from_result(
+        self,
+        result=None,
+        prompt="",
+        content="",
+        provider_name="",
+        model="",
+        system_role="assistant",
+        location=None,
+        chat_id=None,
+        usage_department=None,
+        usage_source=None,
+    ):
+        import chat_db
+        usage = result.get("usage") if isinstance(result, dict) else {}
+        if not isinstance(usage, dict):
+            usage = {}
+        prompt_tokens = 0
+        completion_tokens = 0
+        total_tokens = 0
+        estimated = 0
+        try:
+            prompt_tokens = int(usage.get("prompt_tokens") or 0)
+            completion_tokens = int(usage.get("completion_tokens") or 0)
+            total_tokens = int(usage.get("total_tokens") or 0)
+        except Exception:
+            prompt_tokens = completion_tokens = total_tokens = 0
+        if prompt_tokens <= 0 and completion_tokens <= 0:
+            estimated = 1
+            prompt_tokens = max(1, int(len(str(prompt or "")) / 4))
+            completion_tokens = max(1, int(len(str(content or "")) / 4))
+            total_tokens = prompt_tokens + completion_tokens
+        elif total_tokens <= 0:
+            total_tokens = prompt_tokens + completion_tokens
+        model_name = str(model or "").strip()
+        cost_usd = chat_db.estimate_ai_cost_usd(model_name, prompt_tokens, completion_tokens)
+        department = self._ai_usage_department(location, system_role, usage_department)
+        source = self._ai_usage_source(system_role, usage_source)
+        threading.Thread(
+            target=chat_db.record_ai_usage_event,
+            kwargs={
+                "department": department,
+                "source": source,
+                "system_role": system_role,
+                "provider": provider_name,
+                "model": model_name,
+                "location": location,
+                "chat_id": chat_id,
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": total_tokens,
+                "cost_usd": cost_usd,
+                "estimated": estimated,
+            },
+            daemon=True,
+        ).start()
+
+    def _connected_ai_providers(self):
+        ai_section = self.config.get("ai", {}) if isinstance(self.config, dict) else {}
+        providers = ai_section.get("providers") if isinstance(ai_section.get("providers"), dict) else {}
+        order = [str(x).strip() for x in (ai_section.get("order") or []) if str(x).strip()]
+        out = []
+        for name, cfg in providers.items():
+            if not isinstance(cfg, dict):
+                continue
+            api_key = str(cfg.get("api_key") or "")
+            connected = bool(api_key) and "YOUR_" not in api_key and len(api_key) >= 10
+            out.append({
+                "id": str(name),
+                "model": str(cfg.get("model") or ""),
+                "connected": connected,
+                "in_order": str(name) in order,
+                "order_index": order.index(str(name)) if str(name) in order else None,
+            })
+        out.sort(key=lambda x: (999 if x["order_index"] is None else x["order_index"], x["id"]))
+        return out
 
     def _extract_first_json_object(self, raw_text):
         text = str(raw_text or "").strip()
@@ -39229,6 +39351,43 @@ Write ONE short message only. No JSON. No explanations."""
                     return jsonify({"status": "success", "auto_reply_locations": list(current_auto), "auto_reply_draft_locations": list(current_draft)})
             except Exception as e:
                 logging.error(f"Error in /api/auto_reply_settings: {e}")
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/ai_usage/report', methods=['GET', 'OPTIONS'])
+        def api_ai_usage_report():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "ok"}), 200
+            try:
+                import chat_db
+                from_date = str(request.args.get("from") or "").strip()
+                to_date = str(request.args.get("to") or "").strip()
+                report = chat_db.get_ai_usage_report(from_date, to_date)
+                rates = chat_db.get_ai_usage_rates()
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        **report,
+                        "currency": rates.get("currency") or "USD",
+                        "providers": self._connected_ai_providers(),
+                    },
+                })
+            except Exception as e:
+                logging.error(f"Error in /api/ai_usage/report: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/ai_usage/rates', methods=['GET', 'POST', 'OPTIONS'])
+        def api_ai_usage_rates():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "ok"}), 200
+            try:
+                import chat_db
+                if request.method == 'GET':
+                    return jsonify({"status": "success", "data": chat_db.get_ai_usage_rates()})
+                data = request.json or {}
+                saved = chat_db.save_ai_usage_rates(data)
+                return jsonify({"status": "success", "data": saved})
+            except Exception as e:
+                logging.error(f"Error in /api/ai_usage/rates: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/settings/<key>', methods=['GET', 'POST', 'OPTIONS'])

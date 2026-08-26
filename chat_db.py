@@ -3,6 +3,8 @@ import uuid
 import os
 import re
 import time
+import json
+import logging
 from email.utils import parseaddr
 from datetime import datetime, timedelta, timezone
 try:
@@ -455,6 +457,30 @@ def init_db():
         c.execute("CREATE INDEX IF NOT EXISTS idx_sales_state_priority ON sales_customer_state(priority);")
         c.execute("CREATE INDEX IF NOT EXISTS idx_sales_state_last_contact_date ON sales_customer_state(last_contact_date DESC);")
         c.execute("CREATE INDEX IF NOT EXISTS idx_sales_state_is_starred ON sales_customer_state(is_starred);")
+
+        c.execute(
+            """
+            CREATE TABLE IF NOT EXISTS ai_usage_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at TIMESTAMP,
+                department TEXT,
+                source TEXT,
+                system_role TEXT,
+                provider TEXT,
+                model TEXT,
+                location TEXT,
+                chat_id TEXT,
+                prompt_tokens INTEGER DEFAULT 0,
+                completion_tokens INTEGER DEFAULT 0,
+                total_tokens INTEGER DEFAULT 0,
+                cost_usd REAL DEFAULT 0,
+                estimated INTEGER DEFAULT 0
+            )
+            """
+        )
+        c.execute("CREATE INDEX IF NOT EXISTS idx_ai_usage_created_at ON ai_usage_events(created_at DESC);")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_ai_usage_department_created_at ON ai_usage_events(department, created_at DESC);")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_ai_usage_provider_created_at ON ai_usage_events(provider, created_at DESC);")
         conn.commit()
 
 def _get_hr_audit_fernet():
@@ -4325,3 +4351,293 @@ def compute_sales_daily_tasks(actor_user_id=None, is_admin=False, locations=None
     out["inactive"] = top_n(out["inactive"], 30)
     out["counts"] = {k: len(v) for k, v in out.items() if isinstance(v, list)}
     return out
+
+
+DEFAULT_AI_USAGE_RATES = {
+    "currency": "USD",
+    "default": {"input_per_1m": 0.14, "output_per_1m": 0.28},
+    "models": {
+        "deepseek-v4-flash": {"input_per_1m": 0.14, "output_per_1m": 0.28},
+        "deepseek-chat": {"input_per_1m": 0.14, "output_per_1m": 0.28},
+        "deepseek-v4-pro": {"input_per_1m": 0.55, "output_per_1m": 2.19},
+        "deepseek-reasoner": {"input_per_1m": 0.55, "output_per_1m": 2.19},
+        "gpt-4o-mini": {"input_per_1m": 0.15, "output_per_1m": 0.60},
+        "gpt-4o": {"input_per_1m": 2.50, "output_per_1m": 10.00},
+        "gpt-5.6-terra": {"input_per_1m": 1.25, "output_per_1m": 10.00},
+        "gpt-5.6-luna": {"input_per_1m": 2.50, "output_per_1m": 15.00},
+        "gpt-5.6-sol": {"input_per_1m": 5.00, "output_per_1m": 20.00},
+        "gpt-5.6": {"input_per_1m": 2.50, "output_per_1m": 15.00},
+    },
+}
+
+
+def _normalize_ai_usage_rates(raw):
+    base = {
+        "currency": "USD",
+        "default": dict(DEFAULT_AI_USAGE_RATES["default"]),
+        "models": {k: dict(v) for k, v in DEFAULT_AI_USAGE_RATES["models"].items()},
+    }
+    if not isinstance(raw, dict):
+        return base
+    currency = str(raw.get("currency") or "USD").strip().upper() or "USD"
+    base["currency"] = currency
+    default = raw.get("default") if isinstance(raw.get("default"), dict) else {}
+    try:
+        if default.get("input_per_1m") is not None:
+            base["default"]["input_per_1m"] = max(0.0, float(default.get("input_per_1m")))
+        if default.get("output_per_1m") is not None:
+            base["default"]["output_per_1m"] = max(0.0, float(default.get("output_per_1m")))
+    except Exception:
+        pass
+    models = raw.get("models") if isinstance(raw.get("models"), dict) else {}
+    for model_name, rates in models.items():
+        name = str(model_name or "").strip()
+        if not name or not isinstance(rates, dict):
+            continue
+        try:
+            inp = float(rates.get("input_per_1m"))
+            outp = float(rates.get("output_per_1m"))
+        except Exception:
+            continue
+        base["models"][name] = {"input_per_1m": max(0.0, inp), "output_per_1m": max(0.0, outp)}
+    return base
+
+
+def get_ai_usage_rates():
+    raw = None
+    try:
+        stored = get_setting("ai_usage_rates")
+        if stored:
+            raw = json.loads(stored)
+    except Exception:
+        raw = None
+    return _normalize_ai_usage_rates(raw)
+
+
+def save_ai_usage_rates(raw):
+    rates = _normalize_ai_usage_rates(raw)
+    try:
+        set_setting("ai_usage_rates", json.dumps(rates, ensure_ascii=False))
+    except Exception:
+        pass
+    return rates
+
+
+def _ai_usage_rate_for_model(model_name, rates=None):
+    rates = rates or get_ai_usage_rates()
+    default = rates.get("default") or DEFAULT_AI_USAGE_RATES["default"]
+    model = str(model_name or "").strip().lower()
+    models = rates.get("models") or {}
+    best_key = ""
+    best_rates = None
+    for key, val in models.items():
+        k = str(key or "").strip().lower()
+        if not k:
+            continue
+        if model == k or model.startswith(k) or k.startswith(model):
+            if len(k) >= len(best_key):
+                best_key = k
+                best_rates = val
+    if isinstance(best_rates, dict):
+        return best_rates
+    return default
+
+
+def estimate_ai_cost_usd(model_name, prompt_tokens, completion_tokens, rates=None):
+    rates = rates or get_ai_usage_rates()
+    per = _ai_usage_rate_for_model(model_name, rates)
+    try:
+        inp = float(per.get("input_per_1m") or 0)
+        outp = float(per.get("output_per_1m") or 0)
+    except Exception:
+        inp, outp = 0.0, 0.0
+    cost = (int(prompt_tokens or 0) / 1_000_000.0) * inp + (int(completion_tokens or 0) / 1_000_000.0) * outp
+    return round(max(0.0, cost), 6)
+
+
+def record_ai_usage_event(
+    department="",
+    source="",
+    system_role="",
+    provider="",
+    model="",
+    location="",
+    chat_id="",
+    prompt_tokens=0,
+    completion_tokens=0,
+    total_tokens=0,
+    cost_usd=0.0,
+    estimated=0,
+):
+    try:
+        prompt_tokens = max(0, int(prompt_tokens or 0))
+        completion_tokens = max(0, int(completion_tokens or 0))
+        total_tokens = max(0, int(total_tokens or (prompt_tokens + completion_tokens)))
+        cost_usd = float(cost_usd or 0)
+    except Exception:
+        return False
+    attempts = 3
+    for attempt in range(attempts):
+        try:
+            with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+                try:
+                    conn.execute("PRAGMA busy_timeout = 15000;")
+                except Exception:
+                    pass
+                conn.execute(
+                    """
+                    INSERT INTO ai_usage_events (
+                        created_at, department, source, system_role, provider, model,
+                        location, chat_id, prompt_tokens, completion_tokens, total_tokens,
+                        cost_usd, estimated
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        get_cairo_time(),
+                        str(department or "Unassigned")[:80],
+                        str(source or "")[:80],
+                        str(system_role or "")[:80],
+                        str(provider or "")[:80],
+                        str(model or "")[:120],
+                        str(location or "")[:80],
+                        str(chat_id or "")[:160],
+                        prompt_tokens,
+                        completion_tokens,
+                        total_tokens,
+                        cost_usd,
+                        1 if estimated else 0,
+                    ),
+                )
+                conn.commit()
+                return True
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower() and attempt < (attempts - 1):
+                time.sleep(0.15 * (attempt + 1))
+                continue
+            logging.error(f"AI usage sqlite write failed: {e}")
+            return False
+        except Exception as e:
+            logging.error(f"AI usage write failed: {e}")
+            return False
+    return False
+
+
+def _ai_usage_date_bounds(from_date, to_date):
+    today = get_cairo_time()[:10]
+    start = str(from_date or "").strip()[:10] or today
+    end = str(to_date or "").strip()[:10] or today
+    if len(start) < 10:
+        start = today
+    if len(end) < 10:
+        end = today
+    if start > end:
+        start, end = end, start
+    return f"{start}T00:00:00", f"{end}T23:59:59.999999"
+
+
+def get_ai_usage_report(from_date=None, to_date=None):
+    start, end = _ai_usage_date_bounds(from_date, to_date)
+    empty = {
+        "from": start[:10],
+        "to": end[:10],
+        "totals": {
+            "requests": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "cost_usd": 0.0,
+            "estimated_requests": 0,
+        },
+        "by_department": [],
+        "by_provider": [],
+        "by_source": [],
+    }
+    try:
+        with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            def _rows(group_col):
+                c.execute(
+                    f"""
+                    SELECT
+                        COALESCE(NULLIF(TRIM({group_col}), ''), 'Unassigned') AS label,
+                        COUNT(*) AS requests,
+                        COALESCE(SUM(prompt_tokens), 0) AS prompt_tokens,
+                        COALESCE(SUM(completion_tokens), 0) AS completion_tokens,
+                        COALESCE(SUM(total_tokens), 0) AS total_tokens,
+                        COALESCE(SUM(cost_usd), 0) AS cost_usd,
+                        COALESCE(SUM(CASE WHEN estimated = 1 THEN 1 ELSE 0 END), 0) AS estimated_requests
+                    FROM ai_usage_events
+                    WHERE created_at >= ? AND created_at <= ?
+                    GROUP BY label
+                    ORDER BY total_tokens DESC
+                    """,
+                    (start, end),
+                )
+                out = []
+                for row in c.fetchall():
+                    out.append({
+                        "label": row["label"],
+                        "requests": int(row["requests"] or 0),
+                        "prompt_tokens": int(row["prompt_tokens"] or 0),
+                        "completion_tokens": int(row["completion_tokens"] or 0),
+                        "total_tokens": int(row["total_tokens"] or 0),
+                        "cost_usd": round(float(row["cost_usd"] or 0), 6),
+                        "estimated_requests": int(row["estimated_requests"] or 0),
+                    })
+                return out
+
+            by_department = _rows("department")
+            by_provider = _rows("provider")
+            c.execute(
+                """
+                SELECT
+                    COALESCE(NULLIF(TRIM(provider), ''), 'unknown') AS provider,
+                    COALESCE(NULLIF(TRIM(model), ''), 'unknown') AS model,
+                    COUNT(*) AS requests,
+                    COALESCE(SUM(prompt_tokens), 0) AS prompt_tokens,
+                    COALESCE(SUM(completion_tokens), 0) AS completion_tokens,
+                    COALESCE(SUM(total_tokens), 0) AS total_tokens,
+                    COALESCE(SUM(cost_usd), 0) AS cost_usd
+                FROM ai_usage_events
+                WHERE created_at >= ? AND created_at <= ?
+                GROUP BY provider, model
+                ORDER BY total_tokens DESC
+                """,
+                (start, end),
+            )
+            by_provider_model = []
+            for row in c.fetchall():
+                by_provider_model.append({
+                    "provider": row["provider"],
+                    "model": row["model"],
+                    "label": f"{row['provider']} / {row['model']}",
+                    "requests": int(row["requests"] or 0),
+                    "prompt_tokens": int(row["prompt_tokens"] or 0),
+                    "completion_tokens": int(row["completion_tokens"] or 0),
+                    "total_tokens": int(row["total_tokens"] or 0),
+                    "cost_usd": round(float(row["cost_usd"] or 0), 6),
+                })
+            by_source = _rows("source")
+            totals = {
+                "requests": sum(x["requests"] for x in by_department),
+                "prompt_tokens": sum(x["prompt_tokens"] for x in by_department),
+                "completion_tokens": sum(x["completion_tokens"] for x in by_department),
+                "total_tokens": sum(x["total_tokens"] for x in by_department),
+                "cost_usd": round(sum(x["cost_usd"] for x in by_department), 6),
+                "estimated_requests": sum(x["estimated_requests"] for x in by_department),
+            }
+            return {
+                "from": start[:10],
+                "to": end[:10],
+                "totals": totals,
+                "by_department": by_department,
+                "by_provider": by_provider,
+                "by_provider_model": by_provider_model,
+                "by_source": by_source,
+            }
+    except Exception as e:
+        logging.error(f"AI usage report failed: {e}")
+        return empty
+

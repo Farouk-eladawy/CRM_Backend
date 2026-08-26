@@ -341,6 +341,30 @@
       "records_synced": 2204,
       "airtable_table_id": "tbl3DJBzGrDIlBnU1",
       "complete": true
+    },
+    "Products_Catalog": {
+      "baserow_table_id": 137,
+      "records_synced": 2,
+      "airtable_table_id": "tblTr0v9wGmN9Bwdg",
+      "complete": true
+    },
+    "Add Guide Name & Phone": {
+      "baserow_table_id": 138,
+      "records_synced": 415,
+      "airtable_table_id": "tblNs1p6J23nhSBm6",
+      "complete": true
+    },
+    "Add Representative Name & Phone": {
+      "baserow_table_id": 139,
+      "records_synced": 16,
+      "airtable_table_id": "tblPczNyohkeovdqp",
+      "complete": true
+    },
+    "Add Supplier Name & Phone": {
+      "baserow_table_id": 140,
+      "records_synced": 11,
+      "airtable_table_id": "tblPQ3QCo9nNTXC2O",
+      "complete": true
     }
   },
   "_note": "Fresh start for Baserow migration."

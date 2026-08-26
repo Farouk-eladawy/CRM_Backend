@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT))
 from tools.migrate_airtable_to_baserow import BaserowApi, load_config, load_state  # noqa: E402
 
 LOGS = [
+    Path(r"C:\Users\Aloosh2020\migrate_list_bundle.log"),
     Path(r"C:\Users\Aloosh2020\migrate_list_fresh.log"),
     Path(r"C:\Users\Aloosh2020\migrate_all.log"),
 ]

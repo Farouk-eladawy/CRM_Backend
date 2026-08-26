@@ -36,6 +36,8 @@ BATCH_SIZE = 15
 MAX_RETRIES = 10
 BATCH_SLEEP_SEC = 0.55
 
+LIST_BUNDLE_EXCLUDE_DEFAULT = ["Grand_Tickets"]
+
 LIST_LINK_TARGETS = [
     "Add Driver Name & Phone copy",
     "Add Guide Name & Phone",
@@ -67,8 +69,17 @@ def discover_list_link_targets(at: "AirtableSource", list_table_name: str = "Lis
     return sorted(names) if names else list(LIST_LINK_TARGETS)
 
 
-def list_bundle_table_names(at: "AirtableSource", list_table_name: str = "List") -> List[str]:
-    deps = discover_list_link_targets(at, list_table_name)
+def list_bundle_table_names(
+    at: "AirtableSource",
+    list_table_name: str = "List",
+    exclude: Optional[List[str]] = None,
+) -> List[str]:
+    exclude_set = {
+        e.strip()
+        for e in (exclude if exclude is not None else LIST_BUNDLE_EXCLUDE_DEFAULT)
+        if e and e.strip()
+    }
+    deps = [n for n in discover_list_link_targets(at, list_table_name) if n not in exclude_set]
     return deps + (["List"] if list_table_name not in deps else [])
 
 
@@ -115,7 +126,7 @@ AIRTABLE_TO_BASEROW = {
     "phoneNumber": "phone_number",
     "singleSelect": "single_select",
     "multipleSelects": "multiple_select",
-    "multipleAttachments": "long_text",
+    "multipleAttachments": "file",
     "multipleRecordLinks": "link_row",
     "formula": "long_text",
     "rollup": "long_text",
@@ -193,6 +204,21 @@ def save_state(state: dict) -> None:
         json.dump(state, f, ensure_ascii=False, indent=2)
 
 
+def extract_attachment_urls(value: Any) -> List[str]:
+    if not value:
+        return []
+    items = value if isinstance(value, list) else [value]
+    urls: List[str] = []
+    for item in items:
+        if isinstance(item, dict):
+            url = str(item.get("url") or "").strip()
+            if url:
+                urls.append(url)
+        elif isinstance(item, str) and item.strip():
+            urls.append(item.strip())
+    return urls
+
+
 def flatten_value(value: Any) -> Any:
     if value is None:
         return None
@@ -207,11 +233,36 @@ def flatten_value(value: Any) -> Any:
     return value
 
 
-def format_for_baserow(value: Any, at_type: str) -> Any:
+def format_for_baserow(
+    value: Any, at_type: str, br: Optional["BaserowApi"] = None, file_cache: Optional[dict] = None
+) -> Any:
     if value is None:
         return None
     if at_type in AUTO_COMPUTED_TYPES:
         return None
+    if at_type == "multipleAttachments":
+        urls = extract_attachment_urls(value)
+        if not urls:
+            return None
+        if br is not None:
+            cache = file_cache if file_cache is not None else {}
+            files: List[dict] = []
+            for url in urls:
+                cached = cache.get(url)
+                if cached:
+                    files.append({"name": cached})
+                    continue
+                try:
+                    uploaded = br.upload_file_via_url(url)
+                    name = str(uploaded.get("name") or "")
+                    if name:
+                        cache[url] = name
+                        files.append({"name": name})
+                except RuntimeError as exc:
+                    print(f"    attachment skip: {exc}")
+            return files or None
+        # Fallback without upload: plain URLs (not JSON)
+        return urls[0] if len(urls) == 1 else "\n".join(urls)
     if at_type in NUMERIC_AS_TEXT or at_type in SELECT_AS_TEXT or at_type in STORE_AS_TEXT:
         if at_type in ("createdBy", "lastModifiedBy") and isinstance(value, dict):
             return value.get("email") or value.get("name") or json.dumps(value, ensure_ascii=False)
@@ -304,6 +355,10 @@ class BaserowApi:
                 continue
             raise RuntimeError(msg)
         raise RuntimeError(f"Baserow {method} {path} -> max retries exceeded")
+
+    def upload_file_via_url(self, file_url: str) -> dict:
+        data = self._req("POST", "/api/user-files/upload-via-url/", json={"url": file_url})
+        return data if isinstance(data, dict) else {}
 
     def list_applications(self) -> List[dict]:
         data = self._req("GET", "/api/applications/")
@@ -418,6 +473,30 @@ def resolve_database_id(br: BaserowApi, br_cfg: dict) -> int:
     raise RuntimeError(
         "Could not detect database_id. Open your database in Baserow; URL contains /database/ID/ — set baserow.database_id in config.json"
     )
+
+
+def ensure_database_id(br: BaserowApi, br_cfg: dict) -> int:
+    """Use configured database if it exists; else find/create FTS target database."""
+    target_name = str(br_cfg.get("database_name") or "FTS Travels's company").strip()
+    workspace_id = int(br_cfg.get("workspace_id") or 2)
+    configured = int(br_cfg.get("database_id") or 0)
+    apps = br.list_applications()
+    by_id = {int(a["id"]): a for a in apps if a.get("id")}
+    if configured and configured in by_id:
+        return configured
+    for app in apps:
+        if str(app.get("type") or "") == "database" and str(app.get("name") or "") == target_name:
+            db_id = int(app["id"])
+            safe_print(f"Using existing database '{target_name}' id={db_id}")
+            return db_id
+    created = br._req(
+        "POST",
+        f"/api/applications/workspace/{workspace_id}/",
+        json={"name": target_name, "type": "database"},
+    )
+    db_id = int(created["id"])
+    safe_print(f"Created database '{target_name}' id={db_id} in workspace {workspace_id}")
+    return db_id
 
 
 class AirtableSource:
@@ -555,6 +634,9 @@ def migrate_table(
 
     link_table_ids[at_id] = tid
     existing_names = {f.get("name") for f in br.list_fields(tid)}
+    br_field_types = {
+        str(f.get("name") or ""): str(f.get("type") or "") for f in br.list_fields(tid)
+    }
     used_names: set[str] = set(existing_names)
     field_name_map: Dict[str, str] = {}
     added = 0
@@ -580,14 +662,29 @@ def migrate_table(
             br.create_field(tid, body)
             added += 1
             existing_names.add(br_name)
+            br_field_types[br_name] = str(body.get("type") or "")
             time.sleep(0.05)
         except RuntimeError as exc:
+            if str(body.get("type") or "") == "file":
+                body = {"name": br_name, "type": "url"}
+                try:
+                    br.create_field(tid, body)
+                    added += 1
+                    existing_names.add(br_name)
+                    br_field_types[br_name] = "url"
+                    print(f"    field fallback {br_name}: file -> url")
+                    time.sleep(0.05)
+                    continue
+                except RuntimeError:
+                    pass
             print(f"    field skip {br_name}: {exc}")
     if skipped_computed:
         print(f"  skipped {skipped_computed} auto-computed Airtable fields (formula/rollup/lookup/system)")
     if added:
         print(f"  added {added} fields")
 
+    br_field_types = {str(f.get("name") or ""): str(f.get("type") or "") for f in br.list_fields(tid)}
+    file_cache: dict[str, str] = {}
     records = at.fetch_records(table_name, max_records=max_records)
     rows: List[dict] = []
     for rec in records:
@@ -599,7 +696,15 @@ def migrate_table(
             if at_type == "multipleRecordLinks":
                 continue  # links in phase 2
             out_key = field_name_map[k]
-            val = format_for_baserow(v, at_type)
+            use_file_upload = (
+                at_type == "multipleAttachments" and br_field_types.get(out_key) == "file"
+            )
+            val = format_for_baserow(
+                v,
+                at_type,
+                br=br if use_file_upload else None,
+                file_cache=file_cache if use_file_upload else None,
+            )
             if val is not None and val != "":
                 row[out_key] = val
         rows.append(row)
@@ -642,12 +747,12 @@ def migrate_table(
 
 
 def cmd_discover(br: BaserowApi, database_id: int, cfg: dict) -> int:
-    print("Applications:")
+    safe_print("Applications:")
     for app in br.list_applications():
-        print(f"  {app.get('name')} id={app.get('id')} type={app.get('type')}")
-    print(f"\nTables in database {database_id}:")
+        safe_print(f"  {app.get('name')} id={app.get('id')} type={app.get('type')}")
+    safe_print(f"\nTables in database {database_id}:")
     for t in br.list_tables(database_id):
-        print(f"  {t.get('name')} id={t.get('id')}")
+        safe_print(f"  {t.get('name')} id={t.get('id')}")
     br_cfg = cfg.setdefault("baserow", {})
     br_cfg["database_id"] = database_id
     save_config(cfg)
@@ -664,11 +769,15 @@ def cmd_migrate(
     skip_existing: bool,
     recreate: bool,
     cfg: dict,
+    fresh_bundle: bool = False,
 ) -> int:
     state = load_state()
     state.setdefault("tables", {})
-    bundle_set = set(table_names) if table_names else None
-    link_table_ids: Dict[str, int] = build_link_table_ids(br, database_id, state, bundle_set)
+    if fresh_bundle:
+        link_table_ids: Dict[str, int] = {}
+    else:
+        bundle_set = set(table_names) if table_names else None
+        link_table_ids = build_link_table_ids(br, database_id, state, bundle_set)
 
     schema_names = {t["name"] for t in at.fetch_schema()}
     table_names = [n for n in table_names if n in schema_names]
@@ -718,6 +827,13 @@ def main() -> int:
         action="store_true",
         help="With --list-bundle: clear saved state for bundle tables before migrate (fresh start)",
     )
+    p.add_argument(
+        "--exclude-tables",
+        nargs="*",
+        default=None,
+        metavar="TABLE",
+        help="Skip tables in --list-bundle (default: Grand_Tickets). Use --exclude-tables with no names to skip nothing.",
+    )
     p.add_argument("--all-tables", action="store_true")
     p.add_argument("--max-records", type=int, default=0)
     p.add_argument("--skip-existing", action="store_true")
@@ -736,7 +852,12 @@ def main() -> int:
     database_id = 0
     db_err = ""
     try:
-        database_id = resolve_database_id(br, br_cfg)
+        if args.cmd == "migrate" and getattr(args, "list_bundle", False):
+            database_id = ensure_database_id(br, br_cfg)
+            br_cfg["database_id"] = database_id
+            save_config(cfg)
+        else:
+            database_id = resolve_database_id(br, br_cfg)
     except RuntimeError as exc:
         db_err = str(exc)
         if args.cmd != "discover":
@@ -754,12 +875,18 @@ def main() -> int:
             print("Set baserow.database_id in config.json", file=sys.stderr)
             return 2
         if args.list_bundle:
-            names = list_bundle_table_names(at)
+            exclude = args.exclude_tables
+            if exclude is None:
+                exclude = list(LIST_BUNDLE_EXCLUDE_DEFAULT)
+            names = list_bundle_table_names(at, exclude=exclude)
             if args.fresh_bundle:
                 state_pre = load_state()
-                n = clear_list_bundle_state(state_pre, names)
+                clear_names = sorted(set(names) | set(exclude))
+                n = clear_list_bundle_state(state_pre, clear_names)
                 save_state(state_pre)
-                print(f"Cleared state for {n} bundle table(s) (fresh start)")
+                print(f"Cleared state for {n} table(s) (fresh start)")
+            if exclude:
+                print(f"Excluded: {', '.join(exclude)}")
             print(f"List bundle: {len(names) - 1} linked table(s) + List = {len(names)} total")
             for n in names:
                 print(f"  - {n}")
@@ -774,6 +901,7 @@ def main() -> int:
         return cmd_migrate(
             br, at, database_id, names,
             args.max_records, args.skip_existing, args.recreate, cfg,
+            fresh_bundle=bool(args.list_bundle and args.fresh_bundle),
         )
     return 1
 

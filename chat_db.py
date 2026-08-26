@@ -2245,6 +2245,71 @@ def get_chat_by_record_id(record_id):
         row = c.fetchone()
         return dict(row) if row else None
 
+def sync_conversation_locations_from_des(airtable_record_id, des):
+    """
+    Update inbox location for every chat linked to this Airtable record when des is set.
+    Returns the number of conversations updated.
+    """
+    from chat_location import derive_chat_location_from_des, extract_des_from_fields
+
+    record_id = str(airtable_record_id or "").strip()
+    if not record_id:
+        return 0
+    des_value = str(des or "").strip() if not isinstance(des, dict) else extract_des_from_fields(des)
+    if not des_value:
+        return 0
+
+    new_location = derive_chat_location_from_des(des_value)
+    updated = 0
+    with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+        c = conn.cursor()
+        c.execute(
+            """
+            SELECT chat_id, location
+            FROM conversations
+            WHERE airtable_record_id = ?
+            """,
+            (record_id,),
+        )
+        rows = c.fetchall() or []
+        for chat_id, current_loc in rows:
+            if str(current_loc or "").strip() == new_location:
+                continue
+            c.execute(
+                "UPDATE conversations SET location = ? WHERE chat_id = ?",
+                (new_location, chat_id),
+            )
+            updated += 1
+            logging.info(
+                "Synced chat %s location %s -> %s from Airtable des=%r (record %s)",
+                chat_id,
+                current_loc,
+                new_location,
+                des_value,
+                record_id,
+            )
+        if updated:
+            conn.commit()
+    return updated
+
+def sync_conversation_locations_from_list_records(records):
+    """Batch helper for Airtable mirror / backfill scripts."""
+    total = 0
+    for item in records or []:
+        if not item:
+            continue
+        if isinstance(item, (list, tuple)) and len(item) >= 2:
+            record_id, fields = item[0], item[1]
+        elif isinstance(item, dict):
+            record_id = item.get("id") or item.get("airtable_id")
+            fields = item.get("fields") or {}
+        else:
+            continue
+        from chat_location import extract_des_from_fields
+
+        total += sync_conversation_locations_from_des(record_id, extract_des_from_fields(fields))
+    return total
+
 def find_whatsapp_conversation_by_phone(phone):
     clean_phone = re.sub(r'\D', '', str(phone or ''))
     if not clean_phone:

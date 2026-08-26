@@ -3121,7 +3121,23 @@ class AIAgent:
     def _update_airtable_table_record(self, table, record_id, updates, typecast=False):
         """Apply a normalized Airtable update against any table handle."""
         normalized_updates = self._normalize_airtable_update_keys(updates)
-        return table.update(record_id, normalized_updates, typecast=typecast)
+        result = table.update(record_id, normalized_updates, typecast=typecast)
+        des_value = None
+        for key in (FieldIds.DES, "des", "DES"):
+            if key in (normalized_updates or {}):
+                des_value = normalized_updates.get(key)
+                break
+        if des_value is not None:
+            try:
+                import chat_db
+                chat_db.sync_conversation_locations_from_des(record_id, des_value)
+            except Exception as sync_err:
+                logging.warning(
+                    "Failed to sync chat location after Airtable des update for %s: %s",
+                    record_id,
+                    sync_err,
+                )
+        return result
 
     def _filter_updates_for_leads_crm(self, updates):
         """Keep only fields that exist on Leads CRM; drop List-only keys."""
@@ -3610,24 +3626,16 @@ class AIAgent:
             if pinned_loc in {"Sharm", "Hurghada/Cairo", "Sales", "Quality", "Religious"}:
                 return pinned_loc
 
-        destination = self.get_field_value(raw_fields, FieldIds.DES) or ""
-        destination_text = str(destination).strip().lower()
-        if "sharm" in destination_text or "ras mohamed" in destination_text:
-            return "Sharm"
-        if destination_text:
-            return "Hurghada/Cairo"
+        from chat_location import derive_chat_location_from_des
 
-        fallback = str(fallback_location or "").strip()
-        fallback_lower = fallback.lower()
-        if "sharm" in fallback_lower or "ras mohamed" in fallback_lower:
-            return "Sharm"
-        if any(k in fallback_lower for k in ("hurghada", "cairo", "giza", "luxor", "aswan", "alexandria")):
-            return "Hurghada/Cairo"
-        if fallback_lower == "sales" and not is_leads_table:
-            return "Hurghada/Cairo"
-        if fallback in {"Sharm", "Hurghada/Cairo", "Sales", "Quality", "Unknown", "Religious"}:
-            return fallback
-        return "Unknown"
+        destination = self.get_field_value(raw_fields, FieldIds.DES) or ""
+        derived = derive_chat_location_from_des(destination, fallback_location)
+        if destination and str(destination).strip():
+            return derived
+        if fallback_lower := str(fallback_location or "").strip().lower():
+            if fallback_lower == "sales" and not is_leads_table:
+                return "Hurghada/Cairo"
+        return derived
 
     def append_to_chat_log(self, record_id, message, sender="AI", source="System", table_name=None, skip_local_sync=False):
         """
@@ -9548,7 +9556,25 @@ Conversation:
             conv = chat_db.get_conversation(chat_id) or {}
         except Exception:
             conv = {}
-        if str((conv or {}).get("airtable_record_id") or "").strip():
+        existing_record_id = str((conv or {}).get("airtable_record_id") or "").strip()
+        if existing_record_id:
+            try:
+                rec = self._get_record_from_any_table(existing_record_id) or {}
+                fields = rec.get("fields", {}) if isinstance(rec, dict) else {}
+                if fields:
+                    db_location = self._derive_chat_location_from_fields(
+                        fields,
+                        fallback_location=location or (conv or {}).get("location") or "Unknown",
+                        receiving_phone_id=receiving_phone_id,
+                    )
+                    if db_location and db_location != (conv or {}).get("location"):
+                        chat_db.update_conversation_info(chat_id=chat_id, location=db_location)
+            except Exception as sync_err:
+                logging.warning(
+                    "Failed to re-sync location for linked OTA chat %s: %s",
+                    chat_id,
+                    sync_err,
+                )
             return True
         booking_nr = self._extract_explicit_ota_booking_number(
             thread_id, sender_identifier, subject, message_body

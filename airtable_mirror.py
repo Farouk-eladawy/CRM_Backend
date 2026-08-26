@@ -1004,6 +1004,12 @@ class AirtableMirror:
                     c.executemany("INSERT INTO mirror_list_fts (airtable_id, content) VALUES (?, ?)", fts_values)
                 except Exception:
                     pass
+        try:
+            import chat_db
+
+            chat_db.sync_conversation_locations_from_list_records(records)
+        except Exception:
+            pass
 
     def upsert_main_list_record(self, airtable_id, fields, override_table_key=None):
         table_key = str(override_table_key or "").strip() or None
@@ -1020,6 +1026,14 @@ class AirtableMirror:
                 if table_key == self._get_table_key_for_main_list():
                     self._update_list_projection(str(airtable_id), fields or {})
                     self.bump_list_data_version()
+                    try:
+                        import chat_db
+
+                        chat_db.sync_conversation_locations_from_list_records(
+                            [(str(airtable_id), fields or {})]
+                        )
+                    except Exception:
+                        pass
             except Exception:
                 pass
             return True

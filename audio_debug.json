@@ -110300,3 +110300,85 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0F744ED6428ECD92A39"
+    },
+    "keyId": "3EB0F744ED6428ECD92A39",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:3269 in update_booking_record\nLogger: root\nReason: Failed to update record rec5IVPpW1cb5qLgn in Leads CRM: ('503 Server Error: Service Unavailable for url: https://api.airtable.com/v0/appTp5YgSp9DV2HYc/Leads%20CRM/rec5IVPpW1cb5qLgn', \"{'type': 'RETRIABLE_ERROR', 'message': 'Server encountered an error while processing your request, and it is safe to retry the request'}\")\nAt: 2026-08-26 14:06:58"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787605619,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787778419,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-26T14:07:00.640Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB094D20C0F31FC8F68DD"
+    },
+    "keyId": "3EB094D20C0F31FC8F68DD",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:6064 in update_booking_from_extracted_data\nLogger: root\nReason: Error updating booking from extracted data: ('503 Server Error: Service Unavailable for url: https://api.airtable.com/v0/appTp5YgSp9DV2HYc/Leads%20CRM/rec5IVPpW1cb5qLgn', \"{'type': 'RETRIABLE_ERROR', 'message': 'Server encountered an error while processing your request, and it is safe to retry the request'}\")\nAt: 2026-08-26 14:07:00"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787605621,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1787778421,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-26T14:07:02.527Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

@@ -10,7 +10,7 @@ Setup:
 
 Usage:
   python tools/migrate_airtable_to_baserow.py discover
-  python tools/migrate_airtable_to_baserow.py migrate --link-deps
+  python tools/migrate_airtable_to_baserow.py migrate --list-bundle --skip-existing
   python tools/migrate_airtable_to_baserow.py migrate --tables List
   python tools/migrate_airtable_to_baserow.py migrate --all-tables --skip-existing
 """
@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 import requests
+from requests.exceptions import ChunkedEncodingError, ConnectionError as ReqConnectionError, Timeout
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -31,8 +32,9 @@ sys.path.insert(0, str(ROOT))
 from airtable_fields import TABLE_NAME  # noqa: E402
 
 STATE_PATH = ROOT / "baserow_migration_state.json"
-BATCH_SIZE = 25
-MAX_RETRIES = 8
+BATCH_SIZE = 15
+MAX_RETRIES = 10
+BATCH_SLEEP_SEC = 0.55
 
 LIST_LINK_TARGETS = [
     "Add Driver Name & Phone copy",
@@ -43,6 +45,59 @@ LIST_LINK_TARGETS = [
     "Grand_Tickets",
     "Products_Catalog",
 ]
+
+
+def discover_list_link_targets(at: "AirtableSource", list_table_name: str = "List") -> List[str]:
+    """Return Airtable table names linked from List via multipleRecordLinks."""
+    try:
+        tbl = at.table_by_name(list_table_name)
+    except RuntimeError:
+        return list(LIST_LINK_TARGETS)
+    id_to_name = {str(t["id"]): t["name"] for t in at.fetch_schema()}
+    names: List[str] = []
+    seen: set[str] = set()
+    for field in tbl.get("fields") or []:
+        if str(field.get("type") or "") != "multipleRecordLinks":
+            continue
+        linked_id = str((field.get("options") or {}).get("linkedTableId") or "")
+        linked_name = id_to_name.get(linked_id)
+        if linked_name and linked_name not in seen:
+            seen.add(linked_name)
+            names.append(linked_name)
+    return sorted(names) if names else list(LIST_LINK_TARGETS)
+
+
+def list_bundle_table_names(at: "AirtableSource", list_table_name: str = "List") -> List[str]:
+    deps = discover_list_link_targets(at, list_table_name)
+    return deps + (["List"] if list_table_name not in deps else [])
+
+
+def clear_list_bundle_state(state: dict, bundle_names: List[str]) -> int:
+    tables = state.setdefault("tables", {})
+    removed = 0
+    for name in bundle_names:
+        if name in tables:
+            del tables[name]
+            removed += 1
+    return removed
+
+
+def build_link_table_ids(
+    br: BaserowApi, database_id: int, state: dict, bundle_names: Optional[set[str]] = None
+) -> Dict[str, int]:
+    """Map Airtable table id -> Baserow table id, only when table still exists."""
+    out: Dict[str, int] = {}
+    for name, info in (state.get("tables") or {}).items():
+        if bundle_names and name in bundle_names:
+            continue
+        at_id = str(info.get("airtable_table_id") or "")
+        tid = int(info.get("baserow_table_id") or 0)
+        if not at_id or not tid:
+            continue
+        found = br.find_table_by_name(database_id, name)
+        if found and int(found["id"]) == tid:
+            out[at_id] = tid
+    return out
 
 AIRTABLE_TO_BASEROW = {
     "singleLineText": "text",
@@ -107,6 +162,13 @@ STORE_AS_TEXT = {
     "email",
     "url",
 }
+
+
+def safe_print(msg: str) -> None:
+    try:
+        print(msg, flush=True)
+    except UnicodeEncodeError:
+        print(msg.encode("ascii", "replace").decode("ascii"), flush=True)
 
 
 def load_config() -> dict:
@@ -214,13 +276,21 @@ class BaserowApi:
         url = f"{self.base_url}{path}"
         delay = 2.0
         for attempt in range(1, MAX_RETRIES + 1):
-            for auth_try in range(2):
-                resp = self.session.request(method, url, timeout=180, **kwargs)
-                if resp.status_code == 401 and self._reauth and auth_try == 0:
-                    print("    refreshing expired JWT...")
-                    self._set_token(self._reauth(), "JWT")
-                    continue
-                break
+            try:
+                for auth_try in range(2):
+                    resp = self.session.request(method, url, timeout=180, **kwargs)
+                    if resp.status_code == 401 and self._reauth and auth_try == 0:
+                        print("    refreshing expired JWT...")
+                        self._set_token(self._reauth(), "JWT")
+                        continue
+                    break
+            except (ReqConnectionError, Timeout, ChunkedEncodingError) as exc:
+                if attempt >= MAX_RETRIES:
+                    raise RuntimeError(f"Baserow {method} {path} -> connection error: {exc}") from exc
+                print(f"    retry {method} ({attempt}/{MAX_RETRIES}) connection: {exc}")
+                time.sleep(delay)
+                delay = min(delay * 2, 90)
+                continue
             if resp.ok:
                 if resp.status_code == 204 or not resp.content:
                     return None
@@ -230,7 +300,7 @@ class BaserowApi:
             if retryable:
                 print(f"    retry {method} ({attempt}/{MAX_RETRIES}) after error: {msg[:120]}")
                 time.sleep(delay)
-                delay = min(delay * 2, 60)
+                delay = min(delay * 2, 90)
                 continue
             raise RuntimeError(msg)
         raise RuntimeError(f"Baserow {method} {path} -> max retries exceeded")
@@ -276,6 +346,9 @@ class BaserowApi:
                         "HTTP 409",
                         "HTTP 429",
                         "HTTP 401",
+                        "connection error",
+                        "Connection aborted",
+                        "Remote end closed",
                     )
                 )
                 if not retryable or attempt >= MAX_RETRIES:
@@ -552,7 +625,7 @@ def migrate_table(
                 "complete": False,
             }
             save_state(state)
-        time.sleep(0.35)
+        time.sleep(BATCH_SLEEP_SEC)
 
     result = {
         "baserow_table_id": tid,
@@ -594,11 +667,8 @@ def cmd_migrate(
 ) -> int:
     state = load_state()
     state.setdefault("tables", {})
-    link_table_ids: Dict[str, int] = {
-        str(info.get("airtable_table_id") or ""): int(info["baserow_table_id"])
-        for info in state.get("tables", {}).values()
-        if info.get("baserow_table_id") and info.get("airtable_table_id")
-    }
+    bundle_set = set(table_names) if table_names else None
+    link_table_ids: Dict[str, int] = build_link_table_ids(br, database_id, state, bundle_set)
 
     schema_names = {t["name"] for t in at.fetch_schema()}
     table_names = [n for n in table_names if n in schema_names]
@@ -638,6 +708,16 @@ def main() -> int:
     p = sub.add_parser("migrate")
     p.add_argument("--tables", nargs="*", default=[])
     p.add_argument("--link-deps", action="store_true")
+    p.add_argument(
+        "--list-bundle",
+        action="store_true",
+        help="Migrate List link-deps (discovered from schema) then List",
+    )
+    p.add_argument(
+        "--fresh-bundle",
+        action="store_true",
+        help="With --list-bundle: clear saved state for bundle tables before migrate (fresh start)",
+    )
     p.add_argument("--all-tables", action="store_true")
     p.add_argument("--max-records", type=int, default=0)
     p.add_argument("--skip-existing", action="store_true")
@@ -673,8 +753,18 @@ def main() -> int:
         if not database_id:
             print("Set baserow.database_id in config.json", file=sys.stderr)
             return 2
-        if args.link_deps:
-            names = list(LIST_LINK_TARGETS)
+        if args.list_bundle:
+            names = list_bundle_table_names(at)
+            if args.fresh_bundle:
+                state_pre = load_state()
+                n = clear_list_bundle_state(state_pre, names)
+                save_state(state_pre)
+                print(f"Cleared state for {n} bundle table(s) (fresh start)")
+            print(f"List bundle: {len(names) - 1} linked table(s) + List = {len(names)} total")
+            for n in names:
+                print(f"  - {n}")
+        elif args.link_deps:
+            names = discover_list_link_targets(at)
         elif args.all_tables:
             names = [t["name"] for t in at.fetch_schema()]
         elif args.tables:

@@ -1,45 +1,9 @@
 {
   "tables": {
-    "Products_Catalog": {
-      "baserow_table_id": 83,
-      "records_synced": 2,
-      "airtable_table_id": "tblTr0v9wGmN9Bwdg",
-      "complete": true
-    },
-    "Add Guide Name & Phone": {
-      "baserow_table_id": 8,
-      "records_synced": 422,
-      "airtable_table_id": "tblNs1p6J23nhSBm6",
-      "complete": true
-    },
-    "Grand_Tickets": {
-      "baserow_table_id": 5,
-      "records_synced": 18465,
-      "airtable_table_id": "tblD0FduWq7fCTHBM",
-      "complete": true
-    },
-    "Add Representative Name & Phone": {
-      "baserow_table_id": 9,
-      "records_synced": 16,
-      "airtable_table_id": "tblPczNyohkeovdqp",
-      "complete": true
-    },
-    "Add Supplier Name & Phone": {
-      "baserow_table_id": 10,
-      "records_synced": 11,
-      "airtable_table_id": "tblPQ3QCo9nNTXC2O",
-      "complete": true
-    },
     "Conversations": {
       "baserow_table_id": 11,
       "records_synced": 0,
       "airtable_table_id": "tbl6pMRC6rSxCsHWD",
-      "complete": true
-    },
-    "Add Driver Name & Phone copy": {
-      "baserow_table_id": 12,
-      "records_synced": 603,
-      "airtable_table_id": "tblUJidvg0lqTZ3Ev",
       "complete": true
     },
     "MPC": {
@@ -377,12 +341,6 @@
       "records_synced": 2204,
       "airtable_table_id": "tbl3DJBzGrDIlBnU1",
       "complete": true
-    },
-    "List": {
-      "baserow_table_id": 84,
-      "records_synced": 15575,
-      "airtable_table_id": "tblJodXmOWKiYqiXS",
-      "complete": false
     }
   },
   "_note": "Fresh start for Baserow migration."

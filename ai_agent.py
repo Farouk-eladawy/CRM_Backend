@@ -4913,6 +4913,39 @@ class AIAgent:
             return "[AI_PROVIDER_FAILED_SILENTLY]"
         return ""
 
+    def _infer_usage_source_from_caller(self):
+        import inspect
+        skip = {
+            "query_ai",
+            "_safe_query_ai",
+            "_record_ai_usage_from_result",
+            "_step_ai",
+            "extract_and_update_booking_data",
+        }
+        caller_map = {
+            "extract_booking_data_using_ai": "booking_extraction",
+            "parse_operations_booking_draft": "operations_booking_draft",
+            "parse_operations_filter_prompt": "operations_filter_parse",
+            "extract_contact_from_text": "contact_extraction",
+            "get_booking_record_from_history": "booking_from_history",
+            "generate_smart_reply": "message_classification",
+            "classify_supplier_email_type": "supplier_email_classify",
+            "detect_inquiry_in_supplier_email": "supplier_email_inquiry",
+            "analyze_email_relevance": "supplier_email_relevance",
+            "process_supplier_booking": "supplier_booking_extract",
+            "_run_ai_request_mediator": "internal_assistant_mediator",
+            "_dashboard_assess_reply_batch": "quality_reply_assessment",
+            "update_sales_state_from_recent_messages": "sales_chat_analysis",
+            "_step_ai": "automation_workflow",
+        }
+        for frame in inspect.stack()[2:14]:
+            fn = str(frame.function or "").strip()
+            if not fn or fn in skip:
+                continue
+            if fn in caller_map:
+                return caller_map[fn]
+        return None
+
     def _ai_usage_department(self, location=None, system_role="assistant", usage_department=None):
         explicit = str(usage_department or "").strip()
         if explicit:
@@ -4933,6 +4966,9 @@ class AIAgent:
         explicit = str(usage_source or "").strip()
         if explicit:
             return explicit
+        inferred = self._infer_usage_source_from_caller()
+        if inferred:
+            return inferred
         role = str(system_role or "").strip().lower()
         mapping = {
             "assistant": "customer_auto_reply",
@@ -4963,11 +4999,17 @@ class AIAgent:
         prompt_tokens = 0
         completion_tokens = 0
         total_tokens = 0
+        prompt_cache_hit_tokens = None
+        prompt_cache_miss_tokens = None
         estimated = 0
         try:
             prompt_tokens = int(usage.get("prompt_tokens") or 0)
             completion_tokens = int(usage.get("completion_tokens") or 0)
             total_tokens = int(usage.get("total_tokens") or 0)
+            if usage.get("prompt_cache_hit_tokens") is not None:
+                prompt_cache_hit_tokens = int(usage.get("prompt_cache_hit_tokens") or 0)
+            if usage.get("prompt_cache_miss_tokens") is not None:
+                prompt_cache_miss_tokens = int(usage.get("prompt_cache_miss_tokens") or 0)
         except Exception:
             prompt_tokens = completion_tokens = total_tokens = 0
         if prompt_tokens <= 0 and completion_tokens <= 0:
@@ -4975,10 +5017,20 @@ class AIAgent:
             prompt_tokens = max(1, int(len(str(prompt or "")) / 4))
             completion_tokens = max(1, int(len(str(content or "")) / 4))
             total_tokens = prompt_tokens + completion_tokens
+            prompt_cache_hit_tokens = 0
+            prompt_cache_miss_tokens = prompt_tokens
         elif total_tokens <= 0:
             total_tokens = prompt_tokens + completion_tokens
         model_name = str(model or "").strip()
-        cost_usd = chat_db.estimate_ai_cost_usd(model_name, prompt_tokens, completion_tokens)
+        created_at = chat_db.get_cairo_time()
+        cost_usd = chat_db.estimate_ai_cost_usd(
+            model_name,
+            prompt_tokens,
+            completion_tokens,
+            prompt_cache_hit_tokens=prompt_cache_hit_tokens,
+            prompt_cache_miss_tokens=prompt_cache_miss_tokens,
+            created_at=created_at,
+        )
         department = self._ai_usage_department(location, system_role, usage_department)
         source = self._ai_usage_source(system_role, usage_source)
         threading.Thread(
@@ -4994,8 +5046,11 @@ class AIAgent:
                 "prompt_tokens": prompt_tokens,
                 "completion_tokens": completion_tokens,
                 "total_tokens": total_tokens,
+                "prompt_cache_hit_tokens": prompt_cache_hit_tokens or 0,
+                "prompt_cache_miss_tokens": prompt_cache_miss_tokens if prompt_cache_miss_tokens is not None else prompt_tokens,
                 "cost_usd": cost_usd,
                 "estimated": estimated,
+                "created_at": created_at,
             },
             daemon=True,
         ).start()
@@ -5355,7 +5410,9 @@ class AIAgent:
             session_state=session_state,
             current_intent=current_intent,
         )
-        raw_output = str(self.query_ai(prompt, system_role="structured_mediator") or "").strip()
+        raw_output = str(
+            self.query_ai(prompt, system_role="structured_mediator", usage_source="internal_assistant_mediator") or ""
+        ).strip()
         parsed = self._extract_first_json_object(raw_output)
         normalized = self._normalize_ai_request_mediator_result(parsed)
         normalized["raw_output"] = raw_output[:2000]
@@ -5478,7 +5535,7 @@ class AIAgent:
         Conversation:
         {text}
         """
-        extracted_data_json = self.query_ai(extraction_prompt, system_role="analyzer")
+        extracted_data_json = self.query_ai(extraction_prompt, system_role="analyzer", usage_source="booking_extraction")
         
         try:
             extracted_data_json = str(extracted_data_json or "").strip()
@@ -5568,7 +5625,7 @@ Booking details:
 {raw}
 """
         try:
-            ai_out = self.query_ai(prompt, system_role="analyzer")
+            ai_out = self.query_ai(prompt, system_role="analyzer", usage_source="operations_booking_draft")
             cleaned = str(ai_out or "").strip()
             if not cleaned or "[ESCALATE]" in cleaned or "All AI providers failed" in cleaned:
                 return {}
@@ -5726,7 +5783,7 @@ User request:
 {raw}
 """
         try:
-            ai_out = self.query_ai(prompt, system_role="analyzer")
+            ai_out = self.query_ai(prompt, system_role="analyzer", usage_source="operations_filter_parse")
             cleaned = str(ai_out or "").strip()
             if not cleaned or "[ESCALATE]" in cleaned or "All AI providers failed" in cleaned:
                 return []
@@ -7215,7 +7272,7 @@ User request:
         {history_text}
         {body}
         """
-        result_json = self.query_ai(prompt, system_role="analyzer")
+        result_json = self.query_ai(prompt, system_role="analyzer", usage_source="contact_extraction")
         try:
              result_json = str(result_json or "").strip()
              if not result_json or "[ESCALATE]" in result_json or "All AI providers failed" in result_json:
@@ -7231,7 +7288,7 @@ User request:
 
     def get_booking_record_from_history(self, history_text):
         prompt = f'Extract only booking number as JSON with key "Booking Nr.":\\n{history_text}'
-        out = self.query_ai(prompt, system_role="analyzer")
+        out = self.query_ai(prompt, system_role="analyzer", usage_source="booking_from_history")
         try:
             out = str(out or "").strip()
             if not out or "[ESCALATE]" in out or "All AI providers failed" in out:
@@ -7375,7 +7432,9 @@ User request:
 
         Output format: "INTENT|DEPARTMENT" (e.g. "PICKUP_QUERY|OPERATIONS")"""
         
-        classification_result = self.query_ai(classify_prompt, system_role="analyzer").strip()
+        classification_result = self.query_ai(
+            classify_prompt, system_role="analyzer", usage_source="message_classification"
+        ).strip()
         
         if "|" in classification_result:
             kind, department = classification_result.split("|", 1)
@@ -9012,7 +9071,7 @@ INSTRUCTIONS:
         """
         
         try:
-            response = self.query_ai(prompt, system_role="analyzer").strip().upper()
+            response = self.query_ai(prompt, system_role="analyzer", usage_source="supplier_email_classify").strip().upper()
             # Cleanup
             valid_types = ['BOOKING_CONFIRMATION', 'CANCELLATION', 'CUSTOMER_INQUIRY', 'ADDITIONAL_INFO', 'OTHER']
             for vt in valid_types:
@@ -9057,7 +9116,7 @@ INSTRUCTIONS:
             Email Body (Excerpt):
             {body[:2000]}...
             """
-            response = self.query_ai(prompt, system_role="analyzer")
+            response = self.query_ai(prompt, system_role="analyzer", usage_source="supplier_email_inquiry")
             if "YES" in response.upper():
                 return True
                 
@@ -9102,7 +9161,7 @@ INSTRUCTIONS:
         """
         
         try:
-            response = self.query_ai(prompt, system_role="analyzer").strip().upper()
+            response = self.query_ai(prompt, system_role="analyzer", usage_source="supplier_email_relevance").strip().upper()
             if "PROCESS" in response:
                 return True, "AI decided to Process"
             else:
@@ -9167,7 +9226,7 @@ INSTRUCTIONS:
         """
         
         try:
-            result_json = self.query_ai(prompt, system_role="analyzer")
+            result_json = self.query_ai(prompt, system_role="analyzer", usage_source="supplier_booking_extract")
             result_json = str(result_json or "").strip()
             if not result_json or "[ESCALATE]" in result_json or "All AI providers failed" in result_json:
                 return False
@@ -9378,7 +9437,7 @@ Conversation:
 """
 
         try:
-            ai_out = self.query_ai(prompt, system_role="analyzer")
+            ai_out = self.query_ai(prompt, system_role="analyzer", usage_source="sales_chat_analysis")
         except Exception as e:
             logging.error(f"Sales analyze: AI query failed: {e}", exc_info=True)
             ai_out = None
@@ -30295,9 +30354,13 @@ Prefer the MarkItDown Extraction section below when present.
                 return False, "forbidden"
             return True, None
 
-        def _safe_query_ai(prompt, system_role="analyzer"):
+        def _safe_query_ai(prompt, system_role="analyzer", usage_source=None):
             try:
-                out = self.query_ai(prompt, system_role=system_role)
+                out = self.query_ai(
+                    prompt,
+                    system_role=system_role,
+                    usage_source=usage_source,
+                )
             except Exception as e:
                 logging.error(f"AI query failed: {e}", exc_info=True)
                 out = None
@@ -30358,7 +30421,7 @@ Prefer the MarkItDown Extraction section below when present.
                 "{\"assessments\":[{\"reply_id\":\"...\",\"label\":\"correct|incorrect\",\"reason\":\"short reason\"}]}\n\n"
                 f"Replies:\n{json.dumps(batch, ensure_ascii=False)}"
             )
-            ai_out = _safe_query_ai(prompt, system_role="analyzer")
+            ai_out = _safe_query_ai(prompt, system_role="analyzer", usage_source="quality_reply_assessment")
             if "[ESCALATE]" in str(ai_out or ""):
                 return _dashboard_fallback_assessment(batch)
             try:
@@ -30398,7 +30461,7 @@ Prefer the MarkItDown Extraction section below when present.
                 "Base the analysis on the metrics below and mention the value of the AI assistant when relevant.\n\n"
                 f"Metrics:\n{json.dumps({'summary': summary, 'quality': quality}, ensure_ascii=False)}"
             )
-            ai_out = _safe_query_ai(prompt, system_role="analyzer")
+            ai_out = _safe_query_ai(prompt, system_role="analyzer", usage_source="team_performance_analysis")
             if "[ESCALATE]" in str(ai_out or ""):
                 quality_ratio = float(quality.get("correct_ratio_pct") or 0.0)
                 human_24h = int(summary.get("human_replies_24h") or 0)
@@ -32235,7 +32298,7 @@ Conversation:
 {convo_text}
 """
 
-                ai_out = _safe_query_ai(prompt, system_role="analyzer")
+                ai_out = _safe_query_ai(prompt, system_role="analyzer", usage_source="sales_chat_analysis")
                 if "[ESCALATE]" in ai_out:
                     chat_db.upsert_sales_state(chat_id=chat_id, updates={"needs_ai_review": 1})
                     return jsonify({"status": "error", "message": ai_out}), 502
@@ -42124,7 +42187,7 @@ Write ONE short message only. No JSON. No explanations."""
                 )
                 prompt = prompt + transcript
 
-                ai_text = _safe_query_ai(prompt, system_role="analyzer")
+                ai_text = _safe_query_ai(prompt, system_role="analyzer", usage_source="conversation_summary")
                 cleaned = _clean_json_text(ai_text)
                 parsed = None
                 try:

@@ -242,6 +242,7 @@ class AutomationEngine:
             "now": _utc_now(),
             "event": {"type": event_type, "payload": event_payload or {}},
             "vars": {},
+            "workflow": {"id": wid, "name": str(wf.get("name") or wid).strip()},
         }
 
         chat_id = str((event_payload or {}).get("chat_id") or "").strip()
@@ -351,7 +352,10 @@ class AutomationEngine:
         output_key = str(step.get("output_key") or "ai").strip() or "ai"
         if not prompt:
             return
-        res = self.agent.query_ai(prompt, system_role=system_role)
+        wf = ctx.get("workflow") if isinstance(ctx.get("workflow"), dict) else {}
+        wf_label = str(wf.get("name") or wf.get("id") or "unknown").strip() or "unknown"
+        usage_source = f"automation:{wf_label}"
+        res = self.agent.query_ai(prompt, system_role=system_role, usage_source=usage_source)
         ctx["vars"][output_key] = res
 
     def _step_airtable_update(self, step: dict, ctx: dict):

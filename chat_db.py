@@ -481,6 +481,14 @@ def init_db():
         c.execute("CREATE INDEX IF NOT EXISTS idx_ai_usage_created_at ON ai_usage_events(created_at DESC);")
         c.execute("CREATE INDEX IF NOT EXISTS idx_ai_usage_department_created_at ON ai_usage_events(department, created_at DESC);")
         c.execute("CREATE INDEX IF NOT EXISTS idx_ai_usage_provider_created_at ON ai_usage_events(provider, created_at DESC);")
+        c.execute("PRAGMA table_info(ai_usage_events)")
+        ai_usage_cols = [col[1] for col in c.fetchall()]
+        if "prompt_cache_hit_tokens" not in ai_usage_cols:
+            c.execute("ALTER TABLE ai_usage_events ADD COLUMN prompt_cache_hit_tokens INTEGER DEFAULT 0")
+        if "prompt_cache_miss_tokens" not in ai_usage_cols:
+            c.execute("ALTER TABLE ai_usage_events ADD COLUMN prompt_cache_miss_tokens INTEGER DEFAULT 0")
+        if "pricing_tier" not in ai_usage_cols:
+            c.execute("ALTER TABLE ai_usage_events ADD COLUMN pricing_tier TEXT")
         conn.commit()
 
 def _get_hr_audit_fernet():
@@ -4353,14 +4361,98 @@ def compute_sales_daily_tasks(actor_user_id=None, is_admin=False, locations=None
     return out
 
 
+AI_USAGE_SOURCE_LABELS = {
+    "booking_extraction": {"en": "Booking data extraction", "ar": "استخراج بيانات الحجز من الرسائل/الإيميل"},
+    "operations_booking_draft": {"en": "Operations booking draft parser", "ar": "تحليل مسودة حجز (Operations)"},
+    "operations_filter_parse": {"en": "Operations filter builder (AI)", "ar": "بناء فلاتر العمليات بالذكاء الاصطناعي"},
+    "contact_extraction": {"en": "Contact extraction", "ar": "استخراج إيميل/هاتف"},
+    "booking_from_history": {"en": "Booking number from history", "ar": "استخراج رقم الحجز من السجل"},
+    "message_classification": {"en": "Customer message intent classification", "ar": "تصنيف نية رسالة العميل (Intent)"},
+    "supplier_email_classify": {"en": "Supplier email classification", "ar": "تصنيف إيميلات الموردين (OTA)"},
+    "supplier_email_inquiry": {"en": "Supplier email inquiry detection", "ar": "كشف استفسار داخل إيميل المورد"},
+    "supplier_email_relevance": {"en": "Email spam/relevance filter", "ar": "فلترة الإيميلات (Spam / Process)"},
+    "supplier_booking_extract": {"en": "Supplier booking extraction", "ar": "استخراج حجز من إيميل المورد"},
+    "quality_reply_assessment": {"en": "Quality — reply assessment", "ar": "تقييم جودة ردود الموظفين"},
+    "team_performance_analysis": {"en": "Team performance AI summary", "ar": "تحليل أداء الفريق"},
+    "sales_chat_analysis": {"en": "Sales chat scoring & tags", "ar": "تحليل محادثات المبيعات (Lead score)"},
+    "conversation_summary": {"en": "Conversation summarization", "ar": "تلخيص المحادثات"},
+    "internal_assistant_mediator": {"en": "Internal assistant mediator", "ar": "وسيط المساعد الداخلي (PI)"},
+    "automation_workflow": {"en": "Automation workflow (generic)", "ar": "أتمتة Workflow"},
+    "analysis": {"en": "General analysis (legacy / unspecified)", "ar": "تحليل عام (قديم / غير محدد)"},
+    "translation": {"en": "Translation", "ar": "ترجمة"},
+    "optimizer": {"en": "Text optimizer", "ar": "تحسين النص"},
+    "customer_auto_reply": {"en": "Customer auto-reply", "ar": "رد تلقائي للعميل"},
+    "internal_assistant": {"en": "Internal assistant reply", "ar": "رد المساعد الداخلي"},
+}
+
+
+def _usage_source_label(source_key, lang="en"):
+    key = str(source_key or "").strip()
+    if key.startswith("automation:"):
+        wf = key.split(":", 1)[1].strip() or "workflow"
+        if lang == "ar":
+            return f"أتمتة: {wf}"
+        return f"Automation: {wf}"
+    meta = AI_USAGE_SOURCE_LABELS.get(key) or {}
+    if lang == "ar":
+        return meta.get("ar") or key or "unknown"
+    return meta.get("en") or key or "unknown"
+
+
 DEFAULT_AI_USAGE_RATES = {
     "currency": "USD",
-    "default": {"input_per_1m": 0.14, "output_per_1m": 0.28},
+    "pricing_version": 2,
+    "pricing_reference": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "peak_hours_utc": "Mon–Fri 01:00–04:00 and 06:00–10:00 UTC (off-peak = half price)",
+    "default": {
+        "input_cache_hit_off_peak": 0.22,
+        "input_cache_hit_peak": 0.44,
+        "input_cache_miss_off_peak": 0.22,
+        "input_cache_miss_peak": 0.44,
+        "output_off_peak": 0.66,
+        "output_peak": 1.32,
+    },
     "models": {
-        "deepseek-v4-flash": {"input_per_1m": 0.14, "output_per_1m": 0.28},
-        "deepseek-chat": {"input_per_1m": 0.14, "output_per_1m": 0.28},
-        "deepseek-v4-pro": {"input_per_1m": 0.55, "output_per_1m": 2.19},
-        "deepseek-reasoner": {"input_per_1m": 0.55, "output_per_1m": 2.19},
+        "deepseek-v4-flash": {
+            "input_cache_hit_off_peak": 0.007,
+            "input_cache_hit_peak": 0.014,
+            "input_cache_miss_off_peak": 0.22,
+            "input_cache_miss_peak": 0.44,
+            "output_off_peak": 0.66,
+            "output_peak": 1.32,
+        },
+        "deepseek-v4-flash-vision-exp": {
+            "input_cache_hit_off_peak": 0.007,
+            "input_cache_hit_peak": 0.014,
+            "input_cache_miss_off_peak": 0.22,
+            "input_cache_miss_peak": 0.44,
+            "output_off_peak": 0.66,
+            "output_peak": 1.32,
+        },
+        "deepseek-chat": {
+            "input_cache_hit_off_peak": 0.007,
+            "input_cache_hit_peak": 0.014,
+            "input_cache_miss_off_peak": 0.22,
+            "input_cache_miss_peak": 0.44,
+            "output_off_peak": 0.66,
+            "output_peak": 1.32,
+        },
+        "deepseek-v4-pro": {
+            "input_cache_hit_off_peak": 0.022,
+            "input_cache_hit_peak": 0.044,
+            "input_cache_miss_off_peak": 0.66,
+            "input_cache_miss_peak": 1.32,
+            "output_off_peak": 1.98,
+            "output_peak": 3.96,
+        },
+        "deepseek-reasoner": {
+            "input_cache_hit_off_peak": 0.022,
+            "input_cache_hit_peak": 0.044,
+            "input_cache_miss_off_peak": 0.66,
+            "input_cache_miss_peak": 1.32,
+            "output_off_peak": 1.98,
+            "output_peak": 3.96,
+        },
         "gpt-4o-mini": {"input_per_1m": 0.15, "output_per_1m": 0.60},
         "gpt-4o": {"input_per_1m": 2.50, "output_per_1m": 10.00},
         "gpt-5.6-terra": {"input_per_1m": 1.25, "output_per_1m": 10.00},
@@ -4371,35 +4463,97 @@ DEFAULT_AI_USAGE_RATES = {
 }
 
 
+def _coerce_rate_value(raw, fallback=0.0):
+    try:
+        return max(0.0, float(raw))
+    except Exception:
+        return max(0.0, float(fallback))
+
+
+def _upgrade_legacy_model_rates(model_rates, template=None):
+    src = dict(model_rates or {})
+    tpl = dict(template or {})
+    if src.get("input_cache_miss_off_peak") is not None or src.get("output_off_peak") is not None:
+        out = {
+            "input_cache_hit_off_peak": _coerce_rate_value(
+                src.get("input_cache_hit_off_peak"), tpl.get("input_cache_hit_off_peak", 0)
+            ),
+            "input_cache_hit_peak": _coerce_rate_value(
+                src.get("input_cache_hit_peak"),
+                src.get("input_cache_hit_off_peak", tpl.get("input_cache_hit_peak", 0)) * 2
+                if src.get("input_cache_hit_off_peak") is not None
+                else tpl.get("input_cache_hit_peak", 0),
+            ),
+            "input_cache_miss_off_peak": _coerce_rate_value(
+                src.get("input_cache_miss_off_peak"), tpl.get("input_cache_miss_off_peak", 0)
+            ),
+            "input_cache_miss_peak": _coerce_rate_value(
+                src.get("input_cache_miss_peak"),
+                src.get("input_cache_miss_off_peak", tpl.get("input_cache_miss_peak", 0)) * 2
+                if src.get("input_cache_miss_off_peak") is not None
+                else tpl.get("input_cache_miss_peak", 0),
+            ),
+            "output_off_peak": _coerce_rate_value(src.get("output_off_peak"), tpl.get("output_off_peak", 0)),
+            "output_peak": _coerce_rate_value(
+                src.get("output_peak"),
+                src.get("output_off_peak", tpl.get("output_peak", 0)) * 2
+                if src.get("output_off_peak") is not None
+                else tpl.get("output_peak", 0),
+            ),
+        }
+        return out
+    legacy_in = src.get("input_per_1m", tpl.get("input_per_1m"))
+    legacy_out = src.get("output_per_1m", tpl.get("output_per_1m"))
+    if legacy_in is not None or legacy_out is not None:
+        return {
+            "input_per_1m": _coerce_rate_value(legacy_in, tpl.get("input_per_1m", 0)),
+            "output_per_1m": _coerce_rate_value(legacy_out, tpl.get("output_per_1m", 0)),
+        }
+    if tpl:
+        return _upgrade_legacy_model_rates(tpl, {})
+    return src
+
+
 def _normalize_ai_usage_rates(raw):
     base = {
         "currency": "USD",
-        "default": dict(DEFAULT_AI_USAGE_RATES["default"]),
-        "models": {k: dict(v) for k, v in DEFAULT_AI_USAGE_RATES["models"].items()},
+        "pricing_version": DEFAULT_AI_USAGE_RATES["pricing_version"],
+        "pricing_reference": DEFAULT_AI_USAGE_RATES["pricing_reference"],
+        "peak_hours_utc": DEFAULT_AI_USAGE_RATES["peak_hours_utc"],
+        "default": _upgrade_legacy_model_rates(
+            DEFAULT_AI_USAGE_RATES["default"],
+            DEFAULT_AI_USAGE_RATES["default"],
+        ),
+        "models": {
+            k: _upgrade_legacy_model_rates(v, DEFAULT_AI_USAGE_RATES["models"].get(k))
+            for k, v in DEFAULT_AI_USAGE_RATES["models"].items()
+        },
     }
     if not isinstance(raw, dict):
         return base
-    currency = str(raw.get("currency") or "USD").strip().upper() or "USD"
-    base["currency"] = currency
-    default = raw.get("default") if isinstance(raw.get("default"), dict) else {}
     try:
-        if default.get("input_per_1m") is not None:
-            base["default"]["input_per_1m"] = max(0.0, float(default.get("input_per_1m")))
-        if default.get("output_per_1m") is not None:
-            base["default"]["output_per_1m"] = max(0.0, float(default.get("output_per_1m")))
+        version = int(raw.get("pricing_version") or 0)
     except Exception:
+        version = 0
+    if version < DEFAULT_AI_USAGE_RATES["pricing_version"]:
+        # Stored rates used old flat input/output — prefer official DeepSeek defaults.
         pass
-    models = raw.get("models") if isinstance(raw.get("models"), dict) else {}
-    for model_name, rates in models.items():
-        name = str(model_name or "").strip()
-        if not name or not isinstance(rates, dict):
-            continue
-        try:
-            inp = float(rates.get("input_per_1m"))
-            outp = float(rates.get("output_per_1m"))
-        except Exception:
-            continue
-        base["models"][name] = {"input_per_1m": max(0.0, inp), "output_per_1m": max(0.0, outp)}
+    else:
+        currency = str(raw.get("currency") or "USD").strip().upper() or "USD"
+        base["currency"] = currency
+        base["default"] = _upgrade_legacy_model_rates(
+            raw.get("default") if isinstance(raw.get("default"), dict) else {},
+            DEFAULT_AI_USAGE_RATES["default"],
+        )
+        models = raw.get("models") if isinstance(raw.get("models"), dict) else {}
+        for model_name, rates in models.items():
+            name = str(model_name or "").strip()
+            if not name or not isinstance(rates, dict):
+                continue
+            base["models"][name] = _upgrade_legacy_model_rates(
+                rates,
+                DEFAULT_AI_USAGE_RATES["models"].get(name) or DEFAULT_AI_USAGE_RATES["default"],
+            )
     return base
 
 
@@ -4416,6 +4570,7 @@ def get_ai_usage_rates():
 
 def save_ai_usage_rates(raw):
     rates = _normalize_ai_usage_rates(raw)
+    rates["pricing_version"] = DEFAULT_AI_USAGE_RATES["pricing_version"]
     try:
         set_setting("ai_usage_rates", json.dumps(rates, ensure_ascii=False))
     except Exception:
@@ -4439,20 +4594,88 @@ def _ai_usage_rate_for_model(model_name, rates=None):
                 best_key = k
                 best_rates = val
     if isinstance(best_rates, dict):
-        return best_rates
-    return default
+        return _upgrade_legacy_model_rates(best_rates, default)
+    return _upgrade_legacy_model_rates(default, DEFAULT_AI_USAGE_RATES["default"])
 
 
-def estimate_ai_cost_usd(model_name, prompt_tokens, completion_tokens, rates=None):
+def _parse_usage_timestamp(created_at):
+    s = str(created_at or "").strip()
+    if not s:
+        return datetime.now(timezone.utc)
+    try:
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            # Stored timestamps are Cairo-local wall time without tz suffix.
+            dt = (dt - CAIRO_OFFSET).replace(tzinfo=timezone.utc)
+        else:
+            dt = dt.astimezone(timezone.utc)
+        return dt
+    except Exception:
+        return datetime.now(timezone.utc)
+
+
+def _deepseek_is_peak_utc(dt):
+    """DeepSeek peak: Mon–Fri 01:00–04:00 and 06:00–10:00 UTC."""
+    if not dt:
+        return False
+    if dt.weekday() >= 5:
+        return False
+    hour = dt.hour
+    return (1 <= hour < 4) or (6 <= hour < 10)
+
+
+def _resolve_cache_token_split(prompt_tokens, prompt_cache_hit_tokens=None, prompt_cache_miss_tokens=None):
+    pt = max(0, int(prompt_tokens or 0))
+    hit = prompt_cache_hit_tokens
+    miss = prompt_cache_miss_tokens
+    if hit is None and miss is None:
+        return 0, pt
+    hit = max(0, int(hit or 0))
+    miss = max(0, int(miss or 0))
+    if hit + miss == 0 and pt > 0:
+        return 0, pt
+    if pt > 0 and hit + miss != pt:
+        miss = max(0, pt - hit)
+    return hit, miss
+
+
+def estimate_ai_cost_usd(
+    model_name,
+    prompt_tokens,
+    completion_tokens,
+    prompt_cache_hit_tokens=None,
+    prompt_cache_miss_tokens=None,
+    created_at=None,
+    rates=None,
+):
     rates = rates or get_ai_usage_rates()
     per = _ai_usage_rate_for_model(model_name, rates)
-    try:
-        inp = float(per.get("input_per_1m") or 0)
-        outp = float(per.get("output_per_1m") or 0)
-    except Exception:
-        inp, outp = 0.0, 0.0
-    cost = (int(prompt_tokens or 0) / 1_000_000.0) * inp + (int(completion_tokens or 0) / 1_000_000.0) * outp
+    pt = max(0, int(prompt_tokens or 0))
+    ct = max(0, int(completion_tokens or 0))
+    hit, miss = _resolve_cache_token_split(pt, prompt_cache_hit_tokens, prompt_cache_miss_tokens)
+    dt = _parse_usage_timestamp(created_at)
+    is_peak = _deepseek_is_peak_utc(dt)
+
+    if per.get("input_cache_miss_off_peak") is not None or per.get("output_off_peak") is not None:
+        if is_peak:
+            in_hit_rate = _coerce_rate_value(per.get("input_cache_hit_peak"), per.get("input_cache_hit_off_peak", 0) * 2)
+            in_miss_rate = _coerce_rate_value(per.get("input_cache_miss_peak"), per.get("input_cache_miss_off_peak", 0) * 2)
+            out_rate = _coerce_rate_value(per.get("output_peak"), per.get("output_off_peak", 0) * 2)
+        else:
+            in_hit_rate = _coerce_rate_value(per.get("input_cache_hit_off_peak"))
+            in_miss_rate = _coerce_rate_value(per.get("input_cache_miss_off_peak"))
+            out_rate = _coerce_rate_value(per.get("output_off_peak"))
+        cost = (hit / 1_000_000.0) * in_hit_rate + (miss / 1_000_000.0) * in_miss_rate + (ct / 1_000_000.0) * out_rate
+        return round(max(0.0, cost), 6)
+
+    inp = _coerce_rate_value(per.get("input_per_1m"))
+    outp = _coerce_rate_value(per.get("output_per_1m"))
+    cost = (pt / 1_000_000.0) * inp + (ct / 1_000_000.0) * outp
     return round(max(0.0, cost), 6)
+
+
+def _ai_usage_pricing_tier(created_at=None):
+    return "peak" if _deepseek_is_peak_utc(_parse_usage_timestamp(created_at)) else "off_peak"
 
 
 def record_ai_usage_event(
@@ -4466,14 +4689,32 @@ def record_ai_usage_event(
     prompt_tokens=0,
     completion_tokens=0,
     total_tokens=0,
+    prompt_cache_hit_tokens=0,
+    prompt_cache_miss_tokens=0,
     cost_usd=0.0,
     estimated=0,
+    created_at=None,
 ):
     try:
         prompt_tokens = max(0, int(prompt_tokens or 0))
         completion_tokens = max(0, int(completion_tokens or 0))
         total_tokens = max(0, int(total_tokens or (prompt_tokens + completion_tokens)))
-        cost_usd = float(cost_usd or 0)
+        hit, miss = _resolve_cache_token_split(
+            prompt_tokens, prompt_cache_hit_tokens, prompt_cache_miss_tokens
+        )
+        created_at = str(created_at or get_cairo_time())
+        if cost_usd is None or cost_usd == 0:
+            cost_usd = estimate_ai_cost_usd(
+                model,
+                prompt_tokens,
+                completion_tokens,
+                prompt_cache_hit_tokens=hit,
+                prompt_cache_miss_tokens=miss,
+                created_at=created_at,
+            )
+        else:
+            cost_usd = float(cost_usd or 0)
+        pricing_tier = _ai_usage_pricing_tier(created_at)
     except Exception:
         return False
     attempts = 3
@@ -4489,11 +4730,12 @@ def record_ai_usage_event(
                     INSERT INTO ai_usage_events (
                         created_at, department, source, system_role, provider, model,
                         location, chat_id, prompt_tokens, completion_tokens, total_tokens,
+                        prompt_cache_hit_tokens, prompt_cache_miss_tokens, pricing_tier,
                         cost_usd, estimated
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
-                        get_cairo_time(),
+                        created_at,
                         str(department or "Unassigned")[:80],
                         str(source or "")[:80],
                         str(system_role or "")[:80],
@@ -4504,6 +4746,9 @@ def record_ai_usage_event(
                         prompt_tokens,
                         completion_tokens,
                         total_tokens,
+                        hit,
+                        miss,
+                        pricing_tier,
                         cost_usd,
                         1 if estimated else 0,
                     ),
@@ -4537,13 +4782,19 @@ def _ai_usage_date_bounds(from_date, to_date):
 
 def get_ai_usage_report(from_date=None, to_date=None):
     start, end = _ai_usage_date_bounds(from_date, to_date)
+    rates = get_ai_usage_rates()
     empty = {
         "from": start[:10],
         "to": end[:10],
+        "currency": rates.get("currency") or "USD",
+        "pricing_reference": rates.get("pricing_reference") or DEFAULT_AI_USAGE_RATES["pricing_reference"],
+        "peak_hours_utc": rates.get("peak_hours_utc") or DEFAULT_AI_USAGE_RATES["peak_hours_utc"],
         "totals": {
             "requests": 0,
             "prompt_tokens": 0,
             "completion_tokens": 0,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
             "total_tokens": 0,
             "cost_usd": 0.0,
             "estimated_requests": 0,
@@ -4551,91 +4802,189 @@ def get_ai_usage_report(from_date=None, to_date=None):
         "by_department": [],
         "by_provider": [],
         "by_source": [],
+        "internal_tools_breakdown": [],
+        "source_labels": AI_USAGE_SOURCE_LABELS,
     }
     try:
         with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
-
-            def _rows(group_col):
-                c.execute(
-                    f"""
-                    SELECT
-                        COALESCE(NULLIF(TRIM({group_col}), ''), 'Unassigned') AS label,
-                        COUNT(*) AS requests,
-                        COALESCE(SUM(prompt_tokens), 0) AS prompt_tokens,
-                        COALESCE(SUM(completion_tokens), 0) AS completion_tokens,
-                        COALESCE(SUM(total_tokens), 0) AS total_tokens,
-                        COALESCE(SUM(cost_usd), 0) AS cost_usd,
-                        COALESCE(SUM(CASE WHEN estimated = 1 THEN 1 ELSE 0 END), 0) AS estimated_requests
-                    FROM ai_usage_events
-                    WHERE created_at >= ? AND created_at <= ?
-                    GROUP BY label
-                    ORDER BY total_tokens DESC
-                    """,
-                    (start, end),
-                )
-                out = []
-                for row in c.fetchall():
-                    out.append({
-                        "label": row["label"],
-                        "requests": int(row["requests"] or 0),
-                        "prompt_tokens": int(row["prompt_tokens"] or 0),
-                        "completion_tokens": int(row["completion_tokens"] or 0),
-                        "total_tokens": int(row["total_tokens"] or 0),
-                        "cost_usd": round(float(row["cost_usd"] or 0), 6),
-                        "estimated_requests": int(row["estimated_requests"] or 0),
-                    })
-                return out
-
-            by_department = _rows("department")
-            by_provider = _rows("provider")
             c.execute(
                 """
                 SELECT
-                    COALESCE(NULLIF(TRIM(provider), ''), 'unknown') AS provider,
-                    COALESCE(NULLIF(TRIM(model), ''), 'unknown') AS model,
-                    COUNT(*) AS requests,
-                    COALESCE(SUM(prompt_tokens), 0) AS prompt_tokens,
-                    COALESCE(SUM(completion_tokens), 0) AS completion_tokens,
-                    COALESCE(SUM(total_tokens), 0) AS total_tokens,
-                    COALESCE(SUM(cost_usd), 0) AS cost_usd
+                    created_at, department, source, system_role, provider, model,
+                    prompt_tokens, completion_tokens, total_tokens,
+                    prompt_cache_hit_tokens, prompt_cache_miss_tokens,
+                    pricing_tier, cost_usd, estimated
                 FROM ai_usage_events
                 WHERE created_at >= ? AND created_at <= ?
-                GROUP BY provider, model
-                ORDER BY total_tokens DESC
                 """,
                 (start, end),
             )
-            by_provider_model = []
-            for row in c.fetchall():
-                by_provider_model.append({
-                    "provider": row["provider"],
-                    "model": row["model"],
-                    "label": f"{row['provider']} / {row['model']}",
-                    "requests": int(row["requests"] or 0),
-                    "prompt_tokens": int(row["prompt_tokens"] or 0),
-                    "completion_tokens": int(row["completion_tokens"] or 0),
-                    "total_tokens": int(row["total_tokens"] or 0),
-                    "cost_usd": round(float(row["cost_usd"] or 0), 6),
-                })
-            by_source = _rows("source")
+            rows = [dict(r) for r in c.fetchall()]
+
+            def _event_cost(row):
+                return estimate_ai_cost_usd(
+                    row.get("model"),
+                    row.get("prompt_tokens"),
+                    row.get("completion_tokens"),
+                    prompt_cache_hit_tokens=row.get("prompt_cache_hit_tokens"),
+                    prompt_cache_miss_tokens=row.get("prompt_cache_miss_tokens"),
+                    created_at=row.get("created_at"),
+                    rates=rates,
+                )
+
+            def _bucket_key(row, field):
+                val = str(row.get(field) or "").strip()
+                return val or ("Unassigned" if field == "department" else "unknown")
+
+            buckets_dept = {}
+            buckets_provider = {}
+            buckets_source = {}
+            buckets_provider_model = {}
+            buckets_internal_tools = {}
             totals = {
-                "requests": sum(x["requests"] for x in by_department),
-                "prompt_tokens": sum(x["prompt_tokens"] for x in by_department),
-                "completion_tokens": sum(x["completion_tokens"] for x in by_department),
-                "total_tokens": sum(x["total_tokens"] for x in by_department),
-                "cost_usd": round(sum(x["cost_usd"] for x in by_department), 6),
-                "estimated_requests": sum(x["estimated_requests"] for x in by_department),
+                "requests": 0,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "prompt_cache_hit_tokens": 0,
+                "prompt_cache_miss_tokens": 0,
+                "total_tokens": 0,
+                "cost_usd": 0.0,
+                "estimated_requests": 0,
             }
+
+            for row in rows:
+                pt = int(row.get("prompt_tokens") or 0)
+                ct = int(row.get("completion_tokens") or 0)
+                tt = int(row.get("total_tokens") or (pt + ct))
+                hit, miss = _resolve_cache_token_split(
+                    pt,
+                    row.get("prompt_cache_hit_tokens"),
+                    row.get("prompt_cache_miss_tokens"),
+                )
+                cost = _event_cost(row)
+                estimated = int(row.get("estimated") or 0) == 1
+
+                totals["requests"] += 1
+                totals["prompt_tokens"] += pt
+                totals["completion_tokens"] += ct
+                totals["prompt_cache_hit_tokens"] += hit
+                totals["prompt_cache_miss_tokens"] += miss
+                totals["total_tokens"] += tt
+                totals["cost_usd"] += cost
+                if estimated:
+                    totals["estimated_requests"] += 1
+
+                for field, store in (
+                    ("department", buckets_dept),
+                    ("provider", buckets_provider),
+                    ("source", buckets_source),
+                ):
+                    key = _bucket_key(row, field)
+                    bucket = store.setdefault(
+                        key,
+                        {
+                            "label": key,
+                            "requests": 0,
+                            "prompt_tokens": 0,
+                            "completion_tokens": 0,
+                            "prompt_cache_hit_tokens": 0,
+                            "prompt_cache_miss_tokens": 0,
+                            "total_tokens": 0,
+                            "cost_usd": 0.0,
+                            "estimated_requests": 0,
+                        },
+                    )
+                    bucket["requests"] += 1
+                    bucket["prompt_tokens"] += pt
+                    bucket["completion_tokens"] += ct
+                    bucket["prompt_cache_hit_tokens"] += hit
+                    bucket["prompt_cache_miss_tokens"] += miss
+                    bucket["total_tokens"] += tt
+                    bucket["cost_usd"] += cost
+                    if estimated:
+                        bucket["estimated_requests"] += 1
+
+                provider = _bucket_key(row, "provider")
+                model = _bucket_key(row, "model")
+                pm_key = f"{provider}::{model}"
+                pm = buckets_provider_model.setdefault(
+                    pm_key,
+                    {
+                        "provider": provider,
+                        "model": model,
+                        "label": f"{provider} / {model}",
+                        "requests": 0,
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "prompt_cache_hit_tokens": 0,
+                        "prompt_cache_miss_tokens": 0,
+                        "total_tokens": 0,
+                        "cost_usd": 0.0,
+                    },
+                )
+                pm["requests"] += 1
+                pm["prompt_tokens"] += pt
+                pm["completion_tokens"] += ct
+                pm["prompt_cache_hit_tokens"] += hit
+                pm["prompt_cache_miss_tokens"] += miss
+                pm["total_tokens"] += tt
+                pm["cost_usd"] += cost
+
+                dept_key = _bucket_key(row, "department")
+                if dept_key == "Internal Tools":
+                    src_key = str(row.get("source") or "analysis").strip() or "analysis"
+                    it = buckets_internal_tools.setdefault(
+                        src_key,
+                        {
+                            "source": src_key,
+                            "label_en": _usage_source_label(src_key, "en"),
+                            "label_ar": _usage_source_label(src_key, "ar"),
+                            "system_role": str(row.get("system_role") or "").strip() or "analyzer",
+                            "requests": 0,
+                            "prompt_tokens": 0,
+                            "completion_tokens": 0,
+                            "prompt_cache_hit_tokens": 0,
+                            "prompt_cache_miss_tokens": 0,
+                            "total_tokens": 0,
+                            "cost_usd": 0.0,
+                            "estimated_requests": 0,
+                        },
+                    )
+                    it["requests"] += 1
+                    it["prompt_tokens"] += pt
+                    it["completion_tokens"] += ct
+                    it["prompt_cache_hit_tokens"] += hit
+                    it["prompt_cache_miss_tokens"] += miss
+                    it["total_tokens"] += tt
+                    it["cost_usd"] += cost
+                    if estimated:
+                        it["estimated_requests"] += 1
+
+            def _finalize(items):
+                out = []
+                for item in items:
+                    item = dict(item)
+                    item["cost_usd"] = round(float(item.get("cost_usd") or 0), 6)
+                    out.append(item)
+                out.sort(key=lambda x: x.get("total_tokens") or 0, reverse=True)
+                return out
+
+            totals["cost_usd"] = round(float(totals["cost_usd"] or 0), 6)
             return {
                 "from": start[:10],
                 "to": end[:10],
+                "currency": rates.get("currency") or "USD",
+                "pricing_reference": rates.get("pricing_reference") or DEFAULT_AI_USAGE_RATES["pricing_reference"],
+                "peak_hours_utc": rates.get("peak_hours_utc") or DEFAULT_AI_USAGE_RATES["peak_hours_utc"],
                 "totals": totals,
-                "by_department": by_department,
-                "by_provider": by_provider,
-                "by_provider_model": by_provider_model,
-                "by_source": by_source,
+                "by_department": _finalize(buckets_dept.values()),
+                "by_provider": _finalize(buckets_provider.values()),
+                "by_provider_model": _finalize(buckets_provider_model.values()),
+                "by_source": _finalize(buckets_source.values()),
+                "internal_tools_breakdown": _finalize(buckets_internal_tools.values()),
+                "source_labels": AI_USAGE_SOURCE_LABELS,
             }
     except Exception as e:
         logging.error(f"AI usage report failed: {e}")

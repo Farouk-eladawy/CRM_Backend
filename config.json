@@ -283,10 +283,10 @@
   "baserow": {
     "enabled": true,
     "api_url": "https://focused-blessing-production-8e9e.up.railway.app",
-    "api_token": "BlnPqRwAgDzffO1xsYoVl33O0J1lUChM",
+    "api_token": "M5PHDen51whMnF3GvXsMHKafLuQLuQiw",
     "admin_email": "admin@ftstravels.com",
     "admin_password": "Aa130799??!!",
-    "workspace_id": 2,
+    "workspace_id": 1,
     "database_name": "FTS Travels's company",
     "database_id": 10,
     "public_url": "https://focused-blessing-production-8e9e.up.railway.app"

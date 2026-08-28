@@ -14617,21 +14617,106 @@ Conversation:
                 parts.append(f"{key}={value}")
         return " ".join(parts).strip()
 
+    def _facebook_graph_version(self):
+        fb_cfg = (self.config.get('facebook') or {}) if isinstance(self.config, dict) else {}
+        version = str(fb_cfg.get('graph_version') or META_GRAPH_VERSION or 'v21.0').strip()
+        return version or 'v21.0'
+
+    def _lookup_facebook_profile_via_user_api(self, customer_psid, page_token):
+        graph_version = self._facebook_graph_version()
+        psid = str(customer_psid or '').strip()
+        url = f"https://graph.facebook.com/{graph_version}/{psid}"
+        resp = requests.get(
+            url,
+            params={"fields": "first_name,last_name,name", "access_token": page_token},
+            timeout=6,
+        )
+        try:
+            data = resp.json() if resp.content else {}
+        except Exception:
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
+        name = self._compose_facebook_profile_name(data)
+        if resp.status_code == 200 and name:
+            return name
+        err = data.get("error") if isinstance(data.get("error"), dict) else {}
+        err_code = err.get("code")
+        err_sub = err.get("error_subcode")
+        err_msg = str(err.get("message") or resp.text or "").strip()
+        logging.warning(
+            "Facebook User Profile API did not return a name for %s: status=%s code=%s subcode=%s body=%s",
+            psid,
+            resp.status_code,
+            err_code,
+            err_sub,
+            (err_msg or "{}")[:500],
+        )
+        return ""
+
+    def _lookup_facebook_profile_via_conversations(self, customer_psid, page_token, page_id):
+        graph_version = self._facebook_graph_version()
+        psid = str(customer_psid or '').strip()
+        page_id = str(page_id or '').strip()
+        if not psid or not page_id or not page_token:
+            return ""
+        url = f"https://graph.facebook.com/{graph_version}/{page_id}/conversations"
+        resp = requests.get(
+            url,
+            params={
+                "platform": "messenger",
+                "user_id": psid,
+                "fields": "participants",
+                "limit": 1,
+                "access_token": page_token,
+            },
+            timeout=6,
+        )
+        try:
+            data = resp.json() if resp.content else {}
+        except Exception:
+            data = {}
+        if resp.status_code != 200 or not isinstance(data, dict):
+            logging.warning(
+                "Facebook conversations name lookup failed for %s: status=%s body=%s",
+                psid,
+                resp.status_code,
+                str(resp.text or "")[:500],
+            )
+            return ""
+        rows = data.get("data") if isinstance(data.get("data"), list) else []
+        for row in rows:
+            participants = ((row or {}).get("participants") or {}).get("data") or []
+            if not isinstance(participants, list):
+                continue
+            for person in participants:
+                if not isinstance(person, dict):
+                    continue
+                person_id = str(person.get("id") or "").strip()
+                if person_id != psid:
+                    continue
+                person_name = str(person.get("name") or "").strip()
+                if person_name and not self._is_placeholder_facebook_name(person_name):
+                    return person_name
+        return ""
+
     def _resolve_facebook_sender_name(self, customer_psid, fallback_name=None, allow_lookup=True):
         sender_name = str(fallback_name or "").strip()
+        if sender_name and not self._is_placeholder_facebook_name(sender_name):
+            return sender_name
         try:
             fb_cfg = (self.config.get('facebook') or {}) if isinstance(self.config, dict) else {}
             fb_page_token = str(fb_cfg.get('page_access_token') or '').strip()
+            fb_page_id = str(fb_cfg.get('page_id') or '').strip()
             if allow_lookup and fb_page_token and customer_psid:
-                fb_user_url = f"https://graph.facebook.com/v19.0/{customer_psid}?fields=first_name,last_name,name&access_token={fb_page_token}"
-                fb_resp = requests.get(fb_user_url, timeout=5)
-                if fb_resp.status_code == 200:
-                    fb_data = fb_resp.json()
-                    fb_name = self._compose_facebook_profile_name(fb_data)
-                    if fb_name:
-                        return fb_name
-                else:
-                    logging.warning(f"Facebook profile lookup failed for {customer_psid}: {fb_resp.status_code} {fb_resp.text}")
+                fb_name = self._lookup_facebook_profile_via_user_api(customer_psid, fb_page_token)
+                if fb_name:
+                    return fb_name
+                conv_name = self._lookup_facebook_profile_via_conversations(
+                    customer_psid, fb_page_token, fb_page_id
+                )
+                if conv_name:
+                    return conv_name
         except Exception as e:
             logging.warning(f"Facebook profile lookup exception for {customer_psid}: {e}")
 

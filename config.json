@@ -233,7 +233,7 @@
     "products_file": "gyg_products.json",
     "async_airtable": true
   },
-  "facebook_auto_reply_enabled": true,
+  "facebook_auto_reply_enabled": false,
   "auto_reply_locations": [
     "Sharm",
     "Hurghada/Cairo"

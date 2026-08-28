@@ -1,29 +1,5 @@
 [
   {
-    "timestamp": "2026-08-27T08:23:12.209094",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "We have noted your request on the booking. While arranging a Dutch-speaking guide may be challenging, we will do our utmost to accommodate it. If this is not possible, an English-speaking guide will be provided for your tour.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-27T08:24:32.635958",
-    "original": "أكيد أقدر أساعدك. حضرتك مهتم تتعرف على برامج الحج ولا العمرة؟\n\nمع خالص التحية،\nمسؤول المبيعات هنادي محمد",
-    "corrected": "أهلًا بحضرتك 🌿 حج مبرور إن شاء الله.\nده خط سير برنامج طيران تحسين ببساطة:\n\n🕌 المدينة المنورة — من ٢ إلى ٥ ذو الحجة\nإقامة قريبة من الحرم + إفطار وعشاء\n\n🚄 قطار الحرمين من المدينة لمكة\n\n🕋 مكة قبل المناسك — من ٦ إلى ٨ ذو الحجة\nإقامة فندقية + إفطار وعشاء\n\n⛺ المناسك — من ٩ إلى ١٣ ذو الحجة\nعرفات ومزدلفة ومنى، مخيمات مكيفة ووجبات ومشروبات، ومشرف الشركة معاك طول الوقت\n\n⭐ التحسين على ساحة الحرم — من ١٤ إلى ٢٠ ذو الحجة\nودي أهم ميزة في البرنامج: بعد تعب المناسك، حضرتك بتكون على الحرم مباشرة، تنزل تصلي وترجع ترتاح، من غير باص ولا مشاوير.\n\n💰 السعر ٢٥٠ ألف بدل ٢٧٩ بخصم الحجز المبكر (بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة — والخصم بيتثبت باسم حضرتك مهما كان السعر النهائي). تذكرة الطيران بتتضاف بسعرها وقت الحجز.\n\nولو تحب أكلمك دقيقتين أشرحلك طرق الدفع والتقسيط — رقمك عليه واتساب؟",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-27T08:27:36.420620",
-    "original": "إن شاء الله، ربنا يوفقك وتكون من حجاج بيته السنة دي 🤲  \nنقدر نبدأ تسجيل بياناتك بالاسم فقط دلوقتي، وبعد نزول الضوابط الرسمية هنتواصل مع حضرتك مباشرة بكل التفاصيل.  \nأسهل خطوة إن حضرتك تبعتلي رقم الواتساب بتاعك عشان أكلمك وأأكدلك كل حاجة في مكالمة سريعة.",
-    "corrected": "الحصة محدودة والأولوية بترتيب التسجيل — وبالفعل أكتر من نصها اكتمل.\nأنا ملك من فريق الحجوزات، ورقمي 01288427381 لو حبيت تكلمني في أي وقت.\nأسهل حاجة أكلمك دقيقتين أجاوبك على أي سؤال ونثبّتلك مكانك — رقم حضرتك عليه واتساب؟",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-27T08:28:16.733239",
-    "original": "لقد قمت بتحويل طلبك إلى فريق خدمة العملاء لدينا. سيتواصل معك أحد المندوبين عبر الواتساب قريبًا.\n\nسيتولى فريق المبيعات تزويدك بتفاصيل الإقامة المناسبة لثلاثة أفراد (زوج وزوجة وبنت) وعرض السعر الخاص، وكل التفاصيل المتعلقة بالبرنامج.\n\nمع خالص التحية،\nمسؤول المبيعات ملك ماهر",
-    "corrected": "استفسار حضرتك بخصوص التقديم للحج برنامج الطيران تحسين لحضرتك وزوجتك و ابنتك ؟ الابنه كام سنه",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-08-27T08:38:20.804140",
     "original": "ولا يهمك يا فندم، خالص احترامي لوقت الصلاة 🙏 خذ راحتك تمامًا، وأنا مستنيك لما تخلص. أي وقت تتصل هكون موجود وأي شخص من فريق المبيعات جاهز يرد على حضرتك فورًا.",
     "corrected": "اتشرفت بمعرفه حضرتك جدا",
@@ -597,6 +573,30 @@
     "timestamp": "2026-08-28T02:40:24.092478",
     "original": "أهلًا بحضرتك 🌿\nوصلت رسالتك، وحابب أساعدك في أي استفسار. حضرتك مهتم ببرامج الحج ولا العمرة؟\n\nمع خالص التحية،\nمسؤول المبيعات أحمد خليل",
     "corrected": "✅ للتقديم:\nصورة البطاقة فقط\n\nملحوظة: الخصم خاص فقط للحجز المبكر الان\nوحصص الشركه للحج محدوده جدا وبالفعل اكثر من نصفها تم اكتماله\n\n✅مع حضرتك احمدخليل : 01288427370\nفي خدمه حضرتك للحجز او في اي استفسار ان شاء الله ☺️",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-28T03:14:05.808402",
+    "original": "تمام يا فندم، تفاصيل البرامج باختصار 🌿\n\n🚌 البري — ١٧ يوم، سفر بأتوبيسات حديثة + العبارة، نفس المناسك ونفس الإشراف، وهو الأوفر للتكلفة.\n✈️ طيران اقتصادي — ١٧ يوم، سفر طيران، إقامة فندقية بنفس مستوى البري، توفير في الوقت والمجهود.\n⭐ طيران تحسين — ١٩ يوم، أهم ميزة ٧ أيام على ساحة الحرم بعد المناسك (مشاوير أقل وصلاة أسهل).\n🏨 ٥ نجوم — فنادق ٥ نجوم ومخيمات مجر الكبش، أقصى راحة طول الرحلة.\n\nخط السير الكامل يوم بيوم مع أسماء الفنادق والمخيمات هبعتهولك ملف على الواتساب يفضل معاك — رقم حضرتك عليه واتساب؟",
+    "corrected": "تمام يا فندم، أوضح لحضرتك الفرق ببساطة 🌿\n\n🚌 بري — ٢١٠ آلاف: نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n✈️ طيران اقتصادي — ٢٢٠ ألف: نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n⭐ طيران تحسين — ٢٥٠ ألف: بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n🏨 ٥ نجوم — ٤٩٠ ألف: إقامة فندقية مميزة طول الرحلة.\n\n(كل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.)\n\nحضرتك إيه الأهم بالنسبالك — التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين أرشحلك الأنسب — رقمك عليه واتساب؟",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-28T03:14:31.586255",
+    "original": "تمام، الميزانية دي تناسب برنامج حج طيران تحسين 🌿\n\nسعره ٢٥٠ ألف للفرد — ١٩ يوم — غير شامل تذكرة الطيران، وأهم ميزة فيه إن بعد المناسك بتقعد ٧ أيام على ساحة الحرم، يعني مشاوير أقل وصلاة أسهل.\n\nالسعر ده على أساس الموسم اللي فات، والتأكيد النهائي بعد ضوابط الوزارة.\n\nلو تسمحلي رقم واتساب حضرتك عشان أبعثلك التفاصيل الكاملة وأثبتلك أولوية الحجز المبكر؟",
+    "corrected": "تمام يا فندم، أوضح لحضرتك الفرق ببساطة 🌿\n\n🚌 بري — ٢١٠ آلاف: نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n✈️ طيران اقتصادي — ٢٢٠ ألف: نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n⭐ طيران تحسين — ٢٥٠ ألف: بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n🏨 ٥ نجوم — ٤٩٠ ألف: إقامة فندقية مميزة طول الرحلة.\n\n(كل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.)\n\nحضرتك إيه الأهم بالنسبالك — التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين أرشحلك الأنسب — رقمك عليه واتساب؟",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-28T03:15:45.390784",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Dr. Safaa,\n\nThank you for your message.\n\nWe confirm that your contact number has been updated and noted as:\n\n+20 110 069 9797\n\nWe will use this number for communication regarding your booking BR-1440846019.\n\nBest regards,\nFTS Travels Operations Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-28T03:17:44.973628",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Mr. Clemence,\n\nThank you for contacting us.\n\nAs a special exception, we will do our best to reactivate your booking BR-1440336553 for tomorrow, Saturday, August 29, 2026.\n\nWe understand that the cancellation was made accidentally, and we will coordinate with our team to restore the booking and arrange your pickup.\n\nPlease keep your phone available on WhatsApp, and we will confirm the reactivation and pickup details with you as soon as possible.\n\nWe look forward to welcoming you tomorrow. 😊\n\nBest regards,\nFTS Travels Operations Team",
     "context": "UI Manual Edit"
   }
 ]

@@ -1,37 +1,31 @@
 """
-Workflow: Religious Prices Auto-Reply - ديني (📩 الأسعار - Exact Match لحظي)
-=============================================================================
-Workflow جديد ومستقل 100% — لا يلمس "Religious All Prices Auto-Reply"
-ولا "Religious 6 Programs Prices Auto-Reply" ولا أي Workflow موجود آخر.
-(تمت إضافة كلمة "Religious" و "ديني" في الاسم لتظهر في لوحة المدير الديني
-لأن الفلتر في الواجهة يعتمد على كلمة religious/ديني في الاسم — قاعدة النظام D.)
+Workflow: 📩 الأسعار Auto-Reply - Religious (ابعت 📩 الأسعار)
+====================================================================================
+Workflow جديد ومستقل 100% — لا يلمس أي Workflow موجود آخر.
+(تمت إضافة "Religious/ديني" في الاسم لتظهر في لوحة المدير الديني لأن الفلتر في
+الواجهة يعتمد على كلمة religious/ديني في الاسم — قاعدة النظام D.)
 
 المطلوب (من المدير):
-  اعمل workflow باسم: 📩 الأسعار
-  - لما عميل يبقي الكلمة (📩 الأسعار) في رسالته بنسبة تطابق 100% (Exact Match
-    بالظبط) — رسالة العميل تساوي الكلمة بالكامل (مساواة كاملة == بعد إزالة
-    الرموز غير الحرفية فقط بنفس منطق المحرك الرسمي knowledge_base._normalize_rule_text).
-  - الرد الثابت:
-    "حاضر، هبعتهم لحضرتك حالًا 🙏 قولي بس ميزانيتك التقريبية للفرد عشان اوضحلك
-    الأنسب فيهم ليك — أو اكتب "مش عارف" وأبعتلك الـ٦ على بعض."
+  اعمل workflow باسم: (ابعت 📩 الأسعار)
+  - أول ما يبقي في رسالة بكلمة "📩 الأسعار" بنسبة تطابق 100% (Exact Match بالظبط):
+    رسالة العميل تساوي الكلمة بالكامل (مساواة كاملة == بعد إزالة الرموز غير
+    الحرفية فقط بنفس منطق المحرك الرسمي knowledge_base._normalize_rule_text).
+  - ممنوع Contains / StartsWith / EndsWith: أي كلمة إضافية قبل النص أو بعده → لا رد.
+  - الرد الثابت (حرفياً كما طلب المدير): توضيح أسعار الحج (بري / طيران اقتصادي /
+    طيران تحسين / ٥ نجوم) وسؤال تحفيزي للعميل.
 
 القواعد المنفذة (كما طلب المدير + قواعد النظام):
-  - المطابقة: Exact Match 100% (الرسالة == الكلمة بالكامل بعد التطبيع الذي
-    يحذف الرموز غير الحرفية فقط — لا نوحّد الهمزات ولا الأرقام، فتطابق
-    "📩 الأسعار" حرفياً كما كتبها المدير، وكذلك "الأسعار" بدون الإيموجي لأن
-    التطبيع يحذف الإيموجي/الرموز غير الحرفية — لا تطابق أي جملة إضافية).
+  - المطابقة: Exact Match 100% (الإيموجي 📩 يُحذف بالتطبيع، فيُطابق النص كما كتبه
+    العميل مع أو بدون الإيموجي).
   - القسم المستهدف: Religious فقط (فلترة صارمة - لا يمس أي قسم آخر).
-  - الرد مباشرة (لحظي) على رسالة العميل: تخطي نافذة الـ 24 ساعة تلقائياً
-    لأن هذا رد مباشر (RESPONSE) على رسالة واردة وليس برومو مستقل.
-  - إرسال الرد مرة واحدة فقط لكل رسالة (حجز ذري Atomic Claim يمنع تكرار
-    الإرسال حتى لو وصلت نفس الرسالة من فيسبوك أكثر من مرة / Webhook
-    duplicate deliveries).
+  - الرد مباشرة (لحظي) على رسالة العميل: تخطي نافذة الـ 24 ساعة تلقائياً لأن هذا
+    رد مباشر (RESPONSE) على رسالة واردة وليس برومو مستقل.
+  - إرسال الرد مرة واحدة فقط لكل رسالة (حجز ذري Atomic Claim يمنع تكرار الإرسال
+    حتى لو وصلت نفس الرسالة من فيسبوك أكثر من مرة / Webhook duplicate deliveries).
   - احترام auto_reply_hold_until و needs_help: لا نتداخل مع موظف بشري.
   - تجاهل رسائل الميديا غير النصية (صوت/فيديو/ستيكر/مستند).
-  - لا نلمس أي قواعد strict_qa_rules ولا knowledge.db إطلاقاً:
-    الكلمة المفتاحية والرد معرفان محلياً هنا في هذا الملف (قائمة KEYWORDS).
-  - كل التواريخ تُقارن بتوقيت القاهرة chat_db.get_cairo_time() وليس utcnow
-    (قاعدة النظام F).
+  - كل التواريخ تُقارن بتوقيت القاهرة chat_db.get_cairo_time() وليس utcnow (قاعدة F).
+  - حفظ الحالة عبر ملفات JSON محلية (fts_paths.get_data_path) — يمنع agent.load_state (قاعدة G).
 """
 
 import os
@@ -47,40 +41,37 @@ from fts_paths import get_data_path
 # =============================================================================
 # ⚙️ الكلمة المفتاحية والرد الثابت المعتمد (عدّل هنا فقط لإضافة/تعديل الكلمات)
 # =============================================================================
-# IMPORTANT: النص التالي منسوخ حرفياً من طلب المدير
-# — مع الحفاظ على النص العربي والإيموجي وعلامات الترقيم كما هي.
+# IMPORTANT: النص التالي منسوخ حرفياً من طلب المدير — مع الحفاظ على النص
+# العربي والإيموجي والأرقام وعلامات الترقيم كما هي.
 KEYWORDS = [
     {
         "keyword": "📩 الأسعار",
         "reply": (
-            "تمام يا فندم، أوضح لحضرتك الفرق ببساطة 🌿\n\n"
-            "🚌 بري — ٢١٠ آلاف: نفس المناسك ونفس الإشراف، والسفر بري "
-            "بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n"
-            "✈️ طيران اقتصادي — ٢٢٠ ألف: نفس مستوى البري لكن السفر طيران — "
-            "توفير في الوقت والمجهود بفرق بسيط.\n"
-            "⭐ طيران تحسين — ٢٥٠ ألف: بعد المناسك ٧ أيام على ساحة الحرم — "
-            "مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n"
-            "🏨 ٥ نجوم — ٤٩٠ ألف: إقامة فندقية مميزة طول الرحلة.\n\n"
-            "(كل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.)\n\n"
-            "حضرتك إيه الأهم بالنسبالك — التكلفة ولا الراحة؟ وأسهل حاجة أكلمك "
-            "دقيقتين أرشحلك الأنسب — رقمك عليه واتساب؟"
+            "تمام يا فندم، أوضح لحضرتك الفرق ببساطة 🌿\n"
+            "\n"
+            "🚌 بري — ٢١٠ آلاف: نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n"
+            "✈️ طيران اقتصادي — ٢٢٠ ألف: نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n"
+            "⭐ طيران تحسين — ٢٥٠ ألف: بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n"
+            "🏨 ٥ نجوم — ٤٩٠ ألف: إقامة فندقية مميزة طول الرحلة.\n"
+            "\n"
+            "(كل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.)\n"
+            "\n"
+            "حضرتك إيه الأهم بالنسبالك — التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين أرشحلك الأنسب — رقمك عليه واتساب؟"
         ),
         "enabled": True,   # مفعّلة
     },
 ]
 
 # ملف الحالة الاحتياطي (يُستخدم فقط لو تعطلت قاعدة البيانات)
-STATE_FILE = get_data_path("religious_prices_autoreply_state.json")
+STATE_FILE = get_data_path("prices_autoreply_state.json")
 
 # قاعدة بيانات الحالة الذرية (Atomic Dedup) - مستقلة تماماً عن أي سكربت آخر
-DEDUP_DB = get_data_path("religious_prices_autoreply_dedup.db")
+DEDUP_DB = get_data_path("prices_autoreply_dedup.db")
 
 # أقصى عدد سجلات محفوظة في ملف الحالة الاحتياطي (منع نمو الملف بلا حدود)
 MAX_STATE_RECORDS = 2000
 
 # مهلة منع التكرار: إذا أُرسل نفس الرد لنفس المحادثة خلال هذه المدة نتجاهل (بالثواني)
-# السبب: فيسبوك يُرسل أحياناً نفس رسالة العميل أكثر من مرة (Webhook duplicate deliveries)
-# بنفس النص ومعرفات (mid) مختلفة، فنحتاج حماية ذرية تمنع الإرسال المتكرر.
 DEDUP_WINDOW_SECONDS = 600
 
 log = logging.getLogger("ReligiousPricesAutoReply")
@@ -115,18 +106,15 @@ def _dedup_key(chat_id: str, external_id: str, message_body: str) -> str:
 
 
 def _normalize_body_for_dedup(message_body: str) -> str:
-    r"""
+    """
     توحيد نص الرسالة لمنع التكرار فقط (وليس للمطابقة):
     يزيل الإيموجي وعلامات الترقيم والنقاط بنفس طريقة المحرك الرسمي
-    (حذف [^\w\s]) بحيث تُعتبر "📩 الأسعار" و "الأسعار." رسالة واحدة لنفس
+    (حذف [^\w\s]) بحيث تُعتبر "📩 الأسعار" و"الاسعار." رسالة واحدة لنفس
     المحادثة خلال نافذة منع التكرار.
-    ملاحظة: لا نوحّد الهمزات هنا أيضاً (مطابقة دقيقة حتى في منع التكرار).
     """
     try:
         s = str(message_body or "").strip().lower()
-        # إزالة علامات التشكيل العربية والتطويل
         s = re.sub(r"[\u0610-\u061A\u0640\u064B-\u065F\u0670\u06D6-\u06ED]", "", s)
-        # إزالة كل ما ليس حرفاً أو رقماً (يمحو الإيموجي والترقيم)
         s = re.sub(r"[^\w\s]", " ", s, flags=re.UNICODE)
         s = re.sub(r"\s+", " ", s, flags=re.UNICODE)
         return s.strip()
@@ -144,7 +132,7 @@ def _ensure_dedup_table():
             conn.execute("PRAGMA busy_timeout = 30000;")
             conn.execute(
                 """
-                CREATE TABLE IF NOT EXISTS religious_prices_reply_dedup (
+                CREATE TABLE IF NOT EXISTS prices_reply_dedup (
                     dedup_key TEXT PRIMARY KEY,
                     chat_id TEXT NOT NULL,
                     replied_at TEXT NOT NULL,
@@ -162,11 +150,8 @@ def _claim_reply(chat_id: str, external_id: str, message_body: str, keyword: str
     محاولة حجز (Claim) حق الرد على هذه الرسالة بشكل ذري.
     تعيد True إذا كان هذا التشغيل هو الأول (يُسمح بالإرسال)،
     و False إذا كانت الرسالة مُعالجة بالفعل (يُمنع الإرسال المكرر).
-    المفتاح الموحد يعتمد على المحادثة + النص المطبع (بدون إيموجي/ترقيم)
-    وليس على mid المتغير من فيسبوك.
     """
     _ensure_dedup_table()
-    # مفتاح موحد: chat_id + hash للنص المطبع (يتجاهل الإيموجي والنقاط)
     try:
         normalized = _normalize_body_for_dedup(message_body)
         body_hash = hashlib.sha256(normalized.encode("utf-8", errors="ignore")).hexdigest()[:24]
@@ -175,8 +160,7 @@ def _claim_reply(chat_id: str, external_id: str, message_body: str, keyword: str
     unified_key = f"{chat_id}:{body_hash}"
     try:
         import chat_db as _cdb
-        now_raw = _cdb.get_cairo_time()
-        now = datetime.fromisoformat(now_raw)
+        now = datetime.fromisoformat(_cdb.get_cairo_time())
         if now.tzinfo is not None:
             now = now.replace(tzinfo=None)
     except Exception:
@@ -187,15 +171,13 @@ def _claim_reply(chat_id: str, external_id: str, message_body: str, keyword: str
         with sqlite3.connect(DEDUP_DB, timeout=30.0) as conn:
             conn.execute("PRAGMA busy_timeout = 30000;")
             cur = conn.cursor()
-            # حذف السجلات القديمة (أقدم من النافذة) للحفاظ على صغر الجدول
             try:
                 cutoff = (now - timedelta(seconds=DEDUP_WINDOW_SECONDS)).isoformat()
-                cur.execute("DELETE FROM religious_prices_reply_dedup WHERE replied_at < ?", (cutoff,))
+                cur.execute("DELETE FROM prices_reply_dedup WHERE replied_at < ?", (cutoff,))
             except Exception:
                 pass
-            # INSERT OR IGNORE: إذا كان المفتاح موجوداً بالفعل فلن يُدرج => منع التكرار
             cur.execute(
-                "INSERT OR IGNORE INTO religious_prices_reply_dedup (dedup_key, chat_id, replied_at, keyword) VALUES (?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO prices_reply_dedup (dedup_key, chat_id, replied_at, keyword) VALUES (?, ?, ?, ?)",
                 (unified_key, str(chat_id or ""), now_iso, str(keyword or "")),
             )
             conn.commit()
@@ -203,7 +185,6 @@ def _claim_reply(chat_id: str, external_id: str, message_body: str, keyword: str
         return claimed
     except Exception as e:
         log.error(f"Failed to claim dedup: {e}")
-        # في حال فشل قاعدة البيانات، نعود للملف الاحتياطي
         return _legacy_claim(chat_id, external_id, message_body)
 
 
@@ -250,11 +231,6 @@ def _match_keyword(message_body: str):
     (مساواة كاملة == بعد إزالة الرموز غير الحرفية فقط — نفس منطق المحرك الرسمي).
     - ممنوع Contains: أي كلمة إضافية قبل النص أو بعده تكسر المساواة → لا رد.
     - ممنوع StartsWith / EndsWith.
-    - إذا تساوت رسالتان مع كلمتين مختلفتين (مستحيل عملياً) نعيد أول تطابق فقط
-      (عدم تشغيل أكثر من رد على الرسالة نفسها).
-    مثال تطابقي: "📩 الأسعار" بمفردها → تُطابق (الإيموجي يُحذف بالتطبيع والهمزة
-    تبقى كما هي) — وكذلك "الأسعار" بدون الإيموجي — أما "عايز أعرف الأسعار كلها"
-    فلا تُطابق (كلمات إضافية).
     """
     normalized_message = _normalize_for_match(message_body)
     if not normalized_message:
@@ -295,8 +271,7 @@ def _is_non_text_media(message_body: str) -> bool:
 def _is_human_active(chat_id: str) -> bool:
     """
     هل يوجد مساعد بشري نشط في المحادثة (needs_help=1)؟
-    تمت إضافة هذا الشرط حتى لا يتعارض الرد الآلي مع تدخل الموظف البشري
-    (نفس سلوك المسار الرئيسي: needs_help=1 يوقف الرد الآلي).
+    تمت إضافة هذا الشرط حتى لا يتعارض الرد الآلي مع تدخل الموظف البشري.
     """
     try:
         import chat_db
@@ -325,10 +300,8 @@ def _is_chat_on_hold(chat_id: str) -> bool:
             hold_dt = datetime.fromisoformat(hold_raw)
             if hold_dt.tzinfo is not None:
                 hold_dt = hold_dt.replace(tzinfo=None)
-            # إذا كانت فترة الإيقاف ما زالت سارية → لا نرسل
             if hold_dt > now:
                 return True
-            # انتهت الفترة → نلغي الإيقاف ونسمح بالإرسال
             try:
                 chat_db.update_auto_reply_hold_until(chat_id, None)
             except Exception:
@@ -388,9 +361,6 @@ def run(agent, payload: dict = None) -> dict:
         return {"ok": True, "skipped": "empty_reply", "chat_id": chat_id}
 
     # ===== منع التكرار (الحجز الذري) - بعد تحديد الكلمة وقبل الإرسال =====
-    # الـ claim يعتمد على مفتاح موحد (chat_id + hash النص المطبع) وليس على
-    # mid المتغير من فيسبوك، حتى لو وصلت نفس الرسالة أكثر من مرة خلال النافذة
-    # الزمنية. كما يتجاهل الإيموجي والنقاط في النص لمنع التكرار.
     claimed = _claim_reply(chat_id, incoming_external_message_id, message_body, matched.get("keyword"))
     if not claimed:
         return {"ok": True, "skipped": "already_processed", "chat_id": chat_id}
@@ -449,7 +419,7 @@ def run(agent, payload: dict = None) -> dict:
             if agent and hasattr(agent, "cancel_whatsapp_ai_processing"):
                 agent.cancel_whatsapp_ai_processing(
                     chat_id=chat_id,
-                    reason="religious_prices_autoreply",
+                    reason="prices_autoreply",
                 )
         except Exception:
             pass

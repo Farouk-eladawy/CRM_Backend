@@ -33,6 +33,10 @@ Workflow: Religious "🕋 الراحة والقرب من الحرم" Auto-Reply 
       المفتاحية التي تحمل إيموجي.
   - القسم المستهدف: Religious فقط (المحتوى عن برنامج التحسين وأسعار الحج —
     فلترة صارمة من الجذور لا تمس أي قسم آخر).
+  - القنوات المستهدفة: فيسبوك/واتساب فقط (طلب المدير 2026-08-28: "يطبق على
+    القسم الديني فقط لرسائل فيسبوك/واتساب") — أي مصدر آخر (Email / Instagram
+    / Messenger variants ...) يُتجاهل تماماً في بداية السكربت + Guard في
+    steps_json (طبقتا حماية).
   - trigger_type = "message_received" (رد لحظي مباشر على رسالة العميل الواردة).
   - الرد المباشر يخطي نافذة الـ 24 ساعة تلقائياً لأن هذا رد (RESPONSE) وليس برومو.
   - إرسال الرد مرة واحدة فقط لكل رسالة (حجز ذري Atomic Claim يمنع تكرار الإرسال
@@ -389,6 +393,13 @@ def run(agent, payload: dict = None) -> dict:
     # قسم آخر (Hurghada / Sharm / Sales / Drivers ...) — الفلتر هنا في أول السكربت.
     if location.lower() != "religious":
         return {"ok": True, "skipped": "not_religious", "chat_id": chat_id}
+
+    # ===== فلترة صارمة من الجذور: القنوات المعتمدة فيسبوك/واتساب فقط =====
+    # طلب المدير (2026-08-28): الـ Workflow يطبق على القسم الديني فقط لرسائل
+    # فيسبوك/واتساب — أي مصدر آخر (Email / Instagram / ...) يُتجاهل تماماً
+    # (طبقة حماية ثانية بعد Guard الـ steps_json في محرك الأتمتة).
+    if source.lower() not in ("facebook", "whatsapp"):
+        return {"ok": True, "skipped": "unsupported_source", "chat_id": chat_id}
 
     if not chat_id or not message_body or not sender_identifier:
         return {"ok": True, "skipped": "missing_data", "chat_id": chat_id}

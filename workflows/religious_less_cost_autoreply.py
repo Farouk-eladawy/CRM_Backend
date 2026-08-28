@@ -30,6 +30,9 @@ Workflow: Religious "💰 أقل تكلفة" Auto-Reply - ديني (Exact Match 
       "💰 أقل تكلفة" معاً — نفس سلوك باقي الكلمات المفتاحية التي تحمل إيموجي.
   - القسم المستهدف: Religious فقط (المحتوى عن برنامج الحج البري والأسعار —
     فلترة صارمة من الجذور لا تمس أي قسم آخر).
+  - القنوات المستهدفة: فيسبوك / واتساب فقط (طلب المدير 2026-08-28). أي مصدر
+    آخر (Email / البريد الداخلي ...) يُتجاهل فوراً ولا يُرسل له شيء — نفس
+    فلتر المصدر الموجود في Guard الخطوات (event.payload.source).
   - trigger_type = "message_received" (رد لحظي مباشر على رسالة العميل الواردة).
   - الرد المباشر يخطي نافذة الـ 24 ساعة تلقائياً لأن هذا رد (RESPONSE) وليس برومو.
   - إرسال الرد مرة واحدة فقط لكل رسالة (حجز ذري Atomic Claim يمنع تكرار الإرسال
@@ -387,6 +390,12 @@ def run(agent, payload: dict = None) -> dict:
     # قسم آخر (Hurghada / Sharm / Sales / Drivers ...) — الفلتر هنا في أول السكربت.
     if location.lower() != "religious":
         return {"ok": True, "skipped": "not_religious", "chat_id": chat_id}
+
+    # ===== فلترة صارمة: فيسبوك / واتساب فقط (طلب المدير 2026-08-28) =====
+    # أي مصدر آخر (Email / بريد داخلي ...) يُتجاهل فوراً — نفس فلتر Guard
+    # المصدر في steps_json (event.payload.source contains_any facebook/whatsapp).
+    if str(source).lower() not in ("facebook", "whatsapp"):
+        return {"ok": True, "skipped": "not_fb_wa", "chat_id": chat_id}
 
     if not chat_id or not message_body or not sender_identifier:
         return {"ok": True, "skipped": "missing_data", "chat_id": chat_id}

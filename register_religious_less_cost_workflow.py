@@ -31,6 +31,9 @@ workflow in automation_workflows (chat_history.db).
     حقول حدث الرسالة كاملة إلى السكربت.
   - Guard: event.payload.location يحتوي "Religious" (فلترة من الجذور) —
     المحتوى عن برنامج الحج البري وأسعاره وهو تخصص القسم الديني.
+  - Guard إضافي: event.payload.source فيسبوك/واتساب فقط (طلب المدير 2026-08-28)
+    — أي مصدر آخر (Email ...) يُمنع من الدخول حتى لا يشتغل الـ Workflow على
+    رسائل البريد أو أي قناة أخرى.
 
 قواعد النظام المطبقة:
   - الاسم يحتوي على "Religious" و "ديني" حتى يظهر في لوحة المدير الديني
@@ -77,6 +80,12 @@ steps = [
         "case_insensitive": True,
     },
     {
+        "type": "guard",
+        "path": "event.payload.source",
+        "contains_any": ["facebook", "whatsapp"],
+        "case_insensitive": True,
+    },
+    {
         "type": "http_request",
         "method": "POST",
         "url": "http://127.0.0.1:5001/api/automation/run_script",
@@ -100,7 +109,8 @@ payload = {
     "name": "💰 أقل تكلفة - Religious Auto-Reply - ديني (Exact Match لحظي)",
     "description": (
         "الرد التلقائي اللحظي (رد مباشرة) على رسائل عملاء القسم الديني "
-        "(Religious فقط - فلترة صارمة لا تمس أي قسم آخر) عندما يرسل العميل "
+        "(Religious فقط - فلترة صارمة لا تمس أي قسم آخر) عبر قنوات فيسبوك/واتساب "
+        "فقط (طلب المدير: لا Email) عندما يرسل العميل "
         "عبارة '💰 أقل تكلفة' بنسبة تطابق 100% (Exact Match كامل - "
         "ممنوع Contains/StartsWith/EndsWith). الرد الثابت: اختيار واضح 👍 "
         "الأنسب لحضرتك غالبًا برنامج الحج البري + توضيح أن التوفير الحقيقي "

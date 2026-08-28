@@ -31,8 +31,12 @@ workflow in automation_workflows (chat_history.db).
     http://127.0.0.1:5001/api/automation/run_script
     مع body = {"script_name": "religious_haram_comfort_autoreply.py"} + تمرير
     حقول حدث الرسالة كاملة إلى السكربت.
-  - Guard: event.payload.location يحتوي "Religious" (فلترة من الجذور) —
+  - Guard 1: event.payload.location يحتوي "Religious" (فلترة من الجذور) —
     المحتوى عن برنامج التحسين وأسعار الحج وهو تخصص القسم الديني.
+  - Guard 2 (طلب المدير 2026-08-28: "يطبق على القسم الديني فقط لرسائل
+    فيسبوك/واتساب"): event.payload.source يحتوي "facebook" أو "whatsapp" —
+    أي مصدر آخر (Email / Instagram / ...) يُمنع من الوصول للسكربت من الأساس
+    + طبقة حماية ثانية داخل السكربت نفسه.
 
 قواعد النظام المطبقة:
   - الاسم يحتوي على "Religious" و "ديني" حتى يظهر في لوحة المدير الديني
@@ -79,6 +83,13 @@ steps = [
         "case_insensitive": True,
     },
     {
+        # طلب المدير: القسم الديني فقط لرسائل فيسبوك/واتساب — حجب أي مصدر آخر
+        "type": "guard",
+        "path": "event.payload.source",
+        "contains_any": ["facebook", "whatsapp"],
+        "case_insensitive": True,
+    },
+    {
         "type": "http_request",
         "method": "POST",
         "url": "http://127.0.0.1:5001/api/automation/run_script",
@@ -102,7 +113,9 @@ payload = {
     "name": "🕋 الراحة والقرب من الحرم - Religious Auto-Reply - ديني (Exact Match لحظي)",
     "description": (
         "الرد التلقائي اللحظي (رد مباشرة) على رسائل عملاء القسم الديني "
-        "(Religious فقط - فلترة صارمة لا تمس أي قسم آخر) عندما يرسل العميل "
+        "(Religious فقط - فلترة صارمة لا تمس أي قسم آخر) عبر قنوات فيسبوك/واتساب "
+        "فقط (Guard على event.payload.source + فحص داخل السكربت - أي مصدر آخر "
+        "مثل Email/Instagram يُتجاهل تماماً) عندما يرسل العميل "
         "عبارة '🕋 الراحة والقرب من الحرم' بنسبة تطابق 100% (Exact Match كامل - "
         "ممنوع Contains/StartsWith/EndsWith). الرد الثابت: اختيار موفق 👍 "
         "الأنسب لحضرتك غالبًا برنامج التحسين + معلومة من خبرتنا أن أكتر وقت "

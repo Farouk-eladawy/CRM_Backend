@@ -147,6 +147,42 @@ r = mod.run(agent, {
 })
 check("media_skipped", r.get("skipped") == "non_text_media" and len(agent.sent) == 0, str(r))
 
+# 11) طلب المدير: فيسبوك/واتساب فقط — مصدر Email يُتجاهل تماماً
+agent = MockAgent()
+r = mod.run(agent, {
+    "chat_id": "test-haram-11", "message_body": "🕋 الراحة والقرب من الحرم",
+    "source": "email", "sender_identifier": "user@example.com",
+    "location": "Religious",
+})
+check("source_email_skipped", r.get("skipped") == "unsupported_source" and len(agent.sent) == 0, str(r))
+
+# 12) مصدر Instagram يُتجاهل تماماً (غير فيسبوك/واتساب)
+agent = MockAgent()
+r = mod.run(agent, {
+    "chat_id": "test-haram-12", "message_body": "🕋 الراحة والقرب من الحرم",
+    "source": "instagram", "sender_identifier": "ig-user",
+    "location": "Religious",
+})
+check("source_instagram_skipped", r.get("skipped") == "unsupported_source" and len(agent.sent) == 0, str(r))
+
+# 13) مصدر "Facebook" بأحرف كبيرة (case-insensitive) -> يعمل
+agent = MockAgent()
+r = mod.run(agent, {
+    "chat_id": "test-haram-13", "message_body": "🕋 الراحة والقرب من الحرم",
+    "source": "Facebook", "sender_identifier": "psid-1313",
+    "location": "Religious",
+})
+check("source_fb_case_insensitive", r.get("sent") is True and len(agent.sent) == 1, str(r))
+
+# 14) مصدر "WhatsApp" بأحرف كبيرة (case-insensitive) -> يعمل
+agent = MockAgent()
+r = mod.run(agent, {
+    "chat_id": "test-haram-14", "message_body": "🕋 الراحة والقرب من الحرم",
+    "source": "WhatsApp", "sender_identifier": "201005555555",
+    "location": "Religious", "receiving_phone_id": "1029384756",
+})
+check("source_wa_case_insensitive", r.get("sent") is True and len(agent.sent) == 1, str(r))
+
 # ===== التقرير =====
 print("\n" + "=" * 70)
 print("نتائج اختبار Workflow: 🕋 الراحة والقرب من الحرم")

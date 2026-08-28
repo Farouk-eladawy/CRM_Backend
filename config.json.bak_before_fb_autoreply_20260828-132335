@@ -162,10 +162,10 @@
     "refresh_token": "eyJraWQiOiJkNjFiYzMxMiIsImFsZyI6IkVTMjU2In0.eyJpZCI6MTI1MjIxMSwidmVyIjo1LCJwdWIiOnRydWUsInNjb3BlcyI6WyJydzphbGwiXSwiZXhwIjoyMDcyODIyNDAwLCJqdGkiOiI3NWQ5MTQzYi1mYzA4LTRhZTQtODYzOC1kMDY3MDliMzIzYTYiLCJraW5kIjoicmVmcmVzaCIsInNiZCI6bnVsbH0.AHHmXJ23eSItcMyp28R3d1fGEEh4Fy7IKFQOaZP3JFKGJRzxmNb8gqyI8gqFwwIsjMzrKxz9Uvcs9UCLr-8afg"
   },
   "facebook": {
-    "page_access_token": "EAAOioPl0MaMBSa5VmnQZCIwaZBhg9jpSRXeC9qLQbNPB2haGZC6Q69P0csJVivjA8CAW9pK180hDVrb0H7UBj1xPxFOA8RH7pUHBPFdorZCENZBkCywEjc0VoZCmZCqeWkaG4fqPkpeIRLCZBJkcbduPc3tJ7gyfYKwdHsX9rHawHQT82wTGBJxjn2g3u5tVz9qIJP8ZD",
+    "page_access_token": "EAAOioPl0MaMBSBXqDMxqc97tJbEZB0FOV6BW23rPRaL6kkTo1dKeEMld50sg0vXyLAfZC5reI9SIW4LWxVyMXfxzfSarDnZCiUNwxO2DqszLLwZBnCSZBhTOAgvgV3YIQvFLcZC4ZA5Oa3BMYm3xvR9I2IKFBMpdaR4jTYbPVI19WBx5tFMypb5zXsf4HkMjL54cIvZCEIAZD",
     "page_id": "134596153060573",
     "page_name": "FTS Travels اف تي اس للسياحة - رحلات الحج والعمرة",
-    "connected_at": "2026-08-28T20:33:38.825733",
+    "connected_at": "2026-08-15T16:57:34.867082",
     "routing_location": "Religious",
     "app_id": "1023237193740707",
     "app_secret": "c45687d6e2585df4ae05a16d87a740e3",
@@ -233,7 +233,7 @@
     "products_file": "gyg_products.json",
     "async_airtable": true
   },
-  "facebook_auto_reply_enabled": true,
+  "facebook_auto_reply_enabled": false,
   "auto_reply_locations": [
     "Sharm",
     "Hurghada/Cairo"

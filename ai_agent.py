@@ -39628,6 +39628,13 @@ Write ONE short message only. No JSON. No explanations."""
                             for x in (user_obj.get("allowSensitive") or [])
                             if str(x).strip()
                         ][:40],
+                        "deniedInboxTools": [
+                            str(x).strip().lower()
+                            for x in (user_obj.get("deniedInboxTools") or [])
+                            if str(x).strip().lower() in (
+                                "ai_reply", "optimize", "wa_template", "fb_template", "attach", "voice"
+                            )
+                        ][:20],
                         "canManageChannels": bool(user_obj.get("canManageChannels") or False),
                         "createdBy": str(user_obj.get("createdBy") or ""),
                         "skipWhatsAppSetup": bool(user_obj.get("skipWhatsAppSetup") or False),
@@ -39769,6 +39776,13 @@ Write ONE short message only. No JSON. No explanations."""
                                                 for x in (u.get("allowSensitive") or [])
                                                 if str(x).strip()
                                             ][:40],
+                                            "deniedInboxTools": [
+                                                str(x).strip().lower()
+                                                for x in (u.get("deniedInboxTools") or [])
+                                                if str(x).strip().lower() in (
+                                                    "ai_reply", "optimize", "wa_template", "fb_template", "attach", "voice"
+                                                )
+                                            ][:20],
                                             "canManageChannels": bool(u.get("canManageChannels") or False),
                                             "createdBy": str(u.get("createdBy") or ""),
                                             "skipWhatsAppSetup": bool(u.get("skipWhatsAppSetup") or False),

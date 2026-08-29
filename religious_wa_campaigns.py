@@ -452,7 +452,13 @@ def _set_campaign_status(campaign_id: str, status: str, error: str = None):
         conn.commit()
 
 
+def _is_campaign_running(campaign_id: str) -> bool:
+    with _SEND_LOCK:
+        return campaign_id in _RUNNING
+
+
 def _send_loop(agent, campaign_id: str):
+    stopped_early = False
     try:
         camp = get_campaign(campaign_id)
         if not camp:
@@ -469,9 +475,12 @@ def _send_loop(agent, campaign_id: str):
             ]
         sent_n = 0
         for idx, phone in enumerate(phones):
-            with _SEND_LOCK:
-                still = campaign_id in _RUNNING
-            if not still:
+            if not _is_campaign_running(campaign_id):
+                stopped_early = True
+                break
+            live = get_campaign(campaign_id) or {}
+            if str(live.get("status") or "") == "cancelled":
+                stopped_early = True
                 break
             if not _claim(campaign_id, phone):
                 continue
@@ -552,12 +561,21 @@ def _send_loop(agent, campaign_id: str):
 
             if idx < len(phones) - 1:
                 time.sleep(delay_sec)
+                if not _is_campaign_running(campaign_id):
+                    stopped_early = True
+                    break
                 if (idx + 1) % 20 == 0:
                     time.sleep(5)
-        _set_campaign_status(campaign_id, "completed")
+        final = get_campaign(campaign_id) or {}
+        if stopped_early or str(final.get("status") or "") == "cancelled":
+            _set_campaign_status(campaign_id, "cancelled")
+        else:
+            _set_campaign_status(campaign_id, "completed")
     except Exception as e:
         log.exception("campaign send loop crashed")
-        _set_campaign_status(campaign_id, "completed", str(e))
+        final = get_campaign(campaign_id) or {}
+        if str(final.get("status") or "") != "cancelled":
+            _set_campaign_status(campaign_id, "completed", str(e))
     finally:
         with _SEND_LOCK:
             _RUNNING.discard(campaign_id)
@@ -585,14 +603,131 @@ def start_campaign(agent, campaign_id: str, retry_failed: bool = False) -> dict:
 
 
 def cancel_campaign(campaign_id: str) -> dict:
+    camp = get_campaign(campaign_id)
+    if not camp:
+        raise ValueError("campaign not found")
     with _SEND_LOCK:
         _RUNNING.discard(campaign_id)
     _set_campaign_status(campaign_id, "cancelled")
     with _connect() as conn:
         conn.execute(
-            "UPDATE recipients SET status = 'pending' WHERE campaign_id = ? AND status = 'sending'",
+            "UPDATE recipients SET status = 'pending', error = NULL WHERE campaign_id = ? AND status = 'sending'",
             (campaign_id,),
         )
+        conn.commit()
+    return get_campaign(campaign_id)
+
+
+def update_campaign(campaign_id: str, payload: dict) -> dict:
+    """Edit draft/cancelled/completed campaign content and optionally add phones."""
+    camp = get_campaign(campaign_id)
+    if not camp:
+        raise ValueError("campaign not found")
+    status = str(camp.get("status") or "")
+    if status == "sending" or _is_campaign_running(campaign_id):
+        raise ValueError("cannot edit while campaign is sending — stop it first")
+
+    name = payload.get("name")
+    send_type = payload.get("send_type")
+    template_name = payload.get("template_name")
+    template_language = payload.get("template_language")
+    template_header_media_url = payload.get("template_header_media_url")
+    template_header_media_type = payload.get("template_header_media_type")
+    text_body = payload.get("text_body") if "text_body" in payload else payload.get("text")
+    delay_sec = payload.get("delay_sec")
+    variables = payload.get("template_variables")
+    phones_raw = payload.get("phones") if "phones" in payload else payload.get("phone_list")
+    reset_to_draft = bool(payload.get("reset_to_draft", True))
+
+    next_send_type = str(send_type or camp.get("send_type") or "").strip().lower()
+    if next_send_type not in ("template", "text"):
+        raise ValueError("send_type must be template or text")
+
+    next_name = str(name if name is not None else camp.get("name") or "").strip()
+    if not next_name:
+        raise ValueError("name is required")
+
+    next_template_name = str(
+        template_name if template_name is not None else camp.get("template_name") or ""
+    ).strip()
+    next_template_language = str(
+        template_language if template_language is not None else camp.get("template_language") or "en"
+    ).strip() or "en"
+    next_text_body = str(
+        text_body if text_body is not None else camp.get("text_body") or ""
+    ).strip()
+    if next_send_type == "template" and not next_template_name:
+        raise ValueError("template_name is required")
+    if next_send_type == "text" and not next_text_body:
+        raise ValueError("text_body is required")
+
+    next_delay = float(delay_sec if delay_sec is not None else camp.get("delay_sec") or 2.5)
+    if next_delay < 1.5:
+        next_delay = 1.5
+    if next_delay > 8:
+        next_delay = 8
+
+    if variables is None:
+        next_vars = camp.get("template_variables") or []
+    elif isinstance(variables, list):
+        next_vars = [str(x) for x in variables]
+    else:
+        next_vars = []
+
+    next_header_url = str(
+        template_header_media_url
+        if template_header_media_url is not None
+        else camp.get("template_header_media_url")
+        or ""
+    ).strip()
+    next_header_type = str(
+        template_header_media_type
+        if template_header_media_type is not None
+        else camp.get("template_header_media_type")
+        or "image"
+    ).strip() or "image"
+
+    new_phones = parse_phone_list(phones_raw) if phones_raw is not None else []
+
+    with _connect() as conn:
+        conn.execute(
+            """
+            UPDATE campaigns SET
+                name = ?,
+                send_type = ?,
+                template_name = ?,
+                template_language = ?,
+                template_header_media_url = ?,
+                template_header_media_type = ?,
+                template_variables_json = ?,
+                text_body = ?,
+                delay_sec = ?,
+                status = CASE WHEN ? THEN 'draft' ELSE status END,
+                finished_at = CASE WHEN ? THEN NULL ELSE finished_at END,
+                error = CASE WHEN ? THEN NULL ELSE error END
+            WHERE id = ?
+            """,
+            (
+                next_name,
+                next_send_type,
+                next_template_name,
+                next_template_language,
+                next_header_url,
+                next_header_type,
+                json.dumps(next_vars, ensure_ascii=False),
+                next_text_body,
+                next_delay,
+                1 if reset_to_draft and status in ("cancelled", "completed", "draft") else 0,
+                1 if reset_to_draft and status in ("cancelled", "completed") else 0,
+                1 if reset_to_draft else 0,
+                campaign_id,
+            ),
+        )
+        if new_phones:
+            conn.executemany(
+                "INSERT OR IGNORE INTO recipients (campaign_id, phone, status) VALUES (?, ?, 'pending')",
+                [(campaign_id, p) for p in new_phones],
+            )
         conn.commit()
     return get_campaign(campaign_id)
 
@@ -634,10 +769,20 @@ def register_routes(app, agent):
             log.exception("religious_wa_campaigns list/create")
             return jsonify({"status": "error", "message": str(e)}), 500
 
-    @app.route("/api/religious_wa_campaigns/<campaign_id>", methods=["GET", "OPTIONS"])
-    def api_rwc_get(campaign_id):
+    @app.route("/api/religious_wa_campaigns/<campaign_id>", methods=["GET", "PUT", "PATCH", "OPTIONS"])
+    def api_rwc_get_or_update(campaign_id):
         if request.method == "OPTIONS":
             return _ok_options()
+        if request.method in ("PUT", "PATCH"):
+            try:
+                payload = request.get_json(silent=True) or {}
+                camp = update_campaign(campaign_id, payload)
+                return jsonify({"status": "success", "data": camp}), 200
+            except ValueError as e:
+                return jsonify({"status": "error", "message": str(e)}), 400
+            except Exception as e:
+                log.exception("update campaign")
+                return jsonify({"status": "error", "message": str(e)}), 500
         camp = get_campaign(campaign_id)
         if not camp:
             return jsonify({"status": "error", "message": "not found"}), 404

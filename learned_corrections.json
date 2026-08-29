@@ -1,41 +1,5 @@
 [
   {
-    "timestamp": "2026-08-29T01:15:05.392132",
-    "original": "تمام، الحجز ليك شخصيًا إن شاء الله. حضرتك مهتم ببرامج الحج ولا العمرة؟ عشان أبعثلك التفاصيل والبرامج المناسبة ليك.\n\nمع خالص التحية،\nمسؤول المبيعات أحمد خليل",
-    "corrected": "الحصة محدودة والأولوية بترتيب التسجيل — وبالفعل أكتر من نصها اكتمل.\nأنا أحمد خليل من فريق الحجوزات، ورقمي 01288427370 لو حبيت تكلمني في أي وقت.\nأسهل حاجة أكلمك دقيقتين أجاوبك على أي سؤال ونثبّتلك مكانك — رقم حضرتك عليه واتساب؟",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-29T01:18:46.864661",
-    "original": "وصلني رقم حضرتك ✅ أنا مسؤول المبيعات أيه محمد من FTS Travels، هكلمك خلال ساعة على نفس الرقم إن شاء الله — ولو الوقت مش مناسب قولّي وأنا أنزّل على اللي يناسب حضرتك.",
-    "corrected": "تم التواصل",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-29T01:38:33.282202",
-    "original": "حاضر يا فندم 🌿\n\nالبرنامج الاقتصادي (حج طيران اقتصادي):\n- المدة: ١٧ يوم\n- السعر: ٢٢٠ ألف جنيه — بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة\n- غير شامل تذكرة الطيران (الموسم اللي فات كانت في حدود ٥٠ ألف)\n- إقامة قريبة من الحرم + إفطار وعشاء\n- الحصة الأولى اكتملت، والتسجيل مفتوح حاليًا في الحصة الثانية\n\nبالنسبة للدفع كاش: متاح طبعًا في مقر الشركة بالمعادي، وكمان تحويل بنكي أو إنستاباي — لكن حاليًا مفيش أي مبالغ قبل نزول الضوابط وفتح التسجيل الرسمي.\n\nعشان أبعتهالك خط السير كامل يوم بيوم بالتفاصيل، ياريت رقم الواتساب بتاع حضرتك — وأكلمك دقيقتين أشرحلك طرق الدفع بالتفصيل.",
-    "corrected": "برنامج حج الطيران الاقتصادي 🕋\n⏳ المدة: ١٧ يوم\n💰 السعر: ٢٢٠ ألف بدل ٢٤٥ بخصم الحجز المبكر (بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة — والخصم بيتثبت باسم حضرتك). غير شامل تذكرة الطيران.\n\n📌 خط سير الرحلة:\n🕌 المدينة المنورة — من ٢ إلى ٥ ذو الحجة\nفندق بالمركزية، ٥ دقايق مشي للحرم — إفطار وعشاء أوبن بوفيه\n🚄 قطار الحرمين السريع من المدينة لمكة — هدية من الشركة\n🕋 مكة قبل المناسك — من ٦ إلى ٨ ذو الحجة\nعمارة فندقية — إفطار وعشاء\n⛺ المناسك — من ٩ إلى ١٣ ذو الحجة\nمخيمات ألماني مكيفة — إفطار وغداء وعشاء أوبن بوفيه + مشروبات وسناكس\n🕋 العزيزية — من ١٤ إلى ١٧ ذو الحجة\nإفطار وعشاء\n\n✅ مشرف مرافق ووجبات طوال الرحلة\n✅ حجك على سنة النبي ﷺ: المبيت في منى أيام التشريق والمبيت في مزدلفة\n\nالبرنامج ده مناسب لحضرتك ولا تحب تعرف الفرق بينه وبين التحسين؟ وأسهل حاجة أكلمك دقيقتين نثبّتلك مكانك — رقمك عليه واتساب؟",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-29T01:42:28.576272",
-    "original": "تمام يا فندم، وصلني إن الرقم ده ليك شخصيًا ✅  \nأنا أيه محمد من فريق المبيعات، هكلمك خلال ساعة إن شاء الله نكمل فيها التفاصيل ونحدد البرنامج الأنسب ليك — ولو في وقت تاني مناسب ليك قولّي.",
-    "corrected": "ربنا يكتبها لحضرتك يارب",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-29T01:43:02.331895",
-    "original": "تمام، دي أسعار برامج الحج الستة بسعر الموسم اللي فات، والتأكيد النهائي بعد ضوابط وزارة السياحة، وخصم الحجز المبكر بيتثبت لحضرتك مهما كان السعر النهائي:\n\n١) الحج البري: ٢١٠ آلاف + تذكرة العبارة ١٩٬٥٠٠ (١٧ يوم) — الحصة الأساسية اكتملت والمتاح حصة إضافية.  \n٢) حج الطيران الاقتصادي: ٢٢٠ ألف (١٧ يوم، غير شامل تذكرة الطيران) — الحصة الأولى اكتملت والتسجيل في التانية.  \n٣) حج الطيران تحسين: ٢٥٠ ألف (١٩ يوم، غير شامل التذكرة) — وميزته ٧ أيام على ساحة الحرم بعد المناسك.  \n٤) حج ٥ نجوم: ٤٩٠ ألف.  \n٥) حج ٥ نجوم صف أول على الحرم: ٥٥٠ ألف.  \n٦) حج ٥ نجوم كدانه: ٦٤٠ ألف.  \n\nبرامج الخمس نجوم محتاجة مكالمة قصيرة عشان التفاصيل والأماكن المتبقية. أسهل حاجة أكلمك دقيقتين أجاوبك على أي سؤال ونثبّتلك مكانك — رقم حضرتك على واتساب إيه؟",
-    "corrected": "تمام يا فندم، أوضح لحضرتك الفرق ببساطة 🌿\n\n🚌 بري — ٢١٠ آلاف: نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n✈️ طيران اقتصادي — ٢٢٠ ألف: نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n⭐ طيران تحسين — ٢٥٠ ألف: بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n🏨 ٥ نجوم — ٤٩٠ ألف: إقامة فندقية مميزة طول الرحلة.\n\n(كل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.)\n\nحضرتك إيه الأهم بالنسبالك — التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين أرشحلك الأنسب — رقمك عليه واتساب؟",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-08-29T01:51:05.779956",
-    "original": "As this booking was made via Headout, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Hello, I'm Basant from FTS Travels from the sales team, I send you all details now via WhatsApp",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-08-29T01:54:23.192392",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "please contact get your guide regarding that",
@@ -597,6 +561,42 @@
     "timestamp": "2026-08-29T10:02:26.912233",
     "original": "أهلاً بيك معانا. وصلتني محافظتك: منيا القمح - الشرقية ✅\n\nبخصوص سؤالك عن \"المطلوب\": التسجيل بيتم حسب الضوابط الرسمية، والأولوية بترتيب التسجيل، والمطلوب الأساسي جواز السفر والرقم القومي وسيادتك هتعرف التفاصيل كاملة من فريق الحجوزات.\n\nوبخصوص \"المكان\": فريق المبيعات هيتواصل معاك ويشرحلك كل الخطوات والمكان بالتفصيل. برنامج طيران 220 ده حج الطيران الاقتصادي - 17 يوم، غير شامل تذكرة الطيران، والقبول بقرعة إلكترونية رسمية تحت إشراف وزارة السياحة.\n\nأسهل حاجة أكلمك دقيقتين أجاوبك على أي سؤال ونثبتلك مكانك — رقم حضرتك عليه واتساب؟\n\nمع خالص التحية،\nمسؤول المبيعات أيه محمد",
     "corrected": "الحصة محدودة والأولوية بترتيب التسجيل — وبالفعل أكتر من نصها اكتمل.\nأنا آية من فريق الحجوزات، ورقمي 01279471619 لو حبيت تكلمني في أي وقت.\nأسهل حاجة أكلمك دقيقتين أجاوبك على أي سؤال ونثبّتلك مكانك — رقم حضرتك عليه واتساب؟",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-29T10:17:03.243795",
+    "original": "As this booking was made via Headout, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Florian,\n\nThank you again for your patience.\n\nI am pleased to share with you our special offer for your fully private 2-day Cairo trip by plane from El Gouna, specially arranged for your family group of 14 people.\n\nAs comfort, organization and a relaxed pace are especially important for your family, we have designed the program so that all transfers, sightseeing and guiding services are completely private, using modern air-conditioned vehicles throughout the entire trip.\n\nDay 1 – El Gouna → Hurghada Airport → Cairo | Pyramids & Grand Egyptian Museum\n\nYour journey will begin with a private transfer from your hotel in El Gouna to Hurghada Airport in a comfortable, modern, air-conditioned vehicle.\n\nYou will then take your domestic flight from Hurghada to Cairo.\n\nUpon arrival at Cairo Airport, our private vehicle and your private German-speaking tour guide will be waiting for you.\n\nYou will then start your sightseeing program with:\n\nThe Giza Pyramids & the Great Sphinx\nEnjoy a private guided visit to one of the most iconic archaeological sites in the world, with enough time to explore the area comfortably and without rushing.\n\nAfterwards, you will enjoy lunch at a selected local restaurant in Cairo.\n\nFollowing lunch, you will visit:\n\nThe Grand Egyptian Museum (GEM)\nYou will have the opportunity to explore this remarkable museum with your private German-speaking guide and discover its extraordinary collection of ancient Egyptian treasures.\n\nAt the end of the sightseeing program, we will transfer you privately to your carefully selected, comfortable, high-quality hotel in Cairo, where you will spend the night.\n\nDay 2 – Cairo | Citadel, Old Cairo & Return to El Gouna\n\nAfter breakfast at your hotel, your private vehicle and German-speaking guide will meet you to begin your second day in Cairo.\n\nYou will visit:\n\nThe Citadel of Salah El-Din\nOne of Cairo's most important historical landmarks, including the famous Mosque of Muhammad Ali and beautiful panoramic views over the city.\n\nYou will then continue to:\n\nOld Cairo\nExplore one of the oldest and most historic areas of Cairo with your private guide and discover its unique cultural and religious heritage.\n\nAfter the visits, you will enjoy lunch at a local restaurant in Cairo.\n\nFollowing lunch, we will transfer you privately to Cairo Airport for your return flight to Hurghada.\n\nUpon arrival at Hurghada Airport, our private vehicle will be waiting for you and will transfer you comfortably back to your hotel in El Gouna.\n\nFrom the moment we pick you up at your hotel until we return you there, the entire experience will be arranged privately for your family.\n\nYour Package Includes\nPrivate transfer from El Gouna hotel to Hurghada Airport\nDomestic flights Hurghada – Cairo – Hurghada\nPrivate airport transfers in Cairo\nPrivate modern air-conditioned vehicle throughout both days\nPrivate German-speaking tour guide for both days\nPrivate sightseeing program in Cairo\nEntrance tickets for the included sightseeing attractions\nOne-night accommodation at a comfortable, high-quality hotel in Cairo\nBreakfast at the hotel\nLunch at a local restaurant on Day 1\nLunch at a local restaurant on Day 2\nBottled water and soft drinks available in the vehicle during the drives\nPrivate transfer from Hurghada Airport back to your hotel in El Gouna\nFull organization and assistance throughout the trip\nSpecial Group Price\n\nAdults: €380 per person\n\nChildren: €300 per child\n\nRegarding the 12-year-old child: according to our general policy, children aged 12 years and above are normally calculated as adults. However, please send me the child's exact date of birth as shown in the passport, and I will reconfirm the applicable rate for you.\n\nBased on the ages currently provided — 10 adults including the 12-year-old and 4 children under 12 — the total package price would be:\n\n€5,000 for the whole family of 14 people.\n\nThe offer can be arranged for either:\n\n28–29 December 2026\nor\n29–30 December 2026\n\nThe exact flight schedule will be coordinated according to the best available domestic flight times for your selected dates.\n\nWe have designed this trip specifically to provide your family with a comfortable, relaxed and fully private experience, especially considering the children and the elderly family member travelling with you.\n\nI look forward to hearing from you as soon as possible so we can proceed with the preferred dates and arrangements.\n\nIf convenient, please also send me your WhatsApp number. Communication will be much easier there, and we can quickly discuss the flight schedule, hotel arrangements or any changes you may prefer.\n\nBest regards,\nBasant Khaled\nSales Department\nFTS Travels",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-29T10:18:56.250247",
+    "original": "وعليكم السلام ورحمة الله وبركاته 🌿\n\nنعم، من سبق له الحج له برنامج خاص \"الحج المباشر بدون قرعة\" — وحالة حضرتك ليها إجراء خاص هوضحهولك بالتفصيل في مكالمة قصيرة، لأن التفاصيل بتختلف حسب سنة الحج السابقة.\n\nأسهل حاجة أكلمك دقيقتين أوضّحلك كل حاجة — رقم حضرتك عليه واتساب؟\n\nمع خالص التحية،\nمسؤول المبيعات ملك ماهر",
+    "corrected": "عليكم السلام ورحمة الله وبركاته",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-29T10:40:24.264728",
+    "original": "تم تحويل طلبك إلى فريق خدمة العملاء، وسيتواصل معك أحد المندوبين عبر واتساب قريبًا.\n\nعذرًا على الالتباس في الرسالة السابقة — استفسارك واضح وهو عن العمرة. لدينا باقات عمرة (اقتصادي ٨ أيام، اقتصادي ١٥ يوم، و٤ نجوم ١٠ أيام) وسيرسل لك المندوب التفاصيل والأسعار كاملة على الواتساب.",
+    "corrected": "اول ما البرامج تنزل ياافندم هيعتها لحضرتك واتساب",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-29T10:40:51.069509",
+    "original": "تمام يا فندم، الحج ليك شخصيًا — أول حجة ليك إن شاء الله. وبخصوص أختك اللي حجت من ٢٠ سنة، ده مأثرش على حضرتك إطلاقًا، انت لسه بتُعتبر أول مرة.\n\nالمهم دلوقتي إننا نثبت لك الأولوية في الحجز المبكر قبل اكتمال حصة الشركة، لأن الأماكن محدودة والعدد بيكمل بسرعة.\n\nأسهل حاجة أكلمك دقيقتين أأكدلك التفاصيل وأثبتلك مكانك — رقم حضرتك اللي عليه واتساب؟",
+    "corrected": "ربنا يكتبها لحضراتكم",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-29T10:43:05.164136",
+    "original": "حاضر يا فندم، وصلت المعلومة: حضرتك حجيت سنة ٢٠١٩ بقرعة سياحة ✅\n\nالإجابة على سؤالك: من سبق له الحج يقدر يسجل في برنامج الحج المباشر بدون قرعة، وده مناسب لحضرتك جدًا.\n\nتفاصيل البرنامج والأسعار بنشرحها في مكالمة سريعة عشان نضمنلك كل حاجة بالظبط. رقم حضرتك عليه واتساب؟ هكلمك في أقرب وقت.",
+    "corrected": "كدا هيكون متاح لحضرتك حج مباشر",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-29T11:13:22.241431",
+    "original": "تمام يا فندم، دي الأسعار كاملة 🌿\n\n🚌 حج بري: ٢١٠ آلاف + تذكرة العبارة ١٩٬٥٠٠ (١٧ يوم)\n✈️ طيران اقتصادي: ٢٢٠ ألف (١٧ يوم، غير شامل التذكرة)\n⭐ طيران تحسين: ٢٥٠ ألف (١٩ يوم — أهم ميزة ٧ أيام على ساحة الحرم بعد المناسك)\n🏨 ٥ نجوم: ٤٩٠ ألف\n👑 ٥ نجوم صف أول: ٥٥٠ ألف\n💎 ٥ نجوم كدانه: ٦٤٠ ألف\n\nكل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة. عشان أحددلك الأنسب لميزانيتك، أسهل حاجة أكلمك دقيقتين أرشحلك البرنامج المناسب — رقم حضرتك عليه واتساب؟",
+    "corrected": "تمام يا فندم، أوضح لحضرتك الفرق ببساطة 🌿\n\n🚌 بري — ٢١٠ آلاف: نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n✈️ طيران اقتصادي — ٢٢٠ ألف: نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n⭐ طيران تحسين — ٢٥٠ ألف: بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n🏨 ٥ نجوم — ٤٩٠ ألف: إقامة فندقية مميزة طول الرحلة.\n\n(كل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.)\n\nحضرتك إيه الأهم بالنسبالك — التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين أرشحلك الأنسب — رقمك عليه واتساب؟",
     "context": "UI Manual Edit"
   }
 ]

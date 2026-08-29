@@ -114375,3 +114375,1356 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BBF2BAB778F49DDA04"
+    },
+    "keyId": "3EB0BBF2BAB778F49DDA04",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDE5NDM1FQIAERgSM0E1MThDQTEyRTMxNkI1QkZDAA== | recipient=201000019435 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:46:49"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852809,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025610,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:46:51.519Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB09EECF6C786A79E553C"
+    },
+    "keyId": "3EB09EECF6C786A79E553C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDIzMDg1FQIAERgSRjBCRDhGREExRTA0QTIwODM1AA== | recipient=201000023085 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:46:56"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852816,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025617,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:46:58.018Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0A08BAC1997B985438B"
+    },
+    "keyId": "3EB0A08BAC1997B985438B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDM4MDkwFQIAERgSRDlENkEwRTAwNDQwOTRBNzA0AA== | recipient=201000038090 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:05"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852825,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025626,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:06.950Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0A11B6151E79CA310C4"
+    },
+    "keyId": "3EB0A11B6151E79CA310C4",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDUzMTk2FQIAERgSOUEzQ0ZGRkE4MkIwRDIzMzA1AA== | recipient=201000053196 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:13"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852833,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025634,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:14.836Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB03CD0AB5089587B42FE"
+    },
+    "keyId": "3EB03CD0AB5089587B42FE",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDY3OTkxFQIAERgSQkQ3NzA3MDBEMjJEQTJDQjg3AA== | recipient=201000067991 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:20"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852840,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025642,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:22.832Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0E9E6E310DCDD20E8E3"
+    },
+    "keyId": "3EB0E9E6E310DCDD20E8E3",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDgwMTA4FQIAERgSQjdBRjUwMDg0RUEyNDRCNDExAA== | recipient=201000080108 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:30"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852850,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025651,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:32.214Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0C96B039DF6CFA2E49B"
+    },
+    "keyId": "3EB0C96B039DF6CFA2E49B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDk0Mjk4FQIAERgSRkIwRkU5MDExQkExMzRCRDEzAA== | recipient=201000094298 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:39"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852859,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025660,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:40.863Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB00703506DD59189BEE0"
+    },
+    "keyId": "3EB00703506DD59189BEE0",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDk1MzAwFQIAERgSNTg1RkQxQUM0OEZBMEFBRDVGAA== | recipient=201000095300 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:46"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852866,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025667,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:48.139Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0E3C82802B611195A79"
+    },
+    "keyId": "3EB0E3C82802B611195A79",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDk1OTM1FQIAERgSNTk2NDM5RTU2NkQwNjk4NjRGAA== | recipient=201000095935 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:47:55"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852875,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025676,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:47:57.174Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB00369E5080BCC8CA2A9"
+    },
+    "keyId": "3EB00369E5080BCC8CA2A9",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMTIwMzU2FQIAERgSMUY1NTRFMjUyODk5M0MwODJBAA== | recipient=201000120356 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:48:04"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852884,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025685,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:48:05.848Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB01AB6A066C30AF8BAAA"
+    },
+    "keyId": "3EB01AB6A066C30AF8BAAA",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMTIwNTc0FQIAERgSOTlDRkIwRjUzRUVGRkZCQjE2AA== | recipient=201000120574 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:48:11"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852891,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025692,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:48:13.177Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB05BDDFF91CAA6203891"
+    },
+    "keyId": "3EB05BDDFF91CAA6203891",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMTYxNjg1FQIAERgSMkQyRjA1RjA5RkZFNEU0MkY2AA== | recipient=201000161685 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:48:19"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852900,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025700,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:48:21.269Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0556C9100C34801E048"
+    },
+    "keyId": "3EB0556C9100C34801E048",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMTk3MDIzFQIAERgSNzJFMzVGMzhDRkIyRDJGNEYxAA== | recipient=201000197023 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:48:28"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852908,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025709,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:48:29.607Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB04DDDDE59E6E14CB387"
+    },
+    "keyId": "3EB04DDDDE59E6E14CB387",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMjIyNTY5FQIAERgSNDIxQUFEMTQxRjZBOTk3MjJCAA== | recipient=201000222569 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:48:45"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852925,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025726,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:48:46.854Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0844AB6458F09AEF637"
+    },
+    "keyId": "3EB0844AB6458F09AEF637",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMjQ1MDg5FQIAERgSNUIxNzA1REE4OTlDMUNEMTM0AA== | recipient=201000245089 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:48:53"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852933,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025733,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:48:54.368Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0A43ACA56C7F6D977E7"
+    },
+    "keyId": "3EB0A43ACA56C7F6D977E7",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMjUwNjgwFQIAERgSOEY5QjgwRUU4MEZGQjI2MDc3AA== | recipient=201000250680 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:01"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852941,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025742,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:03.295Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB082281CEE14BF324CCF"
+    },
+    "keyId": "3EB082281CEE14BF324CCF",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMzIxNzcyFQIAERgSMEQyNzk2NjhEMDM4Nzc2MTRCAA== | recipient=201000321772 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:09"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852949,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025750,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:11.430Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB04C6E457B68CAB81232"
+    },
+    "keyId": "3EB04C6E457B68CAB81232",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMzU4Nzc4FQIAERgSOUIzMTRBQ0M0N0IwOTFCMjlEAA== | recipient=201000358778 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:17"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852958,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025758,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:19.209Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0463D81C52A361E0361"
+    },
+    "keyId": "3EB0463D81C52A361E0361",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNDE2ODI3FQIAERgSMEY4NjNBMUIyQzVGQ0M1Rjg1AA== | recipient=201000416827 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:26"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852966,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025767,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:27.673Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB055FB4551CA92EF3343"
+    },
+    "keyId": "3EB055FB4551CA92EF3343",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNDMzOTk2FQIAERgSQzRDOEQ5MEIwMTk0QUI2OUNFAA== | recipient=201000433996 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:40"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852981,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025781,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:42.409Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D9FAD23AC0BBFC8037"
+    },
+    "keyId": "3EB0D9FAD23AC0BBFC8037",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNDQyNjYyFQIAERgSQkRFNjAzRThFMjczMzE1RTRFAA== | recipient=201000442662 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:48"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852988,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025789,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:49.784Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0446747FF4CB2705094"
+    },
+    "keyId": "3EB0446747FF4CB2705094",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNDYwMDk1FQIAERgSMUM5NzhENDY5OENBNTM3NTBCAA== | recipient=201000460095 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:49:57"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787852997,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025797,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:49:58.402Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D94087DF47CB44A43F"
+    },
+    "keyId": "3EB0D94087DF47CB44A43F",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNDc2OTUwFQIAERgSNENCMTZGNURGN0FBMjE2RDQwAA== | recipient=201000476950 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:50:05"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853005,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025806,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:50:06.627Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB025B8D25252418A4012"
+    },
+    "keyId": "3EB025B8D25252418A4012",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNTMyMTMyFQIAERgSQUVBNzI5QTM1OTUwQ0U3RDk2AA== | recipient=201000532132 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:50:14"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853014,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025815,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:50:15.984Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0972B28FD6B07EEA75C"
+    },
+    "keyId": "3EB0972B28FD6B07EEA75C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNjU2NTQzFQIAERgSMjQyMEZFMTYyMzc0MkUyNDcwAA== | recipient=201000656543 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:50:22"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853023,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025823,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:50:24.175Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB06DE8154567058F77B2"
+    },
+    "keyId": "3EB06DE8154567058F77B2",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNjcwMjMxFQIAERgSMjZFQjc3NEU4NjM3ODUyRjQyAA== | recipient=201000670231 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:50:30"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853031,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025831,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:50:32.207Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BB3AC47E439322C6B8"
+    },
+    "keyId": "3EB0BB3AC47E439322C6B8",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwNzI3OTc0FQIAERgSRkFCNDM1RUE2MTM2OUVCNDA5AA== | recipient=201000727974 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=4487473721533334&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-08-29 10:50:39"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853039,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025840,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:50:40.582Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB076C3E58FE57A290318"
+    },
+    "keyId": "3EB076C3E58FE57A290318",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDE5NDM1FQIAERgSQkRERDNFMjIzNzAyMjFDRUVBAA== | recipient=201000019435 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because there were one or more errors related to your payment method.\nAt: 2026-08-29 10:52:50"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853170,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788025970,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:52:51.240Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0480C5C56A23A14CA16"
+    },
+    "keyId": "3EB0480C5C56A23A14CA16",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMDgwMTA4FQIAERgSNTY5OEQ0RjZGMEYyQUNGMzM2AA== | recipient=201000080108 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-08-29 10:53:31"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853211,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788026011,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:53:32.435Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0F6663410203813E26B"
+    },
+    "keyId": "3EB0F6663410203813E26B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAwMTIwMzU2FQIAERgSRTNGMzQ3MDEwRkM3RDZBOEMzAA== | recipient=201000120356 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-08-29 10:54:05"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853245,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788026045,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T10:54:06.060Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0A904F66C98732F24A6"
+    },
+    "keyId": "3EB0A904F66C98732F24A6",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAxNjMxNzAzFQIAERgSNTA3RjA4MkY3QUQwOEM1NUMyAA== | recipient=201001631703 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-08-29 11:04:00"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787853840,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788026640,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T11:04:00.870Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0607DF6655A6301108E"
+    },
+    "keyId": "3EB0607DF6655A6301108E",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAyMTAyMzUzFQIAERgSNTlCM0QyMDU3ODlFQTE2OEI5AA== | recipient=201002102353 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-08-29 11:09:04"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787854144,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788026944,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T11:09:04.845Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB07FB1BEDE3F42C96AB4"
+    },
+    "keyId": "3EB07FB1BEDE3F42C96AB4",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43764 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDAyMjIzNzQ1FQIAERgSNjlFMzE4OTQ4NzNGODJCMTcxAA== | recipient=201002223745 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-08-29 11:09:37"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1787854177,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788026977,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-08-29T11:09:38.315Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

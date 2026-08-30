@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-08-29T05:49:31.893087",
-    "original": "حاضر يا فندم 🌿 دي ملخص أسعار الحج تاني بشكل سريع:\n- بري: ٢١٠ ألف + تذكرة عبارة ١٩٥٠٠ (١٧ يوم)\n- طيران اقتصادي: ٢٢٠ ألف (١٧ يوم)\n- طيران تحسين: ٢٥٠ ألف (١٩ يوم، وفيه ٧ أيام على ساحة الحرم)\n- ٥ نجوم: ٤٩٠ ألف\n\nكل الأسعار بسعر الموسم اللي فات، والتأكيد بعد ضوابط الوزارة.\n\nعشان أبعثلك التفاصيل الكاملة وصور الفنادق على الواتساب، إيه رقم حضرتك؟ هبعتلك كل حاجة في دقايق.",
-    "corrected": "الحصة محدودة والأولوية بترتيب التسجيل — وبالفعل أكتر من نصها اكتمل.\nأنا أحمد خليل من فريق الحجوزات، ورقمي 01288427370 لو حبيت تكلمني في أي وقت.\nأسهل حاجة أكلمك دقيقتين أجاوبك على أي سؤال ونثبّتلك مكانك — رقم حضرتك عليه واتساب؟",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-08-29T05:52:47.178234",
     "original": "[LANGUAGE: Arabic]\nوصلني رقم حضرتك ✅ أنا مسؤول المبيعات أحمد خليل من فريق الحجوزات، هكلمك خلال ساعة إن شاء الله عشان أبعثلك تفاصيل عمرة رمضان كاملة ونثبّت لك مكانك.\nلو الوقت مش مناسب لحضرتك، قولّي وحددلي الأنسب.",
     "corrected": "وصلني رقم حضرتك ✅ أنا",
@@ -597,6 +591,12 @@
     "timestamp": "2026-08-30T06:06:27.380428",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Hi Marco, this is Azzam from the FTS Quality Team. I’m sorry to hear that you experienced some issues during the tour.\n\nPlease let me know what happened and how we can assist you.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-08-30T06:16:11.331842",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Hi Marco,\n\nThank you for sharing your feedback, and we sincerely apologize for the discomfort you experienced with the seats at the back of the bus. We completely understand that this made the journey less comfortable for you.\n\nPlease note that you could have informed our guide during the trip, and he would have been happy to assist you with changing your seat whenever another suitable seat was available.\n\nWe truly appreciate your feedback, and we will share it with our operations team to help us improve the comfort and experience of our guests.\n\nWe’re also glad to hear that, apart from this issue, you had no other complaints about the tour. Thank you for choosing FTS Travels.",
     "context": "UI Manual Edit"
   }
 ]

@@ -19,8 +19,11 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import sys
+import tempfile
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,7 +44,33 @@ from tools.migrate_airtable_to_baserow import (  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
-SYNC_STATE_PATH = ROOT / "baserow_sync_state.json"
+# Prefer project file; fall back under LOCALAPPDATA if Downloads/OneDrive locks cause Errno 22.
+_PROJECT_STATE_PATH = ROOT / "baserow_sync_state.json"
+_APP_STATE_DIR = Path(os.environ.get("LOCALAPPDATA") or os.environ.get("TEMP") or str(ROOT)) / "FTSTravels"
+_APP_STATE_PATH = _APP_STATE_DIR / "baserow_sync_state.json"
+SYNC_STATE_PATH = _PROJECT_STATE_PATH
+_STATE_LOCK = threading.Lock()
+_STATE_PATH_LOCK = threading.Lock()
+
+
+def _resolve_sync_state_path() -> Path:
+    """Use appdata copy if project path previously failed, else project path."""
+    global SYNC_STATE_PATH
+    with _STATE_PATH_LOCK:
+        return SYNC_STATE_PATH
+
+
+def _use_appdata_state_path() -> Path:
+    global SYNC_STATE_PATH
+    with _STATE_PATH_LOCK:
+        try:
+            _APP_STATE_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
+        SYNC_STATE_PATH = _APP_STATE_PATH
+        return SYNC_STATE_PATH
+
+
 BATCH_SIZE = 15
 DELETE_BATCH = 100
 SKIP_TABLE_SUBSTRINGS = ("import report", "airtable import")
@@ -64,17 +93,116 @@ def _utc_now_iso() -> str:
 
 
 def load_sync_state() -> dict:
-    if SYNC_STATE_PATH.is_file():
+    global SYNC_STATE_PATH
+    candidates = []
+    cur = _resolve_sync_state_path()
+    candidates.append(cur)
+    if _PROJECT_STATE_PATH not in candidates:
+        candidates.append(_PROJECT_STATE_PATH)
+    if _APP_STATE_PATH not in candidates:
+        candidates.append(_APP_STATE_PATH)
+    for path in candidates:
+        if not path.is_file():
+            continue
         try:
-            return json.loads(SYNC_STATE_PATH.read_text(encoding="utf-8"))
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                with _STATE_PATH_LOCK:
+                    SYNC_STATE_PATH = path
+                return data
         except Exception:
-            pass
+            continue
     return {"tables": {}}
 
 
 def save_sync_state(state: dict) -> None:
-    SYNC_STATE_PATH.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    """
+    Atomic write with retries. Windows Downloads/OneDrive often raises
+    OSError Errno 22 (Invalid argument) on direct overwrite — use temp+replace,
+    then fall back to %LOCALAPPDATA%\\FTSTravels if needed.
+    """
+    global SYNC_STATE_PATH
+    payload = json.dumps(state, ensure_ascii=False, indent=2) + "\n"
+    paths_to_try = [_resolve_sync_state_path(), _PROJECT_STATE_PATH, _APP_STATE_PATH]
+    # dedupe while preserving order
+    seen = set()
+    ordered: List[Path] = []
+    for p in paths_to_try:
+        key = str(p).lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered.append(p)
 
+    last_err: Optional[BaseException] = None
+    with _STATE_LOCK:
+        for path in ordered:
+            try:
+                path.parent.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                last_err = exc
+                continue
+            for attempt in range(6):
+                tmp_path: Optional[Path] = None
+                try:
+                    fd, tmp_name = tempfile.mkstemp(
+                        prefix=".baserow_sync_state_",
+                        suffix=".tmp",
+                        dir=str(path.parent),
+                    )
+                    tmp_path = Path(tmp_name)
+                    with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+                        f.write(payload)
+                        f.flush()
+                        try:
+                            os.fsync(f.fileno())
+                        except OSError:
+                            pass
+                    os.replace(str(tmp_path), str(path))
+                    with _STATE_PATH_LOCK:
+                        SYNC_STATE_PATH = path
+                    if path != _PROJECT_STATE_PATH:
+                        logger.warning(
+                            "baserow_sync_state saved to fallback path (project file locked): %s",
+                            path,
+                        )
+                    return
+                except OSError as exc:
+                    last_err = exc
+                    if tmp_path is not None:
+                        try:
+                            tmp_path.unlink(missing_ok=True)
+                        except OSError:
+                            pass
+                    time.sleep(0.08 * (attempt + 1))
+                except Exception as exc:
+                    last_err = exc
+                    if tmp_path is not None:
+                        try:
+                            tmp_path.unlink(missing_ok=True)
+                        except OSError:
+                            pass
+                    time.sleep(0.08 * (attempt + 1))
+            # Prefer appdata after project path keeps failing
+            if path == _PROJECT_STATE_PATH:
+                _use_appdata_state_path()
+
+    if last_err is not None:
+        raise OSError(f"save_sync_state failed after retries: {last_err}") from last_err
+    raise OSError("save_sync_state failed: no writable path")
+
+
+def _safe_save_sync_state(state: dict, context: str = "") -> bool:
+    try:
+        save_sync_state(state)
+        return True
+    except OSError as exc:
+        logger.warning(
+            "Baserow sync state save failed%s: %s (sync data may still be OK)",
+            f" ({context})" if context else "",
+            exc,
+        )
+        return False
 
 def _airtable_escape(s: str) -> str:
     return s.replace("\\", "\\\\").replace("'", "\\'")
@@ -534,7 +662,7 @@ def set_sync_paused(paused: bool, reason: str = "") -> None:
     state["paused"] = bool(paused)
     state["pause_reason"] = reason if paused else ""
     state["pause_updated_at"] = _utc_now_iso()
-    save_sync_state(state)
+    _safe_save_sync_state(state, context="set_sync_paused")
 
 
 def reset_table_cursors(state_keys: Optional[List[str]] = None) -> int:
@@ -550,7 +678,7 @@ def reset_table_cursors(state_keys: Optional[List[str]] = None) -> int:
         info["last_result"] = "reset_for_full_sync"
         tables[key] = info
         n += 1
-    save_sync_state(state)
+    _safe_save_sync_state(state, context="reset_table_cursors")
     return n
 
 
@@ -705,7 +833,7 @@ class AirtableBaserowSync:
             tstate["last_result"] = "noop"
             tstate["baserow_table_id"] = tid
             state.setdefault("tables", {})[state_key] = tstate
-            save_sync_state(state)
+            _safe_save_sync_state(state, context=f"{target_name}/{table_name} noop")
             return {
                 "target": target_name,
                 "table": table_name,
@@ -808,7 +936,7 @@ class AirtableBaserowSync:
         tstate["natural_key"] = nk_field
         tstate["last_result"] = "ok"
         state.setdefault("tables", {})[state_key] = tstate
-        save_sync_state(state)
+        _safe_save_sync_state(state, context=f"{target_name}/{table_name}")
 
         return {
             "target": target_name,
@@ -877,6 +1005,26 @@ class AirtableBaserowSync:
                         or "HTTP 400" in msg
                     ):
                         logger.warning("Baserow sync validation %s/%s: %s", tname, table_name, msg[:240])
+                        results.append(
+                            {
+                                "target": tname,
+                                "table": table_name,
+                                "status": "partial",
+                                "message": msg[:400],
+                            }
+                        )
+                    elif isinstance(exc, OSError) and (
+                        getattr(exc, "errno", None) == 22
+                        or "Invalid argument" in msg
+                        or "baserow_sync_state" in msg
+                    ):
+                        # Windows file lock / OneDrive — sync rows may be fine; state write failed
+                        logger.warning(
+                            "Baserow sync state I/O %s/%s: %s",
+                            tname,
+                            table_name,
+                            msg[:240],
+                        )
                         results.append(
                             {
                                 "target": tname,

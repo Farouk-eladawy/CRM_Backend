@@ -45190,7 +45190,7 @@ Draft to optimize:
                     while not self._baserow_sync_stop.is_set():
                         try:
                             # Soft validation skips (phone/email/decimals) are warnings — not WhatsApp ERROR.
-                            # Dates normalized to Africa/Cairo calendar day (Date Trip etc.).
+                            # Dates normalized to Africa/Cairo. State file uses atomic write (Windows Errno 22).
                             self.baserow_sync.tick()
                             backoff = 1
                             time.sleep(self.baserow_sync.interval_sec())

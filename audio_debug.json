@@ -135900,3 +135900,372 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB09D0DF0F741CE6305F5"
+    },
+    "keyId": "3EB09D0DF0F741CE6305F5",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync religious/حجاج حج مباشر failed\nException: RuntimeError: Baserow PATCH /api/database/rows/table/4/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_ROW_IDS_NOT_UNIQUE\",\"detail\":\"The provided row ids [19, 14] are not unique.\"}\nAt: 2026-09-01 01:50:13"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788079813,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788252613,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T01:50:14.817Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0AFE4A6A2240798D276"
+    },
+    "keyId": "3EB0AFE4A6A2240798D276",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync religious/حجاج حج مباشر باقات failed\nException: RuntimeError: Baserow PATCH /api/database/rows/table/5/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_ROW_IDS_NOT_UNIQUE\",\"detail\":\"The provided row ids [68, 77] are not unique.\"}\nAt: 2026-09-01 01:50:17"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788079817,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788252617,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T01:50:18.401Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB01EFBF2C5F062F6EAA9"
+    },
+    "keyId": "3EB01EFBF2C5F062F6EAA9",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync religious/استفسارات جديدة failed\nException: RuntimeError: Baserow POST /api/database/rows/table/11/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_REQUEST_BODY_VALIDATION\",\"detail\":{\"items\":{\"6\":{\"الايميل\":[{\"error\":\"Enter a valid value.\",\"code\":\"invalid\"}]},\"14\":{\"الايميل\":[{\"error\":\"Enter a valid value.\",\"code\":\"invalid\"}]}}}}\nAt: 2026-09-01 01:50:47"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788079847,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788252647,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T01:50:48.754Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB08BABF98E645457EE2B"
+    },
+    "keyId": "3EB08BABF98E645457EE2B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync main/List failed\nException: RuntimeError: Baserow POST /api/database/rows/table/21/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_REQUEST_BODY_VALIDATION\",\"detail\":{\"items\":{\"2\":{\"Commission Breakdown\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]},\"11\":{\"Customer Phone\":[{\"error\":\"Enter a valid value.\",\"code\":\"invalid\"}]},\"12\":{\"Commission Breakdown\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]}}}}\nAt: 2026-09-01 02:06:07"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788080767,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788253567,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T02:06:08.073Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0DEE398F167F9E0A9DE"
+    },
+    "keyId": "3EB0DEE398F167F9E0A9DE",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync main/Add Driver Name & Phone copy failed\nException: RuntimeError: Baserow POST /api/database/rows/table/22/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_REQUEST_BODY_VALIDATION\",\"detail\":{\"items\":{\"4\":{\"Phone Number\":[{\"error\":\"Enter a valid value.\",\"code\":\"invalid\"}]}}}}\nAt: 2026-09-01 02:06:11"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788080771,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788253571,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T02:06:12.268Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0115F99B014993D6D22"
+    },
+    "keyId": "3EB0115F99B014993D6D22",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync main/Add Guide Name & Phone failed\nException: RuntimeError: Baserow POST /api/database/rows/table/23/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_REQUEST_BODY_VALIDATION\",\"detail\":{\"items\":{\"11\":{\"Phone Number\":[{\"error\":\"Enter a valid value.\",\"code\":\"invalid\"}]}}}}\nAt: 2026-09-01 02:06:14"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788080774,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788253574,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T02:06:15.473Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB00A8CED02BE9EF55602"
+    },
+    "keyId": "3EB00A8CED02BE9EF55602",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync main/Add Representative Name & Phone failed\nException: RuntimeError: Baserow POST /api/database/rows/table/24/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_REQUEST_BODY_VALIDATION\",\"detail\":{\"items\":{\"14\":{\"Phone Number\":[{\"error\":\"Enter a valid value.\",\"code\":\"invalid\"}]}}}}\nAt: 2026-09-01 02:06:16"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788080777,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788253577,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T02:06:17.848Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0A0F11BE0F56F0045EA"
+    },
+    "keyId": "3EB0A0F11BE0F56F0045EA",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync main/Offer failed\nException: RuntimeError: Baserow PATCH /api/database/rows/table/26/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_ROW_IDS_NOT_UNIQUE\",\"detail\":\"The provided row ids [185] are not unique.\"}\nAt: 2026-09-01 02:06:21"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788080781,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788253581,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T02:06:22.282Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB014C971FBD6BF3AB562"
+    },
+    "keyId": "3EB014C971FBD6BF3AB562",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Database\nSource: baserow_sync.py:500 in tick\nLogger: baserow_sync\nReason: Baserow sync main/GYG Analytics failed\nException: RuntimeError: Baserow POST /api/database/rows/table/27/batch/?user_field_names=true -> HTTP 400: {\"error\":\"ERROR_REQUEST_BODY_VALIDATION\",\"detail\":{\"items\":{\"4\":{\"rating\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]},\"7\":{\"rating\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]},\"8\":{\"rating\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]},\"10\":{\"rating\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]},\"11\":{\"rating\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]},\"12\":{\"rating\":[{\"error\":\"Ensure that there are no more than 0 decimal places.\",\"code\":\"max_decimal_places\"}]}}}}\nAt: 2026-09-01 02:06:23"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788080784,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788253584,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-01T02:06:25.011Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

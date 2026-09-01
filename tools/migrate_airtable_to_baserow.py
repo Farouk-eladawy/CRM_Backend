@@ -20,8 +20,10 @@ import argparse
 import json
 import sys
 import time
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
+from zoneinfo import ZoneInfo
 
 import requests
 from requests.exceptions import ChunkedEncodingError, ConnectionError as ReqConnectionError, Timeout
@@ -30,6 +32,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from airtable_fields import TABLE_NAME  # noqa: E402
+
+# FTS Egypt — date-only fields use Cairo calendar day (avoid UTC day-shift).
+BUSINESS_TZ = ZoneInfo("Africa/Cairo")
 
 STATE_PATH = ROOT / "baserow_migration_state.json"
 BATCH_SIZE = 15
@@ -233,8 +238,76 @@ def flatten_value(value: Any) -> Any:
     return value
 
 
+def parse_airtable_datetime(value: Any) -> Optional[datetime]:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        dt = value
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
+    if isinstance(value, date) and not isinstance(value, datetime):
+        return datetime(value.year, value.month, value.day, 12, 0, 0, tzinfo=BUSINESS_TZ)
+    s = str(value).strip()
+    if not s:
+        return None
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        if "T" in s:
+            dt = datetime.fromisoformat(s)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        # YYYY-MM-DD → noon in business TZ (stable calendar day)
+        d = datetime.strptime(s[:10], "%Y-%m-%d").date()
+        return datetime(d.year, d.month, d.day, 12, 0, 0, tzinfo=BUSINESS_TZ)
+    except ValueError:
+        return None
+
+
+def format_date_for_baserow(
+    value: Any,
+    at_type: str = "date",
+    br_field_def: Optional[dict] = None,
+) -> Any:
+    """
+    Normalize Airtable date/datetime for Baserow without timezone day-shift.
+
+    - Baserow date_include_time=false: YYYY-MM-DD in Africa/Cairo.
+    - Baserow date_include_time=true: ISO datetime with Africa/Cairo offset
+      (date-only Airtable values become midnight Cairo that calendar day).
+    """
+    br_include_time = bool((br_field_def or {}).get("date_include_time")) if br_field_def else False
+
+    # Pure calendar string YYYY-MM-DD
+    if isinstance(value, str):
+        s = value.strip()
+        if len(s) >= 10 and s[4] == "-" and s[7] == "-" and "T" not in s and " " not in s[:10]:
+            try:
+                d = datetime.strptime(s[:10], "%Y-%m-%d").date()
+                if br_include_time:
+                    local = datetime(d.year, d.month, d.day, 0, 0, 0, tzinfo=BUSINESS_TZ)
+                    return local.isoformat(timespec="seconds")
+                return s[:10]
+            except ValueError:
+                pass
+
+    dt = parse_airtable_datetime(value)
+    if dt is None:
+        return None
+    local = dt.astimezone(BUSINESS_TZ)
+    if not br_include_time:
+        return local.strftime("%Y-%m-%d")
+    return local.isoformat(timespec="seconds")
+
+
 def format_for_baserow(
-    value: Any, at_type: str, br: Optional["BaserowApi"] = None, file_cache: Optional[dict] = None
+    value: Any,
+    at_type: str,
+    br: Optional["BaserowApi"] = None,
+    file_cache: Optional[dict] = None,
+    br_field_def: Optional[dict] = None,
 ) -> Any:
     if value is None:
         return None
@@ -270,12 +343,7 @@ def format_for_baserow(
             return str(value)
         return flatten_value(value)
     if at_type in ("date", "dateTime"):
-        s = str(value).strip()
-        if not s:
-            return None
-        if "T" in s:
-            return s.split("T")[0]
-        return s[:10] if len(s) >= 10 else s
+        return format_date_for_baserow(value, at_type=at_type, br_field_def=br_field_def)
     return flatten_value(value)
 
 
@@ -377,6 +445,9 @@ class BaserowApi:
 
     def create_field(self, table_id: int, body: dict) -> dict:
         return self._req("POST", f"/api/database/fields/table/{table_id}/", json=body)
+
+    def update_field(self, field_id: int, body: dict) -> dict:
+        return self._req("PATCH", f"/api/database/fields/{field_id}/", json=body)
 
     def delete_table(self, table_id: int) -> None:
         self._req("DELETE", f"/api/database/tables/{table_id}/")
@@ -699,11 +770,22 @@ def migrate_table(
             use_file_upload = (
                 at_type == "multipleAttachments" and br_field_types.get(out_key) == "file"
             )
+            # Prefer Baserow field options for date/time formatting (Cairo calendar day).
+            br_field_def = None
+            if br_field_types.get(out_key) == "date":
+                # list_fields may not be in scope as defs; pass include_time=False for date-only AT types
+                br_field_def = {
+                    "type": "date",
+                    "date_include_time": at_type == "dateTime",
+                }
+            if at_type == "date":
+                br_field_def = {"type": "date", "date_include_time": False}
             val = format_for_baserow(
                 v,
                 at_type,
                 br=br if use_file_upload else None,
                 file_cache=file_cache if use_file_upload else None,
+                br_field_def=br_field_def,
             )
             if val is not None and val != "":
                 row[out_key] = val

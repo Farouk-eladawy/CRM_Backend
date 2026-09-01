@@ -35,6 +35,7 @@ from tools.migrate_airtable_to_baserow import (  # noqa: E402
     BaserowApi,
     AirtableSource,
     format_for_baserow,
+    format_date_for_baserow,
     load_config,
 )
 
@@ -198,6 +199,10 @@ def coerce_for_baserow_field(
     if br_type == "email" or look_like_email_field(field_name, br_type):
         if br_type == "email":
             return normalize_email(val)
+    if br_type == "date":
+        # Baserow date field — respect date_include_time from field_def
+        at_hint = "dateTime" if (field_def or {}).get("date_include_time") else "date"
+        return format_date_for_baserow(val, at_type=at_hint, br_field_def=field_def)
     if br_type == "url":
         s = str(val).strip()
         if not s.startswith(("http://", "https://")):
@@ -207,6 +212,31 @@ def coerce_for_baserow_field(
                 return None
         return s
     return val
+
+
+# Only force date-only when Baserow field itself has no time.
+# Date Trip / Real Date Trip keep time when Baserow date_include_time=true.
+DATE_ONLY_NAME_HINTS = (
+    "review date",
+    "issue tickets date",
+)
+
+
+def looks_like_date_only_field(name: str, at_type: str, br_def: Optional[dict]) -> bool:
+    """True when this field should be stored as YYYY-MM-DD (no clock time)."""
+    br_type = str((br_def or {}).get("type") or "")
+    # Respect Baserow: if field includes time, never strip it
+    if br_type == "date" and (br_def or {}).get("date_include_time"):
+        return False
+    if at_type == "date" and br_type != "date":
+        # Airtable date mapped to non-date Baserow column — still calendar day
+        return True
+    if br_type == "date" and not (br_def or {}).get("date_include_time"):
+        return True
+    if at_type not in ("date", "dateTime") and br_type != "date":
+        return False
+    n = (name or "").strip().lower()
+    return any(h in n for h in DATE_ONLY_NAME_HINTS)
 
 
 def build_row_payload(
@@ -241,15 +271,24 @@ def build_row_payload(
         if k not in br_field_names:
             continue
         br_type = br_types.get(k, "")
+        br_def = br_defs.get(k)
         use_file = at_type == "multipleAttachments"
+        # Force date-only formatting for Date Trip and similar (Cairo calendar day)
+        if looks_like_date_only_field(k, at_type, br_def):
+            at_type_eff = "date"
+            if isinstance(br_def, dict):
+                br_def = {**br_def, "date_include_time": False}
+        else:
+            at_type_eff = at_type
         val = format_for_baserow(
             v,
-            at_type,
+            at_type_eff,
             br=br if use_file else None,
             file_cache=file_cache if use_file else None,
+            br_field_def=br_def,
         )
         if val is not None and val != "":
-            val = coerce_for_baserow_field(val, br_type, br_defs.get(k), field_name=k)
+            val = coerce_for_baserow_field(val, br_type, br_def, field_name=k)
         if val is not None and val != "":
             row[k] = val
     return row

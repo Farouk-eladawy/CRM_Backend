@@ -1,0 +1,46 @@
+{
+  "types": {
+    "Date Trip": "dateTime",
+    "Collecting on date Trip": "number",
+    "Create Date  ": "createdTime",
+    "Date Trip Changed": "lastModifiedTime",
+    "Real Date Trip": "dateTime"
+  },
+  "rows": [
+    {
+      "id": "rec00Dz27SBsWDDUq",
+      "Date Trip": "2026-06-13T21:00:00.000Z",
+      "Real Date Trip": null,
+      "Create Date  ": "2026-06-13T14:05:18.000Z",
+      "Trip Start Time": null
+    },
+    {
+      "id": "rec00RkHCgS33JOTo",
+      "Date Trip": "2026-07-17T22:30:00.000Z",
+      "Real Date Trip": "2026-07-17T22:30:00.000Z",
+      "Create Date  ": "2026-07-06T09:03:07.000Z",
+      "Trip Start Time": null
+    },
+    {
+      "id": "rec01QbzNe8kletWT",
+      "Date Trip": "2026-08-31T23:00:00.000Z",
+      "Real Date Trip": null,
+      "Create Date  ": "2026-08-29T18:44:48.000Z",
+      "Trip Start Time": null
+    },
+    {
+      "id": "rec01lIgnoBvp0Okw",
+      "Date Trip": "2026-09-03T01:00:00.000Z",
+      "Real Date Trip": "2026-09-03T01:00:00.000Z",
+      "Create Date  ": "2026-07-01T11:25:19.000Z",
+      "Trip Start Time": null
+    },
+    {
+      "id": "rec01qTng2gtJ5vGV",
+      "Date Trip": "2026-06-14T21:30:00.000Z",
+      "Real Date Trip": "2026-06-14T21:30:00.000Z",
+      "Create Date  ": "2026-06-11T10:33:53.000Z",
+      "Trip Start Time": "2026-06-14T21:48:05.442Z"
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "database_id": 7,
+  "table_id": 60,
+  "table_name": "List",
+  "matched_fields": [
+    {
+      "name": "Date Trip",
+      "type": "date",
+      "id": 983,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": "Africa/Cairo",
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": true
+      }
+    },
+    {
+      "name": "trip Name",
+      "type": "long_text",
+      "id": 984
+    },
+    {
+      "name": "pickup time",
+      "type": "single_select",
+      "id": 999
+    },
+    {
+      "name": "Collecting on date Trip",
+      "type": "number",
+      "id": 1007
+    },
+    {
+      "name": "Create Date  ",
+      "type": "date",
+      "id": 1019,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": "Africa/Cairo",
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": true
+      }
+    },
+    {
+      "name": "Last Modified",
+      "type": "date",
+      "id": 1020,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Whatsapp Pickup Time2",
+      "type": "single_select",
+      "id": 1021
+    },
+    {
+      "name": "Pickup Scheduled",
+      "type": "url",
+      "id": 1024
+    },
+    {
+      "name": "Stripe invoice",
+      "type": "url",
+      "id": 1026
+    },
+    {
+      "name": "Review Date",
+      "type": "date",
+      "id": 1031,
+      "date_options": {
+        "date_include_time": false,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Send Sharm Pickup",
+      "type": "url",
+      "id": 1048
+    },
+    {
+      "name": "CancelBookingUpdateCXLDate",
+      "type": "date",
+      "id": 1052,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": "UTC",
+        "date_format": "US",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Issue Tickets Date",
+      "type": "date",
+      "id": 1064,
+      "date_options": {
+        "date_include_time": false,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "End trip",
+      "type": "boolean",
+      "id": 1077
+    },
+    {
+      "name": "Trip Status",
+      "type": "text",
+      "id": 1080
+    },
+    {
+      "name": "Trip Start Time",
+      "type": "date",
+      "id": 1081,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "12",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Created By Username",
+      "type": "single_select",
+      "id": 1083
+    },
+    {
+      "name": "Created By Email",
+      "type": "long_text",
+      "id": 1084
+    },
+    {
+      "name": "Invoice Request Date",
+      "type": "date",
+      "id": 1086,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "12",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Trip UUID",
+      "type": "text",
+      "id": 1103
+    },
+    {
+      "name": "Tickets Created?",
+      "type": "boolean",
+      "id": 1112
+    },
+    {
+      "name": "Date Trip Changed",
+      "type": "date",
+      "id": 1113,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Last Modified AI Chat log",
+      "type": "date",
+      "id": 1116,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Last_Modified_Customer_Location",
+      "type": "date",
+      "id": 1122,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "24",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Real Date Trip",
+      "type": "date",
+      "id": 1123,
+      "date_options": {
+        "date_include_time": true,
+        "date_force_timezone": null,
+        "date_format": "ISO",
+        "date_time_format": "12",
+        "date_show_tzinfo": false
+      }
+    },
+    {
+      "name": "Send Reminder Pickup",
+      "type": "single_select",
+      "id": 1126
+    }
+  ],
+  "sample_field_names": [
+    "Date Trip",
+    "Create Date  ",
+    "pickup time",
+    "Whatsapp Pickup Time2"
+  ],
+  "sample_rows": [
+    {
+      "id": 1,
+      "Date Trip": "2026-08-29T04:00:00Z",
+      "Create Date  ": "2026-08-28T22:24:52Z",
+      "pickup time": null,
+      "Whatsapp Pickup Time2": null
+    },
+    {
+      "id": 2,
+      "Date Trip": "2026-08-29T00:00:00Z",
+      "Create Date  ": "2026-08-28T22:06:14Z",
+      "pickup time": null,
+      "Whatsapp Pickup Time2": null
+    },
+    {
+      "id": 3,
+      "Date Trip": "2026-09-06T05:00:00Z",
+      "Create Date  ": "2026-08-28T22:05:59Z",
+      "pickup time": null,
+      "Whatsapp Pickup Time2": null
+    }
+  ],
+  "date_trip_type": "date",
+  "type_by_name": {
+    "Date Trip": "date",
+    "trip Name": "long_text",
+    "pickup time": "single_select",
+    "Collecting on date Trip": "number",
+    "Create Date  ": "date",
+    "Last Modified": "date",
+    "Whatsapp Pickup Time2": "single_select",
+    "Pickup Scheduled": "url",
+    "Stripe invoice": "url",
+    "Review Date": "date",
+    "Send Sharm Pickup": "url",
+    "CancelBookingUpdateCXLDate": "date",
+    "Issue Tickets Date": "date",
+    "End trip": "boolean",
+    "Trip Status": "text",
+    "Trip Start Time": "date",
+    "Created By Username": "single_select",
+    "Created By Email": "long_text",
+    "Invoice Request Date": "date",
+    "Trip UUID": "text",
+    "Tickets Created?": "boolean",
+    "Date Trip Changed": "date",
+    "Last Modified AI Chat log": "date",
+    "Last_Modified_Customer_Location": "date",
+    "Real Date Trip": "date",
+    "Send Reminder Pickup": "single_select"
+  }
+}

@@ -262,7 +262,7 @@
       "last_result": "noop"
     },
     "religious::حجاج حج قرعة": {
-      "last_run": "2026-09-01T12:08:45.000Z",
+      "last_run": "2026-09-01T13:12:51.000Z",
       "last_modified_cursor": "2026-09-01T07:41:36.000Z",
       "last_created": 0,
       "last_updated": 75,
@@ -271,7 +271,7 @@
       "last_result": "noop"
     },
     "religious::حجاج تحسين": {
-      "last_run": "2026-09-01T12:08:45.000Z",
+      "last_run": "2026-09-01T13:12:51.000Z",
       "last_modified_cursor": "2026-09-01T07:41:42.000Z",
       "last_created": 1,
       "last_updated": 88,
@@ -280,7 +280,7 @@
       "last_result": "noop"
     },
     "religious::حجاج بري": {
-      "last_run": "2026-09-01T12:08:46.000Z",
+      "last_run": "2026-09-01T13:12:51.000Z",
       "last_modified_cursor": "2026-09-01T07:41:50.000Z",
       "last_created": 14,
       "last_updated": 29,
@@ -289,7 +289,7 @@
       "last_result": "noop"
     },
     "religious::حجاج كوكتيل": {
-      "last_run": "2026-09-01T12:08:46.000Z",
+      "last_run": "2026-09-01T13:12:51.000Z",
       "last_modified_cursor": "2026-09-01T07:41:55.000Z",
       "last_created": 0,
       "last_updated": 8,
@@ -298,7 +298,7 @@
       "last_result": "noop"
     },
     "religious::إحصائيات البرامج": {
-      "last_run": "2026-09-01T12:08:46.000Z",
+      "last_run": "2026-09-01T13:12:51.000Z",
       "last_modified_cursor": "2026-09-01T07:41:58.000Z",
       "last_created": 5,
       "last_updated": 0,
@@ -357,25 +357,45 @@
       "last_result": "ok"
     },
     "religious::حجاج حج مباشر": {
-      "last_run": "2026-09-01T12:08:31.000Z",
+      "last_run": "2026-09-01T13:12:50.000Z",
       "last_modified_cursor": "2026-09-01T12:08:31.000Z",
       "last_created": 0,
       "last_updated": 40,
       "baserow_table_id": 4,
       "natural_key": "رقم التليفون",
-      "last_result": "ok"
+      "last_result": "noop"
     },
     "religious::حجاج حج مباشر باقات": {
-      "last_run": "2026-09-01T12:08:38.000Z",
+      "last_run": "2026-09-01T13:12:50.000Z",
       "last_modified_cursor": "2026-09-01T12:08:38.000Z",
       "last_created": 0,
       "last_updated": 74,
       "baserow_table_id": 5,
       "natural_key": "رقم التليفون",
-      "last_result": "ok"
+      "last_result": "noop"
+    },
+    "religious::استفسارات جديدة": {
+      "last_run": "2026-09-01T13:12:52.000Z",
+      "last_modified_cursor": "2026-09-01T13:03:46.000Z",
+      "last_created": 1,
+      "last_updated": 0,
+      "baserow_table_id": 11,
+      "natural_key": "رقم التليفون",
+      "last_result": "noop"
+    },
+    "main::List": {
+      "baserow_table_id": 60,
+      "id_field": "Record ID",
+      "last_modified_cursor": "2026-09-01T13:12:36.000Z",
+      "last_run": "2026-09-01T13:12:36.000Z",
+      "last_result": "baseline_after_manual_import",
+      "last_created": 0,
+      "last_updated": 0
     }
   },
-  "paused": true,
-  "pause_reason": "stopped_by_user",
-  "pause_updated_at": "2026-09-01T12:12:06.888Z"
+  "paused": false,
+  "pause_reason": "",
+  "pause_updated_at": "2026-09-01T13:12:36.000Z",
+  "baseline_at": "2026-09-01T13:12:36.000Z",
+  "note": "Incremental Airtable→Baserow from baseline; only tables with Record ID"
 }

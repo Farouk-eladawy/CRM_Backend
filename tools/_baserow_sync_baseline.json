@@ -1,0 +1,72 @@
+{
+  "baseline_at": "2026-09-01T13:12:36.000Z",
+  "ready": [
+    {
+      "table": "List",
+      "id": 60,
+      "id_field": "Record ID"
+    }
+  ],
+  "skipped_no_record_id": [
+    {
+      "table": "MPC",
+      "id": 61,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Add Driver Name & Phone copy",
+      "id": 62,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Add Guide Name & Phone",
+      "id": 63,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Add Representative Name & Phone",
+      "id": 64,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Add Supplier Name & Phone",
+      "id": 65,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Offer",
+      "id": 66,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Leads CRM",
+      "id": 67,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "GYG Analytics",
+      "id": 68,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Reservation close",
+      "id": 70,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Aegypten-Ausfluege Requests",
+      "id": 71,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Audio_Content",
+      "id": 72,
+      "reason": "missing Record ID"
+    },
+    {
+      "table": "Sales_Performance_Reviews",
+      "id": 73,
+      "reason": "missing Record ID"
+    }
+  ]
+}

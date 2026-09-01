@@ -2,17 +2,17 @@
 Airtable → Baserow continuous sync (transition until Airtable is retired).
 
 - Auto-discovers tables that exist in BOTH Baserow and Airtable (by exact name).
-- Supports multiple targets (main ops + religious).
-- Ensures `airtable_record_id` field exists (Baserow native Airtable import lacks it).
-- Upserts by airtable_record_id; first-time match via natural keys (e.g. Booking Nr.).
+- Only syncs tables already present in Baserow (never creates missing tables).
+- Upserts via Baserow field `Record ID` (preferred) or `airtable_record_id`.
+- Airtable is source of truth.
 
 Config (config.json → baserow.sync):
   "enabled": true,
   "interval_sec": 90,
   "auto_discover": true,
+  "id_field": "Record ID",
   "targets": [
-    {"name": "main", "database_id": 5, "airtable_base_id": "appTp5YgSp9DV2HYc", "tables": "auto"},
-    {"name": "religious", "database_id": 3, "airtable_base_id": "appzc9rxT8kfD0HMp", "tables": "auto"}
+    {"name": "main", "database_id": 5, "airtable_base_id": "appTp5YgSp9DV2HYc", "tables": "auto"}
   ]
 """
 from __future__ import annotations
@@ -218,14 +218,23 @@ def build_row_payload(
     br: Optional[BaserowApi] = None,
     file_cache: Optional[dict] = None,
     include_airtable_id: bool = True,
+    id_field: Optional[str] = None,
 ) -> dict:
     type_by_name = {str(f.get("name") or ""): str(f.get("type") or "") for f in fields_meta}
     br_types = br_field_types or {}
     br_defs = br_field_defs or {}
     row: dict = {}
-    if include_airtable_id and "airtable_record_id" in br_field_names:
-        row["airtable_record_id"] = rec.get("id")
+    id_col = id_field or resolve_id_field_name(br_field_names)
+    if include_airtable_id and id_col and id_col in br_field_names:
+        row[id_col] = rec.get("id")
+    skip_write_names = set()
+    if id_col:
+        skip_write_names.add(id_col)
+    # Don't overwrite Record ID from Airtable formula value if we already set from rec.id
+    skip_write_names.update(ID_FIELD_CANDIDATES)
     for k, v in (rec.get("fields") or {}).items():
+        if k in skip_write_names:
+            continue
         at_type = type_by_name.get(k, "singleLineText")
         if at_type in AUTO_COMPUTED_TYPES or at_type == "multipleRecordLinks":
             continue
@@ -325,7 +334,23 @@ def batch_update_rows_safe(br: BaserowApi, table_id: int, items: List[dict]) -> 
         raise
 
 
-def airtable_id_to_baserow_row_id(br: BaserowApi, table_id: int) -> Dict[str, int]:
+SKIP_TABLE_SUBSTRINGS = ("import report", "airtable import")
+# Preferred Baserow column holding Airtable record id (recXXXXXXXX)
+ID_FIELD_CANDIDATES = ("Record ID", "airtable_record_id", "Airtable Record ID")
+
+
+def resolve_id_field_name(br_field_names: set[str], preferred: Optional[str] = None) -> Optional[str]:
+    if preferred and preferred in br_field_names:
+        return preferred
+    for name in ID_FIELD_CANDIDATES:
+        if name in br_field_names:
+            return name
+    return None
+
+
+def airtable_id_to_baserow_row_id(
+    br: BaserowApi, table_id: int, id_field: str = "Record ID"
+) -> Dict[str, int]:
     out: Dict[str, int] = {}
     page = 1
     while True:
@@ -335,10 +360,13 @@ def airtable_id_to_baserow_row_id(br: BaserowApi, table_id: int) -> Dict[str, in
             params={"user_field_names": "true", "size": 200, "page": page},
         )
         for row in data.get("results") or []:
-            aid = row.get("airtable_record_id")
+            aid = row.get(id_field)
+            if not aid:
+                # fallback legacy names on same row
+                aid = row.get("airtable_record_id") or row.get("Record ID")
             rid = row.get("id")
             if aid and rid:
-                out[str(aid)] = int(rid)
+                out[str(aid).strip()] = int(rid)
         if not data.get("next"):
             break
         page += 1
@@ -350,21 +378,22 @@ def batch_update_rows(br: BaserowApi, table_id: int, items: List[dict]) -> Any:
     return br._req("PATCH", path, json={"items": items})
 
 
-def ensure_airtable_id_field(br: BaserowApi, table_id: int, existing_names: set[str]) -> set[str]:
-    if "airtable_record_id" in existing_names:
-        return existing_names
-    try:
-        br.create_field(table_id, {"name": "airtable_record_id", "type": "text"})
-        existing_names.add("airtable_record_id")
-        logger.info("Created airtable_record_id on Baserow table id=%s", table_id)
-        time.sleep(0.2)
-    except RuntimeError as exc:
-        msg = str(exc)
-        if "already exists" in msg.lower() or "ERROR_FIELD_NAME" in msg:
-            existing_names.add("airtable_record_id")
-        else:
-            raise
-    return existing_names
+def ensure_id_field(
+    br: BaserowApi,
+    table_id: int,
+    existing_names: set[str],
+    preferred: str = "Record ID",
+) -> Tuple[set[str], Optional[str]]:
+    """Require an existing Record ID column — never invent empty ids (avoids duplicate rows)."""
+    found = resolve_id_field_name(existing_names, preferred)
+    if found:
+        return existing_names, found
+    logger.warning(
+        "Baserow table id=%s missing '%s' (and legacy id fields) — skip until field is added",
+        table_id,
+        preferred,
+    )
+    return existing_names, None
 
 
 def pick_natural_key(br_names: set[str], at_fields: List[dict]) -> Optional[str]:
@@ -501,7 +530,7 @@ class AirtableBaserowSync:
         self._at_by_base: Dict[str, AirtableSource] = {}
         self._id_maps: Dict[str, Dict[str, int]] = {}
         self._nk_maps: Dict[str, Dict[str, int]] = {}
-        self._field_cache: Dict[str, Tuple[List[dict], set[str], Dict[str, str], Dict[str, dict]]] = {}
+        self._field_cache: Dict[str, tuple] = {}
         self._at_names_cache: Dict[str, List[str]] = {}
 
     def enabled(self) -> bool:
@@ -590,6 +619,9 @@ class AirtableBaserowSync:
     def _cache_key(self, target_name: str, table_name: str) -> str:
         return f"{target_name}::{table_name}"
 
+    def preferred_id_field(self) -> str:
+        return str(self.sync_cfg.get("id_field") or "Record ID").strip() or "Record ID"
+
     def _fields_for(self, at: AirtableSource, br: BaserowApi, table_name: str, tid: int, cache_key: str):
         if cache_key in self._field_cache:
             return self._field_cache[cache_key]
@@ -597,13 +629,13 @@ class AirtableBaserowSync:
         fields_meta = list(at_tbl.get("fields") or [])
         br_fields = list(br.list_fields(tid))
         br_names = {str(f.get("name") or "") for f in br_fields}
-        br_names = ensure_airtable_id_field(br, tid, br_names)
+        br_names, id_field = ensure_id_field(br, tid, br_names, preferred=self.preferred_id_field())
         br_types = {str(f.get("name") or ""): str(f.get("type") or "") for f in br_fields}
         br_defs = {str(f.get("name") or ""): f for f in br_fields}
-        if "airtable_record_id" not in br_types:
-            br_types["airtable_record_id"] = "text"
-        self._field_cache[cache_key] = (fields_meta, br_names, br_types, br_defs)
-        return fields_meta, br_names, br_types, br_defs
+        if id_field and id_field not in br_types:
+            br_types[id_field] = "text"
+        self._field_cache[cache_key] = (fields_meta, br_names, br_types, br_defs, id_field)
+        return fields_meta, br_names, br_types, br_defs, id_field
 
     def sync_table(
         self,
@@ -645,24 +677,26 @@ class AirtableBaserowSync:
             }
 
         try:
-            fields_meta, br_names, br_types, br_defs = self._fields_for(at, br, table_name, tid, ck)
+            fields_meta, br_names, br_types, br_defs, id_field = self._fields_for(
+                at, br, table_name, tid, ck
+            )
         except RuntimeError as exc:
             if "ERROR_TABLE_DOES_NOT_EXIST" in str(exc) or "HTTP 404" in str(exc):
                 logger.warning("Baserow sync skip %s/%s: table gone", target_name, table_name)
                 return {"target": target_name, "table": table_name, "status": "skipped", "reason": "missing"}
             raise
 
-        if "airtable_record_id" not in br_names:
+        if not id_field:
             return {
                 "target": target_name,
                 "table": table_name,
-                "status": "error",
-                "message": "could not create airtable_record_id",
+                "status": "skipped",
+                "reason": "missing Record ID / airtable_record_id field",
             }
 
         id_map = self._id_maps.get(ck)
         if id_map is None:
-            id_map = airtable_id_to_baserow_row_id(br, tid)
+            id_map = airtable_id_to_baserow_row_id(br, tid, id_field=id_field)
             self._id_maps[ck] = id_map
 
         nk_field = pick_natural_key(br_names, fields_meta)
@@ -686,6 +720,7 @@ class AirtableBaserowSync:
                 br_field_defs=br_defs,
                 br=br,
                 file_cache=file_cache,
+                id_field=id_field,
             )
             existing = id_map.get(aid)
             if not existing and nk_field:
@@ -693,13 +728,13 @@ class AirtableBaserowSync:
                 if nkv:
                     existing = nk_map.get(nkv)
                     if existing:
-                        payload = {**payload, "airtable_record_id": aid}
+                        payload = {**payload, id_field: aid}
             if existing:
                 item = {"id": existing, **payload}
                 to_update.append(item)
                 id_map[aid] = existing
             else:
-                if len(payload) <= 1 and payload.get("airtable_record_id"):
+                if len(payload) <= 1 and payload.get(id_field):
                     skipped_rows += 1
                     continue
                 to_create.append(payload)
@@ -721,7 +756,7 @@ class AirtableBaserowSync:
             time.sleep(0.35)
 
         if to_create or to_update:
-            self._id_maps[ck] = airtable_id_to_baserow_row_id(br, tid)
+            self._id_maps[ck] = airtable_id_to_baserow_row_id(br, tid, id_field=id_field)
             if nk_field:
                 self._nk_maps[ck] = natural_key_index(br, tid, nk_field)
 
@@ -730,6 +765,7 @@ class AirtableBaserowSync:
         tstate["last_created"] = created
         tstate["last_updated"] = updated
         tstate["baserow_table_id"] = tid
+        tstate["id_field"] = id_field
         tstate["natural_key"] = nk_field
         tstate["last_result"] = "ok"
         state.setdefault("tables", {})[state_key] = tstate
@@ -743,6 +779,7 @@ class AirtableBaserowSync:
             "created": created,
             "updated": updated,
             "skipped_rows": skipped_rows,
+            "id_field": id_field,
             "natural_key": nk_field,
         }
 

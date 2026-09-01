@@ -1,0 +1,185 @@
+{
+  "applications": [
+    {
+      "id": 5,
+      "type": "database",
+      "name": "FTS Reservations",
+      "workspace_id": 1
+    },
+    {
+      "id": 3,
+      "type": "database",
+      "name": "حج - إدارة بيانات الحجاج",
+      "workspace_id": 2
+    }
+  ],
+  "databases": {
+    "5": {
+      "name": "FTS Reservations",
+      "workspace_id": 1,
+      "tables": [
+        {
+          "id": 21,
+          "name": "List"
+        },
+        {
+          "id": 22,
+          "name": "Add Driver Name & Phone copy"
+        },
+        {
+          "id": 23,
+          "name": "Add Guide Name & Phone"
+        },
+        {
+          "id": 24,
+          "name": "Add Representative Name & Phone"
+        },
+        {
+          "id": 25,
+          "name": "Add Supplier Name & Phone"
+        },
+        {
+          "id": 26,
+          "name": "Offer"
+        },
+        {
+          "id": 27,
+          "name": "GYG Analytics"
+        },
+        {
+          "id": 28,
+          "name": "Airtable import report"
+        }
+      ]
+    },
+    "3": {
+      "name": "حج - إدارة بيانات الحجاج",
+      "workspace_id": 2,
+      "tables": [
+        {
+          "id": 4,
+          "name": "حجاج حج مباشر"
+        },
+        {
+          "id": 5,
+          "name": "حجاج حج مباشر باقات"
+        },
+        {
+          "id": 6,
+          "name": "حجاج حج قرعة"
+        },
+        {
+          "id": 7,
+          "name": "حجاج تحسين"
+        },
+        {
+          "id": 8,
+          "name": "حجاج بري"
+        },
+        {
+          "id": 9,
+          "name": "حجاج كوكتيل"
+        },
+        {
+          "id": 10,
+          "name": "إحصائيات البرامج"
+        },
+        {
+          "id": 11,
+          "name": "استفسارات جديدة"
+        },
+        {
+          "id": 12,
+          "name": "Airtable import report"
+        }
+      ]
+    }
+  },
+  "airtable_main": [
+    "List",
+    "MPC",
+    "Grand_Tickets",
+    "Ticket Imports",
+    "Products_Catalog",
+    "Hotel For Extra Transfer",
+    "Tito Sunny",
+    "Nile_Crystal_Booking",
+    "Fun_Time_Booking",
+    "Product's",
+    "Reservation close",
+    "Monitor reservations",
+    "Aegypten-Ausfluege Requests",
+    "Manage_User",
+    "Guides",
+    "Destinations",
+    "Trip Names",
+    "Management Option",
+    "Add-on",
+    "Trip Name Correction",
+    "Add Driver Name & Phone copy",
+    "Add Guide Name & Phone",
+    "Add Representative Name & Phone",
+    "Add Supplier Name & Phone",
+    "Destination Name Correction",
+    "Flights",
+    "Contacts",
+    "Consultation Bookings",
+    "Users",
+    "Messages",
+    "Hurghada Ägypten Ausflüge",
+    "Tours",
+    "Audio Guide",
+    "Audio_Content",
+    "Audio_Content copy",
+    "Leads CRM",
+    "Offer",
+    "GYG Analytics",
+    "Nile_GYG_Analytics",
+    "Sales_Performance_Reviews"
+  ],
+  "airtable_religious": [
+    "حجاج حج مباشر",
+    "حجاج حج مباشر باقات",
+    "حجاج حج قرعة",
+    "حجاج تحسين",
+    "حجاج بري",
+    "حجاج كوكتيل",
+    "إحصائيات البرامج",
+    "استفسارات جديدة"
+  ],
+  "matches": {
+    "main": [
+      {
+        "database_id": 5,
+        "name": "FTS Reservations",
+        "tables": [
+          "Add Driver Name & Phone copy",
+          "Add Guide Name & Phone",
+          "Add Representative Name & Phone",
+          "Add Supplier Name & Phone",
+          "GYG Analytics",
+          "List",
+          "Offer"
+        ],
+        "baserow_only": []
+      }
+    ],
+    "religious": [
+      {
+        "database_id": 3,
+        "name": "حج - إدارة بيانات الحجاج",
+        "tables": [
+          "إحصائيات البرامج",
+          "استفسارات جديدة",
+          "حجاج بري",
+          "حجاج تحسين",
+          "حجاج حج قرعة",
+          "حجاج حج مباشر",
+          "حجاج حج مباشر باقات",
+          "حجاج كوكتيل"
+        ],
+        "baserow_only": []
+      }
+    ]
+  }
+}

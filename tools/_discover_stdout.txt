@@ -1,0 +1,37 @@
+{
+  "main": [
+    {
+      "database_id": 5,
+      "name": "FTS Reservations",
+      "tables": [
+        "Add Driver Name & Phone copy",
+        "Add Guide Name & Phone",
+        "Add Representative Name & Phone",
+        "Add Supplier Name & Phone",
+        "GYG Analytics",
+        "List",
+        "Offer"
+      ],
+      "baserow_only": []
+    }
+  ],
+  "religious": [
+    {
+      "database_id": 3,
+      "name": "╪¡╪¼ - ╪Ñ╪»╪º╪▒╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪¡╪¼╪º╪¼",
+      "tables": [
+        "╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ╪º┘ä╪¿╪▒╪º┘à╪¼",
+        "╪º╪│╪¬┘ü╪│╪º╪▒╪º╪¬ ╪¼╪»┘è╪»╪⌐",
+        "╪¡╪¼╪º╪¼ ╪¿╪▒┘è",
+        "╪¡╪¼╪º╪¼ ╪¬╪¡╪│┘è┘å",
+        "╪¡╪¼╪º╪¼ ╪¡╪¼ ┘é╪▒╪╣╪⌐",
+        "╪¡╪¼╪º╪¼ ╪¡╪¼ ┘à╪¿╪º╪┤╪▒",
+        "╪¡╪¼╪º╪¼ ╪¡╪¼ ┘à╪¿╪º╪┤╪▒ ╪¿╪º┘é╪º╪¬",
+        "╪¡╪¼╪º╪¼ ┘â┘ê┘â╪¬┘è┘ä"
+      ],
+      "baserow_only": []
+    }
+  ]
+}
+
+Full dump: C:\Users\Aloosh2020\Downloads\New Project's\AIAgentProject\OpenClaw_Version\tools\_baserow_discover_out.json

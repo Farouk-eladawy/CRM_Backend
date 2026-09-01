@@ -1,0 +1,70 @@
+[
+  {
+    "target": "main",
+    "database_id": 5,
+    "existing": [
+      "Add Driver Name & Phone copy",
+      "Add Guide Name & Phone",
+      "Add Representative Name & Phone",
+      "Add Supplier Name & Phone",
+      "Airtable import report",
+      "GYG Analytics",
+      "List",
+      "Offer"
+    ],
+    "missing": [
+      "MPC",
+      "Grand_Tickets",
+      "Ticket Imports",
+      "Products_Catalog",
+      "Hotel For Extra Transfer",
+      "Product's",
+      "Reservation close",
+      "Monitor reservations",
+      "Aegypten-Ausfluege Requests",
+      "Manage_User",
+      "Guides",
+      "Destinations",
+      "Trip Names",
+      "Management Option",
+      "Add-on",
+      "Trip Name Correction",
+      "Destination Name Correction",
+      "Flights",
+      "Contacts",
+      "Consultation Bookings",
+      "Users",
+      "Messages",
+      "Hurghada Ägypten Ausflüge",
+      "Tours",
+      "Audio Guide",
+      "Audio_Content",
+      "Audio_Content copy",
+      "Leads CRM",
+      "Sales_Performance_Reviews"
+    ],
+    "excluded_present": [
+      "Tito Sunny",
+      "Nile_Crystal_Booking",
+      "Fun_Time_Booking",
+      "Nile_GYG_Analytics"
+    ]
+  },
+  {
+    "target": "religious",
+    "database_id": 3,
+    "existing": [
+      "Airtable import report",
+      "إحصائيات البرامج",
+      "استفسارات جديدة",
+      "حجاج بري",
+      "حجاج تحسين",
+      "حجاج حج قرعة",
+      "حجاج حج مباشر",
+      "حجاج حج مباشر باقات",
+      "حجاج كوكتيل"
+    ],
+    "missing": [],
+    "excluded_present": []
+  }
+]

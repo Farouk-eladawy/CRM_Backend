@@ -133,11 +133,53 @@ def _decimal_places(field_def: dict, br_type: str) -> Optional[int]:
     return None
 
 
-def coerce_for_baserow_field(val: Any, br_type: str, field_def: Optional[dict] = None) -> Any:
+def normalize_email(value: Any) -> Optional[str]:
+    if value is None:
+        return None
+    s = str(value).strip().strip(",;").lower()
+    if not s or s in {"n/a", "na", "none", "-", "—", "null", "undefined"}:
+        return None
+    # Take first address if multiple were pasted
+    if "," in s or ";" in s or " " in s:
+        for part in re.split(r"[,;\s]+", s):
+            part = part.strip()
+            if part and "@" in part:
+                s = part
+                break
+    if "@" not in s or s.startswith("@") or s.endswith("@"):
+        return None
+    local, _, domain = s.partition("@")
+    if not local or "." not in domain or " " in s:
+        return None
+    return s
+
+
+def look_like_email_field(name: str, br_type: str) -> bool:
+    if br_type == "email":
+        return True
+    n = (name or "").strip().lower()
+    return any(x in n for x in ("email", "e-mail", "ايميل", "الإيميل", "الايميل"))
+
+
+def look_like_phone_field(name: str, br_type: str) -> bool:
+    if br_type == "phone_number":
+        return True
+    n = (name or "").strip().lower()
+    return any(x in n for x in ("phone", "mobile", "whatsapp", "تليفون", "هاتف", "موبايل"))
+
+
+def coerce_for_baserow_field(
+    val: Any,
+    br_type: str,
+    field_def: Optional[dict] = None,
+    field_name: str = "",
+) -> Any:
     if val is None or val == "":
         return None
-    if br_type == "phone_number":
-        return normalize_phone(val)
+    if br_type == "phone_number" or look_like_phone_field(field_name, br_type):
+        # Only coerce strictly when Baserow field is phone_number
+        if br_type == "phone_number":
+            return normalize_phone(val)
     if br_type in ("number", "rating"):
         dec = _decimal_places(field_def or {}, br_type)
         try:
@@ -152,11 +194,9 @@ def coerce_for_baserow_field(val: Any, br_type: str, field_def: Optional[dict] =
         if dec is not None and dec > 0:
             return round(num, dec)
         return num
-    if br_type == "email":
-        s = str(val).strip()
-        if "@" not in s or " " in s:
-            return None
-        return s
+    if br_type == "email" or look_like_email_field(field_name, br_type):
+        if br_type == "email":
+            return normalize_email(val)
     if br_type == "url":
         s = str(val).strip()
         if not s.startswith(("http://", "https://")):
@@ -198,8 +238,8 @@ def build_row_payload(
             br=br if use_file else None,
             file_cache=file_cache if use_file else None,
         )
-        if val is not None and val != "" and br_type:
-            val = coerce_for_baserow_field(val, br_type, br_defs.get(k))
+        if val is not None and val != "":
+            val = coerce_for_baserow_field(val, br_type, br_defs.get(k), field_name=k)
         if val is not None and val != "":
             row[k] = val
     return row
@@ -212,13 +252,18 @@ def dedupe_updates(items: List[dict]) -> List[dict]:
         rid = item.get("id")
         if rid is None:
             continue
-        rid = int(rid)
+        try:
+            rid = int(rid)
+        except (TypeError, ValueError):
+            continue
         if rid in by_id:
             merged = {**by_id[rid], **item}
             merged["id"] = rid
             by_id[rid] = merged
         else:
-            by_id[rid] = dict(item)
+            clean = dict(item)
+            clean["id"] = rid
+            by_id[rid] = clean
     return list(by_id.values())
 
 
@@ -229,7 +274,8 @@ def batch_create_rows_safe(br: BaserowApi, table_id: int, rows: List[dict]) -> T
         br.batch_create_rows(table_id, rows)
         return len(rows), 0
     except RuntimeError as exc:
-        if "ERROR_REQUEST_BODY_VALIDATION" not in str(exc):
+        msg = str(exc)
+        if "ERROR_REQUEST_BODY_VALIDATION" not in msg and "HTTP 400" not in msg:
             raise
         ok, skipped = 0, 0
         for row in rows:
@@ -255,26 +301,27 @@ def batch_update_rows_safe(br: BaserowApi, table_id: int, items: List[dict]) -> 
         return len(items), 0
     except RuntimeError as exc:
         msg = str(exc)
-        if "ERROR_ROW_IDS_NOT_UNIQUE" in msg:
-            items = dedupe_updates(items)
-            batch_update_rows(br, table_id, items)
-            return len(items), 0
-        if "ERROR_REQUEST_BODY_VALIDATION" not in msg:
-            raise
-        ok, skipped = 0, 0
-        for item in items:
-            try:
-                batch_update_rows(br, table_id, [item])
-                ok += 1
-            except RuntimeError as row_exc:
-                skipped += 1
-                logger.warning(
-                    "Baserow sync skip update row id=%s (table=%s): %s",
-                    item.get("id"),
-                    table_id,
-                    str(row_exc)[:240],
-                )
-        return ok, skipped
+        # Always fall back to per-row for uniqueness / validation issues
+        if (
+            "ERROR_ROW_IDS_NOT_UNIQUE" in msg
+            or "ERROR_REQUEST_BODY_VALIDATION" in msg
+            or "HTTP 400" in msg
+        ):
+            ok, skipped = 0, 0
+            for item in dedupe_updates(items):
+                try:
+                    batch_update_rows(br, table_id, [item])
+                    ok += 1
+                except RuntimeError as row_exc:
+                    skipped += 1
+                    logger.warning(
+                        "Baserow sync skip update row id=%s (table=%s): %s",
+                        item.get("id"),
+                        table_id,
+                        str(row_exc)[:240],
+                    )
+            return ok, skipped
+        raise
 
 
 def airtable_id_to_baserow_row_id(br: BaserowApi, table_id: int) -> Dict[str, int]:
@@ -661,7 +708,11 @@ class AirtableBaserowSync:
                                 "reason": "missing",
                             }
                         )
-                    elif "ERROR_REQUEST_BODY_VALIDATION" in msg or "ERROR_ROW_IDS_NOT_UNIQUE" in msg:
+                    elif (
+                        "ERROR_REQUEST_BODY_VALIDATION" in msg
+                        or "ERROR_ROW_IDS_NOT_UNIQUE" in msg
+                        or "HTTP 400" in msg
+                    ):
                         logger.warning("Baserow sync validation %s/%s: %s", tname, table_name, msg[:240])
                         results.append(
                             {

@@ -45189,6 +45189,7 @@ Draft to optimize:
                     backoff = 1
                     while not self._baserow_sync_stop.is_set():
                         try:
+                            # Soft validation skips (phone/email/decimals) are warnings — not WhatsApp ERROR.
                             self.baserow_sync.tick()
                             backoff = 1
                             time.sleep(self.baserow_sync.interval_sec())

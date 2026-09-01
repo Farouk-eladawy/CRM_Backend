@@ -153,6 +153,131 @@ def _row_campaign(row):
     return d
 
 
+def _truncate(text: str, limit: int = 1500) -> str:
+    s = str(text or "").strip()
+    if len(s) <= limit:
+        return s
+    return s[: max(0, limit - 1)] + "…"
+
+
+def _extract_meta_error_parts(meta) -> dict:
+    """Normalize Meta / send failure payloads into structured fields for Note."""
+    out = {
+        "message_id": "",
+        "recipient": "",
+        "code": "",
+        "title": "",
+        "message": "",
+        "details": "",
+        "status_code": "",
+        "raw": "",
+    }
+    if meta is None:
+        return out
+    if not isinstance(meta, dict):
+        out["raw"] = str(meta)
+        out["message"] = str(meta)
+        return out
+
+    out["status_code"] = str(meta.get("status_code") or "").strip()
+    body = meta.get("body")
+    parsed = meta.get("json") if isinstance(meta.get("json"), dict) else None
+    if parsed is None and isinstance(body, str) and body.strip().startswith("{"):
+        try:
+            parsed = json.loads(body)
+        except Exception:
+            parsed = None
+    err = {}
+    if isinstance(parsed, dict):
+        err = parsed.get("error") if isinstance(parsed.get("error"), dict) else {}
+        # Some payloads nest under messages / error_data
+        if not err and isinstance(parsed.get("error"), str):
+            out["message"] = str(parsed.get("error"))
+    if isinstance(meta.get("error"), dict):
+        err = meta.get("error") or err
+
+    if isinstance(err, dict) and err:
+        out["code"] = str(err.get("code") or "").strip()
+        out["title"] = str(err.get("error_user_title") or err.get("type") or err.get("title") or "").strip()
+        out["message"] = str(err.get("message") or err.get("error_user_msg") or "").strip()
+        details = err.get("error_data") if isinstance(err.get("error_data"), dict) else {}
+        if details:
+            out["details"] = str(details.get("details") or details.get("message") or "").strip()
+        if not out["details"]:
+            out["details"] = str(err.get("error_data") or "").strip() if not isinstance(err.get("error_data"), dict) else ""
+        fbtrace = str(err.get("fbtrace_id") or "").strip()
+        if fbtrace and not out["details"]:
+            out["details"] = f"fbtrace_id={fbtrace}"
+
+    # message id from successful structure shouldn't appear on failure, but keep if present
+    try:
+        msgs = (parsed or {}).get("messages") if isinstance(parsed, dict) else None
+        if isinstance(msgs, list) and msgs:
+            out["message_id"] = str((msgs[0] or {}).get("id") or "").strip()
+    except Exception:
+        pass
+
+    if not out["message"] and isinstance(body, str) and body.strip():
+        out["raw"] = body.strip()
+        out["message"] = body.strip()[:500]
+    if not out["message"] and meta.get("error"):
+        out["message"] = str(meta.get("error"))
+    return out
+
+
+def _format_send_error(meta, phone: str = None) -> str:
+    parts = _extract_meta_error_parts(meta)
+    if phone and not parts.get("recipient"):
+        parts["recipient"] = str(phone)
+    chunks = []
+    if parts.get("message_id"):
+        chunks.append(f"message_id={parts['message_id']}")
+    if parts.get("recipient"):
+        chunks.append(f"recipient={parts['recipient']}")
+    if parts.get("code"):
+        chunks.append(f"code={parts['code']}")
+    if parts.get("title"):
+        chunks.append(f"title={parts['title']}")
+    if parts.get("message"):
+        chunks.append(f"message={parts['message']}")
+    if parts.get("details"):
+        chunks.append(f"details={parts['details']}")
+    if parts.get("status_code") and not parts.get("code"):
+        chunks.append(f"http={parts['status_code']}")
+    if not chunks and parts.get("raw"):
+        chunks.append(parts["raw"])
+    if not chunks:
+        chunks.append("Send failed (unknown error)")
+    text = " | ".join(chunks)
+    # Friendly Arabic/English prefix for billing / payment Meta issues
+    joined = text.lower()
+    if any(
+        x in joined
+        for x in (
+            "payment",
+            "billing",
+            "invoice",
+            "business eligibility",
+            "131042",
+            "account has been restricted",
+            "unpaid",
+            "فاتورة",
+            "دفع",
+        )
+    ):
+        text = "Meta billing/payment issue — " + text
+    return _truncate(text, 1500)
+
+
+def _is_campaign_blocking_failure(err_txt: str, meta=None) -> bool:
+    """
+    Stop the whole campaign after a failed send.
+    Account/billing issues always block; user requested auto-stop on any send failure
+    so operators can fix Meta/config before continuing.
+    """
+    return True
+
+
 def campaign_counts(campaign_id: str) -> dict:
     with _connect() as conn:
         rows = conn.execute(
@@ -426,7 +551,7 @@ def _mark(campaign_id: str, phone: str, status: str, error: str = None, chat_id:
                 SET status = ?, error = ?, chat_id = COALESCE(?, chat_id)
                 WHERE campaign_id = ? AND phone = ?
                 """,
-                (status, str(error or "")[:400], chat_id, campaign_id, phone),
+                (status, _truncate(error or "", 1500), chat_id, campaign_id, phone),
             )
         conn.commit()
 
@@ -440,16 +565,37 @@ def _set_campaign_status(campaign_id: str, status: str, error: str = None):
                 (status, now, campaign_id),
             )
         elif status in ("completed", "cancelled"):
-            conn.execute(
-                "UPDATE campaigns SET status = ?, finished_at = ?, error = ? WHERE id = ?",
-                (status, now, str(error or "")[:400] if error else None, campaign_id),
-            )
+            if error is None:
+                # Preserve an existing auto-stop reason (do not wipe Note/error).
+                conn.execute(
+                    "UPDATE campaigns SET status = ?, finished_at = COALESCE(finished_at, ?) WHERE id = ?",
+                    (status, now, campaign_id),
+                )
+            else:
+                conn.execute(
+                    "UPDATE campaigns SET status = ?, finished_at = ?, error = ? WHERE id = ?",
+                    (status, now, _truncate(error, 1500), campaign_id),
+                )
         else:
             conn.execute(
                 "UPDATE campaigns SET status = ?, error = ? WHERE id = ?",
-                (status, str(error or "")[:400] if error else None, campaign_id),
+                (status, _truncate(error or "", 1500) if error else None, campaign_id),
             )
         conn.commit()
+
+
+def _auto_stop_campaign(campaign_id: str, reason: str):
+    """Stop sending immediately and keep pending numbers for later resume."""
+    with _SEND_LOCK:
+        _RUNNING.discard(campaign_id)
+    _set_campaign_status(campaign_id, "cancelled", reason)
+    with _connect() as conn:
+        conn.execute(
+            "UPDATE recipients SET status = 'pending', error = NULL WHERE campaign_id = ? AND status = 'sending'",
+            (campaign_id,),
+        )
+        conn.commit()
+    log.warning("Campaign %s auto-stopped: %s", campaign_id, _truncate(reason, 300))
 
 
 def _is_campaign_running(campaign_id: str) -> bool:
@@ -488,11 +634,20 @@ def _send_loop(agent, campaign_id: str):
             try:
                 chat_id = _ensure_conversation(phone)
             except Exception as e:
-                _mark(campaign_id, phone, "failed", str(e))
+                err_txt = _format_send_error(str(e), phone=phone)
+                _mark(campaign_id, phone, "failed", err_txt)
+                if _is_campaign_blocking_failure(err_txt):
+                    _auto_stop_campaign(
+                        campaign_id,
+                        f"Auto-stopped: conversation setup failed for {phone} — {err_txt}",
+                    )
+                    stopped_early = True
+                    break
                 continue
 
             ok = False
             meta = None
+            err_txt = ""
             try:
                 if send_type == "template":
                     ok, meta = agent.send_whatsapp_message(
@@ -536,11 +691,7 @@ def _send_loop(agent, campaign_id: str):
                 else:
                     header = str(camp.get("text_body") or "").strip() or f"[Religious Campaign {campaign_id[:8]}] Text"
             else:
-                err_txt = ""
-                if isinstance(meta, dict):
-                    err_txt = str(meta.get("body") or meta.get("error") or "")[:400]
-                else:
-                    err_txt = str(meta or "")[:400]
+                err_txt = _format_send_error(meta, phone=phone)
                 _mark(campaign_id, phone, "failed", err_txt, chat_id=chat_id)
                 status_txt = "error"
                 header = f"[Religious Campaign {campaign_id[:8]}] FAILED - {err_txt[:200]}"
@@ -559,6 +710,14 @@ def _send_loop(agent, campaign_id: str):
                 except Exception as e:
                     log.warning("log message failed for %s: %s", phone, e)
 
+            if status_txt == "error" and _is_campaign_blocking_failure(err_txt, meta):
+                _auto_stop_campaign(
+                    campaign_id,
+                    f"Auto-stopped after send failure to {phone}: {err_txt}",
+                )
+                stopped_early = True
+                break
+
             if idx < len(phones) - 1:
                 time.sleep(delay_sec)
                 if not _is_campaign_running(campaign_id):
@@ -568,14 +727,13 @@ def _send_loop(agent, campaign_id: str):
                     time.sleep(5)
         final = get_campaign(campaign_id) or {}
         if stopped_early or str(final.get("status") or "") == "cancelled":
+            # Preserve auto-stop error already stored on the campaign.
             _set_campaign_status(campaign_id, "cancelled")
         else:
             _set_campaign_status(campaign_id, "completed")
     except Exception as e:
         log.exception("campaign send loop crashed")
-        final = get_campaign(campaign_id) or {}
-        if str(final.get("status") or "") != "cancelled":
-            _set_campaign_status(campaign_id, "completed", str(e))
+        _auto_stop_campaign(campaign_id, f"Auto-stopped: campaign crashed — {e}")
     finally:
         with _SEND_LOCK:
             _RUNNING.discard(campaign_id)

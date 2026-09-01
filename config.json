@@ -297,6 +297,8 @@
       "enabled": true,
       "interval_sec": 90,
       "auto_discover": true,
+      "source_of_truth": "airtable",
+      "direction": "airtable_to_baserow",
       "targets": [
         {
           "name": "main",

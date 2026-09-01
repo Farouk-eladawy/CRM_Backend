@@ -42,6 +42,7 @@ logger = logging.getLogger(__name__)
 
 SYNC_STATE_PATH = ROOT / "baserow_sync_state.json"
 BATCH_SIZE = 15
+DELETE_BATCH = 100
 SKIP_TABLE_SUBSTRINGS = ("import report", "airtable import")
 
 # First matching Airtable/Baserow field used to link existing imported rows
@@ -408,6 +409,83 @@ def at_natural_value(rec: dict, key_field: str) -> str:
     return str(v).strip()
 
 
+def list_all_row_ids(br: BaserowApi, table_id: int) -> List[int]:
+    ids: List[int] = []
+    page = 1
+    while True:
+        data = br._req(
+            "GET",
+            f"/api/database/rows/table/{table_id}/",
+            params={"size": 200, "page": page},
+        )
+        for row in data.get("results") or []:
+            rid = row.get("id")
+            if rid is not None:
+                ids.append(int(rid))
+        total = data.get("count")
+        if page == 1 or page % 10 == 0:
+            logger.info(
+                "  listing row ids table=%s page=%s collected=%s count=%s",
+                table_id,
+                page,
+                len(ids),
+                total,
+            )
+        if not data.get("next"):
+            break
+        page += 1
+        time.sleep(0.05)
+    return ids
+
+
+def clear_baserow_table_rows(br: BaserowApi, table_id: int) -> int:
+    """Delete all rows; keep columns/schema. Returns deleted count."""
+    logger.info("  clearing rows for Baserow table id=%s ...", table_id)
+    ids = list_all_row_ids(br, table_id)
+    if not ids:
+        logger.info("  table id=%s already empty", table_id)
+        return 0
+    deleted = 0
+    total = len(ids)
+    for i in range(0, total, DELETE_BATCH):
+        chunk = ids[i : i + DELETE_BATCH]
+        br._req(
+            "POST",
+            f"/api/database/rows/table/{table_id}/batch-delete/",
+            json={"items": chunk},
+        )
+        deleted += len(chunk)
+        if deleted == len(chunk) or deleted % 500 == 0 or deleted >= total:
+            logger.info("  deleted %s/%s rows (table=%s)", deleted, total, table_id)
+        time.sleep(0.25)
+    return deleted
+
+
+def set_sync_paused(paused: bool, reason: str = "") -> None:
+    state = load_sync_state()
+    state["paused"] = bool(paused)
+    state["pause_reason"] = reason if paused else ""
+    state["pause_updated_at"] = _utc_now_iso()
+    save_sync_state(state)
+
+
+def reset_table_cursors(state_keys: Optional[List[str]] = None) -> int:
+    state = load_sync_state()
+    tables = state.setdefault("tables", {})
+    n = 0
+    keys = list(tables.keys()) if state_keys is None else state_keys
+    for key in keys:
+        info = tables.get(key)
+        if not isinstance(info, dict):
+            continue
+        info.pop("last_modified_cursor", None)
+        info["last_result"] = "reset_for_full_sync"
+        tables[key] = info
+        n += 1
+    save_sync_state(state)
+    return n
+
+
 class AirtableBaserowSync:
     def __init__(self, agent_or_cfg=None):
         if agent_or_cfg is None:
@@ -671,8 +749,17 @@ class AirtableBaserowSync:
     def tick(self) -> dict:
         if not self.enabled():
             return {"status": "disabled"}
+        state = load_sync_state()
+        if state.get("paused"):
+            logger.info(
+                "Baserow sync paused (%s) — skipping incremental tick",
+                state.get("pause_reason") or "full resync",
+            )
+            return {"status": "paused", "reason": state.get("pause_reason")}
         self._field_cache = {}
         self._at_names_cache = {}
+        self._id_maps = {}
+        self._nk_maps = {}
         results = []
         for target in self.targets():
             tname = str(target.get("name") or "target")
@@ -734,22 +821,132 @@ class AirtableBaserowSync:
                         )
         return {"status": "ok", "results": results}
 
+    def full_resync(self, clear_rows: bool = True, targets_filter: Optional[List[str]] = None) -> dict:
+        """
+        Airtable is source of truth:
+        1) optionally clear Baserow rows (keep columns)
+        2) reset cursors
+        3) force full Airtable → Baserow sync for every overlapping table
+        """
+        if not self.enabled():
+            return {"status": "disabled"}
+        set_sync_paused(True, "full_resync_airtable_sot")
+        summary: Dict[str, Any] = {"cleared": [], "synced": [], "errors": []}
+        try:
+            self._field_cache = {}
+            self._at_names_cache = {}
+            self._id_maps = {}
+            self._nk_maps = {}
+            br = self._br_client()
+            for target in self.targets():
+                tname = str(target.get("name") or "target")
+                if targets_filter and tname not in targets_filter:
+                    continue
+                base_id = str(target.get("airtable_base_id") or "").strip()
+                pairs = self.resolve_target_tables(target)
+                logger.info("Full resync [%s]: %s tables", tname, len(pairs))
+                for table_name, tid in pairs:
+                    state_key = self._cache_key(tname, table_name)
+                    try:
+                        if clear_rows:
+                            deleted = clear_baserow_table_rows(br, tid)
+                            logger.info(
+                                "Cleared %s/%s (id=%s): deleted %s rows",
+                                tname,
+                                table_name,
+                                tid,
+                                deleted,
+                            )
+                            summary["cleared"].append(
+                                {
+                                    "target": tname,
+                                    "table": table_name,
+                                    "table_id": tid,
+                                    "deleted": deleted,
+                                }
+                            )
+                            self._id_maps.pop(state_key, None)
+                            self._nk_maps.pop(state_key, None)
+                        reset_table_cursors([state_key])
+                        result = self.sync_table(
+                            tname, base_id, table_name, tid, force_full=True
+                        )
+                        summary["synced"].append(result)
+                        logger.info(
+                            "Full sync done %s/%s: created=%s updated=%s skipped=%s",
+                            tname,
+                            table_name,
+                            result.get("created"),
+                            result.get("updated"),
+                            result.get("skipped_rows"),
+                        )
+                    except Exception as exc:
+                        logger.exception("Full resync failed %s/%s", tname, table_name)
+                        summary["errors"].append(
+                            {
+                                "target": tname,
+                                "table": table_name,
+                                "message": str(exc)[:500],
+                            }
+                        )
+            summary["status"] = "ok" if not summary["errors"] else "partial"
+            return summary
+        finally:
+            set_sync_paused(False)
+            logger.info("Baserow incremental sync resumed (Airtable → Baserow)")
+
 
 def main() -> int:
+    import argparse
+
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    parser = argparse.ArgumentParser(description="Airtable → Baserow sync (Airtable = source of truth)")
+    parser.add_argument(
+        "--full-resync",
+        action="store_true",
+        help="Clear Baserow rows (keep columns) then full sync from Airtable",
+    )
+    parser.add_argument(
+        "--no-clear",
+        action="store_true",
+        help="With --full-resync: do not delete existing Baserow rows (upsert only)",
+    )
+    parser.add_argument(
+        "--targets",
+        nargs="*",
+        default=None,
+        help="Optional target names (e.g. main religious)",
+    )
+    parser.add_argument(
+        "--discover-only",
+        action="store_true",
+        help="Print overlapping tables and exit",
+    )
+    args = parser.parse_args()
     syncer = AirtableBaserowSync()
     if not syncer.enabled():
         print("baserow.sync.enabled is false — set it in config.json")
         return 2
-    # Discover-only preview
+
     for t in syncer.targets():
         pairs = syncer.resolve_target_tables(t)
         print(f"[{t.get('name')}] db={t.get('database_id')} tables={len(pairs)}")
         for n, tid in pairs:
             print(f"  - {n} (id={tid})")
+    if args.discover_only:
+        return 0
+
+    if args.full_resync:
+        out = syncer.full_resync(
+            clear_rows=not args.no_clear,
+            targets_filter=args.targets,
+        )
+        print(json.dumps(out, ensure_ascii=False, indent=2))
+        return 0 if out.get("status") == "ok" else 1
+
     out = syncer.tick()
     print(json.dumps(out, ensure_ascii=False, indent=2))
-    return 0 if out.get("status") == "ok" else 1
+    return 0 if out.get("status") in ("ok", "paused") else 1
 
 
 if __name__ == "__main__":

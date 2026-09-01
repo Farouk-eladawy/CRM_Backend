@@ -45176,6 +45176,34 @@ Draft to optimize:
                 logging.info("Airtable Mirror started (List delta loop + full/other tables loop).")
         except Exception as e:
             logging.error(f"Failed to start Airtable Mirror: {e}")
+
+        try:
+            br_cfg = (self.config.get("baserow") or {}) if isinstance(self.config, dict) else {}
+            br_sync_cfg = (br_cfg.get("sync") or {}) if isinstance(br_cfg, dict) else {}
+            if br_cfg.get("enabled") and br_sync_cfg.get("enabled"):
+                from baserow_sync import AirtableBaserowSync
+                self.baserow_sync = AirtableBaserowSync(self)
+                self._baserow_sync_stop = threading.Event()
+
+                def _baserow_sync_loop():
+                    backoff = 1
+                    while not self._baserow_sync_stop.is_set():
+                        try:
+                            self.baserow_sync.tick()
+                            backoff = 1
+                            time.sleep(self.baserow_sync.interval_sec())
+                        except Exception as e:
+                            logging.error(f"Baserow sync loop error: {e}")
+                            time.sleep(min(120, backoff * 5))
+                            backoff = min(24, backoff * 2)
+
+                threading.Thread(target=_baserow_sync_loop, daemon=True, name="baserow-sync").start()
+                logging.info(
+                    "Airtable→Baserow sync started (interval=%ss).",
+                    self.baserow_sync.interval_sec(),
+                )
+        except Exception as e:
+            logging.error(f"Failed to start Baserow sync: {e}")
         
         # Schedule tasks
         try:

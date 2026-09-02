@@ -10,7 +10,7 @@
       "last_result": "noop"
     },
     "main::MPC": {
-      "last_run": "2026-09-02T06:12:51.000Z",
+      "last_run": "2026-09-02T07:11:41.000Z",
       "last_modified_cursor": "2026-09-01T04:05:19.000Z",
       "last_created": 0,
       "last_updated": 462,
@@ -46,7 +46,7 @@
       "last_result": "noop"
     },
     "main::Reservation close": {
-      "last_run": "2026-09-02T06:12:55.000Z",
+      "last_run": "2026-09-02T07:11:44.000Z",
       "last_modified_cursor": "2026-09-01T04:08:06.000Z",
       "last_created": 0,
       "last_updated": 102,
@@ -64,7 +64,7 @@
       "last_result": "noop"
     },
     "main::Aegypten-Ausfluege Requests": {
-      "last_run": "2026-09-02T06:12:55.000Z",
+      "last_run": "2026-09-02T07:11:44.000Z",
       "last_modified_cursor": "2026-09-01T04:08:54.000Z",
       "last_created": 0,
       "last_updated": 630,
@@ -208,7 +208,7 @@
       "last_result": "noop"
     },
     "main::Audio_Content": {
-      "last_run": "2026-09-02T06:12:55.000Z",
+      "last_run": "2026-09-02T07:11:45.000Z",
       "last_modified_cursor": "2026-09-01T04:10:53.000Z",
       "last_created": 0,
       "last_updated": 30,
@@ -235,7 +235,7 @@
       "last_result": "ok"
     },
     "main::Sales_Performance_Reviews": {
-      "last_run": "2026-09-02T06:12:55.000Z",
+      "last_run": "2026-09-02T07:11:45.000Z",
       "last_modified_cursor": "2026-09-01T04:12:43.000Z",
       "last_created": 0,
       "last_updated": 1,
@@ -339,7 +339,7 @@
       "last_result": "noop"
     },
     "main::Offer": {
-      "last_run": "2026-09-02T06:12:54.000Z",
+      "last_run": "2026-09-02T07:11:43.000Z",
       "last_modified_cursor": "2026-09-01T12:07:48.000Z",
       "last_created": 0,
       "last_updated": 171,
@@ -348,7 +348,7 @@
       "last_result": "noop"
     },
     "main::GYG Analytics": {
-      "last_run": "2026-09-02T06:12:54.000Z",
+      "last_run": "2026-09-02T07:11:44.000Z",
       "last_modified_cursor": "2026-09-01T12:08:03.000Z",
       "last_created": 23,
       "last_updated": 0,
@@ -386,8 +386,8 @@
     "main::List": {
       "baserow_table_id": 60,
       "id_field": "Record ID",
-      "last_modified_cursor": "2026-09-02T06:11:09.000Z",
-      "last_run": "2026-09-02T06:11:09.000Z",
+      "last_modified_cursor": "2026-09-02T07:09:59.000Z",
+      "last_run": "2026-09-02T07:09:59.000Z",
       "last_result": "ok",
       "last_created": 0,
       "last_updated": 1,

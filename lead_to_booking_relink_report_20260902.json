@@ -3,644 +3,949 @@
     {
       "chat_id": "0ca43caa-a009-42c6-ae89-0af40c87b3d3",
       "intended_booking": "GYGKBF5598Q2",
-      "expected_lead": "recDKPX3XTphlj7eZ",
-      "preferred_target": "reckkTYkCrxnbwqJF",
+      "preferred_list_id": "recDKPX3XTphlj7eZ",
       "before": {
         "booking_number": "GYGKBF5598Q2",
         "airtable_record_id": "reckkTYkCrxnbwqJF",
         "sender_identifier": "33658385246",
-        "customer_phone": null
+        "contact_name": "Kevin MILLER"
       },
-      "resolved_target": "reckkTYkCrxnbwqJF",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recDKPX3XTphlj7eZ",
       "resolved_booking": "GYGKBF5598Q2",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "GYGKBF5598Q2",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "GYGKBF5598Q2",
-        "airtable_record_id": "reckkTYkCrxnbwqJF"
-      }
+        "airtable_record_id": "recDKPX3XTphlj7eZ"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "90352fba-70a6-4eac-aff5-5e536b074cbe",
       "intended_booking": "41855",
-      "expected_lead": "recMDNKMPV4jNqtDx",
-      "preferred_target": "reckFPkUItTZUYLkk",
+      "preferred_list_id": "recMDNKMPV4jNqtDx",
       "before": {
         "booking_number": "41855",
         "airtable_record_id": "reckFPkUItTZUYLkk",
         "sender_identifier": "4907751737759",
-        "customer_phone": null
+        "contact_name": "New Lead +4907751737759"
       },
-      "resolved_target": "reckFPkUItTZUYLkk",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recMDNKMPV4jNqtDx",
       "resolved_booking": "41855",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "41855",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "41855",
-        "airtable_record_id": "reckFPkUItTZUYLkk"
-      }
+        "airtable_record_id": "recMDNKMPV4jNqtDx"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "d6c4c791-6fb6-4fe1-a231-dd940fdcf90b",
       "intended_booking": "40995",
-      "expected_lead": null,
-      "preferred_target": "recBRlxBQiTL83ZrO",
+      "preferred_list_id": null,
       "before": {
         "booking_number": "40995",
         "airtable_record_id": "recBRlxBQiTL83ZrO",
         "sender_identifier": "14077249942",
-        "customer_phone": null
+        "contact_name": "14077249942"
       },
-      "resolved_target": "recBRlxBQiTL83ZrO",
+      "resolve_notes": [
+        "resolved_by_booking_nr:recVKOLILSEfNMGAH"
+      ],
+      "resolved_target": "recVKOLILSEfNMGAH",
       "resolved_booking": "40995",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Canceled",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "40995",
+        "booking_status": "Canceled"
+      },
       "after": {
         "booking_number": "40995",
-        "airtable_record_id": "recBRlxBQiTL83ZrO"
-      }
+        "airtable_record_id": "recVKOLILSEfNMGAH"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "0ed51b2d-94b8-4830-ad75-d8c4126a7b92",
       "intended_booking": "GYG32L254MA4",
-      "expected_lead": "recEcXWWvb0HvqKzJ",
-      "preferred_target": "recolu2ezYOO4305B",
+      "preferred_list_id": "recEcXWWvb0HvqKzJ",
       "before": {
         "booking_number": "GYG32L254MA4",
         "airtable_record_id": "recolu2ezYOO4305B",
         "sender_identifier": "393666654127",
-        "customer_phone": null
+        "contact_name": "Marcella Roma"
       },
-      "resolved_target": "recolu2ezYOO4305B",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recEcXWWvb0HvqKzJ",
       "resolved_booking": "GYG32L254MA4",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "GYG32L254MA4",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "GYG32L254MA4",
-        "airtable_record_id": "recolu2ezYOO4305B"
-      }
+        "airtable_record_id": "recEcXWWvb0HvqKzJ"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "c234627f-95a7-4dc9-b339-00744e5782a9",
       "intended_booking": "GYG32LZ9YWG4",
-      "expected_lead": "recTGSsq5gRckPARC",
-      "preferred_target": "recWRheb8OwxtEDfr",
+      "preferred_list_id": "recTGSsq5gRckPARC",
       "before": {
         "booking_number": "GYG32LZ9YWG4",
         "airtable_record_id": "recWRheb8OwxtEDfr",
         "sender_identifier": "212696418175",
-        "customer_phone": null
+        "contact_name": "zineb bahaj"
       },
-      "resolved_target": "recWRheb8OwxtEDfr",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recTGSsq5gRckPARC",
       "resolved_booking": "GYG32LZ9YWG4",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Active",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "GYG32LZ9YWG4",
+        "booking_status": "Active"
+      },
       "after": {
         "booking_number": "GYG32LZ9YWG4",
-        "airtable_record_id": "recWRheb8OwxtEDfr"
-      }
+        "airtable_record_id": "recTGSsq5gRckPARC"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "bc746244-4ed6-4c0d-9dc3-8fc4935ece3e",
       "intended_booking": "GYG7VKVG9X72",
-      "expected_lead": "recdrlibFH3n1QsoE",
-      "preferred_target": "recuB4j179oTDax79",
+      "preferred_list_id": "recdrlibFH3n1QsoE",
       "before": {
         "booking_number": "GYG7VKVG9X72",
         "airtable_record_id": "recuB4j179oTDax79",
         "sender_identifier": "19049553432",
-        "customer_phone": null
+        "contact_name": "Joshua"
       },
-      "resolved_target": "recuB4j179oTDax79",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recdrlibFH3n1QsoE",
       "resolved_booking": "GYG7VKVG9X72",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "GYG7VKVG9X72",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "GYG7VKVG9X72",
-        "airtable_record_id": "recuB4j179oTDax79"
-      }
+        "airtable_record_id": "recdrlibFH3n1QsoE"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "3edf4fc9-5388-431d-af30-e0f436143598",
       "intended_booking": "GYGZGZXNRWL9",
-      "expected_lead": "recsYCvf3wzxT0E2E",
-      "preferred_target": "rec9SgvNpwib0ZEd3",
+      "preferred_list_id": "recsYCvf3wzxT0E2E",
       "before": {
         "booking_number": "GYGZGZXNRWL9",
         "airtable_record_id": "rec9SgvNpwib0ZEd3",
         "sender_identifier": "33698027584",
-        "customer_phone": null
+        "contact_name": "Nourhane"
       },
-      "resolved_target": "rec9SgvNpwib0ZEd3",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recsYCvf3wzxT0E2E",
       "resolved_booking": "GYGZGZXNRWL9",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Active",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "GYGZGZXNRWL9",
+        "booking_status": "Active"
+      },
       "after": {
         "booking_number": "GYGZGZXNRWL9",
-        "airtable_record_id": "rec9SgvNpwib0ZEd3"
-      }
+        "airtable_record_id": "recsYCvf3wzxT0E2E"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "106e280b-68fc-4109-b201-c2d9a52e061c",
       "intended_booking": "GYGZGZW3VGBN",
-      "expected_lead": "recaoF81dMlEURkrS",
-      "preferred_target": "recW9AVWCPpkqe3W2",
+      "preferred_list_id": "recaoF81dMlEURkrS",
       "before": {
         "booking_number": "GYGZGZW3VGBN",
         "airtable_record_id": "recW9AVWCPpkqe3W2",
         "sender_identifier": "491728904371",
-        "customer_phone": null
+        "contact_name": "Tiago"
       },
-      "resolved_target": "recW9AVWCPpkqe3W2",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recaoF81dMlEURkrS",
       "resolved_booking": "GYGZGZW3VGBN",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Active",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "GYGZGZW3VGBN",
+        "booking_status": "Active"
+      },
       "after": {
         "booking_number": "GYGZGZW3VGBN",
-        "airtable_record_id": "recW9AVWCPpkqe3W2"
-      }
+        "airtable_record_id": "recaoF81dMlEURkrS"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "f1c909ff-b7f4-4f48-af95-1fad0dcd4e55",
       "intended_booking": "41839",
-      "expected_lead": "recOylL7MTTGQk9HQ",
-      "preferred_target": "recJJIoCaVPVD3S3G",
+      "preferred_list_id": "recOylL7MTTGQk9HQ",
       "before": {
         "booking_number": "41839",
         "airtable_record_id": "recJJIoCaVPVD3S3G",
         "sender_identifier": "32467871902",
-        "customer_phone": null
+        "contact_name": "Koml"
       },
-      "resolved_target": "recJJIoCaVPVD3S3G",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recOylL7MTTGQk9HQ",
       "resolved_booking": "41839",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Canceled",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "41839",
+        "booking_status": "Canceled"
+      },
       "after": {
         "booking_number": "41839",
-        "airtable_record_id": "recJJIoCaVPVD3S3G"
-      }
+        "airtable_record_id": "recOylL7MTTGQk9HQ"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "967ecfa0-9d01-4224-8f13-8bfa37994bb4",
       "intended_booking": "41844",
-      "expected_lead": "recWDBZQtFPZGaF4P",
-      "preferred_target": "recBDwdSSaLbnQm7O",
+      "preferred_list_id": "recWDBZQtFPZGaF4P",
       "before": {
         "booking_number": "41844",
         "airtable_record_id": "recBDwdSSaLbnQm7O",
         "sender_identifier": "33760135680",
-        "customer_phone": null
+        "contact_name": "Chassaing Ingrid"
       },
-      "resolved_target": "recBDwdSSaLbnQm7O",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recWDBZQtFPZGaF4P",
       "resolved_booking": "41844",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "41844",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "41844",
-        "airtable_record_id": "recBDwdSSaLbnQm7O"
-      }
+        "airtable_record_id": "recWDBZQtFPZGaF4P"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "6bef69dd-0322-4889-8bbe-88f63ca33977",
       "intended_booking": "FTS-84196928",
-      "expected_lead": "rec2zTM5dJRFSAktu",
-      "preferred_target": "recwDbRgbG59gU8xS",
+      "preferred_list_id": "rec2zTM5dJRFSAktu",
       "before": {
         "booking_number": "FTS-84196928",
         "airtable_record_id": "recwDbRgbG59gU8xS",
         "sender_identifier": "33785233030",
-        "customer_phone": null
+        "contact_name": "Delamare Lola"
       },
-      "resolved_target": "recwDbRgbG59gU8xS",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "rec2zTM5dJRFSAktu",
       "resolved_booking": "FTS-84196928",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "FTS-84196928",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "FTS-84196928",
-        "airtable_record_id": "recwDbRgbG59gU8xS"
-      }
+        "airtable_record_id": "rec2zTM5dJRFSAktu"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "78e802f9-8045-4346-87ce-35affa0ee10b",
       "intended_booking": "FTS-45908806",
-      "expected_lead": "rec6ID1ETx2daSQgu",
-      "preferred_target": "recnGtA2OSKznLsHG",
+      "preferred_list_id": "rec6ID1ETx2daSQgu",
       "before": {
         "booking_number": "FTS-45908806",
         "airtable_record_id": "recnGtA2OSKznLsHG",
         "sender_identifier": "201000590506",
-        "customer_phone": null
+        "contact_name": "New Lead +201000590506"
       },
-      "resolved_target": "recnGtA2OSKznLsHG",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "rec6ID1ETx2daSQgu",
       "resolved_booking": "FTS-45908806",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Canceled",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "FTS-45908806",
+        "booking_status": "Canceled"
+      },
       "after": {
         "booking_number": "FTS-45908806",
-        "airtable_record_id": "recnGtA2OSKznLsHG"
-      }
+        "airtable_record_id": "rec6ID1ETx2daSQgu"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "7fa19019-201e-4273-8529-7802b541c885",
       "intended_booking": "FTS-87522412",
-      "expected_lead": "rec8gaOxZi0zrqDDs",
-      "preferred_target": "recY6rnKZpLJ0vBzt",
+      "preferred_list_id": "rec8gaOxZi0zrqDDs",
       "before": {
         "booking_number": "FTS-87522412",
         "airtable_record_id": "recY6rnKZpLJ0vBzt",
         "sender_identifier": "4915141608536",
-        "customer_phone": null
+        "contact_name": "Alexander Ziermann"
       },
-      "resolved_target": "recY6rnKZpLJ0vBzt",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "rec8gaOxZi0zrqDDs",
       "resolved_booking": "FTS-87522412",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "FTS-87522412",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "FTS-87522412",
-        "airtable_record_id": "recY6rnKZpLJ0vBzt"
-      }
+        "airtable_record_id": "rec8gaOxZi0zrqDDs"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "ed1f7b96-9b8c-44b9-9eac-68d507f089c5",
       "intended_booking": "FTS-93885524",
-      "expected_lead": "recIhXSdOsy8i7886",
-      "preferred_target": "rec9n7TjrgzIgLRzW",
+      "preferred_list_id": "recIhXSdOsy8i7886",
       "before": {
         "booking_number": "FTS-93885524",
         "airtable_record_id": "rec9n7TjrgzIgLRzW",
         "sender_identifier": "32489512359",
-        "customer_phone": null
+        "contact_name": "Sumeyye Cengiz"
       },
-      "resolved_target": "rec9n7TjrgzIgLRzW",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recIhXSdOsy8i7886",
       "resolved_booking": "FTS-93885524",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "FTS-93885524",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "FTS-93885524",
-        "airtable_record_id": "rec9n7TjrgzIgLRzW"
-      }
+        "airtable_record_id": "recIhXSdOsy8i7886"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "0256d4a7-453e-451a-b12f-f480fba757d8",
       "intended_booking": "FTS-28652499",
-      "expected_lead": "recY83JndIMREbMr3",
-      "preferred_target": "recwngtSNEDrhK8yr",
+      "preferred_list_id": "recY83JndIMREbMr3",
       "before": {
         "booking_number": "FTS-28652499",
         "airtable_record_id": "recwngtSNEDrhK8yr",
         "sender_identifier": "351925794065",
-        "customer_phone": null
+        "contact_name": "Virgílio Guilherme Ferreira"
       },
-      "resolved_target": "recwngtSNEDrhK8yr",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recY83JndIMREbMr3",
       "resolved_booking": "FTS-28652499",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "FTS-28652499",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "FTS-28652499",
-        "airtable_record_id": "recwngtSNEDrhK8yr"
-      }
+        "airtable_record_id": "recY83JndIMREbMr3"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     },
     {
       "chat_id": "20bf7962-736b-496d-af90-24f05431d043",
       "intended_booking": "FTS-73586357",
-      "expected_lead": "recgNZKHZ3eRmd6EN",
-      "preferred_target": "recQjlEimqA8WhVaQ",
+      "preferred_list_id": "recgNZKHZ3eRmd6EN",
       "before": {
         "booking_number": "FTS-73586357",
         "airtable_record_id": "recQjlEimqA8WhVaQ",
         "sender_identifier": "447891149067",
-        "customer_phone": null
+        "contact_name": "Michelle Farrell"
       },
-      "resolved_target": "recQjlEimqA8WhVaQ",
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ],
+      "resolved_target": "recgNZKHZ3eRmd6EN",
       "resolved_booking": "FTS-73586357",
-      "resolved_status": null,
-      "resolve_notes": [],
-      "action": "skipped",
-      "reason": "already_linked_to_target",
+      "resolved_status": "Confirmed",
+      "target_classification": {
+        "in_list": true,
+        "in_leads": false,
+        "table_keys": [
+          "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+        ],
+        "booking_nr": "FTS-73586357",
+        "booking_status": "Confirmed"
+      },
       "after": {
         "booking_number": "FTS-73586357",
-        "airtable_record_id": "recQjlEimqA8WhVaQ"
-      }
+        "airtable_record_id": "recgNZKHZ3eRmd6EN"
+      },
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "proof_not_lead": true,
+      "proof_equals_target": true,
+      "id_changed": true
     }
   ],
   "verification": [
     {
       "chat_id": "0ca43caa-a009-42c6-ae89-0af40c87b3d3",
       "booking_number": "GYGKBF5598Q2",
-      "airtable_record_id": "reckkTYkCrxnbwqJF",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recDKPX3XTphlj7eZ",
       "intended_booking": "GYGKBF5598Q2",
-      "resolved_target": "reckkTYkCrxnbwqJF",
-      "expected_lead": "recDKPX3XTphlj7eZ",
-      "before": {
-        "booking_number": "GYGKBF5598Q2",
-        "airtable_record_id": "reckkTYkCrxnbwqJF",
-        "sender_identifier": "33658385246",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recDKPX3XTphlj7eZ",
+      "resolved_target": "recDKPX3XTphlj7eZ",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "GYGKBF5598Q2",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "reckkTYkCrxnbwqJF",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "90352fba-70a6-4eac-aff5-5e536b074cbe",
       "booking_number": "41855",
-      "airtable_record_id": "reckFPkUItTZUYLkk",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recMDNKMPV4jNqtDx",
       "intended_booking": "41855",
-      "resolved_target": "reckFPkUItTZUYLkk",
-      "expected_lead": "recMDNKMPV4jNqtDx",
-      "before": {
-        "booking_number": "41855",
-        "airtable_record_id": "reckFPkUItTZUYLkk",
-        "sender_identifier": "4907751737759",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recMDNKMPV4jNqtDx",
+      "resolved_target": "recMDNKMPV4jNqtDx",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "41855",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "reckFPkUItTZUYLkk",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "d6c4c791-6fb6-4fe1-a231-dd940fdcf90b",
       "booking_number": "40995",
-      "airtable_record_id": "recBRlxBQiTL83ZrO",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recVKOLILSEfNMGAH",
       "intended_booking": "40995",
-      "resolved_target": "recBRlxBQiTL83ZrO",
-      "expected_lead": null,
-      "before": {
-        "booking_number": "40995",
-        "airtable_record_id": "recBRlxBQiTL83ZrO",
-        "sender_identifier": "14077249942",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": null,
+      "resolved_target": "recVKOLILSEfNMGAH",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "40995",
+      "mirror_status": "Canceled",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recBRlxBQiTL83ZrO",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "resolved_by_booking_nr:recVKOLILSEfNMGAH"
+      ]
     },
     {
       "chat_id": "0ed51b2d-94b8-4830-ad75-d8c4126a7b92",
       "booking_number": "GYG32L254MA4",
-      "airtable_record_id": "recolu2ezYOO4305B",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recEcXWWvb0HvqKzJ",
       "intended_booking": "GYG32L254MA4",
-      "resolved_target": "recolu2ezYOO4305B",
-      "expected_lead": "recEcXWWvb0HvqKzJ",
-      "before": {
-        "booking_number": "GYG32L254MA4",
-        "airtable_record_id": "recolu2ezYOO4305B",
-        "sender_identifier": "393666654127",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recEcXWWvb0HvqKzJ",
+      "resolved_target": "recEcXWWvb0HvqKzJ",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "GYG32L254MA4",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recolu2ezYOO4305B",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "c234627f-95a7-4dc9-b339-00744e5782a9",
       "booking_number": "GYG32LZ9YWG4",
-      "airtable_record_id": "recWRheb8OwxtEDfr",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recTGSsq5gRckPARC",
       "intended_booking": "GYG32LZ9YWG4",
-      "resolved_target": "recWRheb8OwxtEDfr",
-      "expected_lead": "recTGSsq5gRckPARC",
-      "before": {
-        "booking_number": "GYG32LZ9YWG4",
-        "airtable_record_id": "recWRheb8OwxtEDfr",
-        "sender_identifier": "212696418175",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recTGSsq5gRckPARC",
+      "resolved_target": "recTGSsq5gRckPARC",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "GYG32LZ9YWG4",
+      "mirror_status": "Active",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recWRheb8OwxtEDfr",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "bc746244-4ed6-4c0d-9dc3-8fc4935ece3e",
       "booking_number": "GYG7VKVG9X72",
-      "airtable_record_id": "recuB4j179oTDax79",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recdrlibFH3n1QsoE",
       "intended_booking": "GYG7VKVG9X72",
-      "resolved_target": "recuB4j179oTDax79",
-      "expected_lead": "recdrlibFH3n1QsoE",
-      "before": {
-        "booking_number": "GYG7VKVG9X72",
-        "airtable_record_id": "recuB4j179oTDax79",
-        "sender_identifier": "19049553432",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recdrlibFH3n1QsoE",
+      "resolved_target": "recdrlibFH3n1QsoE",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "GYG7VKVG9X72",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recuB4j179oTDax79",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "3edf4fc9-5388-431d-af30-e0f436143598",
       "booking_number": "GYGZGZXNRWL9",
-      "airtable_record_id": "rec9SgvNpwib0ZEd3",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recsYCvf3wzxT0E2E",
       "intended_booking": "GYGZGZXNRWL9",
-      "resolved_target": "rec9SgvNpwib0ZEd3",
-      "expected_lead": "recsYCvf3wzxT0E2E",
-      "before": {
-        "booking_number": "GYGZGZXNRWL9",
-        "airtable_record_id": "rec9SgvNpwib0ZEd3",
-        "sender_identifier": "33698027584",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recsYCvf3wzxT0E2E",
+      "resolved_target": "recsYCvf3wzxT0E2E",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "GYGZGZXNRWL9",
+      "mirror_status": "Active",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "rec9SgvNpwib0ZEd3",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "106e280b-68fc-4109-b201-c2d9a52e061c",
       "booking_number": "GYGZGZW3VGBN",
-      "airtable_record_id": "recW9AVWCPpkqe3W2",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recaoF81dMlEURkrS",
       "intended_booking": "GYGZGZW3VGBN",
-      "resolved_target": "recW9AVWCPpkqe3W2",
-      "expected_lead": "recaoF81dMlEURkrS",
-      "before": {
-        "booking_number": "GYGZGZW3VGBN",
-        "airtable_record_id": "recW9AVWCPpkqe3W2",
-        "sender_identifier": "491728904371",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recaoF81dMlEURkrS",
+      "resolved_target": "recaoF81dMlEURkrS",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "GYGZGZW3VGBN",
+      "mirror_status": "Active",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recW9AVWCPpkqe3W2",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "f1c909ff-b7f4-4f48-af95-1fad0dcd4e55",
       "booking_number": "41839",
-      "airtable_record_id": "recJJIoCaVPVD3S3G",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recOylL7MTTGQk9HQ",
       "intended_booking": "41839",
-      "resolved_target": "recJJIoCaVPVD3S3G",
-      "expected_lead": "recOylL7MTTGQk9HQ",
-      "before": {
-        "booking_number": "41839",
-        "airtable_record_id": "recJJIoCaVPVD3S3G",
-        "sender_identifier": "32467871902",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recOylL7MTTGQk9HQ",
+      "resolved_target": "recOylL7MTTGQk9HQ",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "41839",
+      "mirror_status": "Canceled",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recJJIoCaVPVD3S3G",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "967ecfa0-9d01-4224-8f13-8bfa37994bb4",
       "booking_number": "41844",
-      "airtable_record_id": "recBDwdSSaLbnQm7O",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recWDBZQtFPZGaF4P",
       "intended_booking": "41844",
-      "resolved_target": "recBDwdSSaLbnQm7O",
-      "expected_lead": "recWDBZQtFPZGaF4P",
-      "before": {
-        "booking_number": "41844",
-        "airtable_record_id": "recBDwdSSaLbnQm7O",
-        "sender_identifier": "33760135680",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recWDBZQtFPZGaF4P",
+      "resolved_target": "recWDBZQtFPZGaF4P",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "41844",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recBDwdSSaLbnQm7O",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "6bef69dd-0322-4889-8bbe-88f63ca33977",
       "booking_number": "FTS-84196928",
-      "airtable_record_id": "recwDbRgbG59gU8xS",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "rec2zTM5dJRFSAktu",
       "intended_booking": "FTS-84196928",
-      "resolved_target": "recwDbRgbG59gU8xS",
-      "expected_lead": "rec2zTM5dJRFSAktu",
-      "before": {
-        "booking_number": "FTS-84196928",
-        "airtable_record_id": "recwDbRgbG59gU8xS",
-        "sender_identifier": "33785233030",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "rec2zTM5dJRFSAktu",
+      "resolved_target": "rec2zTM5dJRFSAktu",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "FTS-84196928",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recwDbRgbG59gU8xS",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "78e802f9-8045-4346-87ce-35affa0ee10b",
       "booking_number": "FTS-45908806",
-      "airtable_record_id": "recnGtA2OSKznLsHG",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "rec6ID1ETx2daSQgu",
       "intended_booking": "FTS-45908806",
-      "resolved_target": "recnGtA2OSKznLsHG",
-      "expected_lead": "rec6ID1ETx2daSQgu",
-      "before": {
-        "booking_number": "FTS-45908806",
-        "airtable_record_id": "recnGtA2OSKznLsHG",
-        "sender_identifier": "201000590506",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "rec6ID1ETx2daSQgu",
+      "resolved_target": "rec6ID1ETx2daSQgu",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "FTS-45908806",
+      "mirror_status": "Canceled",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recnGtA2OSKznLsHG",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "7fa19019-201e-4273-8529-7802b541c885",
       "booking_number": "FTS-87522412",
-      "airtable_record_id": "recY6rnKZpLJ0vBzt",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "rec8gaOxZi0zrqDDs",
       "intended_booking": "FTS-87522412",
-      "resolved_target": "recY6rnKZpLJ0vBzt",
-      "expected_lead": "rec8gaOxZi0zrqDDs",
-      "before": {
-        "booking_number": "FTS-87522412",
-        "airtable_record_id": "recY6rnKZpLJ0vBzt",
-        "sender_identifier": "4915141608536",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "rec8gaOxZi0zrqDDs",
+      "resolved_target": "rec8gaOxZi0zrqDDs",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "FTS-87522412",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recY6rnKZpLJ0vBzt",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "ed1f7b96-9b8c-44b9-9eac-68d507f089c5",
       "booking_number": "FTS-93885524",
-      "airtable_record_id": "rec9n7TjrgzIgLRzW",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recIhXSdOsy8i7886",
       "intended_booking": "FTS-93885524",
-      "resolved_target": "rec9n7TjrgzIgLRzW",
-      "expected_lead": "recIhXSdOsy8i7886",
-      "before": {
-        "booking_number": "FTS-93885524",
-        "airtable_record_id": "rec9n7TjrgzIgLRzW",
-        "sender_identifier": "32489512359",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recIhXSdOsy8i7886",
+      "resolved_target": "recIhXSdOsy8i7886",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "FTS-93885524",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "rec9n7TjrgzIgLRzW",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "0256d4a7-453e-451a-b12f-f480fba757d8",
       "booking_number": "FTS-28652499",
-      "airtable_record_id": "recwngtSNEDrhK8yr",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recY83JndIMREbMr3",
       "intended_booking": "FTS-28652499",
-      "resolved_target": "recwngtSNEDrhK8yr",
-      "expected_lead": "recY83JndIMREbMr3",
-      "before": {
-        "booking_number": "FTS-28652499",
-        "airtable_record_id": "recwngtSNEDrhK8yr",
-        "sender_identifier": "351925794065",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recY83JndIMREbMr3",
+      "resolved_target": "recY83JndIMREbMr3",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "FTS-28652499",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recwngtSNEDrhK8yr",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     },
     {
       "chat_id": "20bf7962-736b-496d-af90-24f05431d043",
       "booking_number": "FTS-73586357",
-      "airtable_record_id": "recQjlEimqA8WhVaQ",
-      "action": "skipped",
-      "mirror_status": null,
-      "reason": "already_linked_to_target",
+      "airtable_record_id": "recgNZKHZ3eRmd6EN",
       "intended_booking": "FTS-73586357",
-      "resolved_target": "recQjlEimqA8WhVaQ",
-      "expected_lead": "recgNZKHZ3eRmd6EN",
-      "before": {
-        "booking_number": "FTS-73586357",
-        "airtable_record_id": "recQjlEimqA8WhVaQ",
-        "sender_identifier": "447891149067",
-        "customer_phone": null
-      },
-      "resolve_notes": []
+      "intended_list_id": "recgNZKHZ3eRmd6EN",
+      "resolved_target": "recgNZKHZ3eRmd6EN",
+      "in_list": true,
+      "in_leads": false,
+      "table_keys": [
+        "appTp5YgSp9DV2HYc:tblJodXmOWKiYqiXS"
+      ],
+      "mirror_booking_nr": "FTS-73586357",
+      "mirror_status": "Confirmed",
+      "is_forbidden_lead_id": false,
+      "action": "updated",
+      "reason": "relinked_lead_to_list_booking",
+      "before_airtable_record_id": "recQjlEimqA8WhVaQ",
+      "id_changed": true,
+      "ok": true,
+      "resolve_notes": [
+        "preferred_verified_in_list"
+      ]
     }
-  ]
+  ],
+  "all_ok": true
 }

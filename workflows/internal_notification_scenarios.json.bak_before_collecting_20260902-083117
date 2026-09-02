@@ -286,22 +286,6 @@
       "include_customer_phone": false
     },
     {
-      "id": "int_notify_collecting_on_date_trip_v1",
-      "name": "Collecting On Date Trip",
-      "source_file": "Collecting On Date Trip (manager request 2026-09-02)",
-      "trigger": "airtable_view_poll",
-      "mode": "collecting",
-      "view_label": "Collecting On Data Trip",
-      "view_id": "viwLCrbJAim0LSR1a",
-      "table_id": "tblJodXmOWKiYqiXS",
-      "base_id": "appTp5YgSp9DV2HYc",
-      "trigger_field": "Collecting on date Trip",
-      "phones": ["+201128174899"],
-      "include_customer_phone": false,
-      "bootstrap_seen_on_first_run": true,
-      "notes": "Sends WhatsApp when Collecting on date Trip gets a value. Same value is never re-sent; if the collecting amount changes, a new alert is sent."
-    },
-    {
       "id": "int_notify_aegypten_requests_v1",
       "name": "Aegypten Requests",
       "source_file": "Aegypten Requests.blueprint.json",

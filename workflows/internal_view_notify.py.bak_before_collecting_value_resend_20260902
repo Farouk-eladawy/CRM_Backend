@@ -81,31 +81,25 @@ def _ensure_dedup_db():
             conn.close()
 
 
-def _claim_send(record_id: str, booking_nr: str, phone: str, alert_kind: str, scenario_id: str, value_key: str = "") -> bool:
+def _claim_send(record_id: str, booking_nr: str, phone: str, alert_kind: str, scenario_id: str) -> bool:
     """
     Atomically claim the right to send this alert.
     Returns True only for the first claim (caller may send).
     Returns False if already claimed (skip send).
-    value_key: optional (used by collecting) so the same record can be claimed
-    again when the Collecting amount changes (prev->new).
     """
     _ensure_dedup_db()
     rid = str(record_id or "").strip()
     phone_n = _norm_phone(phone)
     kind = str(alert_kind or "last_minute").strip().lower() or "last_minute"
     booking = str(booking_nr or "").strip()
-    extra = ""
-    vk = str(value_key or "").strip()
-    if vk:
-        extra = f"|v|{vk}"
     if not phone_n or (not rid and not booking):
         return False
 
     keys = []
     if rid:
-        keys.append(f"rec|{rid}|{phone_n}|{kind}{extra}")
+        keys.append(f"rec|{rid}|{phone_n}|{kind}")
     if booking:
-        keys.append(f"bk|{booking.lower()}|{phone_n}|{kind}{extra}")
+        keys.append(f"bk|{booking.lower()}|{phone_n}|{kind}")
     if not keys:
         return False
 
@@ -291,24 +285,6 @@ def _fmt_collecting_amount(raw) -> str:
         return str(raw).strip()
 
 
-def _collecting_should_notify(last_value: str, current_value: str, record_already_known: bool) -> tuple:
-    """
-    بدون تكرار لنفس القيمة، وإعادة الإرسال فقط إذا تغيّرت قيمة Collecting.
-    Returns (should_send, reason).
-    """
-    current = str(current_value or "").strip()
-    last = str(last_value or "").strip()
-    if not current:
-        return False, "empty"
-    if not last and record_already_known:
-        return False, "bootstrap_backfill"
-    if last and last == current:
-        return False, "unchanged"
-    if last and last != current:
-        return True, "value_changed"
-    return True, "new_value"
-
-
 def _build_last_minute(fields: dict, include_customer_phone: bool, agent=None) -> str:
     booking_nr = _field(fields, "Booking Nr.", "Booking Nr")
     trip_name = _field(fields, "trip Name", "Trip Name")
@@ -426,54 +402,6 @@ def _save_seen(agent, scenario_id: str, ids: list):
         chat_db.set_setting(
             key,
             json.dumps({"ids": trimmed, "updated_at": datetime.utcnow().isoformat()}, ensure_ascii=False),
-        )
-    except Exception as e:
-        log.error("Failed to save seen state: %s", e)
-
-
-def _load_seen_values(agent, scenario_id: str) -> dict:
-    key = STATE_PREFIX + scenario_id
-    try:
-        import chat_db
-        raw = chat_db.get_setting(key)
-        if not raw:
-            return {}
-        data = json.loads(raw)
-        if not isinstance(data, dict):
-            return {}
-        vals = data.get("values") or {}
-        if not isinstance(vals, dict):
-            return {}
-        out = {}
-        for k, v in vals.items():
-            ks = str(k or "").strip()
-            vs = str(v or "").strip()
-            if ks and vs:
-                out[ks] = vs
-        return out
-    except Exception:
-        return {}
-
-
-def _save_seen_state(agent, scenario_id: str, ids: list, values: dict):
-    """حفظ ids + آخر قيمة Collecting لكل سجل حتى نعيد الإرسال عند تغيّر القيمة فقط."""
-    key = STATE_PREFIX + scenario_id
-    trimmed = list(dict.fromkeys([str(x).strip() for x in ids if str(x).strip()]))[-MAX_SEEN:]
-    keep = set(trimmed)
-    vals = {}
-    for k, v in (values or {}).items():
-        ks = str(k or "").strip()
-        vs = str(v or "").strip()
-        if ks and vs and ks in keep:
-            vals[ks] = vs
-    try:
-        import chat_db
-        chat_db.set_setting(
-            key,
-            json.dumps(
-                {"ids": trimmed, "values": vals, "updated_at": datetime.utcnow().isoformat()},
-                ensure_ascii=False,
-            ),
         )
     except Exception as e:
         log.error("Failed to save seen state: %s", e)
@@ -618,20 +546,14 @@ def _run_locked(
             existing = table.all(view=view_key)
         except Exception:
             existing = table.all(view=view_id) if view_id else []
-        boot_ids = ["__bootstrapped__"]
-        boot_values = {}
+        boot_ids = []
         for rec in existing or []:
             rid = str((rec or {}).get("id") or "").strip()
-            if not rid:
-                continue
-            boot_ids.append(rid)
-            fields = (rec or {}).get("fields") or {}
-            val = _fmt_collecting_amount(_field(fields, require_field or "Collecting on date Trip"))
-            if val:
-                boot_values[rid] = val
+            if rid:
+                boot_ids.append(rid)
         # علامة حتى لو الـ View فاضي: وإلا أول حجز جديد سيُعتبر bootstrap ويُتخطى بدون إرسال.
-        _save_seen_state(agent, state_id, boot_ids, boot_values)
-        if len(boot_ids) > 1:
+        _save_seen(agent, state_id, ["__bootstrapped__"] + boot_ids)
+        if boot_ids:
             return {
                 "ok": True,
                 "sent": False,
@@ -640,7 +562,7 @@ def _run_locked(
                 "mode": mode,
                 "dry_run": dry_run,
                 "bootstrapped": True,
-                "bootstrapped_count": len(boot_ids) - 1,
+                "bootstrapped_count": len(boot_ids),
                 "scanned": len(existing or []),
                 "notified": 0,
                 "message": "first_run_marked_existing_records_seen",
@@ -680,7 +602,6 @@ def _run_locked(
 
     seen = _load_seen(agent, state_id)
     seen_set = set(seen)
-    values = _load_seen_values(agent, state_id) if collecting_mode else {}
     notified = 0
     skipped_seen = 0
     skipped_filter = 0
@@ -692,46 +613,34 @@ def _run_locked(
         rid = str((rec or {}).get("id") or "").strip()
         if not rid:
             continue
+        if rid in seen_set:
+            skipped_seen += 1
+            continue
         fields = (rec or {}).get("fields") or {}
         booking_nr = str(_field(fields, "Booking Nr.", "Booking Nr") or "").strip()
         status = _field(fields, "Booking Status")
         canceled = _is_canceled(status)
 
         alert_kind = None
-        collecting_val = ""
-        last_collecting = ""
         if collecting_mode:
-            collecting_val = _fmt_collecting_amount(_field(fields, require_field or "Collecting on date Trip"))
+            collecting_val = _field(fields, require_field or "Collecting on date Trip")
             if _is_empty_value(collecting_val):
                 skipped_filter += 1
-                continue
-            last_collecting = str(values.get(rid) or "").strip()
-            known = rid in seen_set and rid != "__bootstrapped__"
-            should_send, reason = _collecting_should_notify(last_collecting, collecting_val, known)
-            if not should_send:
-                if reason == "bootstrap_backfill":
-                    values[rid] = collecting_val
-                    if rid not in seen_set:
-                        seen.append(rid)
-                        seen_set.add(rid)
-                skipped_seen += 1
+                seen.append(rid)
+                seen_set.add(rid)
                 continue
             alert_kind = "collecting"
+        elif mode in {"both", "cancel+last-minute", "cancel_last_minute"}:
+            alert_kind = "cancel" if canceled else "last_minute"
+        elif mode in {"cancel", "cancelled"}:
+            alert_kind = "cancel"
         else:
-            if rid in seen_set:
-                skipped_seen += 1
+            if canceled:
+                skipped_filter += 1
+                seen.append(rid)
+                seen_set.add(rid)
                 continue
-            if mode in {"both", "cancel+last-minute", "cancel_last_minute"}:
-                alert_kind = "cancel" if canceled else "last_minute"
-            elif mode in {"cancel", "cancelled"}:
-                alert_kind = "cancel"
-            else:
-                if canceled:
-                    skipped_filter += 1
-                    seen.append(rid)
-                    seen_set.add(rid)
-                    continue
-                alert_kind = "last_minute"
+            alert_kind = "last_minute"
 
         if alert_kind == "cancel":
             text = _build_cancel(fields, include_customer_phone, agent=agent)
@@ -742,11 +651,10 @@ def _run_locked(
 
         send_ok_any = False
         phone_results = []
-        value_key = f"{last_collecting}->{collecting_val}" if alert_kind == "collecting" else ""
         for phone in phones:
             # Claim BEFORE send — prevents concurrent / overlapping-view duplicates
             if not dry_run:
-                claimed = _claim_send(rid, booking_nr, phone, alert_kind, scenario_id, value_key=value_key)
+                claimed = _claim_send(rid, booking_nr, phone, alert_kind, scenario_id)
                 if not claimed:
                     skipped_dedup += 1
                     phone_results.append({"phone": phone, "ok": False, "skipped": "dedup_already_sent"})
@@ -761,31 +669,21 @@ def _run_locked(
 
         # Always mark record seen after processing attempt to stop re-scanning loops.
         # Dedup DB already owns the send-once guarantee per phone.
-        if rid not in seen_set:
-            seen.append(rid)
-            seen_set.add(rid)
-        if alert_kind == "collecting" and collecting_val:
-            values[rid] = collecting_val
+        seen.append(rid)
+        seen_set.add(rid)
         if send_ok_any:
             notified += 1
         details.append({
             "record_id": rid,
             "booking": booking_nr,
             "kind": alert_kind,
-            "collecting": collecting_val or None,
             "phones": phone_results,
         })
         # Persist seen incrementally so a crash mid-loop still blocks re-send
         if len(details) % 3 == 0:
-            if collecting_mode:
-                _save_seen_state(agent, state_id, seen, values)
-            else:
-                _save_seen(agent, state_id, seen)
+            _save_seen(agent, state_id, seen)
 
-    if collecting_mode:
-        _save_seen_state(agent, state_id, seen, values)
-    else:
-        _save_seen(agent, state_id, seen)
+    _save_seen(agent, state_id, seen)
 
     return {
         "ok": True,

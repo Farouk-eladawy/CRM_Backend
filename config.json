@@ -34,7 +34,7 @@
     "providers": {
       "openai": {
         "api_key": "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",
-        "model": "gpt-5.6",
+        "model": "gpt-4o",
         "api_url": "https://api.openai.com/v1/chat/completions",
         "temperature": 0.3,
         "max_tokens": 4000

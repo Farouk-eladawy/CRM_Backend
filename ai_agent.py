@@ -4862,27 +4862,28 @@ class AIAgent:
                 "max_tokens": provider_config.get('max_tokens', 1000)
             }
 
-            # --- NEW: Advanced OpenAI Model Routing (gpt-5.6 series) ---
-            if provider_name == "openai":
-                if system_role in ["analyzer", "structured_mediator", "translator", "optimizer"]:
-                    payload["model"] = "gpt-5.6-luna"
-                elif system_role == "assistant":
-                    prompt_text = str(prompt).lower()
-                    objection_keywords = ["غالي", "مشكلة", "شكوى", "اعتراض", "مدير", "سيء", "مرفوض", "نصب", "سرقة", "تعويض", "محامي", "شرطة", "وزارة", "complain", "escalate"]
-                    complex_keywords = ["نصب", "سرقة", "تعويض", "محامي", "شرطة", "وزارة", "قضية"]
-                    
-                    is_objection = any(kw in prompt_text for kw in objection_keywords)
-                    is_complex = any(kw in prompt_text for kw in complex_keywords) or len(prompt_text) > 300
-                    
-                    if is_objection:
-                        payload["model"] = "gpt-5.6-sol"
-                        payload["reasoning_effort"] = "medium" if is_complex else "low"
-                    else:
-                        payload["model"] = "gpt-5.6-terra"
-                        payload["reasoning_effort"] = "low"
-                
-                # OpenAI reasoning models typically don't support temperature
-                if "reasoning_effort" in payload or "gpt-5.6" in payload.get("model", ""):
+            # DeepSeek V4 enables thinking by default (high effort). That burns max_tokens on
+            # reasoning and can leave message.content empty for chat replies. Disable for
+            # customer-facing / rewrite roles; keep analyzer/mediator on default thinking.
+            provider_name_l = str(provider_name or "").strip().lower()
+            if provider_name_l.startswith("deepseek"):
+                if system_role in ("assistant", "optimizer", "translator"):
+                    payload["thinking"] = {"type": "disabled"}
+                elif system_role in ("analyzer", "structured_mediator"):
+                    payload["thinking"] = {"type": "enabled"}
+                    payload["reasoning_effort"] = "low"
+
+            # OpenAI: use the configured API model only.
+            # Do NOT remap to Cursor-only slugs (gpt-5.6-terra/sol/luna) — those fail on api.openai.com.
+            if provider_name_l == "openai":
+                configured_model = str(provider_config.get("model") or payload.get("model") or "").strip()
+                cursor_only = {"gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra"}
+                if configured_model in cursor_only or not configured_model:
+                    configured_model = "gpt-4o"
+                payload["model"] = configured_model
+                model_l = configured_model.lower()
+                # Newer OpenAI chat models prefer max_completion_tokens; some reject temperature.
+                if model_l.startswith(("o1", "o3", "o4", "gpt-5")):
                     payload.pop("temperature", None)
                     if "max_tokens" in payload:
                         payload["max_completion_tokens"] = payload.pop("max_tokens")
@@ -4892,7 +4893,14 @@ class AIAgent:
                 response = requests.post(provider_config['api_url'], headers=headers, json=payload, timeout=60)
                 response.raise_for_status()
                 result = response.json()
-                content = result['choices'][0]['message']['content']
+                message_obj = (result.get("choices") or [{}])[0].get("message") or {}
+                content = message_obj.get("content")
+                if content is None or (isinstance(content, str) and not str(content).strip()):
+                    raise ValueError(
+                        f"Provider {provider_name} returned empty content "
+                        f"(model={payload.get('model')}, finish_reason="
+                        f"{(result.get('choices') or [{}])[0].get('finish_reason')})"
+                    )
                 try:
                     self._record_ai_usage_from_result(
                         result=result,
@@ -8853,17 +8861,24 @@ INSTRUCTIONS:
         response = self.query_ai(final_prompt, image_url=image_url, location=location, chat_id=chat_id)
         
         # --- NEW: Handle AI Provider Failure Gracefully ---
-        if response == "[AI_PROVIDER_FAILED_SILENTLY]" or response.startswith("All AI providers failed"):
+        response_s = str(response or "").strip()
+        if (
+            not response_s
+            or response_s == "[AI_PROVIDER_FAILED_SILENTLY]"
+            or response_s.startswith("All AI providers failed")
+            or "[AI_PROVIDER_FAILED_SILENTLY]" in response_s
+        ):
             logging.error("AI generation failed silently. No message will be sent to the user.")
             return "[AI_PROVIDER_FAILED_SILENTLY]"
             
         # CLEANUP: Remove [LANGUAGE: ...] tag if present
-        if "[LANGUAGE:" in response:
+        if "[LANGUAGE:" in response_s:
             # We keep everything AFTER the language tag
             # Example: "[LANGUAGE: English]\nDear Customer..."
-            parts = response.split("]", 1)
+            parts = response_s.split("]", 1)
             if len(parts) > 1:
-                response = parts[1].strip()
+                response_s = parts[1].strip()
+        response = response_s
 
         # Religious Meta WhatsApp: model/KB often still appends Farah — strip before tags
         if self._is_religious_meta_whatsapp(chat_id=chat_id, location=location, source=source):
@@ -42398,7 +42413,18 @@ Draft to optimize:
                     prompt += f"\nContext/Booking Data:\n{booking_data}"
 
                 optimized_text = self.query_ai(prompt, system_role="optimizer")
-                return jsonify({"status": "success", "optimized_text": optimized_text.strip()}), 200
+                optimized_s = str(optimized_text or "").strip()
+                if (
+                    not optimized_s
+                    or optimized_s == "[AI_PROVIDER_FAILED_SILENTLY]"
+                    or optimized_s.startswith("All AI providers failed")
+                    or "[AI_PROVIDER_FAILED_SILENTLY]" in optimized_s
+                ):
+                    return jsonify({
+                        "status": "error",
+                        "message": "AI providers failed while optimizing the draft. Please try again in a moment.",
+                    }), 502
+                return jsonify({"status": "success", "optimized_text": optimized_s}), 200
             except Exception as e:
                 return jsonify({"status": "error", "message": str(e)}), 500
 
@@ -42483,10 +42509,22 @@ Draft to optimize:
                     chat_id=chat_id,
                     location=location
                 )
+
+                response_s = str(response_text or "").strip()
+                if (
+                    not response_s
+                    or response_s == "[AI_PROVIDER_FAILED_SILENTLY]"
+                    or response_s.startswith("All AI providers failed")
+                    or "[AI_PROVIDER_FAILED_SILENTLY]" in response_s
+                ):
+                    return jsonify({
+                        "status": "error",
+                        "message": "AI providers failed while generating a reply. Please try again in a moment.",
+                    }), 502
                 
                 # Remove internal tags
                 import re
-                response_text = re.sub(r'\[LANG:.*?\]', '', response_text, flags=re.IGNORECASE | re.DOTALL).strip()
+                response_text = re.sub(r'\[LANG:.*?\]', '', response_s, flags=re.IGNORECASE | re.DOTALL).strip()
                 response_text = re.sub(r'\[TRANS:.*?\]', '', response_text, flags=re.IGNORECASE | re.DOTALL).strip()
                 response_text = re.sub(r'\[DEPT:.*?\]', '', response_text, flags=re.IGNORECASE).strip()
                 response_text = re.sub(r'\[INTENT:.*?\]', '', response_text, flags=re.IGNORECASE).strip()

@@ -1,0 +1,646 @@
+{
+  "results": [
+    {
+      "chat_id": "0ca43caa-a009-42c6-ae89-0af40c87b3d3",
+      "intended_booking": "GYGKBF5598Q2",
+      "expected_lead": "recDKPX3XTphlj7eZ",
+      "preferred_target": "reckkTYkCrxnbwqJF",
+      "before": {
+        "booking_number": "GYGKBF5598Q2",
+        "airtable_record_id": "reckkTYkCrxnbwqJF",
+        "sender_identifier": "33658385246",
+        "customer_phone": null
+      },
+      "resolved_target": "reckkTYkCrxnbwqJF",
+      "resolved_booking": "GYGKBF5598Q2",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "GYGKBF5598Q2",
+        "airtable_record_id": "reckkTYkCrxnbwqJF"
+      }
+    },
+    {
+      "chat_id": "90352fba-70a6-4eac-aff5-5e536b074cbe",
+      "intended_booking": "41855",
+      "expected_lead": "recMDNKMPV4jNqtDx",
+      "preferred_target": "reckFPkUItTZUYLkk",
+      "before": {
+        "booking_number": "41855",
+        "airtable_record_id": "reckFPkUItTZUYLkk",
+        "sender_identifier": "4907751737759",
+        "customer_phone": null
+      },
+      "resolved_target": "reckFPkUItTZUYLkk",
+      "resolved_booking": "41855",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "41855",
+        "airtable_record_id": "reckFPkUItTZUYLkk"
+      }
+    },
+    {
+      "chat_id": "d6c4c791-6fb6-4fe1-a231-dd940fdcf90b",
+      "intended_booking": "40995",
+      "expected_lead": null,
+      "preferred_target": "recBRlxBQiTL83ZrO",
+      "before": {
+        "booking_number": "40995",
+        "airtable_record_id": "recBRlxBQiTL83ZrO",
+        "sender_identifier": "14077249942",
+        "customer_phone": null
+      },
+      "resolved_target": "recBRlxBQiTL83ZrO",
+      "resolved_booking": "40995",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "40995",
+        "airtable_record_id": "recBRlxBQiTL83ZrO"
+      }
+    },
+    {
+      "chat_id": "0ed51b2d-94b8-4830-ad75-d8c4126a7b92",
+      "intended_booking": "GYG32L254MA4",
+      "expected_lead": "recEcXWWvb0HvqKzJ",
+      "preferred_target": "recolu2ezYOO4305B",
+      "before": {
+        "booking_number": "GYG32L254MA4",
+        "airtable_record_id": "recolu2ezYOO4305B",
+        "sender_identifier": "393666654127",
+        "customer_phone": null
+      },
+      "resolved_target": "recolu2ezYOO4305B",
+      "resolved_booking": "GYG32L254MA4",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "GYG32L254MA4",
+        "airtable_record_id": "recolu2ezYOO4305B"
+      }
+    },
+    {
+      "chat_id": "c234627f-95a7-4dc9-b339-00744e5782a9",
+      "intended_booking": "GYG32LZ9YWG4",
+      "expected_lead": "recTGSsq5gRckPARC",
+      "preferred_target": "recWRheb8OwxtEDfr",
+      "before": {
+        "booking_number": "GYG32LZ9YWG4",
+        "airtable_record_id": "recWRheb8OwxtEDfr",
+        "sender_identifier": "212696418175",
+        "customer_phone": null
+      },
+      "resolved_target": "recWRheb8OwxtEDfr",
+      "resolved_booking": "GYG32LZ9YWG4",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "GYG32LZ9YWG4",
+        "airtable_record_id": "recWRheb8OwxtEDfr"
+      }
+    },
+    {
+      "chat_id": "bc746244-4ed6-4c0d-9dc3-8fc4935ece3e",
+      "intended_booking": "GYG7VKVG9X72",
+      "expected_lead": "recdrlibFH3n1QsoE",
+      "preferred_target": "recuB4j179oTDax79",
+      "before": {
+        "booking_number": "GYG7VKVG9X72",
+        "airtable_record_id": "recuB4j179oTDax79",
+        "sender_identifier": "19049553432",
+        "customer_phone": null
+      },
+      "resolved_target": "recuB4j179oTDax79",
+      "resolved_booking": "GYG7VKVG9X72",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "GYG7VKVG9X72",
+        "airtable_record_id": "recuB4j179oTDax79"
+      }
+    },
+    {
+      "chat_id": "3edf4fc9-5388-431d-af30-e0f436143598",
+      "intended_booking": "GYGZGZXNRWL9",
+      "expected_lead": "recsYCvf3wzxT0E2E",
+      "preferred_target": "rec9SgvNpwib0ZEd3",
+      "before": {
+        "booking_number": "GYGZGZXNRWL9",
+        "airtable_record_id": "rec9SgvNpwib0ZEd3",
+        "sender_identifier": "33698027584",
+        "customer_phone": null
+      },
+      "resolved_target": "rec9SgvNpwib0ZEd3",
+      "resolved_booking": "GYGZGZXNRWL9",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "GYGZGZXNRWL9",
+        "airtable_record_id": "rec9SgvNpwib0ZEd3"
+      }
+    },
+    {
+      "chat_id": "106e280b-68fc-4109-b201-c2d9a52e061c",
+      "intended_booking": "GYGZGZW3VGBN",
+      "expected_lead": "recaoF81dMlEURkrS",
+      "preferred_target": "recW9AVWCPpkqe3W2",
+      "before": {
+        "booking_number": "GYGZGZW3VGBN",
+        "airtable_record_id": "recW9AVWCPpkqe3W2",
+        "sender_identifier": "491728904371",
+        "customer_phone": null
+      },
+      "resolved_target": "recW9AVWCPpkqe3W2",
+      "resolved_booking": "GYGZGZW3VGBN",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "GYGZGZW3VGBN",
+        "airtable_record_id": "recW9AVWCPpkqe3W2"
+      }
+    },
+    {
+      "chat_id": "f1c909ff-b7f4-4f48-af95-1fad0dcd4e55",
+      "intended_booking": "41839",
+      "expected_lead": "recOylL7MTTGQk9HQ",
+      "preferred_target": "recJJIoCaVPVD3S3G",
+      "before": {
+        "booking_number": "41839",
+        "airtable_record_id": "recJJIoCaVPVD3S3G",
+        "sender_identifier": "32467871902",
+        "customer_phone": null
+      },
+      "resolved_target": "recJJIoCaVPVD3S3G",
+      "resolved_booking": "41839",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "41839",
+        "airtable_record_id": "recJJIoCaVPVD3S3G"
+      }
+    },
+    {
+      "chat_id": "967ecfa0-9d01-4224-8f13-8bfa37994bb4",
+      "intended_booking": "41844",
+      "expected_lead": "recWDBZQtFPZGaF4P",
+      "preferred_target": "recBDwdSSaLbnQm7O",
+      "before": {
+        "booking_number": "41844",
+        "airtable_record_id": "recBDwdSSaLbnQm7O",
+        "sender_identifier": "33760135680",
+        "customer_phone": null
+      },
+      "resolved_target": "recBDwdSSaLbnQm7O",
+      "resolved_booking": "41844",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "41844",
+        "airtable_record_id": "recBDwdSSaLbnQm7O"
+      }
+    },
+    {
+      "chat_id": "6bef69dd-0322-4889-8bbe-88f63ca33977",
+      "intended_booking": "FTS-84196928",
+      "expected_lead": "rec2zTM5dJRFSAktu",
+      "preferred_target": "recwDbRgbG59gU8xS",
+      "before": {
+        "booking_number": "FTS-84196928",
+        "airtable_record_id": "recwDbRgbG59gU8xS",
+        "sender_identifier": "33785233030",
+        "customer_phone": null
+      },
+      "resolved_target": "recwDbRgbG59gU8xS",
+      "resolved_booking": "FTS-84196928",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "FTS-84196928",
+        "airtable_record_id": "recwDbRgbG59gU8xS"
+      }
+    },
+    {
+      "chat_id": "78e802f9-8045-4346-87ce-35affa0ee10b",
+      "intended_booking": "FTS-45908806",
+      "expected_lead": "rec6ID1ETx2daSQgu",
+      "preferred_target": "recnGtA2OSKznLsHG",
+      "before": {
+        "booking_number": "FTS-45908806",
+        "airtable_record_id": "recnGtA2OSKznLsHG",
+        "sender_identifier": "201000590506",
+        "customer_phone": null
+      },
+      "resolved_target": "recnGtA2OSKznLsHG",
+      "resolved_booking": "FTS-45908806",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "FTS-45908806",
+        "airtable_record_id": "recnGtA2OSKznLsHG"
+      }
+    },
+    {
+      "chat_id": "7fa19019-201e-4273-8529-7802b541c885",
+      "intended_booking": "FTS-87522412",
+      "expected_lead": "rec8gaOxZi0zrqDDs",
+      "preferred_target": "recY6rnKZpLJ0vBzt",
+      "before": {
+        "booking_number": "FTS-87522412",
+        "airtable_record_id": "recY6rnKZpLJ0vBzt",
+        "sender_identifier": "4915141608536",
+        "customer_phone": null
+      },
+      "resolved_target": "recY6rnKZpLJ0vBzt",
+      "resolved_booking": "FTS-87522412",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "FTS-87522412",
+        "airtable_record_id": "recY6rnKZpLJ0vBzt"
+      }
+    },
+    {
+      "chat_id": "ed1f7b96-9b8c-44b9-9eac-68d507f089c5",
+      "intended_booking": "FTS-93885524",
+      "expected_lead": "recIhXSdOsy8i7886",
+      "preferred_target": "rec9n7TjrgzIgLRzW",
+      "before": {
+        "booking_number": "FTS-93885524",
+        "airtable_record_id": "rec9n7TjrgzIgLRzW",
+        "sender_identifier": "32489512359",
+        "customer_phone": null
+      },
+      "resolved_target": "rec9n7TjrgzIgLRzW",
+      "resolved_booking": "FTS-93885524",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "FTS-93885524",
+        "airtable_record_id": "rec9n7TjrgzIgLRzW"
+      }
+    },
+    {
+      "chat_id": "0256d4a7-453e-451a-b12f-f480fba757d8",
+      "intended_booking": "FTS-28652499",
+      "expected_lead": "recY83JndIMREbMr3",
+      "preferred_target": "recwngtSNEDrhK8yr",
+      "before": {
+        "booking_number": "FTS-28652499",
+        "airtable_record_id": "recwngtSNEDrhK8yr",
+        "sender_identifier": "351925794065",
+        "customer_phone": null
+      },
+      "resolved_target": "recwngtSNEDrhK8yr",
+      "resolved_booking": "FTS-28652499",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "FTS-28652499",
+        "airtable_record_id": "recwngtSNEDrhK8yr"
+      }
+    },
+    {
+      "chat_id": "20bf7962-736b-496d-af90-24f05431d043",
+      "intended_booking": "FTS-73586357",
+      "expected_lead": "recgNZKHZ3eRmd6EN",
+      "preferred_target": "recQjlEimqA8WhVaQ",
+      "before": {
+        "booking_number": "FTS-73586357",
+        "airtable_record_id": "recQjlEimqA8WhVaQ",
+        "sender_identifier": "447891149067",
+        "customer_phone": null
+      },
+      "resolved_target": "recQjlEimqA8WhVaQ",
+      "resolved_booking": "FTS-73586357",
+      "resolved_status": null,
+      "resolve_notes": [],
+      "action": "skipped",
+      "reason": "already_linked_to_target",
+      "after": {
+        "booking_number": "FTS-73586357",
+        "airtable_record_id": "recQjlEimqA8WhVaQ"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "chat_id": "0ca43caa-a009-42c6-ae89-0af40c87b3d3",
+      "booking_number": "GYGKBF5598Q2",
+      "airtable_record_id": "reckkTYkCrxnbwqJF",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "GYGKBF5598Q2",
+      "resolved_target": "reckkTYkCrxnbwqJF",
+      "expected_lead": "recDKPX3XTphlj7eZ",
+      "before": {
+        "booking_number": "GYGKBF5598Q2",
+        "airtable_record_id": "reckkTYkCrxnbwqJF",
+        "sender_identifier": "33658385246",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "90352fba-70a6-4eac-aff5-5e536b074cbe",
+      "booking_number": "41855",
+      "airtable_record_id": "reckFPkUItTZUYLkk",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "41855",
+      "resolved_target": "reckFPkUItTZUYLkk",
+      "expected_lead": "recMDNKMPV4jNqtDx",
+      "before": {
+        "booking_number": "41855",
+        "airtable_record_id": "reckFPkUItTZUYLkk",
+        "sender_identifier": "4907751737759",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "d6c4c791-6fb6-4fe1-a231-dd940fdcf90b",
+      "booking_number": "40995",
+      "airtable_record_id": "recBRlxBQiTL83ZrO",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "40995",
+      "resolved_target": "recBRlxBQiTL83ZrO",
+      "expected_lead": null,
+      "before": {
+        "booking_number": "40995",
+        "airtable_record_id": "recBRlxBQiTL83ZrO",
+        "sender_identifier": "14077249942",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "0ed51b2d-94b8-4830-ad75-d8c4126a7b92",
+      "booking_number": "GYG32L254MA4",
+      "airtable_record_id": "recolu2ezYOO4305B",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "GYG32L254MA4",
+      "resolved_target": "recolu2ezYOO4305B",
+      "expected_lead": "recEcXWWvb0HvqKzJ",
+      "before": {
+        "booking_number": "GYG32L254MA4",
+        "airtable_record_id": "recolu2ezYOO4305B",
+        "sender_identifier": "393666654127",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "c234627f-95a7-4dc9-b339-00744e5782a9",
+      "booking_number": "GYG32LZ9YWG4",
+      "airtable_record_id": "recWRheb8OwxtEDfr",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "GYG32LZ9YWG4",
+      "resolved_target": "recWRheb8OwxtEDfr",
+      "expected_lead": "recTGSsq5gRckPARC",
+      "before": {
+        "booking_number": "GYG32LZ9YWG4",
+        "airtable_record_id": "recWRheb8OwxtEDfr",
+        "sender_identifier": "212696418175",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "bc746244-4ed6-4c0d-9dc3-8fc4935ece3e",
+      "booking_number": "GYG7VKVG9X72",
+      "airtable_record_id": "recuB4j179oTDax79",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "GYG7VKVG9X72",
+      "resolved_target": "recuB4j179oTDax79",
+      "expected_lead": "recdrlibFH3n1QsoE",
+      "before": {
+        "booking_number": "GYG7VKVG9X72",
+        "airtable_record_id": "recuB4j179oTDax79",
+        "sender_identifier": "19049553432",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "3edf4fc9-5388-431d-af30-e0f436143598",
+      "booking_number": "GYGZGZXNRWL9",
+      "airtable_record_id": "rec9SgvNpwib0ZEd3",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "GYGZGZXNRWL9",
+      "resolved_target": "rec9SgvNpwib0ZEd3",
+      "expected_lead": "recsYCvf3wzxT0E2E",
+      "before": {
+        "booking_number": "GYGZGZXNRWL9",
+        "airtable_record_id": "rec9SgvNpwib0ZEd3",
+        "sender_identifier": "33698027584",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "106e280b-68fc-4109-b201-c2d9a52e061c",
+      "booking_number": "GYGZGZW3VGBN",
+      "airtable_record_id": "recW9AVWCPpkqe3W2",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "GYGZGZW3VGBN",
+      "resolved_target": "recW9AVWCPpkqe3W2",
+      "expected_lead": "recaoF81dMlEURkrS",
+      "before": {
+        "booking_number": "GYGZGZW3VGBN",
+        "airtable_record_id": "recW9AVWCPpkqe3W2",
+        "sender_identifier": "491728904371",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "f1c909ff-b7f4-4f48-af95-1fad0dcd4e55",
+      "booking_number": "41839",
+      "airtable_record_id": "recJJIoCaVPVD3S3G",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "41839",
+      "resolved_target": "recJJIoCaVPVD3S3G",
+      "expected_lead": "recOylL7MTTGQk9HQ",
+      "before": {
+        "booking_number": "41839",
+        "airtable_record_id": "recJJIoCaVPVD3S3G",
+        "sender_identifier": "32467871902",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "967ecfa0-9d01-4224-8f13-8bfa37994bb4",
+      "booking_number": "41844",
+      "airtable_record_id": "recBDwdSSaLbnQm7O",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "41844",
+      "resolved_target": "recBDwdSSaLbnQm7O",
+      "expected_lead": "recWDBZQtFPZGaF4P",
+      "before": {
+        "booking_number": "41844",
+        "airtable_record_id": "recBDwdSSaLbnQm7O",
+        "sender_identifier": "33760135680",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "6bef69dd-0322-4889-8bbe-88f63ca33977",
+      "booking_number": "FTS-84196928",
+      "airtable_record_id": "recwDbRgbG59gU8xS",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "FTS-84196928",
+      "resolved_target": "recwDbRgbG59gU8xS",
+      "expected_lead": "rec2zTM5dJRFSAktu",
+      "before": {
+        "booking_number": "FTS-84196928",
+        "airtable_record_id": "recwDbRgbG59gU8xS",
+        "sender_identifier": "33785233030",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "78e802f9-8045-4346-87ce-35affa0ee10b",
+      "booking_number": "FTS-45908806",
+      "airtable_record_id": "recnGtA2OSKznLsHG",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "FTS-45908806",
+      "resolved_target": "recnGtA2OSKznLsHG",
+      "expected_lead": "rec6ID1ETx2daSQgu",
+      "before": {
+        "booking_number": "FTS-45908806",
+        "airtable_record_id": "recnGtA2OSKznLsHG",
+        "sender_identifier": "201000590506",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "7fa19019-201e-4273-8529-7802b541c885",
+      "booking_number": "FTS-87522412",
+      "airtable_record_id": "recY6rnKZpLJ0vBzt",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "FTS-87522412",
+      "resolved_target": "recY6rnKZpLJ0vBzt",
+      "expected_lead": "rec8gaOxZi0zrqDDs",
+      "before": {
+        "booking_number": "FTS-87522412",
+        "airtable_record_id": "recY6rnKZpLJ0vBzt",
+        "sender_identifier": "4915141608536",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "ed1f7b96-9b8c-44b9-9eac-68d507f089c5",
+      "booking_number": "FTS-93885524",
+      "airtable_record_id": "rec9n7TjrgzIgLRzW",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "FTS-93885524",
+      "resolved_target": "rec9n7TjrgzIgLRzW",
+      "expected_lead": "recIhXSdOsy8i7886",
+      "before": {
+        "booking_number": "FTS-93885524",
+        "airtable_record_id": "rec9n7TjrgzIgLRzW",
+        "sender_identifier": "32489512359",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "0256d4a7-453e-451a-b12f-f480fba757d8",
+      "booking_number": "FTS-28652499",
+      "airtable_record_id": "recwngtSNEDrhK8yr",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "FTS-28652499",
+      "resolved_target": "recwngtSNEDrhK8yr",
+      "expected_lead": "recY83JndIMREbMr3",
+      "before": {
+        "booking_number": "FTS-28652499",
+        "airtable_record_id": "recwngtSNEDrhK8yr",
+        "sender_identifier": "351925794065",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    },
+    {
+      "chat_id": "20bf7962-736b-496d-af90-24f05431d043",
+      "booking_number": "FTS-73586357",
+      "airtable_record_id": "recQjlEimqA8WhVaQ",
+      "action": "skipped",
+      "mirror_status": null,
+      "reason": "already_linked_to_target",
+      "intended_booking": "FTS-73586357",
+      "resolved_target": "recQjlEimqA8WhVaQ",
+      "expected_lead": "recgNZKHZ3eRmd6EN",
+      "before": {
+        "booking_number": "FTS-73586357",
+        "airtable_record_id": "recQjlEimqA8WhVaQ",
+        "sender_identifier": "447891149067",
+        "customer_phone": null
+      },
+      "resolve_notes": []
+    }
+  ]
+}

@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-08-31T15:43:34.134875",
-    "original": "بالتأكيد حضرتك 🌿 ميزانية ٣٠٠ ألف للفرد تناسب برنامج حج الطيران تحسين — ٢٥٠ ألف للفرد، ١٩ يوم، وأهم ميزة إن حضرتك هتقعد ٧ أيام على ساحة الحرم بعد المناسك. البرنامج غير شامل تذكرة الطيران، وسعر التذكرة بيتأكد حسب الموسم.\n\nوبما إن حضرتك عايزة تقدمي لنفسك وابنك، هبعت تفاصيلكم لفريق المبيعات يتابع معاكم ويأكد الأماكن المتاحة. ممكن تبعتي رقم الواتساب بتاعك عشان نكلمكم في أقرب وقت؟\n\nمع خالص التحية،\nمسؤول المبيعات أحمد خليل",
-    "corrected": "حضرتك، الحصة محدودة والحجز بترتيب التسجيل، وأكتر من نصها اتقفل فعلاً.\n\nأنا أحمد خليل من فريق الحجوزات، ومكانك ممكن يتثبّت في مكالمة دقيقتين بس.\n\n📞 01288427370 — اتصل بيا دلوقتي، الرقم واتساب كمان.\n\nلو مش فاضي تتصل، ابعتلي رقم حضرتك وأنا أتصل بيك خلال دقايق.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-08-31T15:45:08.502651",
     "original": "حضرتك، التقديم الرسمي لسه موقوف على نزول الضوابط من وزارة السياحة — أول ما تنزل هنبلغ كل المسجلين فورًا بالخطوات والمواعيد. الحصص عندنا محدودة وبترتيب التسجيل، وبيانات حضرتك وصلتني بالفعل.\n\nأنا هكلمك على رقم 01004671506 أول ما الشفت يبدأ عشان نثبت مكانك ونجاوبك على أي سؤال. لو في وقت أنسب لحضرتك قولّي.",
     "corrected": "وصلت الميزانية يا فندم — ٣٠٠ ألف للفرد تناسب برنامجين متاحين دلوقتي:\n\n- حج طيران اقتصادي: ٢٢٠ ألف للفرد، ١٧ يوم، غير شامل تذكرة الطيران.\n- حج طيران تحسين: ٢٥٠ ألف للفرد، ١٩ يوم، غير شامل التذكرة، وميزته إنه بيديك ٧ أيام على ساحة الحرم بعد المناسك.\n\nالأسعار دي على أساس الموسم اللي فات، والتأكيد النهائي بيبقى بعد ضوابط الوزارة. وبما إن الحجز لحضرتك وابنك، الأدق إني أكلمك دقيقتين أأكدلك الأماكن المتاحة والتفاصيل كاملة. رقم حضرتك على الواتساب؟",
@@ -598,5 +592,11 @@
     "original": "وصلني طلب حضرتك ✅ أنا مسؤول المبيعات أيه محمد، هكلم حضرتك أول ما يبدأ الشفت الصباحي النهارده — ولو في وقت أنسب ليك غير الصبح قولّي وأنا أنزّل عندك. رقم حضرتك 01014600648 وصلني ومتسجل عندي.",
     "corrected": "تم التواصل",
     "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-02T02:53:17.920206",
+    "original": "FTS Travels\n            Re: 🛑 Encountered 4 errors in OTP VERIFICATION scenario\n        \n\n        \n            Dear Make,\n            \n            \n                Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.To speak with our Quality Team, reply: QUALITYBest regards,Farah Elkhatib\n            \n            \n            \n            \n            \n                Contact Us\n            \n            \n            \n                12h/4 Shawky Abdelmenim St., Maadi, Cairo \n                +2 01030774440 | booking@ftstravels.com \n                www.ftstravels.com\n            \n            \n            \n\n    Note: Farah (our Smart Assistant) may make mistakes. Our team is here to help.",
+    "corrected": "FTS Travels\n\nRe: 🛑 Encountered 4 errors in OTP VERIFICATION scenario\n\nDear\nMake\n,\n\n Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib\n\n Contact Us (mailto:booking@ftstravels.com)\n\n 12h/4 Shawky Abdelmenim St., Maadi, Cairo\n\n +2 01030774440 | booking@ftstravels.com\n\n www.ftstravels.com (https://ftstravels.com)\n\n Note: Farah (our Smart Assistant) may make mistakes. Our team is here to help.",
+    "context": "Draft Edit"
   }
 ]

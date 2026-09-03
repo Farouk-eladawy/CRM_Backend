@@ -144688,3 +144688,290 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0671DD0585DC98A3E0A"
+    },
+    "keyId": "3EB0671DD0585DC98A3E0A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:29573 in _run_create_with_pi_job\nLogger: root\nReason: Create with PI job 760293e2 soft-timeout after 300s — killing Pi process\nAt: 2026-09-03 10:16:34"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788282995,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788455795,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T10:16:35.643Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB04AF1700337C15D7F31"
+    },
+    "keyId": "3EB04AF1700337C15D7F31",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:29738 in _run_create_with_pi_job\nLogger: root\nReason: Create with PI job 760293e2 timed out with no recoverable output\nAt: 2026-09-03 10:16:51"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788283011,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788455811,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T10:16:52.143Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0063B534FCC40E60FBB"
+    },
+    "keyId": "3EB0063B534FCC40E60FBB",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:29573 in _run_create_with_pi_job\nLogger: root\nReason: Create with PI job 4d7288af soft-timeout after 300s — killing Pi process\nAt: 2026-09-03 10:22:28"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788283348,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788456148,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T10:22:29.487Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0F3D290C70B57DC87B1"
+    },
+    "keyId": "3EB0F3D290C70B57DC87B1",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:29573 in _run_create_with_pi_job\nLogger: root\nReason: Create with PI job 86e83bb5 soft-timeout after 300s — killing Pi process\nAt: 2026-09-03 10:29:03"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788283744,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788456544,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T10:29:04.620Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BD1039E36E58DFE1EC"
+    },
+    "keyId": "3EB0BD1039E36E58DFE1EC",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:13691 in send_whatsapp_message\nLogger: root\nReason: Failed to send WhatsApp message. Status: 400, Attempt: 1/3, Response: {\"error\":{\"message\":\"(#131009) Parameter value is not valid\",\"code\":131009,\"type\":\"OAuthException\",\"error_data\":{\"messaging_product\":\"whatsapp\",\"details\":\"The phone number is malformed: Please use the format: +1234567890.\"},\"fbtrace_id\":\"AP8ILFwC6H4R5F8L8utAhVD\"}}\nAt: 2026-09-03 10:40:25"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788284425,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788457225,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T10:40:25.828Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB027F7E11C023C74DA5E"
+    },
+    "keyId": "3EB027F7E11C023C74DA5E",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMjI3NDA5NzcwFQIAERgSNjIwNDk5MTI0RTU2RUU3MEU0AA== | recipient=201227409770 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-03 10:56:21"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788285381,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788458181,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T10:56:21.870Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0CCBD4ED4C9A4D45041"
+    },
+    "keyId": "3EB0CCBD4ED4C9A4D45041",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMOTY2NTA4MDE2MzU4FQIAERgSQTdBRkU3RDRBNjQwMTkyRTVFAA== | recipient=966508016358 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-03 11:02:52"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788285772,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788458572,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-03T11:02:53.167Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

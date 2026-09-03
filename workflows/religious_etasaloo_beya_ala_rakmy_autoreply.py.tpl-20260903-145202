@@ -1,123 +1,90 @@
+# -*- coding: utf-8 -*-
 """
-Workflow: Religious September Campaign Auto-Reply - ديني (لحظي)
-=================================================================
-Workflow جديد ومستقل 100% — لا يلمس "Religious Keyword Auto-Reply - ديني"
-ولا "15 Days Exact Keyword Auto-Reply" ولا "Religious Umrah Package Phrases
-Auto-Reply" ولا أي Workflow موجود آخر.
-(تمت إضافة كلمة "Religious" في الاسم لتظهر في لوحة المدير الديني لأن
-الفلتر في الواجهة يعتمد على كلمة religious/ديني في الاسم.)
+Workflow: 📞 اتصلوا بيا على رقمي - Religious - ديني (Exact Match 100% لحظي)
+============================================================================
+طلب المدير (2026-09-03):
+  - اسم الـ Workflow: "📞 اتصلوا بيا على رقمي"
+  - أول ما يبقى في رسالة بكلمة "📞 اتصلوا بيا على رقمي" بنسبة تطابق 100%
+    (Exact Match كامل) → رد عليها فوراً بالرد الثابت التالي (حرفياً
+    كما كتبها المدير):
 
-الرد التلقائي اللحظي على رسائل عملاء القسم الديني (Religious) عندما تكون
-رسالة العميل مطابقة لإحدى الكلمات الثلاث المحددة **بالكامل** (Exact Match) —
-كما طلب المدير (2026-08-07):
+        في خدمه حضرتك 👍 اكتبلي رقم حضرتك هنا واختارنا اي برنامج وهكلمك النهارده إن شاء الله.
 
-الكلمات الثلاث (تطابق حرفي بالظبط):
-  1) ٢ سبتمبر ✈️        → رد تجهيز السفر (مقعد + جواز + صورة شخصية + مقدم ٥٠٪)
-  2) ٢٣ سبتمبر 🗓       → رد اختيار مريح (نفس البرامج والأسعار + نظام الحجز)
-  3) عندي سؤال الأول     → رد الترحيب بالسؤال (أهلاً بالأسئلة)
-
-القواعد (كما طلب المدير - "مطابقة 100%" / "متطابقة 100%"):
-  - إرسال الرد فقط عندما تكون رسالة العميل مطابقة للكلمة بالكامل (100%).
-  - ممنوع Contains / StartsWith / EndsWith: أي كلمة إضافية قبل النص أو بعده
-    تكسر المساواة → لا رد.
-  - الحفاظ على النص العربي والإيموجي والأرقام (٠-٩ / 0-9) وعلامات الترقيم
-    كما هي في تعريف الكلمات (لا نغيرها إطلاقاً، ولا نوحّد الهمزات إ/أ/آ).
-  - المقارنة تحذف الرموز غير الحرفية فقط (إيموجي ✈️/🗓/نقطة/علامة استفهام/
-    تعجب والشرطات الطويلة '—') بنفس منطق المحرك الرسمي
-    knowledge_base._normalize_rule_text — نفس سلوك Workflows الـ Exact
-    السابقة المُعتمدة من الإدارة. بالتالي "٢ سبتمبر" و "٢ سبتمبر ✈️" و
-    "٢ سبتمبر ✈️✈️" كلها تُطابق الكلمة ١ (السلوك المقصود: الإيموجي لا يمنع
-    التطابق لأنه رمز غير حرفي).
-  - القسم المستهدف: Religious فقط (فلترة صارمة - لا يمس أي قسم آخر).
-  - الرد مباشرة (لحظي) على رسالة العميل: تخطي نافذة الـ 24 ساعة تلقائياً
-    لأن هذا رد مباشر (RESPONSE) على رسالة واردة وليس برومو مستقل.
+القواعد المعتمدة (نفس معايير Workflows الردود اللحظية الدينية السابقة
+— أيوه أحجزلي مكان / أيوه قدمت / وصلني رقمك ...):
+  - القسم المستهدف: Religious فقط (فلترة صارمة - لا نلمس أي قسم آخر
+    — قاعدة النظام 15). الملف يُستدعى من workflow مُقيّد أصلاً بفلتر
+    Religious على مستوى المحرك، ومع ذلك نعيد الفلتر داخل السكربت (دفاع
+    في العمق حتى لو استُدعي السكربت مباشرة من أي مسار آخر).
+  - ممنوع Contains / StartsWith / EndsWith: أي كلمة إضافية قبل النص أو
+    بعده تكسر المساواة → لا رد. (المساواة بعد إزالة الرموز غير الحرفية
+    فقط — نفس منطق المحرك الرسمي knowledge_base._normalize_rule_text:
+    لذلك "📞 اتصلوا بيا على رقمي" و "اتصلوا بيا على رقمي" كلتاهما نفس
+    الرسالة لأن الإيموجي 📞 من الرموز غير الحرفية ويُحذف — بينما
+    "اتصلوا بيا على رقمي لو سمحت" لا تطابق إطلاقاً.)
+  - الرد مباشرة (لحظي) على رسالة العميل: تخطي نافذة Meta الـ 24 ساعة
+    تلقائياً لأن هذا رد مباشر (RESPONSE) على رسالة واردة وليس برومو مستقل.
   - إرسال الرد مرة واحدة فقط لكل رسالة (حجز ذري Atomic Claim يمنع تكرار
     الإرسال حتى لو وصلت نفس الرسالة من فيسبوك أكثر من مرة / Webhook
     duplicate deliveries).
-
-ملاحظات هندسية (لماذا هذه الشروط):
   - احترام auto_reply_hold_until و needs_help: لا نتداخل مع موظف بشري.
   - تجاهل رسائل الميديا غير النصية (صوت/فيديو/ستيكر/مستند).
-  - لا نلمس أي قواعد strict_qa_rules ولا knowledge.db إطلاقاً:
-    الكلمات والردود معرفان محلياً هنا في هذا الملف (قائمة KEYWORDS).
-  - كل التواريخ في مقارنات الحجز الاحتياطي تُقارن بتوقيت القاهرة
+  - تكامل سلس مع Workflow "وصلني رقمك" (client_sent_phone_number): هذا
+    الرد يطلب من العميل رقمه، وبمجرد أن يرسل العميل الرقم في رسالة
+    تالية يتكفل الـ Workflow الآخر (كشف الرقم) بالرد — لا يوجد أي تداخل
+    لأن كلاً منهما يستجيب لرسالة مختلفة تماماً، وكل منهما يرد مرة واحدة.
+  - لا نلمس أي Workflow آخر ولا أي قسم آخر — هذا الملف مستقل 100%.
+
+ملاحظات هندسية:
+  - كل التواريخ في مقارنات الإيقاف تُقارن بتوقيت القاهرة
     chat_db.get_cairo_time() وليس utcnow (قاعدة النظام F).
+  - منع التكرار عبر قاعدة بيانات محلية ذرية (Dedup) + ملف JSON احتياطي
+    (يمنع استخدام agent.load_state — قاعدة النظام G).
+  - (تمت إضافة "Religious" و "ديني" في اسم الـ Workflow لتظهر في لوحة
+    المدير الديني لأن الفلتر في الواجهة يعتمد على هذه الكلمات في الاسم —
+    قاعدة النظام D).
 """
 
 import os
-import json
 import re
-import sqlite3
-import hashlib
+import json
+import time
 import logging
+import hashlib
+import sqlite3
 from datetime import datetime, timedelta
 
 from fts_paths import get_data_path
 
 # =============================================================================
-# ⚙️ الكلمات الثلاث والردود المعتمدة (عدّل هنا فقط لإضافة/تعديل الكلمات)
+# ⚙️ الكلمة المفتاحية والرد الثابت المعتمد (عدّل هنا فقط لإضافة/تعديل)
 # =============================================================================
-# IMPORTANT: النصوص التالية منسوخة حرفياً من طلب المدير (2026-08-07)
-# — مع الحفاظ على النص العربي والإيموجي والأرقام وعلامات الترقيم كما هي.
-# ملاحظة: الإيموجي ✈️ و 🗓 يعتبر رموزاً غير حرفية يزيلها التطبيع قبل
-# المقارنة (نفس منطق المحرك الرسمي)، فيتساوى النص المكتوب بالإيموجي والنص
-# المكتوب بدونه — وهذا هو السلوك المقصود (الكلمة تُطابق حتى لو كتبها العميل
-# بدون إيموجي).
+# IMPORTANT: نص الرد التالي منسوخ حرفياً من طلب المدير (2026-09-03) — مع الحفاظ
+# على النص العربي والإيموجي 👍 وعلامات الترقيم كما هي تماماً.
+
+REPLY_TEXT = (
+    "في خدمه حضرتك 👍 اكتبلي رقم حضرتك هنا واختارنا اي برنامج وهكلمك النهارده إن شاء الله."
+)
+
+# الكلمة المفتاحية (بتطابق دقيق 100% - Exact Match) كما حددها المدير حرفياً:
+#   "📞 اتصلوا بيا على رقمي"
+# ملاحظة: بعد التوحيد القياسي (إزالة الرموز غير الحرفية مثل الإيموجي 📞)
+# تصبح "اتصلوا بيا على رقمي" — نفس منطق المحرك الرسمي، وأي كلمة إضافية تكسر
+# التطابق (لا رد).
 KEYWORDS = [
     {
-        "keyword": "٢ سبتمبر ✈️",
-        "reply": (
-            "الله يكرمك 🌹 يبقى نأمّن مقعد حضرتك قبل [٢٠ أغسطس].\n"
-            "\n"
-            "المطلوب ٣ حاجات بس:\n"
-            "1️⃣ صورة جواز السفر (ساري ٦ شهور من تاريخ السفر)\n"
-            "2️⃣ صورة شخصية بخلفية بيضا\n"
-            "3️⃣ مقدم ٥٠٪ — كاش في مقرنا بالمعادي، إيداع بنكي، أو إنستاباي\n"
-            "\n"
-            "ابعت صورة الجواز هنا دلوقتي، وقولي حضرتك ناوي على أنهي برنامج "
-            "وعددكم كام — وهبعتلك قيمة المقدم بالظبط ✅"
-        ),
-        "enabled": True,   # مفعّلة
-    },
-    {
-        "keyword": "٢٣ سبتمبر 🗓",
-        "reply": (
-            "اختيار مريح 🌹 رحلة ٢٣ سبتمبر بنفس البرامج والأسعار، وقدام "
-            "حضرتك وقت كافي للتجهيز من غير أي ضغط.\n"
-            "\n"
-            "ونصيحة : نفس نظام الحجز شغال (٥٠٪ مقدم والباقي قبل السفر بـ١٥ "
-            "يوم) — واللي بيحجز بدري بيختار غرفته وفندقه على مهله بدل زحمة "
-            "آخر أسبوع.\n"
-            "\n"
-            "تحب أبعتلك برنامج أنهي رحلة؟\n"
-            "٨ أيام» / «١٥ يوم» / «١٠ أيام ٤ نجوم ⭐"
-        ),
-        "enabled": True,   # مفعّلة
-    },
-    {
-        "keyword": "عندي سؤال الأول",
-        "reply": (
-            "اسأل براحتك 🌹 وأنا هجاوبك كتابةً عشان تحتفظ بالرد.\n"
-            "\n"
-            "ولو سؤالك حاجة تانية، اكتبه وهرد عليك فورًا — أو ابعت رقمك "
-            "ونكلمك صوت أسهل ☎️"
-        ),
-        # ⏸️ مُعطّلة مؤقتاً (2026-09-03): العبارة "عندي سؤال الأول" انتقلت إلى
-        # الـ Workflow المخصص الجديد "عندي سؤال الأول - Religious Auto-Reply"
-        # (religious_3andy_so2al_elawel_autoreply.py) بالرد الجديد المعتمد من
-        # المدير. التعطيل (وليس الحذف) يمنع الرد المزدوج (Double Reply) على نفس
-        # رسالة العميل. لإعادة تفعيل الرد القديم هنا: غيّرها إلى True وأوقف
-        # الكلمة في الـ Workflow المخصص. النسخة الكاملة قبل التعديل محفوظة في
-        # religious_sept_campaign_autoreply.py.bak-pi-3andy-so2al-elawel-*
-        "enabled": False,   # مُعطّلة — انتقلت للـ Workflow المخصص (عندي سؤال الأول)
+        "keyword": "📞 اتصلوا بيا على رقمي",
+        "reply": REPLY_TEXT,
+        "enabled": True,   # مفعّلة (الكلمة الأساسية كما طلب المدير)
     },
 ]
 
 # ملف الحالة الاحتياطي (يُستخدم فقط لو تعطلت قاعدة البيانات)
-STATE_FILE = get_data_path("religious_sept_campaign_autoreply_state.json")
+STATE_FILE = get_data_path("religious_etasaloo_beya_ala_rakmy_autoreply_state.json")
 
 # قاعدة بيانات الحالة الذرية (Atomic Dedup) - مستقلة تماماً عن أي سكربت آخر
-DEDUP_DB = get_data_path("religious_sept_campaign_autoreply_dedup.db")
+# (ملف منفصل حتى لا نلمس dedup الخاص بأي workflow آخر — قاعدة النظام 8/12)
+DEDUP_DB = get_data_path("religious_etasaloo_beya_ala_rakmy_autoreply_dedup.db")
 
 # أقصى عدد سجلات محفوظة في ملف الحالة الاحتياطي (منع نمو الملف بلا حدود)
 MAX_STATE_RECORDS = 2000
@@ -127,7 +94,7 @@ MAX_STATE_RECORDS = 2000
 # بنفس النص ومعرفات (mid) مختلفة، فنحتاج حماية ذرية تمنع الإرسال المتكرر.
 DEDUP_WINDOW_SECONDS = 600
 
-log = logging.getLogger("ReligiousSeptCampaignAutoReply")
+log = logging.getLogger("ReligiousEtasalooBeyaAlaRakmyAutoReply")
 
 
 # =============================================================================
@@ -162,9 +129,9 @@ def _normalize_body_for_dedup(message_body: str) -> str:
     r"""
     توحيد نص الرسالة لمنع التكرار فقط (وليس للمطابقة):
     يزيل الإيموجي وعلامات الترقيم والنقاط بنفس طريقة المحرك الرسمي
-    (حذف [^\w\s]) بحيث تُعتبر "٢ سبتمبر ✈️" و "٢ سبتمبر." رسالة واحدة
-    لنفس المحادثة خلال نافذة منع التكرار.
-    ملاحظة: لا نوحّد الهمزات هنا أيضاً (مطابقة دقيقة حتى في منع التكرار).
+    (حذف [^\w\s]) بحيث تُعتبر نفس الرسالة لنفس المحادثة خلال نافذة منع
+    التكرار. ملاحظة: لا نوحّد الهمزات هنا أيضاً (مطابقة دقيقة حتى في
+    منع التكرار).
     """
     try:
         s = str(message_body or "").strip().lower()
@@ -188,7 +155,7 @@ def _ensure_dedup_table():
             conn.execute("PRAGMA busy_timeout = 30000;")
             conn.execute(
                 """
-                CREATE TABLE IF NOT EXISTS religious_sept_campaign_reply_dedup (
+                CREATE TABLE IF NOT EXISTS religious_etasaloo_beya_ala_rakmy_reply_dedup (
                     dedup_key TEXT PRIMARY KEY,
                     chat_id TEXT NOT NULL,
                     replied_at TEXT NOT NULL,
@@ -210,7 +177,6 @@ def _claim_reply(chat_id: str, external_id: str, message_body: str, keyword: str
     وليس على mid المتغير من فيسبوك.
     """
     _ensure_dedup_table()
-    # مفتاح موحد: chat_id + hash للنص المطبع (يتجاهل الإيموجي والنقاط)
     try:
         normalized = _normalize_body_for_dedup(message_body)
         body_hash = hashlib.sha256(normalized.encode("utf-8", errors="ignore")).hexdigest()[:24]
@@ -225,12 +191,12 @@ def _claim_reply(chat_id: str, external_id: str, message_body: str, keyword: str
             # حذف السجلات القديمة (أقدم من النافذة) للحفاظ على صغر الجدول
             try:
                 cutoff = (datetime.utcnow() - timedelta(seconds=DEDUP_WINDOW_SECONDS)).isoformat()
-                cur.execute("DELETE FROM religious_sept_campaign_reply_dedup WHERE replied_at < ?", (cutoff,))
+                cur.execute("DELETE FROM religious_etasaloo_beya_ala_rakmy_reply_dedup WHERE replied_at < ?", (cutoff,))
             except Exception:
                 pass
             # INSERT OR IGNORE: إذا كان المفتاح موجوداً بالفعل فلن يُدرج => منع التكرار
             cur.execute(
-                "INSERT OR IGNORE INTO religious_sept_campaign_reply_dedup (dedup_key, chat_id, replied_at, keyword) VALUES (?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO religious_etasaloo_beya_ala_rakmy_reply_dedup (dedup_key, chat_id, replied_at, keyword) VALUES (?, ?, ?, ?)",
                 (unified_key, str(chat_id or ""), now, str(keyword or "")),
             )
             conn.commit()
@@ -258,15 +224,14 @@ def _legacy_claim(chat_id: str, external_id: str, message_body: str) -> bool:
 
 
 # =============================================================================
-# المطابقة الدقيقة (Exact Keyword Match) - ممنوع Contains/StartsWith/EndsWith
+# المطابقة الدقيقة (Exact Keyword Match) - بنسبة تطابق 100% كما طلب المدير
 # =============================================================================
 def _normalize_for_match(text: str) -> str:
     """
     توحيد النص للمطابقة الدقيقة — نفس سلوك knowledge_base._normalize_rule_text:
       - تحويل لحروف صغيرة
-      - حذف التشكيل والتطويل (الـ → ال)
-      - حذف الرموز غير الحرفية (إيموجي ✈️/🗓، نقاط، علامات استفهام/تعجب،
-        الشرطات '—')
+      - حذف التشكيل والتطويل (الـ → ال) — بالتالي "أثبّت" = "أثبت"
+      - حذف الرموز غير الحرفية (إيموجي 📞/👍، نقاط، علامات استفهام/تعجب)
       - توحيد المسافات
     ملاحظة: لا نوحّد الهمزات (إ/أ/آ) ولا الأرقام (0-9 / ٠-٩) — مطابقة 100%
     بالكلمة كما كتبها المدير.
@@ -283,13 +248,12 @@ def _normalize_for_match(text: str) -> str:
 
 def _match_keyword(message_body: str):
     """
-    المطابقة الدقيقة (EXACT): رسالة العميل يجب أن تساوي إحدى الكلمات الثلاث
-    بالكامل (مساواة كاملة == بعد إزالة الرموز غير الحرفية فقط — نفس منطق
-    المحرك الرسمي).
+    المطابقة الدقيقة (EXACT — نسبة تطابق 100%):
+    رسالة العميل يجب أن تساوي الكلمة المفتاحية بالكامل (مساواة كاملة == بعد
+    إزالة الرموز غير الحرفية فقط — نفس منطق المحرك الرسمي المعتمد).
     - ممنوع Contains: أي كلمة إضافية قبل النص أو بعده تكسر المساواة → لا رد.
     - ممنوع StartsWith / EndsWith.
-    - إذا تساوت رسالتان مع كلمتين مختلفتين (مستحيل عملياً) نعيد أول تطابق فقط
-      (عدم تشغيل أكثر من رد على الرسالة نفسها).
+    - إذا تساوت رسالتان مع كلمتين مختلفتين (مستحيل عملياً) نعيد أول تطابق فقط.
     """
     normalized_message = _normalize_for_match(message_body)
     if not normalized_message:
@@ -303,7 +267,7 @@ def _match_keyword(message_body: str):
         normalized_keyword = _normalize_for_match(keyword)
         if not normalized_keyword:
             continue
-        # المساواة الكاملة (==) وليس الاحتواء — Exact Match بالظبط كما طلب المدير
+        # المساواة الكاملة (==) وليس الاحتواء — Exact Match بنسبة 100% بالظبط
         if normalized_message == normalized_keyword:
             return entry
     return None
@@ -354,6 +318,7 @@ def _is_chat_on_hold(chat_id: str) -> bool:
             return False
         try:
             # استخدام توقيت القاهرة (UTC+3) كما يخزنه النظام كله — لا نستخدم utcnow أبداً
+            # (قاعدة النظام F: مقارنة الوقت في الأتمتة يجب أن تكون بتوقيت القاهرة)
             now = datetime.fromisoformat(chat_db.get_cairo_time())
             if now.tzinfo is not None:
                 now = now.replace(tzinfo=None)
@@ -393,9 +358,14 @@ def run(agent, payload: dict = None) -> dict:
     receiving_phone_id = str(payload.get("receiving_phone_id") or "").strip() or None
     incoming_external_message_id = str(payload.get("incoming_external_message_id") or "").strip()
 
-    # ===== فلترة صارمة: القسم الديني فقط (لا نلمس أي قسم آخر) =====
+    # ===== فلترة صارمة من الجذور: القسم الديني فقط (لا نلمس أي قسم آخر) =====
+    # قاعدة النظام 15: عند تحديد نطاق العمل (Religious) يُمنع تماماً لمس أي
+    # قسم آخر (Hurghada / Sharm / Sales / Drivers ...) — الفلتر هنا في أول السكربت.
     if location.lower() != "religious":
         return {"ok": True, "skipped": "not_religious", "chat_id": chat_id}
+
+    if source.lower() not in ("facebook", "whatsapp"):
+        return {"ok": True, "skipped": "unsupported_source", "chat_id": chat_id}
 
     if not chat_id or not message_body or not sender_identifier:
         return {"ok": True, "skipped": "missing_data", "chat_id": chat_id}
@@ -412,7 +382,7 @@ def run(agent, payload: dict = None) -> dict:
     if _is_human_active(chat_id):
         return {"ok": True, "skipped": "human_active", "chat_id": chat_id}
 
-    # ===== البحث عن الكلمة المفتاحية الدقيقة (Exact Match) =====
+    # ===== البحث عن الكلمة المفتاحية الدقيقة (Exact Match 100%) =====
     matched = _match_keyword(message_body)
     if not matched:
         # لا توجد كلمة مطابقة → يترك النظام الأساسي (AI) يتعامل مع الرسالة
@@ -449,7 +419,7 @@ def run(agent, payload: dict = None) -> dict:
     except Exception as e:
         ok = False
         error = str(e)
-        log.error(f"Send error: {e}")
+        log.error(f"Send error for chat {chat_id}: {e}")
 
     if not ok:
         log.warning(f"Send failed for chat {chat_id}: {error}")
@@ -484,7 +454,7 @@ def run(agent, payload: dict = None) -> dict:
             if agent and hasattr(agent, "cancel_whatsapp_ai_processing"):
                 agent.cancel_whatsapp_ai_processing(
                     chat_id=chat_id,
-                    reason="religious_sept_campaign_autoreply",
+                    reason="religious_etasaloo_beya_ala_rakmy_autoreply",
                 )
         except Exception:
             pass
@@ -499,3 +469,29 @@ def run(agent, payload: dict = None) -> dict:
         "channel": channel,
         "reply_preview": answer[:120],
     }
+
+
+# =============================================================================
+# اختبار ذاتي سريع (يُستخدم عند التطوير فقط — لا يُستدعى من المحرك)
+# =============================================================================
+if __name__ == "__main__":
+    print("=== Self-test: religious_etasaloo_beya_ala_rakmy_autoreply ===")
+    tests = [
+        ("📞 اتصلوا بيا على رقمي", True),
+        ("اتصلوا بيا على رقمي", True),     # الإيموجي 📞 رمز غير حرفي => نفس الرسالة
+        ("اتصلوا بيا على رقمي لو سمحت", False),  # كلمة إضافية => لا تطابق
+        ("اتصلوا بيا علي رقمي", False),     # اختلاف حرف (على/علي) => لا تطابق
+        ("اتصل بيا على رقمي", False),       # صيغة مختلفة => لا تطابق
+        ("أيوه، أحجزلي مكان", False),       # workflow آخر => لا تتداخل
+        ("وصلني رقمك", False),              # workflow آخر => لا تتداخل
+        ("السلام عليكم", False),
+        ("", False),
+    ]
+    ok_all = True
+    for msg, expected in tests:
+        got = _match_keyword(msg) is not None
+        flag = "✅" if got == expected else "❌"
+        if got != expected:
+            ok_all = False
+        print(f"{flag} {msg!r:50} -> matched={got} expected={expected}")
+    print("ALL OK" if ok_all else "SOME TESTS FAILED")

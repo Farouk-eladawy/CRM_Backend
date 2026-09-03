@@ -1,12 +1,26 @@
+import hashlib
 import json
+import os
+import re
+import sqlite3
 import threading
 import time
-import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 
 import automation_db
+
+VISUAL_KEYWORD_DEDUP_WINDOW_SECONDS = 600
+_NON_TEXT_MEDIA_PREFIXES = (
+    "[customer sent an audio message.",
+    "[customer sent a video.",
+    "[customer sent a sticker.",
+    "[customer sent a document.",
+    "[customer sent a message of type:",
+    "[customer shared a location]",
+    "[customer shared contacts.",
+)
 
 
 def _utc_now():
@@ -59,6 +73,114 @@ def _render_template(text: str, ctx: dict):
         return str(val)
 
     return _TPL_RE.sub(_rep, s)
+
+
+def normalize_keyword_text(text: str) -> str:
+    """Same normalization as knowledge_base._normalize_rule_text / religious keyword workflows."""
+    try:
+        s = str(text or "").strip().lower()
+        s = re.sub(r"[\u0610-\u061A\u0640\u064B-\u065F\u0670\u06D6-\u06ED]", "", s)
+        s = re.sub(r"[^\w\s]", " ", s, flags=re.UNICODE)
+        s = re.sub(r"\s+", " ", s, flags=re.UNICODE)
+        return s.strip()
+    except Exception:
+        return str(text or "").strip().lower()
+
+
+def is_non_text_media_message(message_body: str) -> bool:
+    lb = str(message_body or "").lower().strip()
+    return any(lb.startswith(p) for p in _NON_TEXT_MEDIA_PREFIXES)
+
+
+def keyword_matches(message_body: str, keywords, match_mode: str = "phrase"):
+    """
+    Return the first matching keyword, or None.
+
+    Modes:
+      exact    — normalized message == normalized keyword
+      phrase   — exact, OR the raw keyword (including emoji) appears in the raw message
+      contains — normalized keyword is contained in the normalized message
+    """
+    raw_message = str(message_body or "").strip()
+    normalized_message = normalize_keyword_text(raw_message)
+    if not normalized_message and not raw_message:
+        return None
+    mode = str(match_mode or "phrase").strip().lower()
+    if mode in ("literal", "in_message", "phrase_in_message"):
+        mode = "phrase"
+    if isinstance(keywords, str):
+        items = [keywords]
+    elif isinstance(keywords, (list, tuple)):
+        items = list(keywords)
+    else:
+        items = []
+    for raw_kw in items:
+        keyword = str(raw_kw or "").strip()
+        if not keyword:
+            continue
+        normalized_keyword = normalize_keyword_text(keyword)
+        if mode == "exact":
+            if normalized_keyword and normalized_message == normalized_keyword:
+                return keyword
+        elif mode == "contains":
+            if normalized_keyword and normalized_keyword in normalized_message:
+                return keyword
+            if keyword and keyword in raw_message:
+                return keyword
+        else:
+            # phrase (default): exact after normalize, or the literal keyword in the raw text
+            if normalized_keyword and normalized_message == normalized_keyword:
+                return keyword
+            if keyword and keyword in raw_message:
+                return keyword
+    return None
+
+
+def _visual_dedup_db_path() -> str:
+    try:
+        from fts_paths import get_data_path
+        return get_data_path("visual_keyword_reply_dedup.db")
+    except Exception:
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "visual_keyword_reply_dedup.db")
+
+
+def claim_visual_keyword_reply(workflow_id: str, chat_id: str, message_body: str) -> bool:
+    """Atomic per-workflow claim so webhook duplicates do not send twice."""
+    try:
+        normalized = normalize_keyword_text(message_body)
+        body_hash = hashlib.sha256(normalized.encode("utf-8", errors="ignore")).hexdigest()[:24]
+    except Exception:
+        body_hash = "0" * 24
+    unified_key = f"{str(workflow_id or '').strip()}:{str(chat_id or '').strip()}:{body_hash}"
+    now = datetime.utcnow().isoformat()
+    db_path = _visual_dedup_db_path()
+    try:
+        with sqlite3.connect(db_path, timeout=30.0) as conn:
+            conn.execute("PRAGMA busy_timeout = 30000;")
+            cur = conn.cursor()
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS visual_keyword_reply_dedup (
+                    dedup_key TEXT PRIMARY KEY,
+                    workflow_id TEXT,
+                    chat_id TEXT NOT NULL,
+                    replied_at TEXT NOT NULL
+                )
+                """
+            )
+            try:
+                cutoff = (datetime.utcnow() - timedelta(seconds=VISUAL_KEYWORD_DEDUP_WINDOW_SECONDS)).isoformat()
+                cur.execute("DELETE FROM visual_keyword_reply_dedup WHERE replied_at < ?", (cutoff,))
+            except Exception:
+                pass
+            cur.execute(
+                "INSERT OR IGNORE INTO visual_keyword_reply_dedup (dedup_key, workflow_id, chat_id, replied_at) VALUES (?, ?, ?, ?)",
+                (unified_key, str(workflow_id or ""), str(chat_id or ""), now),
+            )
+            conn.commit()
+            return cur.rowcount > 0
+    except Exception:
+        return True
 
 
 class StopWorkflow(Exception):
@@ -283,6 +405,8 @@ class AutomationEngine:
                     self._step_http_request(step, ctx)
                 elif stype == "send_internal_notification":
                     self._step_send_internal_notification(step, ctx)
+                elif stype in ("keyword_reply", "visual_keyword_reply"):
+                    self._step_keyword_reply(step, ctx)
                 else:
                     continue
             try:
@@ -312,6 +436,162 @@ class AutomationEngine:
                     pass
         sent = bool((ctx.get("vars") or {}).get("_workflow_sent"))
         return {"ok": err is None, "error": err, "sent": sent}
+
+    def _is_human_active_chat(self, chat_id: str) -> bool:
+        try:
+            import chat_db
+            conv = chat_db.get_conversation(chat_id) or {}
+            return int(conv.get("needs_help") or 0) == 1
+        except Exception:
+            return False
+
+    def _is_chat_on_hold(self, chat_id: str) -> bool:
+        try:
+            import chat_db
+            conv = chat_db.get_conversation(chat_id) or {}
+            hold_raw = str(conv.get("auto_reply_hold_until") or "").strip()
+            if not hold_raw:
+                return False
+            try:
+                now = datetime.fromisoformat(chat_db.get_cairo_time())
+                if now.tzinfo is not None:
+                    now = now.replace(tzinfo=None)
+                hold_dt = datetime.fromisoformat(hold_raw)
+                if hold_dt.tzinfo is not None:
+                    hold_dt = hold_dt.replace(tzinfo=None)
+                if hold_dt > now:
+                    return True
+                try:
+                    chat_db.update_auto_reply_hold_until(chat_id, None)
+                except Exception:
+                    pass
+            except Exception:
+                return False
+        except Exception:
+            return False
+        return False
+
+    def _step_keyword_reply(self, step: dict, ctx: dict):
+        """
+        Visual builder step: match a customer keyword and send a fixed reply
+        on WhatsApp or Facebook without generating a Python workflow file.
+        """
+        payload = _get_by_path(ctx, "event.payload") or {}
+        if not isinstance(payload, dict):
+            payload = {}
+        chat_id = str(payload.get("chat_id") or "").strip()
+        message_body = str(payload.get("message_body") or "").strip()
+        source = str(payload.get("source") or "").strip().lower()
+        sender_identifier = str(payload.get("sender_identifier") or "").strip()
+        location = str(payload.get("location") or "").strip()
+        receiving_phone_id = str(payload.get("receiving_phone_id") or "").strip() or None
+
+        want_location = str(step.get("location") or "Religious").strip() or "Religious"
+        if want_location.lower() not in location.lower():
+            raise StopWorkflow("keyword_reply_wrong_location")
+
+        sources = step.get("sources")
+        if isinstance(sources, str):
+            allowed_sources = [sources.strip().lower()] if sources.strip() else []
+        elif isinstance(sources, (list, tuple)):
+            allowed_sources = [str(x or "").strip().lower() for x in sources if str(x or "").strip()]
+        else:
+            allowed_sources = ["facebook", "whatsapp"]
+        if allowed_sources and source not in allowed_sources:
+            raise StopWorkflow("keyword_reply_unsupported_source")
+
+        if not chat_id or not message_body or not sender_identifier:
+            raise StopWorkflow("keyword_reply_missing_data")
+
+        skip_media = True if step.get("skip_media") is None else bool(step.get("skip_media"))
+        if skip_media and is_non_text_media_message(message_body):
+            raise StopWorkflow("keyword_reply_non_text_media")
+
+        skip_if_hold = True if step.get("skip_if_hold") is None else bool(step.get("skip_if_hold"))
+        if skip_if_hold and self._is_chat_on_hold(chat_id):
+            raise StopWorkflow("keyword_reply_human_hold")
+
+        skip_if_human = True if step.get("skip_if_human") is None else bool(step.get("skip_if_human"))
+        if skip_if_human and self._is_human_active_chat(chat_id):
+            raise StopWorkflow("keyword_reply_human_active")
+
+        matched = keyword_matches(
+            message_body,
+            step.get("keywords") or step.get("keyword"),
+            match_mode=str(step.get("match_mode") or "phrase"),
+        )
+        if not matched:
+            raise StopWorkflow("keyword_reply_no_match")
+
+        reply = _render_template(str(step.get("reply") or step.get("text") or ""), ctx).strip()
+        if not reply:
+            raise StopWorkflow("keyword_reply_empty_reply")
+
+        wf = ctx.get("workflow") if isinstance(ctx.get("workflow"), dict) else {}
+        workflow_id = str(wf.get("id") or "").strip()
+        if not claim_visual_keyword_reply(workflow_id, chat_id, message_body):
+            raise StopWorkflow("keyword_reply_already_processed")
+
+        use_whatsapp = source == "whatsapp" or str(sender_identifier).startswith("20")
+        channel = "WhatsApp" if use_whatsapp else "Facebook"
+        if not self.agent:
+            raise Exception("keyword_reply_missing_agent")
+        try:
+            if use_whatsapp:
+                ok, error = self.agent.send_whatsapp_message(
+                    sender_identifier,
+                    text=reply,
+                    location=location or "Religious",
+                    receiving_phone_id=receiving_phone_id,
+                )
+            else:
+                ok, error = self.agent.send_facebook_message(sender_identifier, text=reply)
+        except Exception as e:
+            raise Exception(f"keyword_reply_send_failed:{e}")
+        if not ok:
+            raise Exception(f"keyword_reply_send_failed:{error}")
+
+        try:
+            import chat_db
+            chat_db.add_message(
+                chat_id=chat_id,
+                sender_type="agent",
+                text=reply,
+                status="sent",
+                source=channel,
+            )
+            try:
+                chat_db.mark_conversation_read(chat_id)
+            except Exception:
+                pass
+            try:
+                chat_db.delete_proposed_drafts(chat_id)
+            except Exception:
+                pass
+        except Exception:
+            pass
+        try:
+            if hasattr(self.agent, "cancel_whatsapp_ai_processing"):
+                self.agent.cancel_whatsapp_ai_processing(
+                    chat_id=chat_id,
+                    reason="visual_keyword_reply",
+                )
+        except Exception:
+            pass
+        try:
+            if hasattr(self.agent, "mark_workflow_live_reply"):
+                self.agent.mark_workflow_live_reply(chat_id, reason="visual_keyword_reply")
+        except Exception:
+            pass
+
+        ctx.setdefault("vars", {})
+        ctx["vars"]["_workflow_sent"] = True
+        ctx["vars"]["keyword_reply"] = {
+            "sent": True,
+            "chat_id": chat_id,
+            "keyword": matched,
+            "channel": channel,
+        }
 
     def _step_guard(self, step: dict, ctx: dict):
         path = str(step.get("path") or "event.payload.message_body").strip() or "event.payload.message_body"

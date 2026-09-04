@@ -302,6 +302,7 @@ COMPANY_SCOPED_SETTING_KEYS = frozenset({
     "internal_whatsapp_notifications_config",
     "auto_reply_settings",
     "booking_platforms",
+    "dashboard_company_filters",
 })
 
 

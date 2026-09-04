@@ -3345,10 +3345,20 @@ def get_conversations():
     page = get_conversations_page(limit=1000000, offset=0)
     return page.get("items") or []
 
-def get_active_ads():
+def get_active_ads(company_id=None):
+    resolved_company_id = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
     with _get_db() as conn:
         c = conn.cursor()
-        c.execute("SELECT DISTINCT facebook_ad_id, facebook_ad_title FROM conversations WHERE facebook_ad_id IS NOT NULL AND facebook_ad_id != ''")
+        c.execute(
+            """
+            SELECT DISTINCT facebook_ad_id, facebook_ad_title
+            FROM conversations
+            WHERE facebook_ad_id IS NOT NULL
+              AND facebook_ad_id != ''
+              AND COALESCE(NULLIF(company_id, ''), ?) = ?
+            """,
+            (DEFAULT_COMPANY_ID, resolved_company_id),
+        )
         rows = c.fetchall()
         res = []
         for r in rows:

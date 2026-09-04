@@ -144,6 +144,63 @@ def _visual_dedup_db_path() -> str:
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), "visual_keyword_reply_dedup.db")
 
 
+def collect_keyword_media(step: dict):
+    """Normalize visual-builder attachments from step JSON."""
+    if not isinstance(step, dict):
+        return []
+    raw = step.get("media") or step.get("attachments") or []
+    if isinstance(raw, dict):
+        raw = [raw]
+    if not isinstance(raw, list):
+        raw = []
+    single_url = str(step.get("media_url") or "").strip()
+    if single_url:
+        raw = [{
+            "url": single_url,
+            "media_type": step.get("media_type") or step.get("mediaType") or "document",
+            "filename": step.get("media_filename") or step.get("filename") or "",
+            "mime": step.get("media_mime") or step.get("mime") or "",
+        }] + list(raw)
+    items = []
+    seen = set()
+    for item in raw:
+        if isinstance(item, str):
+            url = item.strip()
+            filename = ""
+            media_type = "image"
+            mime = ""
+        elif isinstance(item, dict):
+            url = str(item.get("url") or item.get("media_url") or "").strip()
+            filename = str(item.get("filename") or item.get("name") or "").strip()
+            media_type = str(item.get("media_type") or item.get("mediaType") or "").strip().lower()
+            mime = str(item.get("mime") or item.get("media_mime") or "").strip()
+        else:
+            continue
+        if not url or url in seen:
+            continue
+        seen.add(url)
+        if not media_type:
+            name = (filename or url).lower()
+            mime_l = mime.lower()
+            if mime_l.startswith("image/") or name.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp")):
+                media_type = "image"
+            elif mime_l.startswith("video/") or name.endswith((".mp4", ".mov", ".webm")):
+                media_type = "video"
+            elif mime_l.startswith("audio/") or name.endswith((".mp3", ".m4a", ".ogg", ".opus", ".webm")):
+                media_type = "audio"
+            else:
+                media_type = "document"
+        items.append({
+            "url": url,
+            "media_type": media_type,
+            "filename": filename,
+            "mime": mime,
+        })
+        if len(items) >= 8:
+            break
+    return items
+
+
 def claim_visual_keyword_reply(workflow_id: str, chat_id: str, message_body: str) -> bool:
     """Atomic per-workflow claim so webhook duplicates do not send twice."""
     try:
@@ -524,7 +581,8 @@ class AutomationEngine:
             raise StopWorkflow("keyword_reply_no_match")
 
         reply = _render_template(str(step.get("reply") or step.get("text") or ""), ctx).strip()
-        if not reply:
+        media_items = collect_keyword_media(step)
+        if not reply and not media_items:
             raise StopWorkflow("keyword_reply_empty_reply")
 
         wf = ctx.get("workflow") if isinstance(ctx.get("workflow"), dict) else {}
@@ -537,26 +595,29 @@ class AutomationEngine:
         if not self.agent:
             raise Exception("keyword_reply_missing_agent")
         try:
-            if use_whatsapp:
-                ok, error = self.agent.send_whatsapp_message(
-                    sender_identifier,
-                    text=reply,
-                    location=location or "Religious",
-                    receiving_phone_id=receiving_phone_id,
-                )
-            else:
-                ok, error = self.agent.send_facebook_message(sender_identifier, text=reply)
+            ok, error = self._send_keyword_reply_payload(
+                use_whatsapp=use_whatsapp,
+                sender_identifier=sender_identifier,
+                reply=reply,
+                media_items=media_items,
+                location=location or "Religious",
+                receiving_phone_id=receiving_phone_id,
+            )
         except Exception as e:
             raise Exception(f"keyword_reply_send_failed:{e}")
         if not ok:
             raise Exception(f"keyword_reply_send_failed:{error}")
 
+        log_text = reply
+        for att in media_items:
+            line = f"[Sent {str(att.get('media_type') or 'attachment').capitalize()}] {att.get('url') or att.get('filename') or 'attachment'}"
+            log_text = f"{line}\n{log_text}".strip() if log_text else line
         try:
             import chat_db
             chat_db.add_message(
                 chat_id=chat_id,
                 sender_type="agent",
-                text=reply,
+                text=log_text or reply,
                 status="sent",
                 source=channel,
             )
@@ -591,7 +652,79 @@ class AutomationEngine:
             "chat_id": chat_id,
             "keyword": matched,
             "channel": channel,
+            "media_count": len(media_items),
         }
+
+    def _send_keyword_reply_payload(
+        self,
+        use_whatsapp: bool,
+        sender_identifier: str,
+        reply: str,
+        media_items: list,
+        location: str,
+        receiving_phone_id,
+    ):
+        """Send text and/or attachments on WhatsApp or Facebook."""
+        media_items = [m for m in (media_items or []) if isinstance(m, dict) and str(m.get("url") or "").strip()]
+        last_error = None
+
+        if use_whatsapp:
+            if media_items:
+                long_caption = bool(reply) and len(reply) > 1024
+                if long_caption:
+                    ok, last_error = self.agent.send_whatsapp_message(
+                        sender_identifier,
+                        text=reply,
+                        location=location,
+                        receiving_phone_id=receiving_phone_id,
+                    )
+                    if not ok:
+                        return False, last_error
+                    reply_for_caption = ""
+                else:
+                    reply_for_caption = reply
+                for i, att in enumerate(media_items):
+                    caption = reply_for_caption if i == 0 else ""
+                    ok, last_error = self.agent.send_whatsapp_message(
+                        sender_identifier,
+                        text=caption or None,
+                        location=location,
+                        receiving_phone_id=receiving_phone_id,
+                        media_url=att.get("url"),
+                        media_type=att.get("media_type") or "document",
+                        media_filename=att.get("filename") or None,
+                        media_mime=att.get("mime") or None,
+                    )
+                    if not ok:
+                        return False, last_error
+                return True, None
+            ok, last_error = self.agent.send_whatsapp_message(
+                sender_identifier,
+                text=reply,
+                location=location,
+                receiving_phone_id=receiving_phone_id,
+            )
+            return bool(ok), last_error
+
+        # Facebook: media first, then text — same as inbox composer.
+        for att in media_items:
+            ok, last_error = self.agent.send_facebook_message(
+                sender_identifier,
+                text=None,
+                media_url=att.get("url"),
+                media_type=att.get("media_type") or "file",
+                media_mime=att.get("mime") or None,
+                media_filename=att.get("filename") or None,
+            )
+            if not ok:
+                return False, last_error
+        if reply:
+            ok, last_error = self.agent.send_facebook_message(sender_identifier, text=reply)
+            if not ok:
+                return False, last_error
+        if not media_items and not reply:
+            return False, "empty_payload"
+        return True, None
 
     def _step_guard(self, step: dict, ctx: dict):
         path = str(step.get("path") or "event.payload.message_body").strip() or "event.payload.message_body"

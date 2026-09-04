@@ -13,6 +13,7 @@ from automation_engine import (
     keyword_matches,
     normalize_keyword_text,
     is_non_text_media_message,
+    collect_keyword_media,
 )
 
 
@@ -23,11 +24,11 @@ class MockAgent:
         self.cancelled = []
 
     def send_whatsapp_message(self, recipient, text=None, location="Unknown", receiving_phone_id=None, **kw):
-        self.sent.append(("whatsapp", recipient, text, location, receiving_phone_id))
+        self.sent.append(("whatsapp", recipient, text, location, receiving_phone_id, kw))
         return True, None
 
     def send_facebook_message(self, recipient, text=None, **kw):
-        self.sent.append(("facebook", recipient, text))
+        self.sent.append(("facebook", recipient, text, kw))
         return True, None
 
     def mark_workflow_live_reply(self, chat_id, reason="workflow"):
@@ -151,11 +152,33 @@ engine.agent = agent
 try:
     engine._step_keyword_reply(
         step_for("phrase"),
-        ctx_for("vb-media", "[Customer sent an audio message. Duration: 4s]"),
+        ctx_for("vb-incoming-media", "[Customer sent an audio message. Duration: 4s]"),
     )
     check("skip_media", False, "expected StopWorkflow")
 except StopWorkflow as e:
     check("skip_media", "non_text_media" in str(e), str(e))
+
+PHOTO = "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+check(
+    "collect_media",
+    len(collect_keyword_media({"media": [{"url": PHOTO, "media_type": "image", "filename": "sample.jpg"}]})) == 1,
+)
+
+agent = MockAgent()
+engine.agent = agent
+st = step_for("phrase")
+st["media"] = [{"url": PHOTO, "media_type": "image", "filename": "sample.jpg", "mime": "image/jpeg"}]
+engine._step_keyword_reply(st, ctx_for("vb-photo-fb-1", KW))
+check("fb_media_then_text", len(agent.sent) == 2, str(agent.sent))
+check("fb_media_first", bool(agent.sent and (agent.sent[0][3] or {}).get("media_url") == PHOTO), str(agent.sent[:1]))
+check("fb_text_second", bool(len(agent.sent) > 1 and agent.sent[1][2] == REPLY), str(agent.sent[1:] if len(agent.sent) > 1 else agent.sent))
+
+agent = MockAgent()
+engine.agent = agent
+st = step_for("phrase", reply="")
+st["media"] = [{"url": PHOTO, "media_type": "image", "filename": "sample.jpg"}]
+engine._step_keyword_reply(st, ctx_for("vb-photo-only-1", KW, source="WhatsApp", sender="201000000099"))
+check("wa_photo_only", bool(agent.sent and agent.sent[0][0] == "whatsapp" and (agent.sent[0][5] or {}).get("media_url") == PHOTO), str(agent.sent))
 
 failed = 0
 for name, ok, detail in results:

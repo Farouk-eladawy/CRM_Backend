@@ -19159,7 +19159,7 @@ Conversation:
                 "providerBaseUrl": _embedded_evolution_base_url() if is_fts else "",
                 "apiKey": _embedded_evolution_api_key() if is_fts else "",
                 "webhookUrl": f"http://127.0.0.1:{port}/api/internal_notifications/whatsapp/webhook",
-                "assignedTeams": ["Operations"],
+                "assignedTeams": ["Operations"] if is_fts else [],
                 "notes": "",
                 "connectionStatus": "not_connected",
                 "lastConnectedAt": "",
@@ -29819,7 +29819,7 @@ Prefer the MarkItDown Extraction section below when present.
             if request.method == 'OPTIONS':
                 return jsonify({"status": "ok"}), 200
             try:
-                ads = chat_db.get_active_ads()
+                ads = chat_db.get_active_ads(company_id=_actor_company_id_from_request())
                 return jsonify({"status": "success", "data": ads}), 200
             except Exception as e:
                 logging.error(f"Error in /api/active_ads: {e}", exc_info=True)
@@ -30061,6 +30061,85 @@ Prefer the MarkItDown Extraction section below when present.
                 return jsonify({"status": "success", "data": saved}), 200
             except Exception as e:
                 logging.error(f"Error in POST /api/automation/workflows: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/automation/upload', methods=['POST', 'OPTIONS'])
+        def api_automation_upload():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                actor_raw = request.form.get("actor")
+                try:
+                    actor = json.loads(actor_raw) if actor_raw else {}
+                except Exception:
+                    actor = {}
+                role = str((actor or {}).get("role") or "").strip().lower()
+                if role != "admin":
+                    return jsonify({"status": "error", "message": "Admin only"}), 403
+
+                file = request.files.get("file")
+                if not file or not str(getattr(file, "filename", "") or "").strip():
+                    return jsonify({"status": "error", "message": "No file provided"}), 400
+
+                filename = str(file.filename or "file").strip() or "file"
+                mime_type = str(file.mimetype or "").split(";")[0].strip().lower()
+                file.stream.seek(0, os.SEEK_END)
+                size = int(file.stream.tell() or 0)
+                file.stream.seek(0)
+                if size > 15 * 1024 * 1024:
+                    return jsonify({"status": "error", "message": "File too large (max 15MB)"}), 400
+
+                name_l = filename.lower()
+                if mime_type.startswith("image/") or name_l.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp")):
+                    media_type = "image"
+                    resource_type = "image"
+                elif mime_type.startswith("video/") or name_l.endswith((".mp4", ".mov", ".webm")):
+                    media_type = "video"
+                    resource_type = "video"
+                elif mime_type.startswith("audio/") or name_l.endswith((".mp3", ".m4a", ".ogg", ".opus")):
+                    media_type = "audio"
+                    resource_type = "video"
+                else:
+                    media_type = "document"
+                    resource_type = "raw" if (mime_type == "application/pdf" or name_l.endswith(".pdf")) else "auto"
+
+                import cloudinary
+                import cloudinary.uploader
+                import uuid as _uuid
+                if not cloudinary.config().cloud_name and isinstance(getattr(self, "config", None), dict):
+                    c_conf = self.config.get("cloudinary") or {}
+                    if isinstance(c_conf, dict) and c_conf.get("cloud_name"):
+                        cloudinary.config(
+                            cloud_name=c_conf.get("cloud_name"),
+                            api_key=c_conf.get("api_key"),
+                            api_secret=c_conf.get("api_secret"),
+                        )
+                if not cloudinary.config().cloud_name:
+                    return jsonify({"status": "error", "message": "Cloudinary is not configured"}), 500
+
+                base = os.path.splitext(filename)[0]
+                safe_base = re.sub(r"[^a-zA-Z0-9_-]", "_", str(base)).strip("_") or "upload"
+                public_id = f"{safe_base}_{int(time.time())}_{_uuid.uuid4().hex[:8]}"
+                res = cloudinary.uploader.upload(
+                    file,
+                    resource_type=resource_type,
+                    folder="workflow_builder",
+                    public_id=public_id,
+                    format="pdf" if (mime_type == "application/pdf" or name_l.endswith(".pdf")) else None,
+                )
+                uploaded_url = (res or {}).get("secure_url") or (res or {}).get("url")
+                if not uploaded_url:
+                    return jsonify({"status": "error", "message": "Cloudinary upload failed"}), 500
+                return jsonify({
+                    "status": "success",
+                    "url": uploaded_url,
+                    "filename": filename,
+                    "mime": mime_type,
+                    "media_type": media_type,
+                    "size": size,
+                }), 200
+            except Exception as e:
+                logging.error(f"Error in POST /api/automation/upload: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/automation/workflows/<workflow_id>/enabled', methods=['POST', 'OPTIONS'])

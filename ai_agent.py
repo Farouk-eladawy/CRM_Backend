@@ -13998,163 +13998,16 @@ Conversation:
         return out or None
 
     def _sanitize_religious_operation_acl(self, value):
-        if not isinstance(value, dict):
-            return None
-        out = {}
-        allowed = self._sanitize_table_name_list(value.get("allowedTables"))
-        denied = self._sanitize_table_name_list(value.get("deniedTables"))
-        if allowed:
-            out["allowedTables"] = allowed
-        if denied:
-            out["deniedTables"] = denied
-        return out or None
+        # Retired after Baserow cutover — do not persist table visibility ACLs.
+        return None
 
     def _user_can_access_airtable_table(self, user_obj, table_name, scope="main"):
-        """Admin = all tables. Else apply allowedTables / deniedTables ACL."""
-        if not isinstance(user_obj, dict):
-            return False
-        role = str(user_obj.get("role") or "").strip().lower()
-        if role == "admin":
-            return True
-        name = str(table_name or "").strip()
-        if not name:
-            return False
-        scope_l = str(scope or "main").strip().lower()
-        if scope_l in ("religious", "religion", "rel", "hajj"):
-            acl = user_obj.get("religiousOperationAcl") if isinstance(user_obj.get("religiousOperationAcl"), dict) else {}
-        else:
-            acl = user_obj.get("aiOperationAcl") if isinstance(user_obj.get("aiOperationAcl"), dict) else {}
-        denied = acl.get("deniedTables") if isinstance(acl.get("deniedTables"), list) else []
-        for item in denied:
-            if str(item or "").strip().lower() == name.lower():
-                return False
-        allowed = acl.get("allowedTables") if isinstance(acl.get("allowedTables"), list) else []
-        if allowed:
-            return any(str(item or "").strip().lower() == name.lower() for item in allowed)
-        return True
+        """Table allow/deny ACLs are retired; any named table is allowed."""
+        return bool(str(table_name or "").strip())
 
     def _sanitize_ai_operation_acl(self, value):
-        if not isinstance(value, dict):
-            return None
-        out = {}
-        if "canCreateRecord" in value:
-            out["canCreateRecord"] = bool(value.get("canCreateRecord"))
-        if "canExport" in value:
-            out["canExport"] = bool(value.get("canExport"))
-        if "canDismissForcedRecordFilters" in value:
-            out["canDismissForcedRecordFilters"] = bool(value.get("canDismissForcedRecordFilters"))
-        if "recordFiltersVersion" in value:
-            ver = value.get("recordFiltersVersion")
-            if isinstance(ver, (int, float)) and not isinstance(ver, bool):
-                out["recordFiltersVersion"] = int(ver) if float(ver).is_integer() else ver
-            elif isinstance(ver, str) and ver.strip():
-                out["recordFiltersVersion"] = ver.strip()[:64]
-        raw_fields = value.get("fields")
-        fields = {}
-        if isinstance(raw_fields, dict):
-            for key, caps in raw_fields.items():
-                field_name = str(key or "").strip()
-                if not field_name or len(field_name) > 120:
-                    continue
-                if not isinstance(caps, dict):
-                    continue
-                view = bool(caps["view"]) if "view" in caps else True
-                edit = bool(caps["edit"]) if "edit" in caps else True
-                create = bool(caps["create"]) if "create" in caps else True
-                if not view:
-                    edit = False
-                    create = False
-                if view and edit and create:
-                    continue
-                entry = {}
-                if not view:
-                    entry["view"] = False
-                if not edit:
-                    entry["edit"] = False
-                if not create:
-                    entry["create"] = False
-                fields[field_name] = entry
-                if len(fields) >= 400:
-                    break
-        if fields:
-            out["fields"] = fields
-        raw_filters = value.get("recordFilters")
-        cleaned_filters = self._sanitize_ai_operation_record_filters(raw_filters)
-        if cleaned_filters:
-            out["recordFilters"] = cleaned_filters
-        else:
-            # Legacy simple scope only when Filter builder conditions are absent.
-            raw_scope = value.get("recordScope")
-            if isinstance(raw_scope, dict):
-                scope = {}
-                def _clean_date(v):
-                    s = str(v or "").strip()
-                    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
-                        return None
-                    try:
-                        datetime.fromisoformat(s)
-                        return s
-                    except Exception:
-                        return None
-
-                def _clean_list(v, max_items=80, max_len=160):
-                    if not isinstance(v, list):
-                        return None
-                    seen = set()
-                    out_list = []
-                    for item in v:
-                        s = str(item or "").strip()
-                        if not s or len(s) > max_len:
-                            continue
-                        key = s.lower()
-                        if key in seen:
-                            continue
-                        seen.add(key)
-                        out_list.append(s)
-                        if len(out_list) >= max_items:
-                            break
-                    return out_list or None
-
-                d_from = _clean_date(raw_scope.get("dateTripFrom"))
-                d_to = _clean_date(raw_scope.get("dateTripTo"))
-                if d_from:
-                    scope["dateTripFrom"] = d_from
-                if d_to:
-                    scope["dateTripTo"] = d_to
-                for key in ("tripNames", "agencies", "destinations", "bookingStatuses"):
-                    cleaned = _clean_list(raw_scope.get(key))
-                    if cleaned:
-                        scope[key] = cleaned
-                if scope:
-                    out["recordScope"] = scope
-        allowed_tables = self._sanitize_table_name_list(value.get("allowedTables"))
-        if allowed_tables:
-            out["allowedTables"] = allowed_tables
-        denied_tables = self._sanitize_table_name_list(value.get("deniedTables"))
-        if denied_tables:
-            out["deniedTables"] = denied_tables
-        fixed_ids = {
-            "All Booking",
-            "Operation Today",
-            "Operation Tomorrow",
-            "Operation Weekly",
-        }
-        denied_fixed = self._sanitize_table_name_list(value.get("deniedFixedViews"), max_items=20)
-        if denied_fixed:
-            cleaned_fixed = [x for x in denied_fixed if x in fixed_ids]
-            if cleaned_fixed:
-                out["deniedFixedViews"] = cleaned_fixed
-        if out.get("canCreateRecord") is True:
-            out.pop("canCreateRecord", None)
-        if out.get("canExport") is True:
-            out.pop("canExport", None)
-        if out.get("canDismissForcedRecordFilters") is False:
-            out.pop("canDismissForcedRecordFilters", None)
-        if not out.get("recordFilters") and not out.get("recordScope"):
-            out.pop("recordFiltersVersion", None)
-        if not out:
-            return None
-        return out
+        # Retired after Baserow cutover — do not persist AI Operation ACLs.
+        return None
 
     def _sanitize_ai_operation_record_filters(self, value, depth=0):
         """Sanitize Filter-builder conditions (same shape as AI Operation tab)."""
@@ -14314,34 +14167,8 @@ Conversation:
         user_obj = self._load_dashboard_user_by_actor(actor_obj)
         if self._ai_operation_actor_is_admin(user_obj, actor=actor_obj):
             return filters if isinstance(filters, list) else []
-        acl = (user_obj or {}).get("aiOperationAcl") if isinstance(user_obj, dict) else None
-        base = filters if isinstance(filters, list) else []
-        # User may dismiss forced scope only when ACL grants it.
-        if skip_forced_record_filters and isinstance(acl, dict) and bool(acl.get("canDismissForcedRecordFilters")):
-            current_version = acl.get("recordFiltersVersion")
-            if current_version is None:
-                # Legacy ACL without version: honor dismiss when client sends any skip.
-                return base
-            client_ver = str(dismissed_forced_filters_version or "").strip()
-            server_ver = str(current_version).strip()
-            if client_ver and server_ver and client_ver == server_ver:
-                return base
-            # Version mismatch → admin re-applied filters; keep merging.
-        scope_filters = []
-        if isinstance(acl, dict):
-            cleaned = self._sanitize_ai_operation_record_filters(acl.get("recordFilters"))
-            if cleaned:
-                scope_filters = cleaned
-            else:
-                scope_filters = self._ai_operation_record_scope_to_filters(acl.get("recordScope"))
-        if not scope_filters:
-            return base
-        merged = list(base)
-        for node in scope_filters:
-            item = dict(node)
-            item["connector"] = "and"
-            merged.append(item)
-        return merged
+        # Retired: forced record scope / field ACLs are no longer applied.
+        return filters if isinstance(filters, list) else []
 
     def _load_dashboard_user_by_actor(self, actor=None):
         try:
@@ -14396,52 +14223,11 @@ Conversation:
         return role == "admin"
 
     def _ai_operation_field_allowed(self, user_obj, field_name, action="edit", actor=None):
-        """Allow-by-default field ACL. action: view|edit|create"""
-        if self._ai_operation_actor_is_admin(user_obj, actor=actor):
-            return True
-        name = str(field_name or "").strip()
-        if not name:
-            return True
-        acl = None
-        if isinstance(user_obj, dict):
-            acl = user_obj.get("aiOperationAcl")
-        if not isinstance(acl, dict):
-            return True
-        fields = acl.get("fields")
-        if not isinstance(fields, dict):
-            return True
-        caps = fields.get(name)
-        if not isinstance(caps, dict):
-            # Case-insensitive / trim fallback for UI field labels vs ACL keys.
-            name_l = name.lower()
-            for k, v in fields.items():
-                if str(k or "").strip().lower() == name_l and isinstance(v, dict):
-                    caps = v
-                    break
-        if not isinstance(caps, dict):
-            return True
-        view = caps.get("view", True) is not False
-        if not view:
-            return False
-        if action == "view":
-            return True
-        if action == "edit":
-            return caps.get("edit", True) is not False
-        if action == "create":
-            return caps.get("create", True) is not False
+        """Field view/edit/create ACLs are retired; all named fields are allowed."""
         return True
 
     def _ai_operation_can_create_record(self, user_obj, actor=None):
-        if self._ai_operation_actor_is_admin(user_obj, actor=actor):
-            return True
-        acl = None
-        if isinstance(user_obj, dict):
-            acl = user_obj.get("aiOperationAcl")
-        if not isinstance(acl, dict):
-            return True
-        if "canCreateRecord" not in acl:
-            return True
-        return bool(acl.get("canCreateRecord"))
+        return True
 
     def _filter_ai_operation_fields_by_acl(self, fields, user_obj, action="edit", actor=None):
         """Returns (allowed_fields, denied_field_names)."""
@@ -15105,52 +14891,28 @@ Conversation:
         return bases
 
     def _user_allowed_base_ids(self, user_obj):
-        """Return explicit list, or None for unrestricted (admin). Empty list = none."""
+        """Return inherited location bases, or None for unrestricted (admin). Empty list = none."""
         if not isinstance(user_obj, dict):
             return []
         role = str(user_obj.get("role") or "").strip().lower()
         if role == "admin":
             return None
         configured = self._configured_airtable_bases()
-        known_ids = {
-            str(b.get("baseId") or "").strip().lower()
-            for b in configured
-            if str(b.get("baseId") or "").strip()
-        }
-
-        def _inherit_from_locations():
-            locs = [str(x or "").strip().lower() for x in (user_obj.get("allowedLocations") or []) if str(x or "").strip()]
-            by_label = {str(b.get("label") or "").lower(): str(b.get("baseId") or "").strip() for b in configured}
-            if (not locs) or ("all" in locs):
-                return [b["baseId"] for b in configured if b.get("baseId")]
-            out = []
-            def _push(label):
-                bid = by_label.get(label)
-                if bid and bid.lower() not in {x.lower() for x in out}:
-                    out.append(bid)
-            if "religious" in locs:
-                _push("religious")
-            if any(l not in ("religious", "needhelp") for l in locs):
-                _push("main")
-                _push("trips")
-            return out
-
-        explicit = self._sanitize_allowed_base_ids(user_obj.get("allowedBaseIds"))
-        if explicit:
-            has_known = any(str(x or "").strip().lower() in known_ids for x in explicit)
-            # Custom-only allowlist: keep extras + inherit known bases from Locations
-            # so adding a typed app… does not strip Main and hide FTS AI Operation.
-            if (not has_known) and known_ids:
-                merged = list(_inherit_from_locations())
-                seen = {x.lower() for x in merged}
-                for bid in explicit:
-                    key = str(bid or "").strip().lower()
-                    if key and key not in seen:
-                        merged.append(bid)
-                        seen.add(key)
-                return merged
-            return explicit
-        return _inherit_from_locations()
+        locs = [str(x or "").strip().lower() for x in (user_obj.get("allowedLocations") or []) if str(x or "").strip()]
+        by_label = {str(b.get("label") or "").lower(): str(b.get("baseId") or "").strip() for b in configured}
+        if (not locs) or ("all" in locs):
+            return [b["baseId"] for b in configured if b.get("baseId")]
+        out = []
+        def _push(label):
+            bid = by_label.get(label)
+            if bid and bid.lower() not in {x.lower() for x in out}:
+                out.append(bid)
+        if "religious" in locs:
+            _push("religious")
+        if any(l not in ("religious", "needhelp") for l in locs):
+            _push("main")
+            _push("trips")
+        return out
 
     def _user_can_access_base_id(self, user_obj, base_id):
         allowed = self._user_allowed_base_ids(user_obj)
@@ -15173,16 +14935,6 @@ Conversation:
         match = next((b for b in configured if str(b.get("label") or "").lower() == label), None)
         if match and self._user_can_access_base_id(user_obj, match.get("baseId")):
             return True
-        # Custom Base IDs unlock main/operations scope (same intent as checking Main).
-        if label == "main" and isinstance(user_obj, dict):
-            explicit = self._sanitize_allowed_base_ids(user_obj.get("allowedBaseIds")) or []
-            known_ids = {
-                str(b.get("baseId") or "").strip().lower()
-                for b in configured
-                if str(b.get("baseId") or "").strip()
-            }
-            if any(str(x or "").strip().lower() not in known_ids for x in explicit):
-                return True
         if not match:
             return True
         return False
@@ -39654,8 +39406,6 @@ Write ONE short message only. No JSON. No explanations."""
                         "createdBy": str(user_obj.get("createdBy") or ""),
                         "skipWhatsAppSetup": bool(user_obj.get("skipWhatsAppSetup") or False),
                         "aiOperationAcl": self._sanitize_ai_operation_acl(user_obj.get("aiOperationAcl")),
-                        "religiousOperationAcl": self._sanitize_religious_operation_acl(user_obj.get("religiousOperationAcl")),
-                        "allowedBaseIds": self._sanitize_allowed_base_ids(user_obj.get("allowedBaseIds")),
                     }
 
                 def _has_team_overlap(user_obj, actor_teams):
@@ -39802,8 +39552,6 @@ Write ONE short message only. No JSON. No explanations."""
                                             "createdBy": str(u.get("createdBy") or ""),
                                             "skipWhatsAppSetup": bool(u.get("skipWhatsAppSetup") or False),
                                             "aiOperationAcl": self._sanitize_ai_operation_acl(u.get("aiOperationAcl")),
-                                            "religiousOperationAcl": self._sanitize_religious_operation_acl(u.get("religiousOperationAcl")),
-                                            "allowedBaseIds": self._sanitize_allowed_base_ids(u.get("allowedBaseIds")),
                                         }
                                     )
                             return out

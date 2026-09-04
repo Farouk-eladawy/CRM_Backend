@@ -146246,3 +146246,331 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0B503BEF2D49F8745FD"
+    },
+    "keyId": "3EB0B503BEF2D49F8745FD",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDk2MjAxNzAwFQIAERgSRDczOTA4NDQyOUE5QUVBMEYxAA== | recipient=201096201700 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 03:22:32"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788344553,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788517353,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:22:33.709Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB09E775F7319B904815A"
+    },
+    "keyId": "3EB09E775F7319B904815A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDY3NjY1NDc2FQIAERgSOTZGRDU3QkY4NjZCNjZFNzM1AA== | recipient=201067665476 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 03:35:44"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788345345,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788518145,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:35:45.639Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0A30EEFF58A2B98C416"
+    },
+    "keyId": "3EB0A30EEFF58A2B98C416",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDY3NDA5OTk1FQIAERgSRDM0NjRCQkZDRUIwODkwMjNFAA== | recipient=201067409995 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 03:36:37"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788345398,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788518198,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:36:38.591Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0F35AB74A2E8918174F"
+    },
+    "keyId": "3EB0F35AB74A2E8918174F",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDY1NjA3ODcwFQIAERgSM0FGQjNBRkNCQUVBQ0IyMUJBAA== | recipient=201065607870 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 03:40:41"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788345641,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788518441,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:40:42.142Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB023F5856E9759440BEB"
+    },
+    "keyId": "3EB023F5856E9759440BEB",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMTE4MDA5NzEzFQIAERgSNzQ5QzYyNENBNjMwNjdDOUJBAA== | recipient=201118009713 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 03:45:04"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788345904,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788518704,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:45:05.193Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB073EB774D231AB23802"
+    },
+    "keyId": "3EB073EB774D231AB23802",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDI1MzIxNTIwFQIAERgSRTk1MjQ1QzdFREI2Q0NGNUM1AA== | recipient=201025321520 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 03:56:27"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788346587,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788519387,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:56:27.679Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0541DDA5CB452AD818C"
+    },
+    "keyId": "3EB0541DDA5CB452AD818C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDI0MjU5MjY0FQIAERgSODIzMEZEM0I0Mjc1NkQ3OEQ4AA== | recipient=201024259264 | code=131050 | title=Unable to deliver the message. This recipient has chosen to stop receiving marketing messages on WhatsApp from your business | message=Unable to deliver the message. This recipient has chosen to stop receiving marketing messages on WhatsApp from your business | details=Unable to deliver the message. This recipient has chosen to stop receiving marketing messages on WhatsApp from your business\nAt: 2026-09-04 03:58:05"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788346685,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788519485,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T03:58:06.244Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB093BF26B75F8C89F35C"
+    },
+    "keyId": "3EB093BF26B75F8C89F35C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:43802 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgMMjAxMDIxMDU4NTU2FQIAERgSMzI2NTFDN0U4QjQ5ODYwQUZGAA== | recipient=201021058556 | code=130472 | title=User's number is part of an experiment | message=User's number is part of an experiment | details=Failed to send message because this user's phone number is part of an experiment\nAt: 2026-09-04 04:02:07"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1788346927,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1788519727,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-04T04:02:08.213Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

@@ -9,6 +9,7 @@ import secrets
 from datetime import datetime, timezone
 
 DEFAULT_COMPANY_ID = "fts"
+PRIMARY_ADMIN_USERNAME = "admin"
 COMPANIES_SETTING_KEY = "dashboard_companies"
 
 NEW_COMPANY_ALLOWED_TABS = [
@@ -39,6 +40,33 @@ def normalize_company_id(value) -> str:
 
 def is_default_company(company_id) -> bool:
     return normalize_company_id(company_id) == DEFAULT_COMPANY_ID
+
+
+def coerce_bool(value, default=False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    text = str(value).strip().lower()
+    if text in ("1", "true", "yes", "on"):
+        return True
+    if text in ("0", "false", "no", "off", ""):
+        return False
+    return default
+
+
+def is_primary_admin(user_obj) -> bool:
+    if not isinstance(user_obj, dict):
+        return False
+    return (
+        str(user_obj.get("username") or "").strip().lower() == PRIMARY_ADMIN_USERNAME
+        and str(user_obj.get("role") or "").strip().lower() == "admin"
+    )
+
+
+def default_create_with_pi_enabled(company_id=None) -> bool:
+    # Paid add-on: closed until Admin Manager enables it for the company.
+    return False
 
 
 def user_company_id(user_obj) -> str:
@@ -95,12 +123,42 @@ def resolve_company_id(username=None, user_id=None, fallback=DEFAULT_COMPANY_ID)
     return normalize_company_id(fallback)
 
 
-def sanitize_connections(raw) -> dict:
+def sanitize_connections(raw, existing=None) -> dict:
     src = raw if isinstance(raw, dict) else {}
     out = empty_connections()
+    if isinstance(existing, dict):
+        for key in out:
+            out[key] = str(existing.get(key) or "").strip()
     for key in out:
-        out[key] = str(src.get(key) or "").strip()
+        if key in src:
+            out[key] = str(src.get(key) or "").strip()
+    out["baserowMainUrl"] = sanitize_public_url(out.get("baserowMainUrl"))
+    out["baserowReligiousUrl"] = sanitize_public_url(out.get("baserowReligiousUrl"))
+    out["transportUrl"] = sanitize_public_url(out.get("transportUrl"))
     return out
+
+
+def _normalize_company_record(item, previous=None) -> dict:
+    src = item if isinstance(item, dict) else {}
+    prev = previous if isinstance(previous, dict) else {}
+    cid = str(src.get("id") or prev.get("id") or "").strip()
+    if src.get("createWithPiEnabled") is None:
+        if prev.get("createWithPiEnabled") is None:
+            flag = default_create_with_pi_enabled(cid)
+        else:
+            flag = coerce_bool(prev.get("createWithPiEnabled"), default=default_create_with_pi_enabled(cid))
+    else:
+        flag = coerce_bool(src.get("createWithPiEnabled"), default=False)
+    connections_src = src.get("connections") if "connections" in src else prev.get("connections")
+    created_at = str(src.get("createdAt") or prev.get("createdAt") or "").strip() or _now_iso()
+    return {
+        "id": cid,
+        "name": str(src.get("name") or prev.get("name") or cid).strip() or cid,
+        "createdByUsername": str(src.get("createdByUsername") or prev.get("createdByUsername") or "").strip(),
+        "createdAt": created_at,
+        "createWithPiEnabled": flag,
+        "connections": sanitize_connections(connections_src),
+    }
 
 
 def default_fts_company():
@@ -109,7 +167,22 @@ def default_fts_company():
         "name": "FTS Travels",
         "createdByUsername": "admin",
         "createdAt": _now_iso(),
+        "createWithPiEnabled": False,
         "connections": empty_connections(),
+    }
+
+
+def public_company(company) -> dict:
+    item = company if isinstance(company, dict) else default_fts_company()
+    cid = str(item.get("id") or DEFAULT_COMPANY_ID)
+    return {
+        "id": cid,
+        "name": str(item.get("name") or cid),
+        "createdByUsername": str(item.get("createdByUsername") or ""),
+        "createdAt": str(item.get("createdAt") or ""),
+        "createWithPiEnabled": bool(item.get("createWithPiEnabled")),
+        "isDefaultCompany": is_default_company(cid),
+        "connections": sanitize_connections(item.get("connections")),
     }
 
 
@@ -129,15 +202,7 @@ def load_companies():
         if not cid or cid in seen:
             continue
         seen.add(cid)
-        cleaned.append(
-            {
-                "id": cid,
-                "name": str(item.get("name") or cid).strip() or cid,
-                "createdByUsername": str(item.get("createdByUsername") or "").strip(),
-                "createdAt": str(item.get("createdAt") or "").strip() or _now_iso(),
-                "connections": sanitize_connections(item.get("connections")),
-            }
-        )
+        cleaned.append(_normalize_company_record(item))
     if DEFAULT_COMPANY_ID not in seen:
         cleaned.insert(0, default_fts_company())
         save_companies(cleaned)
@@ -169,24 +234,16 @@ def upsert_company(company):
     if not cid:
         raise ValueError("company id is required")
     companies = load_companies()
-    next_item = {
-        "id": cid,
-        "name": str(company.get("name") or cid).strip() or cid,
-        "createdByUsername": str(company.get("createdByUsername") or "").strip(),
-        "createdAt": str(company.get("createdAt") or "").strip() or _now_iso(),
-        "connections": sanitize_connections(company.get("connections")),
-    }
     found = False
+    next_item = None
     for idx, item in enumerate(companies):
         if item.get("id") == cid:
-            if not next_item["createdByUsername"]:
-                next_item["createdByUsername"] = item.get("createdByUsername") or ""
-            if not str(company.get("createdAt") or "").strip():
-                next_item["createdAt"] = item.get("createdAt") or next_item["createdAt"]
+            next_item = _normalize_company_record(company, previous=item)
             companies[idx] = next_item
             found = True
             break
     if not found:
+        next_item = _normalize_company_record(company)
         companies.append(next_item)
     save_companies(companies)
     return next_item
@@ -199,6 +256,7 @@ def create_company(name, created_by_username=""):
         "name": company_name,
         "createdByUsername": str(created_by_username or "").strip(),
         "createdAt": _now_iso(),
+        "createWithPiEnabled": False,
         "connections": empty_connections(),
     }
     return upsert_company(item)
@@ -213,15 +271,59 @@ def save_connections(company_id, connections):
     company = get_company(company_id)
     if not company:
         raise ValueError("company not found")
-    company["connections"] = sanitize_connections(connections)
+    company["connections"] = sanitize_connections(connections, existing=company.get("connections"))
     return upsert_company(company)
 
 
-def channel_settings_key(company_id) -> str:
+def is_create_with_pi_enabled(company_id) -> bool:
+    company = get_company(company_id)
+    if not company:
+        return False
+    return bool(company.get("createWithPiEnabled"))
+
+
+def set_create_with_pi_enabled(company_id, enabled) -> dict:
+    company = get_company(company_id)
+    if not company:
+        raise ValueError("company not found")
+    company["createWithPiEnabled"] = coerce_bool(enabled, default=False)
+    return upsert_company(company)
+
+
+def list_public_companies():
+    return [public_company(item) for item in load_companies()]
+
+
+COMPANY_SCOPED_SETTING_KEYS = frozenset({
+    "dashboard_general_settings",
+    "dashboard_channel_settings",
+    "facebook_templates",
+    "whatsapp_internal_templates",
+    "internal_whatsapp_notifications_config",
+    "auto_reply_settings",
+    "booking_platforms",
+})
+
+
+def scoped_setting_key(key, company_id) -> str:
+    base = str(key or "").strip()
+    if not base:
+        return base
     cid = normalize_company_id(company_id)
-    if cid == DEFAULT_COMPANY_ID:
-        return "dashboard_channel_settings"
-    return f"dashboard_channel_settings__{cid}"
+    if is_default_company(cid):
+        return base
+    suffix = f"__{cid}"
+    if base.endswith(suffix):
+        return base
+    return f"{base}{suffix}"
+
+
+def is_company_scoped_setting_key(key) -> bool:
+    return str(key or "").strip() in COMPANY_SCOPED_SETTING_KEYS
+
+
+def channel_settings_key(company_id) -> str:
+    return scoped_setting_key("dashboard_channel_settings", company_id)
 
 
 def _iter_phone_ids_from_channel_settings(settings):
@@ -304,12 +406,27 @@ def stamp_user_company(user_obj, company_id):
 
 
 _SAFE_URL_RE = re.compile(r"^https?://", re.I)
+_BLOCKED_URL_RE = re.compile(r"^(javascript|data|vbscript|file|about):", re.I)
+_HOST_URL_RE = re.compile(
+    r"^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d{1,5})?(?:[/?#].*)?$",
+    re.I,
+)
+_LOCAL_URL_RE = re.compile(r"^(localhost|127\.0\.0\.1)(?::\d{1,5})?(?:[/?#].*)?$", re.I)
 
 
 def sanitize_public_url(value) -> str:
     url = str(value or "").strip()
     if not url:
         return ""
+    if _BLOCKED_URL_RE.match(url):
+        return ""
+    if url.startswith("//"):
+        url = "https:" + url
+    elif not _SAFE_URL_RE.match(url):
+        if _HOST_URL_RE.match(url) or _LOCAL_URL_RE.match(url):
+            url = "https://" + url
+        else:
+            return ""
     if not _SAFE_URL_RE.match(url):
         return ""
     return url

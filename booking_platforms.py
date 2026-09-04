@@ -205,8 +205,57 @@ def _is_masked(value: Any) -> bool:
     return (not text) or text.startswith("••••")
 
 
-def get_all_platform_settings() -> dict:
-    stored = _load_raw().get("platforms") or {}
+def _request_company_id() -> str:
+    import company_tenancy
+    username = ""
+    try:
+        username = str(request.args.get("actor_username") or "").strip()
+    except Exception:
+        username = ""
+    data = None
+    try:
+        if request.method in ("POST", "PUT", "PATCH"):
+            data = request.get_json(silent=True)
+    except Exception:
+        data = None
+    if isinstance(data, dict):
+        actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+        username = username or str(actor.get("username") or data.get("actor_username") or "").strip()
+    return company_tenancy.resolve_company_id(username=username or None)
+
+
+def _load_company_platform_store(company_id: str) -> dict:
+    import chat_db
+    import company_tenancy
+    raw = chat_db.get_setting(company_tenancy.scoped_setting_key("booking_platforms", company_id))
+    parsed = raw
+    if isinstance(parsed, str) and parsed.strip():
+        try:
+            parsed = json.loads(parsed)
+        except Exception:
+            parsed = {}
+    if not isinstance(parsed, dict):
+        parsed = {}
+    parsed.setdefault("platforms", {})
+    return parsed
+
+
+def _save_company_platform_store(company_id: str, data: dict) -> None:
+    import chat_db
+    import company_tenancy
+    payload = data if isinstance(data, dict) else {"platforms": {}}
+    chat_db.set_setting(
+        company_tenancy.scoped_setting_key("booking_platforms", company_id),
+        json.dumps(payload, ensure_ascii=False),
+    )
+
+
+def get_all_platform_settings(company_id: Optional[str] = None) -> dict:
+    import company_tenancy
+    if company_id and not company_tenancy.is_default_company(company_id):
+        stored = _load_company_platform_store(company_id).get("platforms") or {}
+    else:
+        stored = _load_raw().get("platforms") or {}
     out = {}
     for meta in PLATFORM_CATALOG:
         pid = meta["id"]
@@ -489,12 +538,17 @@ def _sync_gyg_into_config_json(gyg_settings: dict) -> None:
     os.replace(tmp, config_path)
 
 
-def save_platform_settings(platform_id: str, incoming: dict) -> dict:
+def save_platform_settings(platform_id: str, incoming: dict, company_id: Optional[str] = None) -> dict:
+    import company_tenancy
     allowed = {p["id"] for p in PLATFORM_CATALOG}
     if platform_id not in allowed:
         raise ValueError(f"Unknown platform: {platform_id}")
+    is_external = bool(company_id) and not company_tenancy.is_default_company(company_id)
     with _LOCK:
-        data = _load_raw()
+        if is_external:
+            data = _load_company_platform_store(company_id)
+        else:
+            data = _load_raw()
         platforms = data.setdefault("platforms", {})
         current = _default_platform_settings(platform_id)
         if isinstance(platforms.get(platform_id), dict):
@@ -506,13 +560,16 @@ def save_platform_settings(platform_id: str, incoming: dict) -> dict:
             merged["ingest_mode"] = str(incoming.get("ingest_mode"))
         if "supplier_id" in incoming:
             if platform_id == "getyourguide":
-                merged["supplier_id"] = str(incoming.get("supplier_id") or "S707722").strip() or "S707722"
+                merged["supplier_id"] = str(incoming.get("supplier_id") or "").strip()
             else:
                 try:
                     merged["supplier_id"] = int(incoming.get("supplier_id") or 0)
                 except (TypeError, ValueError):
                     merged["supplier_id"] = 0
         platforms[platform_id] = merged
+        if is_external:
+            _save_company_platform_store(company_id, data)
+            return merged
         _save_raw(data)
         if platform_id == "viator":
             _sync_viator_into_config_json(merged)
@@ -564,9 +621,12 @@ def register_booking_platforms_routes(app, agent=None):
         if request.method == "OPTIONS":
             return jsonify({"status": "ok"}), 200
         try:
-            settings = get_all_platform_settings()
-            viator_products = load_viator_products()
-            gyg_products = load_gyg_products()
+            import company_tenancy
+            company_id = _request_company_id()
+            is_fts = company_tenancy.is_default_company(company_id)
+            settings = get_all_platform_settings(None if is_fts else company_id)
+            viator_products = load_viator_products() if is_fts else {"products": [], "currency": "USD"}
+            gyg_products = load_gyg_products() if is_fts else {"products": [], "currency": "EUR"}
             platforms = []
             for meta in PLATFORM_CATALOG:
                 pid = meta["id"]
@@ -578,7 +638,7 @@ def register_booking_platforms_routes(app, agent=None):
                 "status": "success",
                 "platforms": platforms,
                 "viator": {
-                    "health": _viator_health(),
+                    "health": _viator_health() if is_fts else {"status": "idle"},
                     "products": viator_products.get("products") or [],
                     "currency": viator_products.get("currency") or "USD",
                     "base_url": "/viator",
@@ -596,11 +656,11 @@ def register_booking_platforms_routes(app, agent=None):
                     ],
                 },
                 "getyourguide": {
-                    "health": _gyg_health(),
+                    "health": _gyg_health() if is_fts else {"status": "idle"},
                     "products": gyg_products.get("products") or [],
                     "currency": gyg_products.get("currency") or "EUR",
-                    "supplier_id": gyg_products.get("supplier_id") or "S707722",
-                    "supplier_name": gyg_products.get("supplier_name") or "FTS Travels",
+                    "supplier_id": (gyg_products.get("supplier_id") or "") if is_fts else "",
+                    "supplier_name": (gyg_products.get("supplier_name") or "") if is_fts else "",
                     "base_url": "/gyg/1",
                     "endpoints": [
                         {"name": "Health", "method": "GET", "path": "/gyg/health"},
@@ -626,7 +686,18 @@ def register_booking_platforms_routes(app, agent=None):
             platform_id = str(body.get("platform") or "").strip().lower()
             if not platform_id:
                 return jsonify({"status": "error", "message": "platform is required"}), 400
-            saved = save_platform_settings(platform_id, body.get("settings") or {})
+            import company_tenancy
+            company_id = _request_company_id()
+            is_fts = company_tenancy.is_default_company(company_id)
+            saved = save_platform_settings(platform_id, body.get("settings") or {}, None if is_fts else company_id)
+            products = None
+            if not is_fts:
+                return jsonify({
+                    "status": "success",
+                    "platform": platform_id,
+                    "settings": _public_platform(saved),
+                    "products": body.get("products") if isinstance(body.get("products"), list) else [],
+                }), 200
             products = None
             if platform_id == "viator" and isinstance(body.get("products"), list):
                 products = save_viator_products(body.get("products") or [], saved.get("currency") or "USD")

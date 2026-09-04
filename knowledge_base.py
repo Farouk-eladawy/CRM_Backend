@@ -843,7 +843,7 @@ class KnowledgeBase:
         Get full info of a document by ID.
         """
         cur = self.conn.cursor()
-        cur.execute("SELECT id, filename, department, content, upload_date FROM documents WHERE id = ?", (doc_id,))
+        cur.execute("SELECT id, filename, department, content, upload_date, company_id FROM documents WHERE id = ?", (doc_id,))
         row = cur.fetchone()
         if row:
             return {
@@ -851,7 +851,8 @@ class KnowledgeBase:
                 "filename": row[1],
                 "department": row[2],
                 "content": row[3],
-                "upload_date": row[4]
+                "upload_date": row[4],
+                "company_id": row[5] if len(row) > 5 else "fts",
             }
         return None
 
@@ -971,7 +972,7 @@ class KnowledgeBase:
         cur = self.conn.cursor()
         cur.execute(
             """
-            SELECT id, question, answer, department, match_type, is_enabled, created_at, updated_at
+            SELECT id, question, answer, department, match_type, is_enabled, created_at, updated_at, company_id
             FROM strict_qa_rules
             WHERE id = ?
             """,
@@ -989,6 +990,7 @@ class KnowledgeBase:
             "is_enabled": bool(row[5]),
             "created_at": row[6],
             "updated_at": row[7],
+            "company_id": row[8] if len(row) > 8 else "fts",
         }
 
     def update_strict_qa_rule(self, rule_id, question=None, answer=None, department=None, match_type=None, is_enabled=None):

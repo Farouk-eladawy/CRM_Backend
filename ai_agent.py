@@ -5034,6 +5034,19 @@ class AIAgent:
         }
         return mapping.get(role, role or "other")
 
+    def _auto_reply_sets_for_company(self, company_id=None):
+        cid = company_tenancy.normalize_company_id(company_id)
+        if company_tenancy.is_default_company(cid):
+            auto_locations = set(self.config.get("auto_reply_locations", ["Hurghada/Cairo", "Sharm"]) or [])
+            draft_locations = set(self.config.get("auto_reply_draft_locations", []) or [])
+            return auto_locations, draft_locations
+        raw = _read_json_setting_value(company_tenancy.scoped_setting_key("auto_reply_settings", cid), {}) or {}
+        if not isinstance(raw, dict):
+            raw = {}
+        auto_locations = {str(x).strip() for x in (raw.get("auto_reply_locations") or []) if str(x).strip()}
+        draft_locations = {str(x).strip() for x in (raw.get("auto_reply_draft_locations") or []) if str(x).strip()}
+        return auto_locations, draft_locations
+
     def _record_ai_usage_from_result(
         self,
         result=None,
@@ -12117,9 +12130,13 @@ Conversation:
         except Exception:
             pass
 
-        # Load auto locations dynamically from config
-        auto_locations = set(self.config.get("auto_reply_locations", ["Hurghada/Cairo", "Sharm"]))
-        draft_locations = set(self.config.get("auto_reply_draft_locations", []))
+        # Load auto-reply locations for this chat's company only
+        chat_company_id = None
+        try:
+            chat_company_id = (chat_conv or {}).get("company_id")
+        except Exception:
+            chat_company_id = None
+        auto_locations, draft_locations = self._auto_reply_sets_for_company(chat_company_id)
         is_auto_location = location in auto_locations
         is_draft_location = location in draft_locations
 
@@ -12872,19 +12889,22 @@ Conversation:
             import chat_db
             from datetime import datetime
 
-            auto_locations = set(self.config.get("auto_reply_locations", ["Hurghada/Cairo", "Sharm"]))
-            draft_locations = set(self.config.get("auto_reply_draft_locations", []))
-            all_auto_locations = auto_locations.union(draft_locations)
-            
+            processed = 0
             now_cairo = datetime.now(timezone.utc).replace(tzinfo=None) + CAIRO_OFFSET
-
             try:
                 _limit_i = int(limit or 0)
             except Exception:
                 _limit_i = 20
             page_size = max(200, min(2000, _limit_i * 50))
-            conversations = (chat_db.get_conversations_page(limit=page_size, offset=0, locations=list(all_auto_locations), source="whatsapp") or {}).get("items") or []
-            processed = 0
+            conversations = []
+            for company in (company_tenancy.load_companies() or [company_tenancy.default_fts_company()]):
+                cid = company.get("id") if isinstance(company, dict) else company_tenancy.DEFAULT_COMPANY_ID
+                auto_locations, draft_locations = self._auto_reply_sets_for_company(cid)
+                all_auto_locations = auto_locations.union(draft_locations)
+                if not all_auto_locations:
+                    continue
+                page_items = (chat_db.get_conversations_page(limit=page_size, offset=0, locations=list(all_auto_locations), source="whatsapp", company_id=cid) or {}).get("items") or []
+                conversations.extend(page_items)
 
             for conv in conversations:
                 if processed >= int(limit or 0):
@@ -12893,6 +12913,8 @@ Conversation:
                     if str(conv.get("source") or "").lower() != "whatsapp":
                         continue
                     location = str(conv.get("location") or "").strip()
+                    auto_locations, draft_locations = self._auto_reply_sets_for_company(conv.get("company_id"))
+                    all_auto_locations = auto_locations.union(draft_locations)
                     if location not in all_auto_locations:
                         continue
                     if int(conv.get("sales_inbox") or 0) == 1:
@@ -14572,9 +14594,16 @@ Conversation:
             if not facebook_auto_reply_enabled:
                 logging.info("Facebook auto-reply disabled by configuration.")
                 return
-            
-            auto_locations = set(self.config.get("auto_reply_locations", ["Hurghada/Cairo", "Sharm"]))
-            draft_locations = set(self.config.get("auto_reply_draft_locations", []))
+
+            fb_company_id = None
+            try:
+                fb_company_id = (chat_conv or {}).get("company_id")
+            except Exception:
+                fb_company_id = None
+            if fb_company_id and not company_tenancy.is_default_company(fb_company_id):
+                return
+
+            auto_locations, draft_locations = self._auto_reply_sets_for_company(fb_company_id)
             is_auto_location = location in auto_locations
             is_draft_location = location in draft_locations
 
@@ -19113,7 +19142,9 @@ Conversation:
                 return status
             return _start_embedded_evolution_service()
 
-        def _default_internal_whatsapp_config():
+        def _default_internal_whatsapp_config(company_id=None):
+            cid = company_tenancy.normalize_company_id(company_id) if company_id is not None else company_tenancy.DEFAULT_COMPANY_ID
+            is_fts = company_tenancy.is_default_company(cid)
             try:
                 port = int(((self.config.get("whatsapp", {}) or {}).get("port") or 5001))
             except Exception:
@@ -19121,12 +19152,12 @@ Conversation:
             return {
                 "enabled": True,
                 "provider": "evolution",
-                "useInternalEvolutionService": True,
+                "useInternalEvolutionService": bool(is_fts),
                 "channelName": "Internal Notifications",
-                "instanceName": "fts_internal_notifications",
+                "instanceName": "fts_internal_notifications" if is_fts else f"internal_{cid}",
                 "whatsappNumber": "",
-                "providerBaseUrl": _embedded_evolution_base_url(),
-                "apiKey": _embedded_evolution_api_key(),
+                "providerBaseUrl": _embedded_evolution_base_url() if is_fts else "",
+                "apiKey": _embedded_evolution_api_key() if is_fts else "",
                 "webhookUrl": f"http://127.0.0.1:{port}/api/internal_notifications/whatsapp/webhook",
                 "assignedTeams": ["Operations"],
                 "notes": "",
@@ -19292,10 +19323,12 @@ Conversation:
             safe_username = re.sub(r"[^A-Za-z0-9_]+", "", str(username or "").strip())[:24] or "user"
             return f"FTSUSR_{safe_username}_{secrets.token_urlsafe(24)}"
 
-        def _load_internal_whatsapp_config():
-            cfg = _default_internal_whatsapp_config()
+        def _load_internal_whatsapp_config(company_id=None):
+            cid = company_tenancy.normalize_company_id(company_id) if company_id is not None else company_tenancy.DEFAULT_COMPANY_ID
+            settings_key = company_tenancy.scoped_setting_key(_internal_whatsapp_settings_key, cid)
+            cfg = _default_internal_whatsapp_config(cid)
             try:
-                raw = chat_db.get_setting(_internal_whatsapp_settings_key)
+                raw = chat_db.get_setting(settings_key)
                 parsed = raw
                 if isinstance(parsed, str) and parsed.strip():
                     try:
@@ -19315,26 +19348,48 @@ Conversation:
             cfg["providerBaseUrl"] = _sanitize_url_field(cfg.get("providerBaseUrl"))
             cfg["webhookUrl"] = _sanitize_url_field(cfg.get("webhookUrl"))
             cfg["apiKey"] = str(cfg.get("apiKey") or "").strip().strip("`").strip()
-            if cfg["useInternalEvolutionService"]:
+            if company_tenancy.is_default_company(cid) and cfg["useInternalEvolutionService"]:
                 cfg["providerBaseUrl"] = _embedded_evolution_base_url()
                 if not str(cfg.get("apiKey") or "").strip():
                     cfg["apiKey"] = _embedded_evolution_api_key()
+            elif not company_tenancy.is_default_company(cid):
+                cfg["useInternalEvolutionService"] = False
+                embedded_key = str(_embedded_evolution_api_key() or "").strip()
+                embedded_url = str(_embedded_evolution_base_url() or "").strip()
+                if embedded_key and str(cfg.get("apiKey") or "").strip() == embedded_key:
+                    cfg["apiKey"] = ""
+                if embedded_url and str(cfg.get("providerBaseUrl") or "").strip() == embedded_url:
+                    cfg["providerBaseUrl"] = ""
+                if str(cfg.get("instanceName") or "").strip() == "fts_internal_notifications":
+                    cfg["instanceName"] = f"internal_{cid}"
             return cfg
 
-        def _save_internal_whatsapp_config(cfg):
-            merged = _default_internal_whatsapp_config()
+        def _save_internal_whatsapp_config(cfg, company_id=None):
+            cid = company_tenancy.normalize_company_id(company_id) if company_id is not None else company_tenancy.DEFAULT_COMPANY_ID
+            settings_key = company_tenancy.scoped_setting_key(_internal_whatsapp_settings_key, cid)
+            merged = _default_internal_whatsapp_config(cid)
             if isinstance(cfg, dict):
                 merged.update(cfg)
             merged["useInternalEvolutionService"] = bool(merged.get("useInternalEvolutionService", True))
             merged["providerBaseUrl"] = _sanitize_url_field(merged.get("providerBaseUrl"))
             merged["webhookUrl"] = _sanitize_url_field(merged.get("webhookUrl"))
             merged["apiKey"] = str(merged.get("apiKey") or "").strip().strip("`").strip()
-            if merged["useInternalEvolutionService"]:
+            if company_tenancy.is_default_company(cid) and merged["useInternalEvolutionService"]:
                 merged["providerBaseUrl"] = _embedded_evolution_base_url()
                 if not str(merged.get("apiKey") or "").strip():
                     merged["apiKey"] = _embedded_evolution_api_key()
+            elif not company_tenancy.is_default_company(cid):
+                merged["useInternalEvolutionService"] = False
+                embedded_key = str(_embedded_evolution_api_key() or "").strip()
+                embedded_url = str(_embedded_evolution_base_url() or "").strip()
+                if embedded_key and str(merged.get("apiKey") or "").strip() == embedded_key:
+                    merged["apiKey"] = ""
+                if embedded_url and str(merged.get("providerBaseUrl") or "").strip() == embedded_url:
+                    merged["providerBaseUrl"] = ""
+                if str(merged.get("instanceName") or "").strip() == "fts_internal_notifications":
+                    merged["instanceName"] = f"internal_{cid}"
             try:
-                chat_db.set_setting(_internal_whatsapp_settings_key, json.dumps(merged, ensure_ascii=False))
+                chat_db.set_setting(settings_key, json.dumps(merged, ensure_ascii=False))
             except Exception:
                 pass
             return merged
@@ -28306,13 +28361,13 @@ Rules:
                     booking_record = None
             return _format_lookup_summary(match, booking_record, intent=intent, user_request=message_text)
 
-        def _refresh_internal_whatsapp_status(cfg):
+        def _refresh_internal_whatsapp_status(cfg, company_id=None):
             cfg = dict(cfg or {})
             qr_data = str(cfg.get("qrCodeDataUrl") or "").strip() or None
             instance_name = str(cfg.get("instanceName") or "").strip()
             if not instance_name:
                 cfg["connectionStatus"] = "not_connected"
-                return _save_internal_whatsapp_config(cfg)
+                return _save_internal_whatsapp_config(cfg, company_id)
             try:
                 status_code, payload = _evolution_request("GET", cfg, f"/instance/connectionState/{quote(instance_name)}", timeout=12)
                 state = _extract_connection_state(payload)
@@ -28331,7 +28386,7 @@ Rules:
                 _ensure_internal_whatsapp_webhook(cfg)
             except Exception as e:
                 logging.warning(f"Internal WhatsApp webhook ensure failed during status refresh: {e}")
-            return _save_internal_whatsapp_config(cfg)
+            return _save_internal_whatsapp_config(cfg, company_id)
 
         def _internal_whatsapp_webhook_events():
             return [
@@ -28389,7 +28444,7 @@ Rules:
                     logging.warning(f"Internal WhatsApp webhook setup failed: {e}")
             return create_status_code, create_payload_response
 
-        def _request_internal_whatsapp_qr(cfg):
+        def _request_internal_whatsapp_qr(cfg, company_id=None):
             cfg = dict(cfg or {})
             create_status_code, create_payload_response = _upsert_internal_whatsapp_instance(cfg)
             instance_name = str(cfg.get("instanceName") or "").strip()
@@ -28403,7 +28458,7 @@ Rules:
             if cfg["connectionStatus"] == "connected":
                 cfg["lastConnectedAt"] = _utc_iso_now()
                 cfg["qrCodeDataUrl"] = ""
-            saved = _save_internal_whatsapp_config(cfg)
+            saved = _save_internal_whatsapp_config(cfg, company_id)
             return status_code, payload, saved, create_status_code, create_payload_response
         
         # --- FRONTEND DASHBOARD APIs ---
@@ -28718,6 +28773,11 @@ Rules:
             role = str(matched.get("role") or "").strip().lower()
             if role != "admin":
                 return False, matched, "Admin privileges required for Create with PI"
+
+            if company_tenancy.is_primary_admin(matched):
+                return True, matched, None
+            if not company_tenancy.is_create_with_pi_enabled(company_tenancy.user_company_id(matched)):
+                return False, matched, "Create with PI is a subscription feature. Ask Admin Manager to enable it for this company."
 
             return True, matched, None
 
@@ -31981,10 +32041,12 @@ Prefer the MarkItDown Extraction section below when present.
                 actor_role = request.args.get('actor_role') or ""
                 resolved = _resolve_actor(actor_user_id, actor_role)
                 is_admin = _actor_is_admin(resolved)
+                company_id = company_tenancy.resolve_company_id(username=actor_user_id, user_id=actor_user_id)
                 chats = chat_db.list_sales_customers(
                     actor_user_id=str(resolved.get("user_id") or ""),
                     is_admin=bool(is_admin),
                     locations=["sales"],
+                    company_id=company_id,
                 )
                 return jsonify({"status": "success", "data": chats}), 200
             except Exception as e:
@@ -31998,10 +32060,12 @@ Prefer the MarkItDown Extraction section below when present.
                 actor_role = request.args.get('actor_role') or ""
                 resolved = _resolve_actor(actor_user_id, actor_role)
                 is_admin = _actor_is_admin(resolved)
+                company_id = company_tenancy.resolve_company_id(username=actor_user_id, user_id=actor_user_id)
                 data = chat_db.compute_sales_daily_tasks(
                     actor_user_id=str(resolved.get("user_id") or ""),
                     is_admin=bool(is_admin),
                     locations=["sales"],
+                    company_id=company_id,
                 )
                 return jsonify({"status": "success", "data": data}), 200
             except Exception as e:
@@ -35147,6 +35211,19 @@ Write ONE short message only. No JSON. No explanations."""
                 import requests
                 location = request.args.get('location', 'default')
                 include_pending = str(request.args.get('include_pending') or '').strip().lower() in ('1', 'true', 'yes')
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({
+                        "status": "success",
+                        "data": [],
+                        "from": {"location": location},
+                        "meta": {
+                            "approved_count": 0,
+                            "pending_count": 0,
+                            "other_count": 0,
+                            "pages_fetched": 0,
+                            "include_pending": bool(include_pending),
+                        },
+                    }), 200
                 token = self._get_whatsapp_access_token()
 
                 waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {})
@@ -36693,6 +36770,22 @@ Write ONE short message only. No JSON. No explanations."""
         @cross_origin()
         def facebook_status():
             try:
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({
+                        "status": "success",
+                        "data": {
+                            "connected": False,
+                            "graph_ok": False,
+                            "page_id": "",
+                            "page_name": "",
+                            "connected_at": "",
+                            "auth_mode": "",
+                            "auto_reply_enabled": False,
+                            "subscribed_to_app": None,
+                            "routing_location": "",
+                            "last_error": None,
+                        },
+                    })
                 config_path = os.path.join(SCRIPT_DIR, get_data_path(get_data_path('config.json')))
                 config_data = {}
                 try:
@@ -36787,6 +36880,8 @@ Write ONE short message only. No JSON. No explanations."""
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             try:
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({"status": "error", "message": "Facebook auto-reply is available for FTS only"}), 403
                 data = request.json or {}
                 enabled = bool(data.get("enabled"))
                 self.config["facebook_auto_reply_enabled"] = enabled
@@ -36808,6 +36903,8 @@ Write ONE short message only. No JSON. No explanations."""
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             try:
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({"status": "error", "message": "Facebook routing is available for FTS only"}), 403
                 data = request.json or {}
                 routing_location = str(data.get("routing_location") or "All").strip()
                 
@@ -37093,6 +37190,8 @@ Write ONE short message only. No JSON. No explanations."""
                 rule_info = agent.kb.get_strict_qa_rule(rule_id)
                 if not rule_info:
                     return jsonify({"status": "error", "message": "Strict Q/A rule not found"}), 404
+                if company_tenancy.normalize_company_id(rule_info.get("company_id")) != _actor_company_id_from_request():
+                    return jsonify({"status": "error", "message": "Strict Q/A rule not found"}), 404
 
                 if actor_username:
                     val = chat_db.get_setting("dashboard_users")
@@ -37177,6 +37276,8 @@ Write ONE short message only. No JSON. No explanations."""
                 actor_username = request.args.get('actor_username') or (request.json.get('actor_username') if request.is_json else None)
                 doc_info = agent.kb.get_document_info(doc_id)
                 if not doc_info:
+                    return jsonify({"status": "error", "message": "Document not found"}), 404
+                if company_tenancy.normalize_company_id(doc_info.get("company_id")) != _actor_company_id_from_request():
                     return jsonify({"status": "error", "message": "Document not found"}), 404
                 
                 # Verify permissions
@@ -37411,6 +37512,9 @@ Write ONE short message only. No JSON. No explanations."""
         @app.route('/api/operations/bookings', methods=['GET'])
         def api_get_operations_bookings():
             try:
+                actor_company_id = _actor_company_id_from_request()
+                if not company_tenancy.is_default_company(actor_company_id):
+                    return jsonify({"status": "success", "data": [], "offset": None})
                 view_name = request.args.get('view')
                 offset_param = request.args.get('offset')
                 limit_param = request.args.get('limit')
@@ -37724,6 +37828,9 @@ Write ONE short message only. No JSON. No explanations."""
         def api_operations_bookings_query():
             try:
                 data = request.json or {}
+                actor_company_id = _actor_company_id_from_request()
+                if not company_tenancy.is_default_company(actor_company_id):
+                    return jsonify({"status": "success", "data": [], "offset": None})
                 view_name = data.get('view')
                 offset_param = data.get('offset')
                 limit_param = data.get('limit')
@@ -39298,7 +39405,7 @@ Write ONE short message only. No JSON. No explanations."""
                 return jsonify({"status": "success"}), 200
             company_id = _actor_company_id_from_request()
             company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
-            return jsonify({"status": "success", "data": company}), 200
+            return jsonify({"status": "success", "data": company_tenancy.public_company(company)}), 200
 
         @app.route('/api/company/connections', methods=['GET', 'POST', 'OPTIONS'])
         def api_company_connections():
@@ -39315,6 +39422,7 @@ Write ONE short message only. No JSON. No explanations."""
                         "companyId": company_id,
                         "companyName": company.get("name"),
                         "isDefaultCompany": company_tenancy.is_default_company(company_id),
+                        "createWithPiEnabled": bool(company.get("createWithPiEnabled")),
                         "connections": company_tenancy.get_connections(company_id),
                     },
                 }), 200
@@ -39327,63 +39435,112 @@ Write ONE short message only. No JSON. No explanations."""
             if actor_role.lower() != "admin":
                 return jsonify({"status": "error", "message": "Only company admins can update connections"}), 403
             raw_conn = data.get("connections") if isinstance(data.get("connections"), dict) else data
-            next_conn = company_tenancy.sanitize_connections(raw_conn)
-            next_conn["baserowMainUrl"] = company_tenancy.sanitize_public_url(next_conn.get("baserowMainUrl"))
-            next_conn["baserowReligiousUrl"] = company_tenancy.sanitize_public_url(next_conn.get("baserowReligiousUrl"))
-            next_conn["transportUrl"] = company_tenancy.sanitize_public_url(next_conn.get("transportUrl"))
-            saved = company_tenancy.save_connections(company_id, next_conn)
+            saved = company_tenancy.save_connections(company_id, raw_conn)
+            saved_conn = company_tenancy.get_connections(company_id)
             return jsonify({
                 "status": "success",
                 "data": {
                     "companyId": company_id,
                     "companyName": saved.get("name"),
                     "isDefaultCompany": company_tenancy.is_default_company(company_id),
-                    "connections": saved.get("connections"),
+                    "createWithPiEnabled": bool(saved.get("createWithPiEnabled")),
+                    "connections": saved_conn,
                 },
             }), 200
+
+        def _require_primary_admin_actor():
+            username = ""
+            try:
+                username = str(request.args.get("actor_username") or "").strip()
+            except Exception:
+                username = ""
+            data = request.get_json(silent=True) if request.method in ("POST", "PUT", "PATCH") else None
+            if isinstance(data, dict):
+                actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+                username = username or str(actor.get("username") or data.get("actor_username") or "").strip()
+            actor_user = company_tenancy.find_dashboard_user(username=username or None)
+            if not company_tenancy.is_primary_admin(actor_user):
+                return None, (jsonify({"status": "error", "message": "Admin Manager only"}), 403)
+            return actor_user, None
+
+        @app.route('/api/admin/companies', methods=['GET', 'OPTIONS'])
+        def api_admin_companies():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            _actor_user, err = _require_primary_admin_actor()
+            if err:
+                return err
+            return jsonify({"status": "success", "data": company_tenancy.list_public_companies()}), 200
+
+        @app.route('/api/admin/companies/<company_id>/features', methods=['POST', 'OPTIONS'])
+        def api_admin_company_features(company_id):
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            _actor_user, err = _require_primary_admin_actor()
+            if err:
+                return err
+            data = request.json or {}
+            try:
+                saved = company_tenancy.set_create_with_pi_enabled(
+                    company_id,
+                    data.get("createWithPiEnabled"),
+                )
+            except ValueError as e:
+                return jsonify({"status": "error", "message": str(e)}), 404
+            return jsonify({"status": "success", "data": company_tenancy.public_company(saved)}), 200
 
         @app.route('/api/auto_reply_settings', methods=['GET', 'POST', 'OPTIONS'])
         def api_auto_reply_settings():
             if request.method == 'OPTIONS':
                 return jsonify({"status": "ok"}), 200
             try:
+                company_id = _actor_company_id_from_request()
+                current_auto, current_draft = self._auto_reply_sets_for_company(company_id)
                 if request.method == 'GET':
-                    auto_locations = self.config.get("auto_reply_locations", ["Hurghada/Cairo", "Sharm"])
-                    draft_locations = self.config.get("auto_reply_draft_locations", [])
-                    return jsonify({"status": "success", "auto_reply_locations": list(auto_locations), "auto_reply_draft_locations": list(draft_locations)})
+                    return jsonify({
+                        "status": "success",
+                        "auto_reply_locations": list(current_auto),
+                        "auto_reply_draft_locations": list(current_draft),
+                    })
 
-                elif request.method == 'POST':
-                    data = request.json or {}
-                    location = data.get("location")
-                    mode = data.get("mode") # "auto", "draft", "disabled"
-                    
-                    if not location:
-                        return jsonify({"status": "error", "message": "Location is required"}), 400
-                        
-                    current_auto = set(self.config.get("auto_reply_locations", ["Hurghada/Cairo", "Sharm"]))
-                    current_draft = set(self.config.get("auto_reply_draft_locations", []))
-                    
-                    if mode == "auto":
-                        current_auto.add(location)
-                        current_draft.discard(location)
-                    elif mode == "draft":
-                        current_draft.add(location)
-                        current_auto.discard(location)
-                    else: # disabled
-                        current_auto.discard(location)
-                        current_draft.discard(location)
-                        
-                    # Save to config
+                data = request.json or {}
+                location = data.get("location")
+                mode = data.get("mode") # "auto", "draft", "disabled"
+                if not location:
+                    return jsonify({"status": "error", "message": "Location is required"}), 400
+
+                if mode == "auto":
+                    current_auto.add(location)
+                    current_draft.discard(location)
+                elif mode == "draft":
+                    current_draft.add(location)
+                    current_auto.discard(location)
+                else:
+                    current_auto.discard(location)
+                    current_draft.discard(location)
+
+                if company_tenancy.is_default_company(company_id):
                     self.config["auto_reply_locations"] = list(current_auto)
                     self.config["auto_reply_draft_locations"] = list(current_draft)
-                    
                     import json
                     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), get_data_path(get_data_path('config.json')))
                     with open(config_path, 'w', encoding='utf-8') as f:
                         json.dump(self.config, f, indent=2, ensure_ascii=False)
-                        
-                    logging.info(f"Auto-reply settings updated: {location} -> {mode}")
-                    return jsonify({"status": "success", "auto_reply_locations": list(current_auto), "auto_reply_draft_locations": list(current_draft)})
+                else:
+                    chat_db.set_setting(
+                        company_tenancy.scoped_setting_key("auto_reply_settings", company_id),
+                        json.dumps({
+                            "auto_reply_locations": list(current_auto),
+                            "auto_reply_draft_locations": list(current_draft),
+                        }, ensure_ascii=False),
+                    )
+
+                logging.info(f"Auto-reply settings updated: {location} -> {mode} company={company_id}")
+                return jsonify({
+                    "status": "success",
+                    "auto_reply_locations": list(current_auto),
+                    "auto_reply_draft_locations": list(current_draft),
+                })
             except Exception as e:
                 logging.error(f"Error in /api/auto_reply_settings: {e}")
                 return jsonify({"status": "error", "message": str(e)}), 500
@@ -39396,7 +39553,7 @@ Write ONE short message only. No JSON. No explanations."""
                 import chat_db
                 from_date = str(request.args.get("from") or "").strip()
                 to_date = str(request.args.get("to") or "").strip()
-                report = chat_db.get_ai_usage_report(from_date, to_date)
+                report = chat_db.get_ai_usage_report(from_date, to_date, company_id=_actor_company_id_from_request())
                 rates = chat_db.get_ai_usage_rates()
                 return jsonify({
                     "status": "success",
@@ -39416,8 +39573,10 @@ Write ONE short message only. No JSON. No explanations."""
                 return jsonify({"status": "ok"}), 200
             try:
                 import chat_db
-                if request.method == 'GET':
+                if request.method == "GET":
                     return jsonify({"status": "success", "data": chat_db.get_ai_usage_rates()})
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({"status": "error", "message": "AI usage rates are managed by Admin Manager"}), 403
                 data = request.json or {}
                 saved = chat_db.save_ai_usage_rates(data)
                 return jsonify({"status": "success", "data": saved})
@@ -39512,10 +39671,13 @@ Write ONE short message only. No JSON. No explanations."""
                     return bool(user_teams.intersection(set(actor_teams or [])))
 
                 if request.method == 'GET':
+                    actor_company_id = _actor_company_id_from_request()
                     if str(key) == "dashboard_channel_settings":
-                        actor_company_id = _actor_company_id_from_request()
                         return jsonify({"status": "success", "value": _get_channel_settings_for_company(actor_company_id)})
-                    val = chat_db.get_setting(key)
+                    read_key = key
+                    if company_tenancy.is_company_scoped_setting_key(key):
+                        read_key = company_tenancy.scoped_setting_key(key, actor_company_id)
+                    val = chat_db.get_setting(read_key)
                     if str(key) == "dashboard_users":
                         try:
                             import json
@@ -39781,12 +39943,12 @@ Write ONE short message only. No JSON. No explanations."""
                             logging.warning(f"admin_pi_sessions preserve merge skipped: {pi_merge_err}")
 
                     write_key = key
-                    if str(key) == "dashboard_channel_settings":
+                    if company_tenancy.is_company_scoped_setting_key(key):
                         actor_company_id = company_tenancy.resolve_company_id(
                             username=str((actor or {}).get("username") or actor_user_id or "").strip() or None,
                             user_id=str(actor_user_id or "").strip() or None,
                         )
-                        write_key = company_tenancy.channel_settings_key(actor_company_id)
+                        write_key = company_tenancy.scoped_setting_key(key, actor_company_id)
 
                     _write_setting_value(write_key, val)
                     if str(key) == "dashboard_channel_settings" and company_tenancy.is_default_company(
@@ -39917,12 +40079,14 @@ Write ONE short message only. No JSON. No explanations."""
         @app.route('/api/internal_notifications/whatsapp/status', methods=['GET'])
         def api_internal_notifications_whatsapp_status():
             try:
-                cfg = _load_internal_whatsapp_config()
-                service_status = _collect_embedded_evolution_service_status()
+                cid = _actor_company_id_from_request()
+                cfg = _load_internal_whatsapp_config(cid)
+                service_status = _collect_embedded_evolution_service_status() if company_tenancy.is_default_company(cid) else None
                 refresh = str(request.args.get("refresh") or "true").strip().lower() not in ("0", "false", "no")
                 if refresh and str(cfg.get("providerBaseUrl") or "").strip() and str(cfg.get("apiKey") or "").strip():
-                    cfg = _refresh_internal_whatsapp_status(cfg)
-                    service_status = _collect_embedded_evolution_service_status()
+                    cfg = _refresh_internal_whatsapp_status(cfg, cid)
+                    if company_tenancy.is_default_company(cid):
+                        service_status = _collect_embedded_evolution_service_status()
                 return jsonify({"status": "success", "data": {"config": cfg, "service": service_status}}), 200
             except Exception as e:
                 logging.error(f"Error in /api/internal_notifications/whatsapp/status: {e}", exc_info=True)
@@ -39931,6 +40095,8 @@ Write ONE short message only. No JSON. No explanations."""
         @app.route('/api/internal_notifications/whatsapp/service_status', methods=['GET'])
         def api_internal_notifications_whatsapp_service_status():
             try:
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({"status": "success", "data": None}), 200
                 return jsonify({"status": "success", "data": _collect_embedded_evolution_service_status()}), 200
             except Exception as e:
                 logging.error(f"Error in /api/internal_notifications/whatsapp/service_status: {e}", exc_info=True)
@@ -39946,8 +40112,11 @@ Write ONE short message only. No JSON. No explanations."""
                 role = str(actor.get("role") or "").strip().lower()
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
+                cid = _actor_company_id_from_request()
+                if not company_tenancy.is_default_company(cid):
+                    return jsonify({"status": "error", "message": "Embedded WhatsApp service is available for FTS only"}), 403
                 service_status = _start_embedded_evolution_service()
-                cfg = _save_internal_whatsapp_config(_load_internal_whatsapp_config())
+                cfg = _save_internal_whatsapp_config(_load_internal_whatsapp_config(cid), cid)
                 return jsonify({"status": "success", "data": {"service": service_status, "config": cfg}}), 200
             except Exception as e:
                 logging.error(f"Error in /api/internal_notifications/whatsapp/service_start: {e}", exc_info=True)
@@ -39963,6 +40132,8 @@ Write ONE short message only. No JSON. No explanations."""
                 role = str(actor.get("role") or "").strip().lower()
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
+                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                    return jsonify({"status": "error", "message": "Embedded WhatsApp service is available for FTS only"}), 403
                 service_status = _stop_embedded_evolution_service()
                 return jsonify({"status": "success", "data": {"service": service_status}}), 200
             except Exception as e:
@@ -39982,6 +40153,8 @@ Write ONE short message only. No JSON. No explanations."""
                     return jsonify({"status": "error", "message": "Forbidden"}), 403
 
                 users_list = _load_dashboard_users_list()
+                actor_company_id = company_tenancy.resolve_company_id(username=actor_username)
+                users_list = [u for u in users_list if company_tenancy.user_company_id(u) == actor_company_id]
                 keys_map = _load_dashboard_user_api_keys()
                 by_username = {str(u.get("username") or "").strip(): u for u in users_list if str(u.get("username") or "").strip()}
 
@@ -40233,6 +40406,8 @@ Write ONE short message only. No JSON. No explanations."""
                     return jsonify({"status": "error", "message": "Admin only"}), 403
 
                 users_list = _load_dashboard_users_list()
+                actor_company_id = company_tenancy.resolve_company_id(username=actor_username)
+                users_list = [u for u in users_list if company_tenancy.user_company_id(u) == actor_company_id]
                 keys_map = _load_dashboard_user_api_keys()
                 connections_map = _load_dashboard_user_whatsapp_connections()
                 changed = False
@@ -40526,11 +40701,12 @@ Write ONE short message only. No JSON. No explanations."""
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
 
-                current_cfg = _load_internal_whatsapp_config()
+                cid = _actor_company_id_from_request()
+                current_cfg = _load_internal_whatsapp_config(cid)
                 incoming_cfg = data.get("config")
                 if isinstance(incoming_cfg, dict):
                     current_cfg.update(incoming_cfg)
-                current_cfg = _save_internal_whatsapp_config(current_cfg)
+                current_cfg = _save_internal_whatsapp_config(current_cfg, cid)
 
                 if not str(current_cfg.get("providerBaseUrl") or "").strip():
                     return jsonify({"status": "error", "message": "providerBaseUrl is required"}), 400
@@ -40539,10 +40715,10 @@ Write ONE short message only. No JSON. No explanations."""
                 if not str(current_cfg.get("instanceName") or "").strip():
                     return jsonify({"status": "error", "message": "instanceName is required"}), 400
 
-                if bool(current_cfg.get("useInternalEvolutionService", True)):
+                if company_tenancy.is_default_company(cid) and bool(current_cfg.get("useInternalEvolutionService", True)):
                     _ensure_embedded_evolution_service_running()
-                status_code, payload, saved, create_status_code, create_payload_response = _request_internal_whatsapp_qr(current_cfg)
-                service_status = _collect_embedded_evolution_service_status()
+                status_code, payload, saved, create_status_code, create_payload_response = _request_internal_whatsapp_qr(current_cfg, cid)
+                service_status = _collect_embedded_evolution_service_status() if company_tenancy.is_default_company(cid) else None
                 return jsonify({
                     "status": "success",
                     "data": {
@@ -40569,7 +40745,8 @@ Write ONE short message only. No JSON. No explanations."""
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
 
-                cfg = _load_internal_whatsapp_config()
+                cid = _actor_company_id_from_request()
+                cfg = _load_internal_whatsapp_config(cid)
                 instance_name = str(cfg.get("instanceName") or "").strip()
                 if not instance_name:
                     return jsonify({"status": "error", "message": "instanceName is required"}), 400
@@ -40589,7 +40766,7 @@ Write ONE short message only. No JSON. No explanations."""
                 cfg["connectionStatus"] = "not_connected"
                 cfg["qrCodeDataUrl"] = ""
                 cfg["lastQrUpdatedAt"] = ""
-                saved = _save_internal_whatsapp_config(cfg)
+                saved = _save_internal_whatsapp_config(cfg, cid)
                 return jsonify({
                     "status": "success",
                     "data": {

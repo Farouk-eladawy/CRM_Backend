@@ -4339,7 +4339,7 @@ def get_sales_state(chat_id):
     except sqlite3.OperationalError:
         return None
 
-def list_sales_customers(actor_user_id=None, is_admin=False, locations=None):
+def list_sales_customers(actor_user_id=None, is_admin=False, locations=None, company_id=None):
     try:
         with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
             conn.row_factory = sqlite3.Row
@@ -4356,6 +4356,9 @@ def list_sales_customers(actor_user_id=None, is_admin=False, locations=None):
 
             where = []
             params = []
+            resolved_company_id = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
+            where.append("COALESCE(NULLIF(c.company_id, ''), 'fts') = ?")
+            params.append(resolved_company_id)
             if not is_admin:
                 where.append("(c.lead_owner_user_id IS NULL OR c.lead_owner_user_id = '' OR c.lead_owner_user_id = ?)")
                 params.append(str(actor_user_id or ""))
@@ -4407,10 +4410,10 @@ def list_sales_customers(actor_user_id=None, is_admin=False, locations=None):
     except sqlite3.OperationalError:
         return []
 
-def compute_sales_daily_tasks(actor_user_id=None, is_admin=False, locations=None):
+def compute_sales_daily_tasks(actor_user_id=None, is_admin=False, locations=None, company_id=None):
     from datetime import datetime, date
 
-    chats = list_sales_customers(actor_user_id=actor_user_id, is_admin=is_admin, locations=locations)
+    chats = list_sales_customers(actor_user_id=actor_user_id, is_admin=is_admin, locations=locations, company_id=company_id)
     today = date.today().isoformat()
     out = {
         "followups_today": [],
@@ -4906,9 +4909,10 @@ def _ai_usage_date_bounds(from_date, to_date):
     return f"{start}T00:00:00", f"{end}T23:59:59.999999"
 
 
-def get_ai_usage_report(from_date=None, to_date=None):
+def get_ai_usage_report(from_date=None, to_date=None, company_id=None):
     start, end = _ai_usage_date_bounds(from_date, to_date)
     rates = get_ai_usage_rates()
+    resolved_company_id = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
     empty = {
         "from": start[:10],
         "to": end[:10],
@@ -4938,14 +4942,16 @@ def get_ai_usage_report(from_date=None, to_date=None):
             c.execute(
                 """
                 SELECT
-                    created_at, department, source, system_role, provider, model,
-                    prompt_tokens, completion_tokens, total_tokens,
-                    prompt_cache_hit_tokens, prompt_cache_miss_tokens,
-                    pricing_tier, cost_usd, estimated
-                FROM ai_usage_events
-                WHERE created_at >= ? AND created_at <= ?
+                    e.created_at, e.department, e.source, e.system_role, e.provider, e.model,
+                    e.prompt_tokens, e.completion_tokens, e.total_tokens,
+                    e.prompt_cache_hit_tokens, e.prompt_cache_miss_tokens,
+                    e.pricing_tier, e.cost_usd, e.estimated
+                FROM ai_usage_events e
+                LEFT JOIN conversations conv ON conv.chat_id = e.chat_id
+                WHERE e.created_at >= ? AND e.created_at <= ?
+                  AND COALESCE(NULLIF(conv.company_id, ''), 'fts') = ?
                 """,
-                (start, end),
+                (start, end, resolved_company_id),
             )
             rows = [dict(r) for r in c.fetchall()]
 

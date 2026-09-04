@@ -15,6 +15,8 @@ except Exception:
 from fts_paths import get_data_path
 
 DB_FILE = get_data_path('chat_history.db')
+DEFAULT_COMPANY_ID = 'fts'
+_COMPANY_ID_SQL = "COALESCE(NULLIF(company_id, ''), 'fts')"
 CAIRO_OFFSET = timedelta(hours=3)
 _LAST_TRASH_PURGE_TS = 0.0
 _FACEBOOK_REFERRAL_KV_RE = re.compile(
@@ -352,6 +354,13 @@ def init_db():
             c.execute("ALTER TABLE conversations ADD COLUMN customer_note_updated_by TEXT")
         if 'customer_note_owner_user_id' not in columns:
             c.execute("ALTER TABLE conversations ADD COLUMN customer_note_owner_user_id TEXT")
+        if 'company_id' not in columns:
+            c.execute("ALTER TABLE conversations ADD COLUMN company_id TEXT DEFAULT 'fts'")
+            try:
+                c.execute("UPDATE conversations SET company_id = 'fts' WHERE company_id IS NULL OR TRIM(company_id) = ''")
+            except Exception:
+                pass
+        c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_company_id ON conversations(company_id);')
         c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_last_message_time ON conversations(last_message_time DESC);')
         c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_location_last_message_time ON conversations(location, last_message_time DESC);')
         c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_deleted_at ON conversations(is_deleted, deleted_at);')
@@ -1980,7 +1989,23 @@ def set_setting(key, value):
         ''', (key, value))
         conn.commit()
 
-def get_or_create_conversation(source, sender_identifier, contact_name="", airtable_record_id="", location="Unknown", thread_id="", receiving_phone_id="", sales_inbox=None, email_account_id=None):
+def _resolve_conversation_company_id(company_id=None, receiving_phone_id="", email_account_id=None):
+    resolved = str(company_id or "").strip()
+    if resolved:
+        return resolved
+    try:
+        import company_tenancy
+        if receiving_phone_id:
+            return company_tenancy.lookup_company_id_for_phone(receiving_phone_id)
+        if email_account_id:
+            return company_tenancy.lookup_company_id_for_email_account(email_account_id)
+        return company_tenancy.DEFAULT_COMPANY_ID
+    except Exception:
+        return DEFAULT_COMPANY_ID
+
+
+def get_or_create_conversation(source, sender_identifier, contact_name="", airtable_record_id="", location="Unknown", thread_id="", receiving_phone_id="", sales_inbox=None, email_account_id=None, company_id=None):
+    resolved_company_id = _resolve_conversation_company_id(company_id, receiving_phone_id, email_account_id)
     with _connect(30.0) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
@@ -2008,6 +2033,13 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
         if 'auto_reply_hold_until' not in columns:
             c.execute("ALTER TABLE conversations ADD COLUMN auto_reply_hold_until TIMESTAMP")
             conn.commit()
+        if 'company_id' not in columns:
+            c.execute("ALTER TABLE conversations ADD COLUMN company_id TEXT DEFAULT 'fts'")
+            try:
+                c.execute("UPDATE conversations SET company_id = 'fts' WHERE company_id IS NULL OR TRIM(company_id) = ''")
+            except Exception:
+                pass
+            conn.commit()
         
         # Clean sender identifier if it's a phone number (remove +, spaces, dashes)
         clean_identifier = sender_identifier
@@ -2021,10 +2053,11 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
         # This prevents duplicate chats when a user switches from Email to WhatsApp
         if airtable_record_id:
             c.execute(
-                """
+                f"""
                 SELECT *
                 FROM conversations
                 WHERE airtable_record_id = ?
+                  AND {_COMPANY_ID_SQL} = ?
                 ORDER BY
                   CASE WHEN lower(source) = lower(?) THEN 0 ELSE 1 END,
                   CASE lower(source)
@@ -2036,7 +2069,7 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                   last_message_time DESC
                 LIMIT 1
                 """,
-                (airtable_record_id, str(source or "")),
+                (airtable_record_id, resolved_company_id, str(source or "")),
             )
             row = c.fetchone()
             if row:
@@ -2060,11 +2093,17 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 return dict(row)
 
         if source == "Email" and thread_id:
-            c.execute("SELECT * FROM conversations WHERE source = ? AND thread_id = ?", (source, thread_id))
+            c.execute(
+                f"SELECT * FROM conversations WHERE source = ? AND thread_id = ? AND {_COMPANY_ID_SQL} = ?",
+                (source, thread_id, resolved_company_id),
+            )
             row = c.fetchone()
             if not row:
                 # Try finding it by sender identifier as a secondary check before giving up
-                c.execute("SELECT * FROM conversations WHERE source = ? AND sender_identifier = ?", (source, clean_identifier))
+                c.execute(
+                    f"SELECT * FROM conversations WHERE source = ? AND sender_identifier = ? AND {_COMPANY_ID_SQL} = ?",
+                    (source, clean_identifier, resolved_company_id),
+                )
                 row = c.fetchone()
             if not row and normalized_email_identifier:
                 row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier)
@@ -2080,10 +2119,11 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                       AND {normalized_sender_expr} = ?
                       AND COALESCE(receiving_phone_id, '') = ?
                       AND (thread_id IS NULL OR thread_id = '')
+                      AND {_COMPANY_ID_SQL} = ?
                     ORDER BY last_message_time DESC
                     LIMIT 1
                     """,
-                    (source, clean_identifier, str(receiving_phone_id).strip()),
+                    (source, clean_identifier, str(receiving_phone_id).strip(), resolved_company_id),
                 )
                 row = c.fetchone()
                 if not row:
@@ -2096,10 +2136,11 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                           AND {normalized_sender_expr} = ?
                           AND COALESCE(receiving_phone_id, '') = ''
                           AND (thread_id IS NULL OR thread_id = '')
+                          AND {_COMPANY_ID_SQL} = ?
                         ORDER BY last_message_time DESC
                         LIMIT 1
                         """,
-                        (source, clean_identifier),
+                        (source, clean_identifier, resolved_company_id),
                     )
                     row = c.fetchone()
                 if not row:
@@ -2110,12 +2151,13 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                         WHERE source = ?
                           AND {normalized_sender_expr} = ?
                           AND (thread_id IS NULL OR thread_id = '')
+                          AND {_COMPANY_ID_SQL} = ?
                         ORDER BY
                           CASE WHEN COALESCE(receiving_phone_id, '') = ? THEN 0 ELSE 1 END,
                           last_message_time DESC
                         LIMIT 1
                         """,
-                        (source, clean_identifier, str(receiving_phone_id).strip()),
+                        (source, clean_identifier, resolved_company_id, str(receiving_phone_id).strip()),
                     )
                     row = c.fetchone()
             else:
@@ -2126,15 +2168,19 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                     WHERE source = ?
                       AND {normalized_sender_expr} = ?
                       AND (thread_id IS NULL OR thread_id = '')
+                      AND {_COMPANY_ID_SQL} = ?
                     ORDER BY last_message_time DESC
                     LIMIT 1
                     """,
-                    (source, clean_identifier),
+                    (source, clean_identifier, resolved_company_id),
                 )
                 row = c.fetchone()
         else:
             # Fallback: if no thread_id or WhatsApp, search by sender_identifier
-            c.execute("SELECT * FROM conversations WHERE source = ? AND sender_identifier = ?", (source, clean_identifier))
+            c.execute(
+                f"SELECT * FROM conversations WHERE source = ? AND sender_identifier = ? AND {_COMPANY_ID_SQL} = ?",
+                (source, clean_identifier, resolved_company_id),
+            )
             row = c.fetchone()
             if not row and normalized_email_identifier:
                 row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier)
@@ -2165,9 +2211,9 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
             now = get_cairo_time()
             try:
                 c.execute("""
-                    INSERT INTO conversations (chat_id, source, sender_identifier, contact_name, airtable_record_id, last_message_time, location, thread_id, receiving_phone_id, sales_inbox, email_account_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (chat_id, source, clean_identifier, contact_name, airtable_record_id, now, location, thread_id, receiving_phone_id, 1 if sales_inbox else 0, email_account_id))
+                    INSERT INTO conversations (chat_id, source, sender_identifier, contact_name, airtable_record_id, last_message_time, location, thread_id, receiving_phone_id, sales_inbox, email_account_id, company_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (chat_id, source, clean_identifier, contact_name, airtable_record_id, now, location, thread_id, receiving_phone_id, 1 if sales_inbox else 0, email_account_id, resolved_company_id))
                 conn.commit()
                 
                 c.execute("SELECT * FROM conversations WHERE chat_id = ?", (chat_id,))
@@ -2175,10 +2221,16 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
             except sqlite3.IntegrityError:
                 row = None
                 if source == "Email" and thread_id:
-                    c.execute("SELECT * FROM conversations WHERE source = ? AND thread_id = ? ORDER BY last_message_time DESC LIMIT 1", (source, thread_id))
+                    c.execute(
+                        f"SELECT * FROM conversations WHERE source = ? AND thread_id = ? AND {_COMPANY_ID_SQL} = ? ORDER BY last_message_time DESC LIMIT 1",
+                        (source, thread_id, resolved_company_id),
+                    )
                     row = c.fetchone()
                     if not row:
-                        c.execute("SELECT * FROM conversations WHERE source = ? AND sender_identifier = ? ORDER BY last_message_time DESC LIMIT 1", (source, clean_identifier))
+                        c.execute(
+                            f"SELECT * FROM conversations WHERE source = ? AND sender_identifier = ? AND {_COMPANY_ID_SQL} = ? ORDER BY last_message_time DESC LIMIT 1",
+                            (source, clean_identifier, resolved_company_id),
+                        )
                         row = c.fetchone()
                 elif source == "WhatsApp" and clean_identifier:
                     normalized_sender_expr = "REPLACE(REPLACE(REPLACE(sender_identifier, '+', ''), ' ', ''), '-', '')"
@@ -2189,16 +2241,20 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                         WHERE source = ?
                           AND {normalized_sender_expr} = ?
                           AND (thread_id IS NULL OR thread_id = '')
+                          AND {_COMPANY_ID_SQL} = ?
                         ORDER BY
                           CASE WHEN COALESCE(receiving_phone_id, '') = ? THEN 0 ELSE 1 END,
                           last_message_time DESC
                         LIMIT 1
                         """,
-                        (source, clean_identifier, str(receiving_phone_id or "").strip()),
+                        (source, clean_identifier, resolved_company_id, str(receiving_phone_id or "").strip()),
                     )
                     row = c.fetchone()
                 else:
-                    c.execute("SELECT * FROM conversations WHERE source = ? AND sender_identifier = ? ORDER BY last_message_time DESC LIMIT 1", (source, clean_identifier))
+                    c.execute(
+                        f"SELECT * FROM conversations WHERE source = ? AND sender_identifier = ? AND {_COMPANY_ID_SQL} = ? ORDER BY last_message_time DESC LIMIT 1",
+                        (source, clean_identifier, resolved_company_id),
+                    )
                     row = c.fetchone()
 
                 if row:
@@ -3326,6 +3382,7 @@ def get_conversations_page(
     assigned_to=None,
     dedicated_whatsapp=None,
     ad_id=None,
+    company_id=None,
 ):
     purge_trashed_conversations(retention_days=7)
     try:
@@ -3429,6 +3486,10 @@ def get_conversations_page(
         else:
             where.append("facebook_ad_id = ?")
             params.append(str(ad_id))
+
+    resolved_company_id = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
+    where.append(f"{_COMPANY_ID_SQL} = ?")
+    params.append(resolved_company_id)
 
     where_sql = ("WHERE " + " AND ".join(where)) if where else ""
 

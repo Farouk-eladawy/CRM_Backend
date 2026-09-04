@@ -128,6 +128,17 @@ def _connect():
         """
     )
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_recipients_campaign ON recipients(campaign_id, status)")
+    try:
+        cols = [row[1] for row in conn.execute("PRAGMA table_info(campaigns)").fetchall()]
+    except Exception:
+        cols = []
+    if "company_id" not in cols:
+        try:
+            conn.execute("ALTER TABLE campaigns ADD COLUMN company_id TEXT DEFAULT 'fts'")
+            conn.execute("UPDATE campaigns SET company_id = 'fts' WHERE company_id IS NULL OR TRIM(company_id) = ''")
+        except Exception:
+            pass
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_campaigns_company ON campaigns(company_id)")
     return conn
 
 
@@ -301,10 +312,16 @@ def campaign_counts(campaign_id: str) -> dict:
     return out
 
 
-def list_campaigns():
+def list_campaigns(company_id=None):
+    cid = str(company_id or "fts").strip() or "fts"
     with _connect() as conn:
         rows = conn.execute(
-            "SELECT * FROM campaigns ORDER BY created_at DESC LIMIT 200"
+            """
+            SELECT * FROM campaigns
+            WHERE COALESCE(NULLIF(company_id, ''), 'fts') = ?
+            ORDER BY created_at DESC LIMIT 200
+            """,
+            (cid,),
         ).fetchall()
     items = []
     for row in rows:
@@ -351,6 +368,9 @@ def create_campaign(payload: dict) -> dict:
 
     cid = str(uuid.uuid4())
     now = _now()
+    company_id = str(payload.get("company_id") or "fts").strip() or "fts"
+    phone_id = str(payload.get("receiving_phone_id") or "").strip() or RELIGIOUS_PHONE_ID
+    location = str(payload.get("location") or RELIGIOUS_LOCATION).strip() or RELIGIOUS_LOCATION
     with _connect() as conn:
         conn.execute(
             """
@@ -358,8 +378,8 @@ def create_campaign(payload: dict) -> dict:
                 id, name, send_type, template_name, template_language,
                 template_header_media_url, template_header_media_type, template_variables_json,
                 text_body, status, created_at, created_by_user_id, created_by_name,
-                receiving_phone_id, location, delay_sec
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?)
+                receiving_phone_id, location, delay_sec, company_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 cid,
@@ -374,9 +394,10 @@ def create_campaign(payload: dict) -> dict:
                 now,
                 str(payload.get("created_by_user_id") or "").strip(),
                 str(payload.get("created_by_name") or "").strip(),
-                RELIGIOUS_PHONE_ID,
-                RELIGIOUS_LOCATION,
+                phone_id,
+                location,
                 delay_sec,
+                company_id,
             ),
         )
         conn.executemany(
@@ -890,35 +911,76 @@ def update_campaign(campaign_id: str, payload: dict) -> dict:
     return get_campaign(campaign_id)
 
 
-def religious_from_info():
+def religious_from_info(company_id=None):
+    cid = str(company_id or "fts").strip() or "fts"
+    phone_id = RELIGIOUS_PHONE_ID
+    display = RELIGIOUS_DISPLAY
+    locked = cid == "fts"
+    try:
+        import company_tenancy
+        conn = company_tenancy.get_connections(cid)
+        if conn.get("religiousWaPhoneNumberId"):
+            phone_id = conn["religiousWaPhoneNumberId"]
+            locked = False
+        if conn.get("religiousWaDisplay"):
+            display = conn["religiousWaDisplay"]
+            locked = False
+    except Exception:
+        pass
     return {
         "location": RELIGIOUS_LOCATION,
-        "phone_number_id": RELIGIOUS_PHONE_ID,
-        "display_phone_number": RELIGIOUS_DISPLAY,
-        "locked": True,
+        "phone_number_id": phone_id,
+        "display_phone_number": display,
+        "locked": locked,
+        "company_id": cid,
     }
 
 
 def register_routes(app, agent):
     from flask import jsonify, request
+    import company_tenancy
 
     def _ok_options():
         return jsonify({"status": "ok"}), 200
+
+    def _actor_company_id():
+        username = str(request.args.get("actor_username") or "").strip()
+        payload = request.get_json(silent=True) or {}
+        if not username:
+            actor = payload.get("actor") if isinstance(payload, dict) else {}
+            if isinstance(actor, dict):
+                username = str(actor.get("username") or actor.get("id") or "").strip()
+        if not username:
+            username = str(payload.get("actor_username") or "").strip()
+        return company_tenancy.resolve_company_id(username=username)
+
+    def _guard_campaign(campaign_id):
+        camp = get_campaign(campaign_id)
+        if not camp:
+            return None, (jsonify({"status": "error", "message": "not found"}), 404)
+        camp_company = str(camp.get("company_id") or "fts").strip() or "fts"
+        if camp_company != _actor_company_id():
+            return None, (jsonify({"status": "error", "message": "not found"}), 404)
+        return camp, None
 
     @app.route("/api/religious_wa_campaigns/from", methods=["GET", "OPTIONS"])
     def api_rwc_from():
         if request.method == "OPTIONS":
             return _ok_options()
-        return jsonify({"status": "success", "data": religious_from_info()}), 200
+        return jsonify({"status": "success", "data": religious_from_info(_actor_company_id())}), 200
 
     @app.route("/api/religious_wa_campaigns", methods=["GET", "POST", "OPTIONS"])
     def api_rwc_list_create():
         if request.method == "OPTIONS":
             return _ok_options()
         try:
+            company_id = _actor_company_id()
             if request.method == "GET":
-                return jsonify({"status": "success", "data": list_campaigns(), "from": religious_from_info()}), 200
+                return jsonify({"status": "success", "data": list_campaigns(company_id), "from": religious_from_info(company_id)}), 200
             payload = request.get_json(silent=True) or {}
+            payload["company_id"] = company_id
+            from_info = religious_from_info(company_id)
+            payload.setdefault("receiving_phone_id", from_info.get("phone_number_id"))
             camp = create_campaign(payload)
             return jsonify({"status": "success", "data": camp}), 200
         except ValueError as e:
@@ -933,6 +995,9 @@ def register_routes(app, agent):
             return _ok_options()
         if request.method in ("PUT", "PATCH"):
             try:
+                camp, err = _guard_campaign(campaign_id)
+                if err:
+                    return err
                 payload = request.get_json(silent=True) or {}
                 camp = update_campaign(campaign_id, payload)
                 return jsonify({"status": "success", "data": camp}), 200
@@ -941,17 +1006,20 @@ def register_routes(app, agent):
             except Exception as e:
                 log.exception("update campaign")
                 return jsonify({"status": "error", "message": str(e)}), 500
-        camp = get_campaign(campaign_id)
-        if not camp:
-            return jsonify({"status": "error", "message": "not found"}), 404
+        camp, err = _guard_campaign(campaign_id)
+        if err:
+            return err
         recipients = list_recipients(campaign_id)
-        return jsonify({"status": "success", "data": camp, "recipients": recipients, "from": religious_from_info()}), 200
+        return jsonify({"status": "success", "data": camp, "recipients": recipients, "from": religious_from_info(_actor_company_id())}), 200
 
     @app.route("/api/religious_wa_campaigns/<campaign_id>/start", methods=["POST", "OPTIONS"])
     def api_rwc_start(campaign_id):
         if request.method == "OPTIONS":
             return _ok_options()
         try:
+            camp, err = _guard_campaign(campaign_id)
+            if err:
+                return err
             payload = request.get_json(silent=True) or {}
             camp = start_campaign(agent, campaign_id, retry_failed=bool(payload.get("retry_failed")))
             return jsonify({"status": "success", "data": camp}), 200
@@ -966,6 +1034,9 @@ def register_routes(app, agent):
         if request.method == "OPTIONS":
             return _ok_options()
         try:
+            camp, err = _guard_campaign(campaign_id)
+            if err:
+                return err
             camp = cancel_campaign(campaign_id)
             return jsonify({"status": "success", "data": camp}), 200
         except Exception as e:

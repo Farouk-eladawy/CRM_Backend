@@ -28,6 +28,7 @@ from cachetools import TTLCache
 from pyairtable import Api
 from pyairtable.formulas import match
 from airtable_mirror import AirtableMirror
+import company_tenancy
 
 sys.dont_write_bytecode = True
 
@@ -970,6 +971,44 @@ def _get_channel_settings():
     merged = _merge_channel_settings_with_legacy_whatsapp(raw)
     merged = _merge_channel_settings_with_legacy_email(merged)
     return merged
+
+def _actor_company_id_from_request():
+    username = ""
+    user_id = ""
+    try:
+        username = str(request.args.get("actor_username") or "").strip()
+        user_id = str(request.args.get("actor_id") or "").strip()
+    except Exception:
+        pass
+    try:
+        data = request.get_json(silent=True) if request.method in ("POST", "PUT", "PATCH") else None
+    except Exception:
+        data = None
+    if isinstance(data, dict):
+        actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+        if not username:
+            username = str(actor.get("username") or data.get("actor_username") or "").strip()
+        if not user_id:
+            user_id = str(actor.get("id") or actor.get("user_id") or "").strip()
+    try:
+        if request.form:
+            username = username or str(request.form.get("actor_username") or "").strip()
+            user_id = user_id or str(request.form.get("actor_id") or "").strip()
+    except Exception:
+        pass
+    return company_tenancy.resolve_company_id(username=username or None, user_id=user_id or None)
+
+def _get_channel_settings_for_company(company_id=None):
+    cid = company_tenancy.normalize_company_id(company_id)
+    key = company_tenancy.channel_settings_key(cid)
+    raw = _read_setting_value(key)
+    if not isinstance(raw, dict):
+        raw = {}
+    if company_tenancy.is_default_company(cid):
+        merged = _merge_channel_settings_with_legacy_whatsapp(raw)
+        merged = _merge_channel_settings_with_legacy_email(merged)
+        return merged
+    return raw
 
 def _write_setting_value(key, value):
     raw_value = value
@@ -19140,6 +19179,7 @@ Conversation:
                                 "canManageChannels": bool(item.get("canManageChannels") or False),
                                 "createdBy": str(item.get("createdBy") or ""),
                                 "skipWhatsAppSetup": bool(item.get("skipWhatsAppSetup") or False),
+                                "companyId": str(item.get("companyId") or item.get("company_id") or company_tenancy.DEFAULT_COMPANY_ID).strip() or company_tenancy.DEFAULT_COMPANY_ID,
                             }
                         )
             except Exception:
@@ -29781,7 +29821,11 @@ Prefer the MarkItDown Extraction section below when present.
                     trash=trash,
                     assigned_to=assigned_to,
                     dedicated_whatsapp=dedicated_whatsapp,
-                    ad_id=ad_id
+                    ad_id=ad_id,
+                    company_id=company_tenancy.resolve_company_id(
+                        username=request.args.get("actor_username"),
+                        user_id=actor_id,
+                    ),
                 )
                 items = page.get("items") or []
                 pagination = {
@@ -36819,7 +36863,7 @@ Write ONE short message only. No JSON. No explanations."""
                                 if not dept:
                                     return jsonify({"status": "error", "message": "Unauthorized"}), 403
 
-                docs = self.kb.get_documents(dept)
+                docs = self.kb.get_documents(dept, company_id=_actor_company_id_from_request())
                 return jsonify({"status": "success", "data": docs})
             except Exception as e:
                 return jsonify({"status": "error", "message": str(e)}), 500
@@ -36882,7 +36926,7 @@ Write ONE short message only. No JSON. No explanations."""
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
                 file.save(file_path)
                 
-                res = self.kb.add_document(file_path, file.filename, department)
+                res = self.kb.add_document(file_path, file.filename, department, company_id=_actor_company_id_from_request())
                 if res["status"] == "success":
                     return jsonify(res)
                 else:
@@ -36939,7 +36983,7 @@ Write ONE short message only. No JSON. No explanations."""
                             meta={"department": department, "filename": filename}
                         )
 
-                res = agent.kb.add_text_document(filename, content, department)
+                res = agent.kb.add_text_document(filename, content, department, company_id=_actor_company_id_from_request())
                 if res["status"] == "success":
                     return jsonify(res)
                 return jsonify(res), 500
@@ -36984,7 +37028,7 @@ Write ONE short message only. No JSON. No explanations."""
                                     if not dept:
                                         return jsonify({"status": "error", "message": "Unauthorized"}), 403
 
-                    rules = self.kb.get_strict_qa_rules(dept)
+                    rules = self.kb.get_strict_qa_rules(dept, company_id=_actor_company_id_from_request())
                     return jsonify({"status": "success", "data": rules})
 
                 data = request.get_json(silent=True) or {}
@@ -37030,7 +37074,7 @@ Write ONE short message only. No JSON. No explanations."""
                             meta={"department": department, "question": question, "match_type": match_type}
                         )
 
-                res = agent.kb.add_strict_qa_rule(question, answer, department, match_type=match_type, is_enabled=is_enabled)
+                res = agent.kb.add_strict_qa_rule(question, answer, department, match_type=match_type, is_enabled=is_enabled, company_id=_actor_company_id_from_request())
                 if res["status"] == "success":
                     return jsonify(res)
                 return jsonify(res), 500
@@ -39187,6 +39231,7 @@ Write ONE short message only. No JSON. No explanations."""
             username = data.get('username', '').strip()
             password = data.get('password', '')
             name = data.get('name', username)
+            company_name = str(data.get('company_name') or data.get('companyName') or name or username).strip()
             
             if not username or not password:
                 return jsonify({"status": "error", "message": "Username and password are required"}), 400
@@ -39211,15 +39256,18 @@ Write ONE short message only. No JSON. No explanations."""
             for u in users:
                 if u.get('username') == username:
                     return jsonify({"status": "error", "message": "Username already exists"}), 400
-                    
-            # Generate new user
-            new_id = str(len(users) + 1)
+
+            company = company_tenancy.create_company(company_name, created_by_username=username)
+            company_id = company.get("id")
             new_user = {
-                "id": new_id,
+                "id": secrets.token_hex(8),
                 "username": username,
                 "name": name,
-                "allowedLocations": ["All", "NeedHelp", "Hurghada/Cairo", "Sharm", "Sales", "Guides", "Drivers", "Quality", "Religious"],
-                "role": "Admin"
+                "companyId": company_id,
+                "allowedLocations": ["NeedHelp"],
+                "allowedTabs": list(company_tenancy.NEW_COMPANY_ALLOWED_TABS),
+                "role": "Admin",
+                "canManageChannels": True,
             }
             users.append(new_user)
             
@@ -39242,7 +39290,57 @@ Write ONE short message only. No JSON. No explanations."""
             passwords[username] = password
             chat_db.set_setting("dashboard_user_passwords", json.dumps(passwords))
             
-            return jsonify({"status": "success", "user": new_user}), 200
+            return jsonify({"status": "success", "user": new_user, "company": company}), 200
+
+        @app.route('/api/company', methods=['GET', 'OPTIONS'])
+        def api_company():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            company_id = _actor_company_id_from_request()
+            company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
+            return jsonify({"status": "success", "data": company}), 200
+
+        @app.route('/api/company/connections', methods=['GET', 'POST', 'OPTIONS'])
+        def api_company_connections():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            company_id = _actor_company_id_from_request()
+            company = company_tenancy.get_company(company_id)
+            if not company:
+                return jsonify({"status": "error", "message": "Company not found"}), 404
+            if request.method == 'GET':
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        "companyId": company_id,
+                        "companyName": company.get("name"),
+                        "isDefaultCompany": company_tenancy.is_default_company(company_id),
+                        "connections": company_tenancy.get_connections(company_id),
+                    },
+                }), 200
+            data = request.json or {}
+            actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+            actor_user = company_tenancy.find_dashboard_user(
+                username=str(actor.get("username") or request.args.get("actor_username") or "").strip() or None
+            )
+            actor_role = str((actor_user or {}).get("role") or actor.get("role") or "").strip()
+            if actor_role.lower() != "admin":
+                return jsonify({"status": "error", "message": "Only company admins can update connections"}), 403
+            raw_conn = data.get("connections") if isinstance(data.get("connections"), dict) else data
+            next_conn = company_tenancy.sanitize_connections(raw_conn)
+            next_conn["baserowMainUrl"] = company_tenancy.sanitize_public_url(next_conn.get("baserowMainUrl"))
+            next_conn["baserowReligiousUrl"] = company_tenancy.sanitize_public_url(next_conn.get("baserowReligiousUrl"))
+            next_conn["transportUrl"] = company_tenancy.sanitize_public_url(next_conn.get("transportUrl"))
+            saved = company_tenancy.save_connections(company_id, next_conn)
+            return jsonify({
+                "status": "success",
+                "data": {
+                    "companyId": company_id,
+                    "companyName": saved.get("name"),
+                    "isDefaultCompany": company_tenancy.is_default_company(company_id),
+                    "connections": saved.get("connections"),
+                },
+            }), 200
 
         @app.route('/api/auto_reply_settings', methods=['GET', 'POST', 'OPTIONS'])
         def api_auto_reply_settings():
@@ -39405,6 +39503,7 @@ Write ONE short message only. No JSON. No explanations."""
                         "canManageChannels": bool(user_obj.get("canManageChannels") or False),
                         "createdBy": str(user_obj.get("createdBy") or ""),
                         "skipWhatsAppSetup": bool(user_obj.get("skipWhatsAppSetup") or False),
+                        "companyId": str(user_obj.get("companyId") or user_obj.get("company_id") or company_tenancy.DEFAULT_COMPANY_ID).strip() or company_tenancy.DEFAULT_COMPANY_ID,
                         "aiOperationAcl": self._sanitize_ai_operation_acl(user_obj.get("aiOperationAcl")),
                     }
 
@@ -39414,7 +39513,8 @@ Write ONE short message only. No JSON. No explanations."""
 
                 if request.method == 'GET':
                     if str(key) == "dashboard_channel_settings":
-                        return jsonify({"status": "success", "value": _get_channel_settings()})
+                        actor_company_id = _actor_company_id_from_request()
+                        return jsonify({"status": "success", "value": _get_channel_settings_for_company(actor_company_id)})
                     val = chat_db.get_setting(key)
                     if str(key) == "dashboard_users":
                         try:
@@ -39465,13 +39565,20 @@ Write ONE short message only. No JSON. No explanations."""
                                 actor_allowed = []
                                 actor_teams = []
                                 is_super_admin = False
+                                actor_company_id = company_tenancy.DEFAULT_COMPANY_ID
                                 for u in users:
                                     if u.get("username") == actor_username:
                                         actor_allowed = u.get("allowedLocations") or []
                                         actor_teams = _get_managed_teams(u)
+                                        actor_company_id = company_tenancy.user_company_id(u)
                                         if _is_primary_admin_record(u):
                                             is_super_admin = True
                                         break
+
+                                users = [
+                                    u for u in users
+                                    if company_tenancy.user_company_id(u) == actor_company_id
+                                ]
                                 
                                 if not is_super_admin:
                                     filtered_users = []
@@ -39485,6 +39592,8 @@ Write ONE short message only. No JSON. No explanations."""
                                             filtered_users.append(_sanitize_dashboard_user_entry(u))
                                     filtered_users = [u for u in filtered_users if isinstance(u, dict)]
                                     val = json.dumps(filtered_users)
+                                else:
+                                    val = json.dumps([_sanitize_dashboard_user_entry(u) for u in users if isinstance(_sanitize_dashboard_user_entry(u), dict)])
                             except Exception as e:
                                 logging.error(f"Error filtering dashboard_users: {e}")
 
@@ -39551,6 +39660,7 @@ Write ONE short message only. No JSON. No explanations."""
                                             "canManageChannels": bool(u.get("canManageChannels") or False),
                                             "createdBy": str(u.get("createdBy") or ""),
                                             "skipWhatsAppSetup": bool(u.get("skipWhatsAppSetup") or False),
+                                            "companyId": str(u.get("companyId") or u.get("company_id") or company_tenancy.DEFAULT_COMPANY_ID).strip() or company_tenancy.DEFAULT_COMPANY_ID,
                                             "aiOperationAcl": self._sanitize_ai_operation_acl(u.get("aiOperationAcl")),
                                         }
                                     )
@@ -39564,34 +39674,47 @@ Write ONE short message only. No JSON. No explanations."""
                         actor_allowed = []
                         actor_teams = []
                         is_super_admin = False
+                        actor_company_id = company_tenancy.DEFAULT_COMPANY_ID
                         for u in old_users:
                             if u.get("username") == actor_user_id:
                                 actor_allowed = u.get("allowedLocations") or []
                                 actor_teams = _get_managed_teams(u)
+                                actor_company_id = company_tenancy.user_company_id(u)
                                 if _is_primary_admin_record(u):
                                     is_super_admin = True
                                 break
                         if not is_super_admin and _normalize_username(actor_user_id) == PRIMARY_ADMIN_USERNAME and str(actor_role or "").strip().lower() == "admin":
                             is_super_admin = True
+                            actor_company_id = company_tenancy.DEFAULT_COMPANY_ID
+
+                        other_company_users = [
+                            u for u in old_users
+                            if company_tenancy.user_company_id(u) != actor_company_id
+                        ]
+                        same_company_old = [
+                            u for u in old_users
+                            if company_tenancy.user_company_id(u) == actor_company_id
+                        ]
+                        for u in new_users:
+                            u["companyId"] = actor_company_id
                         
                         if not is_super_admin:
-                            merged_users = []
+                            merged_users = list(other_company_users)
                             allowed_to_modify = {
                                 u.get("username")
-                                for u in old_users
+                                for u in same_company_old
                                 if u.get("createdBy") == actor_user_id
                                 or (str(u.get("role") or "").strip().lower() != "admin" and _has_team_overlap(u, actor_teams))
                             }
                             
                             # Keep users that the actor CANNOT modify
-                            for u in old_users:
+                            for u in same_company_old:
                                 if u.get("username") not in allowed_to_modify and u.get("username") != actor_user_id:
                                     merged_users.append(u)
                                 elif u.get("username") == actor_user_id:
-                                    # Use _sanitize_dashboard_user_entry to ensure we keep new fields if the actor updated themselves
-                                    # Wait, we need to find the actor in new_users if they updated themselves
                                     actor_new = next((n for n in new_users if n.get("username") == actor_user_id), None)
                                     if actor_new:
+                                        actor_new["companyId"] = actor_company_id
                                         merged_users.append(actor_new)
                                     else:
                                         merged_users.append(_sanitize_dashboard_user_entry(u))
@@ -39599,15 +39722,15 @@ Write ONE short message only. No JSON. No explanations."""
                             # Add/update users the actor sent
                             for u in new_users:
                                 if u.get("username") == actor_user_id:
-                                    continue # Actor is already preserved
+                                    continue
                                 if str(u.get("role") or "").strip().lower() == "admin":
-                                    existing_admin = next((x for x in old_users if x.get("username") == u.get("username") and str(x.get("role") or "").strip().lower() == "admin"), None)
+                                    existing_admin = next((x for x in same_company_old if x.get("username") == u.get("username") and str(x.get("role") or "").strip().lower() == "admin"), None)
                                     if existing_admin:
                                         continue
                                     u["role"] = "Agent"
                                 if u.get("username") in allowed_to_modify or not any(x.get("username") == u.get("username") for x in old_users):
                                     u["createdBy"] = actor_user_id
-                                    # Ensure they only assign locations they have access to
+                                    u["companyId"] = actor_company_id
                                     u["allowedLocations"] = [loc for loc in u["allowedLocations"] if loc in actor_allowed]
                                     if str(u.get("role") or "").strip().lower() == "admin":
                                         u["allowedLocations"] = [loc for loc in u["allowedLocations"] if loc != "All"]
@@ -39615,9 +39738,10 @@ Write ONE short message only. No JSON. No explanations."""
                             val = json.dumps(merged_users)
                         else:
                             for u in new_users:
+                                u["companyId"] = actor_company_id
                                 if _normalize_username(u.get("username")) != PRIMARY_ADMIN_USERNAME and str(u.get("role") or "").strip().lower() == "admin":
                                     u["allowedLocations"] = [loc for loc in (u.get("allowedLocations") or []) if loc != "All"]
-                            val = json.dumps(new_users)
+                            val = json.dumps(other_company_users + new_users)
 
                     if str(key).startswith('notification_sound_prefs_'):
                         import notification_sound_validation
@@ -39656,8 +39780,21 @@ Write ONE short message only. No JSON. No explanations."""
                         except Exception as pi_merge_err:
                             logging.warning(f"admin_pi_sessions preserve merge skipped: {pi_merge_err}")
 
-                    _write_setting_value(key, val)
+                    write_key = key
                     if str(key) == "dashboard_channel_settings":
+                        actor_company_id = company_tenancy.resolve_company_id(
+                            username=str((actor or {}).get("username") or actor_user_id or "").strip() or None,
+                            user_id=str(actor_user_id or "").strip() or None,
+                        )
+                        write_key = company_tenancy.channel_settings_key(actor_company_id)
+
+                    _write_setting_value(write_key, val)
+                    if str(key) == "dashboard_channel_settings" and company_tenancy.is_default_company(
+                        company_tenancy.resolve_company_id(
+                            username=str((actor or {}).get("username") or actor_user_id or "").strip() or None,
+                            user_id=str(actor_user_id or "").strip() or None,
+                        )
+                    ):
                         try:
                             self._refresh_dynamic_email_services(force=True)
                         except Exception:

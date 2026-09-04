@@ -52,6 +52,28 @@ class KnowledgeBase:
 
         self.conn.commit()
         self._ensure_documents_fts_schema()
+        self._ensure_company_id_columns()
+
+    def _ensure_company_id_columns(self):
+        cur = self.conn.cursor()
+        for table in ("documents", "strict_qa_rules"):
+            try:
+                columns = [row[1] for row in cur.execute(f"PRAGMA table_info({table})").fetchall()]
+            except Exception:
+                columns = []
+            if "company_id" in columns:
+                continue
+            try:
+                cur.execute(f"ALTER TABLE {table} ADD COLUMN company_id TEXT DEFAULT 'fts'")
+                cur.execute(f"UPDATE {table} SET company_id = 'fts' WHERE company_id IS NULL OR TRIM(company_id) = ''")
+                self.conn.commit()
+            except Exception as e:
+                self.conn.rollback()
+                logging.error(f"Failed to add company_id to {table}: {e}")
+
+    def _company_id(self, company_id=None):
+        cid = str(company_id or "").strip()
+        return cid or "fts"
 
     def _ensure_documents_fts_schema(self):
         cur = self.conn.cursor()
@@ -675,7 +697,7 @@ class KnowledgeBase:
             pass
         return "\n\n".join(ctx_parts)
 
-    def add_document(self, file_path, original_filename, department="general"):
+    def add_document(self, file_path, original_filename, department="general", company_id=None):
         """
         Add a file to the knowledge base. Reads text content from supported files (txt, pdf, etc.).
         Returns dict with status and document id.
@@ -743,12 +765,13 @@ class KnowledgeBase:
 
         content = self._normalize_document_content(content)
         now = datetime.now().isoformat()
+        cid = self._company_id(company_id)
 
         cur = self.conn.cursor()
         try:
             cur.execute(
-                "INSERT INTO documents (id, filename, department, content, upload_date) VALUES (?, ?, ?, ?, ?)",
-                (doc_id, original_filename, department, content, now)
+                "INSERT INTO documents (id, filename, department, content, upload_date, company_id) VALUES (?, ?, ?, ?, ?, ?)",
+                (doc_id, original_filename, department, content, now, cid)
             )
             self._rebuild_documents_fts_index(commit=False)
             self.conn.commit()
@@ -758,7 +781,7 @@ class KnowledgeBase:
             logging.error(f"Error adding document to DB: {e}")
             return {"status": "error", "message": str(e)}
 
-    def add_text_document(self, filename, content, department="general"):
+    def add_text_document(self, filename, content, department="general", company_id=None):
         """
         Add a text document directly to the knowledge base (from manual input).
         Returns dict with status and document id.
@@ -766,12 +789,13 @@ class KnowledgeBase:
         doc_id = str(uuid.uuid4())
         content = self._normalize_document_content(content)
         now = datetime.now().isoformat()
+        cid = self._company_id(company_id)
 
         cur = self.conn.cursor()
         try:
             cur.execute(
-                "INSERT INTO documents (id, filename, department, content, upload_date) VALUES (?, ?, ?, ?, ?)",
-                (doc_id, filename, department, content, now)
+                "INSERT INTO documents (id, filename, department, content, upload_date, company_id) VALUES (?, ?, ?, ?, ?, ?)",
+                (doc_id, filename, department, content, now, cid)
             )
             self._rebuild_documents_fts_index(commit=False)
             self.conn.commit()
@@ -780,22 +804,27 @@ class KnowledgeBase:
             self.conn.rollback()
             return {"status": "error", "message": str(e)}
 
-    def get_documents(self, department=None):
+    def get_documents(self, department=None, company_id=None):
         """
         Get documents filtered by department. 
         If department is None or 'All', returns all documents.
         Department can be a comma-separated list for multiple departments.
         """
         cur = self.conn.cursor()
+        cid = self._company_id(company_id)
+        company_clause = "COALESCE(NULLIF(company_id, ''), 'fts') = ?"
         if department and department.strip().lower() != 'all':
             depts = [d.strip() for d in department.split(",")]
             placeholders = ",".join(["?" for _ in depts])
             cur.execute(
-                f"SELECT id, filename, department, upload_date, length(content) as content_size FROM documents WHERE department IN ({placeholders}) ORDER BY upload_date DESC",
-                depts
+                f"SELECT id, filename, department, upload_date, length(content) as content_size FROM documents WHERE department IN ({placeholders}) AND {company_clause} ORDER BY upload_date DESC",
+                depts + [cid]
             )
         else:
-            cur.execute("SELECT id, filename, department, upload_date, length(content) as content_size FROM documents ORDER BY upload_date DESC")
+            cur.execute(
+                f"SELECT id, filename, department, upload_date, length(content) as content_size FROM documents WHERE {company_clause} ORDER BY upload_date DESC",
+                (cid,)
+            )
 
         rows = cur.fetchall()
         return [
@@ -869,7 +898,7 @@ class KnowledgeBase:
             logging.error(f"Error deleting document {doc_id}: {e}")
             return False
 
-    def add_strict_qa_rule(self, question, answer, department="general", match_type="normalized_exact", is_enabled=True):
+    def add_strict_qa_rule(self, question, answer, department="general", match_type="normalized_exact", is_enabled=True, company_id=None):
         rule_id = str(uuid.uuid4())
         question = self._normalize_text(question)
         answer = self._normalize_text(answer)
@@ -883,10 +912,10 @@ class KnowledgeBase:
             cur.execute(
                 """
                 INSERT INTO strict_qa_rules (
-                    id, question, normalized_question, answer, department, match_type, is_enabled, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    id, question, normalized_question, answer, department, match_type, is_enabled, created_at, updated_at, company_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (rule_id, question, normalized_question, answer, department, match_type, 1 if is_enabled else 0, now, now)
+                (rule_id, question, normalized_question, answer, department, match_type, 1 if is_enabled else 0, now, now, self._company_id(company_id))
             )
             self.conn.commit()
             return {"status": "success", "rule_id": rule_id, "message": f"Strict Q/A rule created in {department}"}
@@ -895,9 +924,11 @@ class KnowledgeBase:
             logging.error(f"Error creating strict Q/A rule: {e}")
             return {"status": "error", "message": str(e)}
 
-    def get_strict_qa_rules(self, department=None):
+    def get_strict_qa_rules(self, department=None, company_id=None):
         cur = self.conn.cursor()
         depts = self._expand_departments(department)
+        cid = self._company_id(company_id)
+        company_clause = "COALESCE(NULLIF(company_id, ''), 'fts') = ?"
         if depts and not any(d.lower() == "all" for d in depts):
             placeholders = ",".join(["?" for _ in depts])
             cur.execute(
@@ -905,17 +936,20 @@ class KnowledgeBase:
                 SELECT id, question, answer, department, match_type, is_enabled, created_at, updated_at
                 FROM strict_qa_rules
                 WHERE department IN ({placeholders})
+                  AND {company_clause}
                 ORDER BY updated_at DESC
                 """,
-                depts
+                depts + [cid]
             )
         else:
             cur.execute(
-                """
+                f"""
                 SELECT id, question, answer, department, match_type, is_enabled, created_at, updated_at
                 FROM strict_qa_rules
+                WHERE {company_clause}
                 ORDER BY updated_at DESC
-                """
+                """,
+                (cid,)
             )
 
         rows = cur.fetchall()
@@ -998,7 +1032,7 @@ class KnowledgeBase:
             logging.error(f"Error deleting strict Q/A rule {rule_id}: {e}")
             return False
 
-    def find_strict_qa_match(self, customer_message, department=None):
+    def find_strict_qa_match(self, customer_message, department=None, company_id=None):
         normalized_message = self._normalize_rule_text(customer_message)
         if not normalized_message:
             return None
@@ -1026,6 +1060,7 @@ class KnowledgeBase:
               AND match_type = 'normalized_exact'
               AND normalized_question = ?
               AND department IN ({placeholders})
+              AND COALESCE(NULLIF(company_id, ''), 'fts') = ?
             ORDER BY CASE
                 WHEN lower(department) = lower(?) THEN 0
                 WHEN lower(department) = 'general' THEN 1
@@ -1033,7 +1068,7 @@ class KnowledgeBase:
             END, updated_at DESC
             LIMIT 1
             """,
-            [normalized_message, *search_depts, search_depts[0]],
+            [normalized_message, *search_depts, self._company_id(company_id), search_depts[0]],
         )
         row = cur.fetchone()
         if row:
@@ -1053,13 +1088,14 @@ class KnowledgeBase:
             WHERE is_enabled = 1
               AND match_type = 'contains'
               AND department IN ({placeholders})
+              AND COALESCE(NULLIF(company_id, ''), 'fts') = ?
             ORDER BY CASE
                 WHEN lower(department) = lower(?) THEN 0
                 WHEN lower(department) = 'general' THEN 1
                 ELSE 2
             END, updated_at DESC
             """,
-            [*search_depts, search_depts[0]],
+            [*search_depts, self._company_id(company_id), search_depts[0]],
         )
         for row in cur.fetchall():
             if row[2] and row[2] in normalized_message:

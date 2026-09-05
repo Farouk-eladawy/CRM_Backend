@@ -38,6 +38,52 @@ from airtable_fields import FieldIds, LeadFieldIds, ReligiousLeadFieldIds, ID_TO
 # Define Fixed Cairo Offset (UTC+3) - Summer Time / Standard Adjustment
 CAIRO_OFFSET = timedelta(hours=3)
 
+# Meta Cloud API customer-care window: rolling 24 hours from the last inbound
+# customer message. Not calendar midnight. Applies to every Meta WhatsApp number.
+META_WHATSAPP_CUSTOMER_WINDOW = timedelta(hours=24)
+
+
+def _parse_cairo_naive_dt(value):
+    """Parse a timestamp into naive Cairo local time (UTC+3)."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        dt = value
+    else:
+        raw = str(value).strip()
+        if not raw:
+            return None
+        try:
+            dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        except Exception:
+            return None
+    if dt.tzinfo is not None:
+        dt = (dt.astimezone(timezone.utc) + CAIRO_OFFSET).replace(tzinfo=None)
+    return dt
+
+
+def is_meta_whatsapp_customer_window_closed(last_ts, now=None):
+    """Return (closed, meta) for Meta WhatsApp free-form text sends.
+
+    The window starts at the last customer inbound message and lasts 24 hours.
+    Midnight does not close it. If last_ts is missing, return closed=False so
+    Meta remains the source of truth.
+    """
+    last_dt = _parse_cairo_naive_dt(last_ts)
+    if last_dt is None:
+        return False, {"diff_hours": None, "day_changed": False, "reason": "no_last_customer_ts"}
+    now_dt = _parse_cairo_naive_dt(now) if now is not None else (
+        datetime.now(timezone.utc).replace(tzinfo=None) + CAIRO_OFFSET
+    )
+    elapsed = now_dt - last_dt
+    diff_hours = elapsed.total_seconds() / 3600.0
+    closed = elapsed >= META_WHATSAPP_CUSTOMER_WINDOW
+    return closed, {
+        "diff_hours": round(diff_hours, 4),
+        "day_changed": False,
+        "last_customer_ts": last_dt.isoformat(),
+    }
+
 class KeyedMutex:
     """
     Mutex that locks based on a key (record_id).
@@ -24490,27 +24536,18 @@ Conversation:
 
                 if str(action.get("mode") or "").strip().lower() == "text":
                     try:
-                        from datetime import datetime, timedelta
                         last_ts = None
                         if record_id:
                             last_ts = chat_db.get_last_customer_whatsapp_message_time(record_id)
                         if not last_ts:
                             last_ts = chat_db.get_last_customer_message_time(chat_id)
-                        if last_ts:
-                            try:
-                                last_dt = datetime.fromisoformat(str(last_ts))
-                            except Exception:
-                                last_dt = None
-                            if last_dt:
-                                cairo_now = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=3)
-                                diff_hours = (cairo_now - last_dt).total_seconds() / 3600.0
-                                day_changed = cairo_now.date() != last_dt.date()
-                                if diff_hours >= 23 or day_changed:
-                                    return False, _pick(
-                                        "نافذة واتساب النصية 24 ساعة مغلقة. استخدم Template لإعادة فتح المحادثة أولًا.",
-                                        "The 24-hour WhatsApp text window is closed. Use a template first to reopen the chat.",
-                                        "نافذة 24 ساعة مغلقة / The 24-hour window is closed. Use a template first.",
-                                    )
+                        window_closed, _window_meta = is_meta_whatsapp_customer_window_closed(last_ts)
+                        if window_closed:
+                            return False, _pick(
+                                "نافذة واتساب النصية 24 ساعة مغلقة. استخدم Template لإعادة فتح المحادثة أولًا.",
+                                "The 24-hour WhatsApp text window is closed. Use a template first to reopen the chat.",
+                                "نافذة 24 ساعة مغلقة / The 24-hour window is closed. Use a template first.",
+                            )
                     except Exception:
                         pass
                 # #region debug-point D:invoice-send-branch
@@ -35836,46 +35873,37 @@ Write ONE short message only. No JSON. No explanations."""
                         # Skip Meta send path below
                     elif not template_name:
                         try:
-                            from datetime import datetime, timedelta
                             last_ts = None
                             if conv_dict.get('airtable_record_id'):
                                 last_ts = chat_db.get_last_customer_whatsapp_message_time(conv_dict.get('airtable_record_id'))
                             if not last_ts and str(source or '').strip().lower() == 'whatsapp':
                                 last_ts = chat_db.get_last_customer_message_time(chat_id)
-                            if last_ts:
+                            window_closed, window_meta = is_meta_whatsapp_customer_window_closed(last_ts)
+                            if window_closed:
+                                window_err = (
+                                    "Message failed to send because more than 24 hours have passed "
+                                    "since the customer last replied to this number."
+                                )
+                                saved_msg_id = None
                                 try:
-                                    last_dt = datetime.fromisoformat(str(last_ts))
+                                    saved_msg_id = chat_db.add_message(
+                                        chat_id,
+                                        'agent',
+                                        text or '',
+                                        status='error',
+                                        source='WhatsApp',
+                                        error_message=window_err,
+                                    )
                                 except Exception:
-                                    last_dt = None
-                                if last_dt:
-                                    cairo_now = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=3)
-                                    diff_hours = (cairo_now - last_dt).total_seconds() / 3600.0
-                                    day_changed = cairo_now.date() != last_dt.date()
-                                    if diff_hours >= 23 or day_changed:
-                                        window_err = (
-                                            "Message failed to send because more than 24 hours have passed "
-                                            "since the customer last replied to this number."
-                                        )
-                                        saved_msg_id = None
-                                        try:
-                                            saved_msg_id = chat_db.add_message(
-                                                chat_id,
-                                                'agent',
-                                                text or '',
-                                                status='error',
-                                                source='WhatsApp',
-                                                error_message=window_err,
-                                            )
-                                        except Exception:
-                                            saved_msg_id = None
-                                        return jsonify({
-                                            "status": "error",
-                                            "message": window_err,
-                                            "error_message": window_err,
-                                            "code": "WHATSAPP_WINDOW_CLOSED",
-                                            "saved_msg_id": saved_msg_id,
-                                            "meta": {"diff_hours": diff_hours, "day_changed": day_changed, "location": location}
-                                        }), 400
+                                    saved_msg_id = None
+                                return jsonify({
+                                    "status": "error",
+                                    "message": window_err,
+                                    "error_message": window_err,
+                                    "code": "WHATSAPP_WINDOW_CLOSED",
+                                    "saved_msg_id": saved_msg_id,
+                                    "meta": {**(window_meta or {}), "location": location},
+                                }), 400
                         except Exception:
                             pass
 

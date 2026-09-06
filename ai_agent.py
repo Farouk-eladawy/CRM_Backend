@@ -30243,6 +30243,145 @@ Prefer the MarkItDown Extraction section below when present.
                 logging.error(f"Error in DELETE /api/automation/workflows/<id>: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        @app.route('/api/automation/scripts', methods=['GET', 'OPTIONS'])
+        def api_automation_scripts():
+            """List workflows/*.py for the Canvas module picker (run_script)."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import os
+                root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'workflows')
+                names = []
+                if os.path.isdir(root):
+                    for fn in sorted(os.listdir(root)):
+                        if not fn.endswith('.py'):
+                            continue
+                        if fn.startswith('_') or fn == '__init__.py':
+                            continue
+                        names.append(fn)
+                return jsonify({"status": "success", "data": names}), 200
+            except Exception as e:
+                logging.error(f"Error in GET /api/automation/scripts: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/automation/compose_module', methods=['POST', 'OPTIONS'])
+        def api_automation_compose_module():
+            """
+            PI helper: turn a short user request into ONE canvas module
+            (moduleId + config). Never invents a full workflow.
+            """
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                payload = request.get_json(silent=True) or {}
+                actor = payload.get("actor") or {}
+                role = str(actor.get("role") or "").strip().lower()
+                if role != "admin":
+                    return jsonify({"status": "error", "message": "Admin only"}), 403
+
+                prompt = str(payload.get("prompt") or "").strip()
+                if not prompt:
+                    return jsonify({"status": "error", "message": "Missing prompt"}), 400
+
+                catalog = payload.get("catalog") if isinstance(payload.get("catalog"), list) else []
+                catalog_lines = []
+                known_ids = set()
+                for item in catalog:
+                    if not isinstance(item, dict):
+                        continue
+                    mid = str(item.get("id") or "").strip()
+                    if not mid:
+                        continue
+                    known_ids.add(mid)
+                    catalog_lines.append(
+                        f"- {mid} | {item.get('kind')} | {item.get('labelEn')} | {item.get('descriptionEn')}"
+                    )
+                catalog_txt = "\n".join(catalog_lines) or "(empty catalog)"
+
+                system = (
+                    "You are FTS Travels Workflow Canvas assistant. "
+                    "The user wants to ADD ONE MODULE only (not a full workflow). "
+                    "Pick the best existing module id from the catalog and fill config fields. "
+                    "Reply with STRICT JSON only, no markdown:\n"
+                    '{"moduleId":"...","config":{...},"noteEn":"...","noteAr":"..."}\n'
+                    "config keys must match the chosen module's form fields when possible "
+                    "(e.g. keywords, reply, script_name, locations, sources, text, prompt, url). "
+                    "If nothing fits, use fts.action.http_request or fts.action.keyword_reply. "
+                    "noteAr/noteEn must remind: this creates one module only."
+                )
+                user_prompt = (
+                    f"User request:\n{prompt}\n\n"
+                    f"Prefer kind: {payload.get('prefer_kind') or 'action'}\n\n"
+                    f"Catalog:\n{catalog_txt}\n"
+                )
+                raw = ""
+                try:
+                    raw = str(
+                        self.query_ai(
+                            user_prompt,
+                            system_role="analyzer",
+                            usage_source="automation_compose_module",
+                        )
+                        or ""
+                    ).strip()
+                except Exception as ai_err:
+                    logging.warning("compose_module query_ai failed: %s", ai_err)
+                    raw = ""
+
+                import re as _re
+                data = None
+                if raw:
+                    m = _re.search(r"\{[\s\S]*\}", raw)
+                    blob = m.group(0) if m else raw
+                    try:
+                        data = json.loads(blob)
+                    except Exception:
+                        data = None
+
+                if not isinstance(data, dict):
+                    # Deterministic fallback without AI
+                    low = prompt.lower()
+                    if any(k in low for k in ("keyword", "كلمة", "رد ثابت", "auto-reply", "autoreply")):
+                        mid = "fts.action.keyword_reply"
+                        cfg = {"keywords": "", "reply": ""}
+                    elif any(k in low for k in ("script", "سكربت", ".py")):
+                        mid = "fts.action.run_script"
+                        sm = _re.search(r"([\w\-]+\.py)", prompt, _re.I)
+                        cfg = {"script_name": sm.group(1) if sm else ""}
+                    elif any(k in low for k in ("whatsapp", "واتساب")):
+                        mid = "fts.action.send_whatsapp"
+                        cfg = {"text": "", "to": "{{event.payload.sender_identifier}}"}
+                    elif any(k in low for k in ("location", "قسم", "ديني", "religious")):
+                        mid = "fts.condition.filter_location"
+                        cfg = {"locations": ["Religious"]}
+                    else:
+                        mid = "fts.action.http_request"
+                        cfg = {"method": "POST", "url": ""}
+                    data = {
+                        "moduleId": mid,
+                        "config": cfg,
+                        "noteEn": "One module only (fallback without PI).",
+                        "noteAr": "موديول واحد فقط (بدون PI).",
+                    }
+
+                mid = str(data.get("moduleId") or data.get("module_id") or "").strip()
+                if known_ids and mid not in known_ids:
+                    # Force closest safe default
+                    mid = "fts.action.keyword_reply" if "keyword" in prompt.lower() or "كلمة" in prompt else "fts.action.http_request"
+                cfg = data.get("config") if isinstance(data.get("config"), dict) else {}
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        "moduleId": mid,
+                        "config": cfg,
+                        "noteEn": str(data.get("noteEn") or data.get("note_en") or "One module created (not a full workflow)."),
+                        "noteAr": str(data.get("noteAr") or data.get("note_ar") or "تم إنشاء موديول واحد فقط (ليس Workflow كامل)."),
+                    },
+                }), 200
+            except Exception as e:
+                logging.error(f"Error in POST /api/automation/compose_module: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
         @app.route('/api/automation/run_script', methods=['POST', 'OPTIONS'])
         def api_automation_run_script():
             if request.method == 'OPTIONS':

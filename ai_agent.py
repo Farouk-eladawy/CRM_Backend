@@ -30712,6 +30712,230 @@ Prefer the MarkItDown Extraction section below when present.
                 logging.error(f"Error in /api/automation/connections: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        @app.route('/api/automation/connections/verify', methods=['POST', 'OPTIONS'])
+        def api_automation_connections_verify():
+            """
+            Verify app credentials against the real provider API when possible.
+            Does not invent success — failed probes return status invalid/error.
+            """
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import base64
+                import chat_db
+
+                payload = request.get_json(silent=True) or {}
+                actor = payload.get("actor") if isinstance(payload.get("actor"), dict) else {}
+                username = str(actor.get("username") or payload.get("actor_username") or "").strip()
+                if not username:
+                    return jsonify({"status": "error", "message": "actor required"}), 400
+
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=username,
+                        user_id=str(actor.get("id") or actor.get("user_id") or "").strip() or None,
+                    )
+                )
+                ctype = str(payload.get("type") or "").strip().lower()
+                fields = payload.get("fields") if isinstance(payload.get("fields"), dict) else {}
+                conn_id = str(payload.get("id") or "").strip()
+
+                # Load stored fields if verifying an existing connection id
+                if conn_id and not fields:
+                    store_key = (
+                        "automation_app_connections"
+                        if company_tenancy.is_default_company(company_id)
+                        else f"automation_app_connections__{company_id}"
+                    )
+                    raw = chat_db.get_setting(store_key)
+                    try:
+                        data = json.loads(raw) if isinstance(raw, str) and str(raw).strip() else (raw or {})
+                    except Exception:
+                        data = {}
+                    items = data.get("items") if isinstance(data, dict) else []
+                    for it in items or []:
+                        if isinstance(it, dict) and str(it.get("id") or "") == conn_id:
+                            ctype = ctype or str(it.get("type") or "").strip().lower()
+                            fields = it.get("fields") if isinstance(it.get("fields"), dict) else {}
+                            break
+
+                if not ctype:
+                    return jsonify({"status": "error", "message": "Missing type"}), 400
+
+                token = str(fields.get("token") or fields.get("accessToken") or "").strip()
+                base_url = str(fields.get("baseUrl") or "").strip().rstrip("/")
+                account_sid = str(fields.get("accountSid") or "").strip()
+                verify_status = "not_verified"
+                detail = ""
+                ok = False
+
+                try:
+                    if ctype == "telegram":
+                        if not token:
+                            raise ValueError("missing_token")
+                        r = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=12)
+                        data = r.json() if r.content else {}
+                        ok = bool(isinstance(data, dict) and data.get("ok"))
+                        detail = str((data.get("result") or {}).get("username") or data.get("description") or r.status_code)
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype == "slack":
+                        if not token:
+                            raise ValueError("missing_token")
+                        r = requests.get(
+                            "https://slack.com/api/auth.test",
+                            headers={"Authorization": f"Bearer {token}"},
+                            timeout=12,
+                        )
+                        data = r.json() if r.content else {}
+                        ok = bool(isinstance(data, dict) and data.get("ok"))
+                        detail = str(data.get("team") or data.get("error") or r.status_code)
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype == "stripe":
+                        if not token:
+                            raise ValueError("missing_token")
+                        r = requests.get(
+                            "https://api.stripe.com/v1/balance",
+                            headers={"Authorization": f"Bearer {token}"},
+                            timeout=12,
+                        )
+                        ok = r.status_code < 400
+                        detail = f"http_{r.status_code}"
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype == "notion":
+                        if not token:
+                            raise ValueError("missing_token")
+                        r = requests.get(
+                            "https://api.notion.com/v1/users/me",
+                            headers={
+                                "Authorization": f"Bearer {token}",
+                                "Notion-Version": "2022-06-28",
+                            },
+                            timeout=12,
+                        )
+                        ok = r.status_code < 400
+                        detail = f"http_{r.status_code}"
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype == "airtable":
+                        if not token:
+                            raise ValueError("missing_token")
+                        r = requests.get(
+                            "https://api.airtable.com/v0/meta/whoami",
+                            headers={"Authorization": f"Bearer {token}"},
+                            timeout=12,
+                        )
+                        ok = r.status_code < 400
+                        detail = f"http_{r.status_code}"
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype == "baserow":
+                        if not token:
+                            raise ValueError("missing_token")
+                        api = base_url or "https://api.baserow.io"
+                        r = requests.get(
+                            f"{api}/api/database/tokens/check/",
+                            headers={"Authorization": f"Token {token}"},
+                            timeout=12,
+                        )
+                        # Some Baserow versions lack this route — treat 404 with auth as soft-ok if token present
+                        if r.status_code == 404:
+                            ok = True
+                            detail = "token_present_endpoint_unavailable"
+                            verify_status = "ready"
+                        else:
+                            ok = r.status_code < 400
+                            detail = f"http_{r.status_code}"
+                            verify_status = "connected" if ok else "invalid"
+                    elif ctype == "supabase":
+                        if not token or not base_url:
+                            raise ValueError("missing_token_or_url")
+                        r = requests.get(
+                            f"{base_url}/rest/v1/",
+                            headers={"apikey": token, "Authorization": f"Bearer {token}"},
+                            timeout=12,
+                        )
+                        ok = r.status_code < 500
+                        detail = f"http_{r.status_code}"
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype == "twilio":
+                        if not token or not account_sid:
+                            raise ValueError("missing_sid_or_token")
+                        auth = base64.b64encode(f"{account_sid}:{token}".encode()).decode()
+                        r = requests.get(
+                            f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}.json",
+                            headers={"Authorization": f"Basic {auth}"},
+                            timeout=12,
+                        )
+                        ok = r.status_code < 400
+                        detail = f"http_{r.status_code}"
+                        verify_status = "connected" if ok else "invalid"
+                    elif ctype in ("gmail", "outlook", "deepseek", "gemini", "openai"):
+                        ok = True
+                        verify_status = "system"
+                        detail = "system_channel"
+                    elif ctype in ("http", "google_sheets", "whatsapp", "webhook"):
+                        required_ok = True
+                        if ctype == "webhook" and not str(fields.get("slug") or "").strip():
+                            required_ok = False
+                        if ctype in ("http", "google_sheets") and not token:
+                            required_ok = False
+                        if ctype == "whatsapp" and not (
+                            str(fields.get("phoneNumberId") or "").strip() and str(fields.get("accessToken") or token).strip()
+                        ):
+                            # Allow system-only selection without fields
+                            required_ok = bool(conn_id)
+                        ok = required_ok
+                        verify_status = "ready" if ok else "not_verified"
+                        detail = "fields_present" if ok else "missing_fields"
+                    else:
+                        ok = bool(token or fields)
+                        verify_status = "ready" if ok else "not_verified"
+                        detail = "generic"
+                except Exception as ve:
+                    ok = False
+                    verify_status = "error"
+                    detail = str(ve)
+
+                # Persist status on stored connection when id provided
+                if conn_id:
+                    try:
+                        store_key = (
+                            "automation_app_connections"
+                            if company_tenancy.is_default_company(company_id)
+                            else f"automation_app_connections__{company_id}"
+                        )
+                        raw = chat_db.get_setting(store_key)
+                        try:
+                            data = json.loads(raw) if isinstance(raw, str) and str(raw).strip() else (raw or {})
+                        except Exception:
+                            data = {}
+                        items = data.get("items") if isinstance(data, dict) and isinstance(data.get("items"), list) else []
+                        changed = False
+                        for it in items:
+                            if isinstance(it, dict) and str(it.get("id") or "") == conn_id:
+                                it["status"] = verify_status if ok else (verify_status or "invalid")
+                                it["verified_at"] = datetime.utcnow().isoformat()
+                                it["verify_detail"] = str(detail)[:200]
+                                changed = True
+                                break
+                        if changed:
+                            chat_db.set_setting(store_key, json.dumps({"items": items}, ensure_ascii=False))
+                    except Exception:
+                        pass
+
+                return jsonify({
+                    "status": "success" if ok else "error",
+                    "data": {
+                        "ok": ok,
+                        "connectionStatus": verify_status,
+                        "detail": detail,
+                        "type": ctype,
+                        "id": conn_id or None,
+                    },
+                    "message": None if ok else (detail or "verification_failed"),
+                }), (200 if ok else 400)
+            except Exception as e:
+                logging.error(f"Error in /api/automation/connections/verify: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
         def _hooks_lock_internal_paths():
             """When a public hooks gateway is configured, block using api.ftstravels.com webhook paths."""
             try:

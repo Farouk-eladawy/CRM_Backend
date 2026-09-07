@@ -437,11 +437,16 @@ class AutomationEngine:
         except Exception:
             run_id = None
 
+        try:
+            run_company_id = automation_db.workflow_company_id(wf)
+        except Exception:
+            run_company_id = ""
         ctx = {
             "now": _utc_now(),
             "event": {"type": event_type, "payload": event_payload or {}},
             "vars": {},
             "workflow": {"id": wid, "name": str(wf.get("name") or wid).strip()},
+            "company_id": run_company_id,
         }
 
         chat_id = str((event_payload or {}).get("chat_id") or "").strip()
@@ -787,24 +792,45 @@ class AutomationEngine:
             if not re.search(str(regex), s, flags=flags):
                 raise StopWorkflow("guard_blocked")
 
-    def _load_user_connections(self):
-        """FTS-native automation connections (never Make.com)."""
+    def _load_user_connections(self, company_id: str = ""):
+        """FTS-native automation connections scoped per company (never Make.com)."""
         try:
             import chat_db
+            import company_tenancy
 
-            raw = chat_db.get_setting("automation_app_connections")
+            cid = automation_db.normalize_workflow_company_id(company_id) if company_id else ""
+            if cid and not company_tenancy.is_default_company(cid):
+                store_key = f"automation_app_connections__{cid}"
+            else:
+                store_key = "automation_app_connections"
+
+            raw = chat_db.get_setting(store_key)
             data = json.loads(raw) if isinstance(raw, str) and raw.strip() else (raw or {})
             items = data.get("items") if isinstance(data, dict) else data
             if not isinstance(items, list):
                 return []
-            return [x for x in items if isinstance(x, dict)]
+            out = []
+            for x in items:
+                if not isinstance(x, dict):
+                    continue
+                item_cid = automation_db.normalize_workflow_company_id(
+                    x.get("company_id") or x.get("companyId") or cid or ""
+                )
+                # Default store: skip explicitly foreign-tagged rows
+                if store_key == "automation_app_connections":
+                    if item_cid and not company_tenancy.is_default_company(item_cid):
+                        continue
+                elif cid and item_cid and item_cid != cid:
+                    continue
+                out.append(x)
+            return out
         except Exception:
             return []
 
-    def _find_connection(self, connection_id: str, connection_type: str = ""):
+    def _find_connection(self, connection_id: str, connection_type: str = "", company_id: str = ""):
         cid = str(connection_id or "").strip()
         ctype = str(connection_type or "").strip().lower()
-        items = self._load_user_connections()
+        items = self._load_user_connections(company_id)
         if cid:
             for it in items:
                 if str(it.get("id") or "").strip() == cid:
@@ -813,8 +839,16 @@ class AutomationEngine:
             for it in items:
                 if str(it.get("type") or "").strip().lower() == ctype:
                     return it
-        # System defaults
-        if ctype == "airtable" or cid in ("system_airtable", "airtable_system"):
+        # System defaults (Airtable only for default/FTS company)
+        try:
+            import company_tenancy
+
+            is_fts = (not company_id) or company_tenancy.is_default_company(
+                automation_db.normalize_workflow_company_id(company_id)
+            )
+        except Exception:
+            is_fts = True
+        if is_fts and (ctype == "airtable" or cid in ("system_airtable", "airtable_system")):
             return {"id": "system_airtable", "type": "airtable", "fields": {}, "source": "system"}
         if ctype in ("gmail", "outlook") or cid.startswith("legacy_gmail") or cid.startswith("gmail_"):
             return {"id": cid or "system_gmail", "type": ctype or "gmail", "fields": {"accountId": cid}, "source": "system"}
@@ -846,7 +880,8 @@ class AutomationEngine:
         conn_type = str(step.get("connection_type") or "").strip().lower()
         if not conn_id and not conn_type:
             return headers
-        conn = self._find_connection(conn_id, conn_type)
+        company_id = str((ctx or {}).get("company_id") or "").strip()
+        conn = self._find_connection(conn_id, conn_type, company_id=company_id)
         if not conn:
             return headers
         cctx = self._connection_ctx(conn)
@@ -1007,7 +1042,11 @@ class AutomationEngine:
         receiving_phone_id = str(_get_by_path(ctx, "chat.receiving_phone_id") or _get_by_path(ctx, "event.payload.receiving_phone_id") or "").strip() or None
         conn_id = str(step.get("connection_id") or "").strip()
         if conn_id and conn_id not in ("system_whatsapp",):
-            conn = self._find_connection(conn_id, "whatsapp")
+            conn = self._find_connection(
+                conn_id,
+                "whatsapp",
+                company_id=str((ctx or {}).get("company_id") or ""),
+            )
             if conn:
                 fields = conn.get("fields") if isinstance(conn.get("fields"), dict) else {}
                 phone_id = str(fields.get("phoneNumberId") or "").strip()

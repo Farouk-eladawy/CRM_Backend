@@ -464,6 +464,14 @@ class AutomationEngine:
                     self._step_send_internal_notification(step, ctx)
                 elif stype in ("keyword_reply", "visual_keyword_reply"):
                     self._step_keyword_reply(step, ctx)
+                elif stype == "set_variable":
+                    self._step_set_variable(step, ctx)
+                elif stype == "text_parser":
+                    self._step_text_parser(step, ctx)
+                elif stype == "json_parse":
+                    self._step_json_parse(step, ctx)
+                elif stype == "sleep":
+                    self._step_sleep(step, ctx)
                 else:
                     continue
             try:
@@ -759,6 +767,132 @@ class AutomationEngine:
             if not re.search(str(regex), s, flags=flags):
                 raise StopWorkflow("guard_blocked")
 
+    def _load_user_connections(self):
+        """FTS-native automation connections (never Make.com)."""
+        try:
+            import chat_db
+
+            raw = chat_db.get_setting("automation_app_connections")
+            data = json.loads(raw) if isinstance(raw, str) and raw.strip() else (raw or {})
+            items = data.get("items") if isinstance(data, dict) else data
+            if not isinstance(items, list):
+                return []
+            return [x for x in items if isinstance(x, dict)]
+        except Exception:
+            return []
+
+    def _find_connection(self, connection_id: str, connection_type: str = ""):
+        cid = str(connection_id or "").strip()
+        ctype = str(connection_type or "").strip().lower()
+        items = self._load_user_connections()
+        if cid:
+            for it in items:
+                if str(it.get("id") or "").strip() == cid:
+                    return it
+        if ctype:
+            for it in items:
+                if str(it.get("type") or "").strip().lower() == ctype:
+                    return it
+        # System defaults
+        if ctype == "airtable" or cid in ("system_airtable", "airtable_system"):
+            return {"id": "system_airtable", "type": "airtable", "fields": {}, "source": "system"}
+        if ctype in ("gmail", "outlook") or cid.startswith("legacy_gmail") or cid.startswith("gmail_"):
+            return {"id": cid or "system_gmail", "type": ctype or "gmail", "fields": {"accountId": cid}, "source": "system"}
+        return None
+
+    def _connection_ctx(self, conn: dict):
+        fields = conn.get("fields") if isinstance(conn.get("fields"), dict) else {}
+        token = str(fields.get("token") or fields.get("accessToken") or "").strip()
+        base_url = str(fields.get("baseUrl") or "").strip().rstrip("/")
+        account_sid = str(fields.get("accountSid") or "").strip()
+        from_number = str(fields.get("fromNumber") or "").strip()
+        out = {
+            "id": str(conn.get("id") or ""),
+            "type": str(conn.get("type") or ""),
+            "token": token,
+            "baseUrl": base_url,
+            "accountSid": account_sid,
+            "fromNumber": from_number,
+            "accountId": str(fields.get("accountId") or conn.get("id") or ""),
+        }
+        if token and str(conn.get("type") or "").lower() == "telegram":
+            out["telegram_send_url"] = f"https://api.telegram.org/bot{token}/sendMessage"
+        if account_sid:
+            out["twilio_messages_url"] = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
+        return out
+
+    def _apply_connection_auth(self, step: dict, headers: dict, ctx: dict):
+        conn_id = str(step.get("connection_id") or "").strip()
+        conn_type = str(step.get("connection_type") or "").strip().lower()
+        if not conn_id and not conn_type:
+            return headers
+        conn = self._find_connection(conn_id, conn_type)
+        if not conn:
+            return headers
+        cctx = self._connection_ctx(conn)
+        ctx["connection"] = cctx
+        token = cctx.get("token") or ""
+        ctype = str(cctx.get("type") or conn_type).lower()
+        h = dict(headers or {})
+        if ctype in ("airtable", "slack", "stripe", "google_sheets", "notion", "deepseek", "gemini", "openai") and token:
+            h.setdefault("Authorization", f"Bearer {token}")
+        elif ctype == "baserow" and token:
+            h.setdefault("Authorization", f"Token {token}")
+        elif ctype == "supabase" and token:
+            h.setdefault("apikey", token)
+            h.setdefault("Authorization", f"Bearer {token}")
+        elif ctype == "http" and token:
+            fields = conn.get("fields") if isinstance(conn.get("fields"), dict) else {}
+            header_name = str(fields.get("headerName") or "Authorization").strip() or "Authorization"
+            prefix = str(fields.get("headerPrefix") if fields.get("headerPrefix") is not None else "Bearer ")
+            h.setdefault(header_name, f"{prefix}{token}")
+        elif ctype == "twilio":
+            # Basic auth via requests auth= handled in http step
+            ctx["_http_basic"] = (cctx.get("accountSid") or "", token)
+        if ctype == "notion":
+            h.setdefault("Notion-Version", "2022-06-28")
+        return h
+
+    def _step_set_variable(self, step: dict, ctx: dict):
+        key = str(step.get("key") or "value").strip() or "value"
+        val = step.get("value")
+        if isinstance(val, str):
+            val = _render_template(val, ctx)
+        ctx.setdefault("vars", {})[key] = val
+
+    def _step_text_parser(self, step: dict, ctx: dict):
+        text = _render_template(step.get("text") or "", ctx)
+        pattern = str(step.get("pattern") or "")
+        output_key = str(step.get("output_key") or "parsed").strip() or "parsed"
+        group = int(step.get("group") or 1)
+        if not pattern:
+            return
+        m = re.search(pattern, text, flags=re.IGNORECASE | re.DOTALL)
+        if not m:
+            ctx.setdefault("vars", {})[output_key] = ""
+            return
+        try:
+            ctx.setdefault("vars", {})[output_key] = m.group(group)
+        except IndexError:
+            ctx.setdefault("vars", {})[output_key] = m.group(0)
+
+    def _step_json_parse(self, step: dict, ctx: dict):
+        text = _render_template(step.get("text") or "", ctx)
+        output_key = str(step.get("output_key") or "json").strip() or "json"
+        try:
+            ctx.setdefault("vars", {})[output_key] = json.loads(text)
+        except Exception:
+            ctx.setdefault("vars", {})[output_key] = None
+
+    def _step_sleep(self, step: dict, ctx: dict):
+        try:
+            seconds = float(step.get("seconds") or 1)
+        except Exception:
+            seconds = 1.0
+        seconds = max(0.0, min(seconds, 30.0))
+        if seconds > 0:
+            time.sleep(seconds)
+
     def _step_ai(self, step: dict, ctx: dict):
         prompt = _render_template(step.get("prompt") or "", ctx)
         system_role = str(step.get("system_role") or "analyzer").strip() or "analyzer"
@@ -768,8 +902,31 @@ class AutomationEngine:
         wf = ctx.get("workflow") if isinstance(ctx.get("workflow"), dict) else {}
         wf_label = str(wf.get("name") or wf.get("id") or "unknown").strip() or "unknown"
         usage_source = f"automation:{wf_label}"
+        # preferred_provider is advisory; query_ai uses system routing.
+        # Connection id is stored for future provider-specific overrides.
+        _ = str(step.get("preferred_provider") or step.get("connection_id") or "")
         res = self.agent.query_ai(prompt, system_role=system_role, usage_source=usage_source)
         ctx["vars"][output_key] = res
+
+    def _step_send_email(self, step: dict, ctx: dict):
+        to_email = _render_template(step.get("to") or "", ctx).strip()
+        if not to_email:
+            to_email = str(_get_by_path(ctx, "event.payload.sender_identifier") or "").strip()
+        if not to_email or "@" not in to_email:
+            raise Exception("send_email_missing_to")
+
+        subject = _render_template(step.get("subject") or "", ctx).strip() or "FTS Travels"
+        body_html = _render_template(step.get("html") or "", ctx).strip()
+        if not body_html:
+            return
+        thread_id = str(_get_by_path(ctx, "event.payload.thread_id") or "").strip() or None
+        mailbox = str(step.get("mailbox") or step.get("connection_id") or "").strip() or None
+        if mailbox in ("system_gmail", "system_outlook", ""):
+            mailbox = None
+        try:
+            self.agent.send_email(to_email, subject, body_html, thread_id=thread_id, mailbox=mailbox)
+        except TypeError:
+            self.agent.send_email(to_email, subject, body_html, thread_id=thread_id)
 
     def _step_airtable_update(self, step: dict, ctx: dict):
         record_id = _render_template(step.get("record_id") or "", ctx).strip()
@@ -798,31 +955,6 @@ class AutomationEngine:
             raise Exception("airtable_not_configured")
         self.agent.table.update(record_id, rendered)
 
-    def _step_send_whatsapp(self, step: dict, ctx: dict):
-        to_phone = _render_template(step.get("to") or "", ctx).strip()
-        if not to_phone:
-            to_phone = str(_get_by_path(ctx, "event.payload.sender_identifier") or "").strip()
-        to_phone = to_phone.replace("+", "").replace(" ", "")
-        if not to_phone:
-            raise Exception("send_whatsapp_missing_to")
-
-        text = _render_template(step.get("text") or "", ctx).strip()
-        if not text:
-            return
-
-        location = str(_get_by_path(ctx, "chat.location") or _get_by_path(ctx, "event.payload.location") or "Unknown").strip() or "Unknown"
-        receiving_phone_id = str(_get_by_path(ctx, "chat.receiving_phone_id") or _get_by_path(ctx, "event.payload.receiving_phone_id") or "").strip() or None
-        ok, _ = self.agent.send_whatsapp_message(to_phone, text=text, location=location, receiving_phone_id=receiving_phone_id)
-
-        chat_id = str(_get_by_path(ctx, "chat.chat_id") or _get_by_path(ctx, "event.payload.chat_id") or "").strip()
-        if ok and chat_id:
-            try:
-                import chat_db
-
-                chat_db.add_message(chat_id=chat_id, sender_type="agent", text=text, status="sent", source="WhatsApp")
-            except Exception:
-                pass
-
     def _step_send_internal_notification(self, step: dict, ctx: dict):
         """Send via Internal Notifications Evolution channel (staff alerts)."""
         to_phone = _render_template(step.get("to") or step.get("phone") or "", ctx).strip()
@@ -839,19 +971,38 @@ class AutomationEngine:
             raise Exception("send_internal_notification_failed")
         ctx.setdefault("vars", {})["_workflow_sent"] = True
 
-    def _step_send_email(self, step: dict, ctx: dict):
-        to_email = _render_template(step.get("to") or "", ctx).strip()
-        if not to_email:
-            to_email = str(_get_by_path(ctx, "event.payload.sender_identifier") or "").strip()
-        if not to_email or "@" not in to_email:
-            raise Exception("send_email_missing_to")
+    def _step_send_whatsapp(self, step: dict, ctx: dict):
+        to_phone = _render_template(step.get("to") or "", ctx).strip()
+        if not to_phone:
+            to_phone = str(_get_by_path(ctx, "event.payload.sender_identifier") or "").strip()
+        to_phone = to_phone.replace("+", "").replace(" ", "")
+        if not to_phone:
+            raise Exception("send_whatsapp_missing_to")
 
-        subject = _render_template(step.get("subject") or "", ctx).strip() or "FTS Travels"
-        body_html = _render_template(step.get("html") or "", ctx).strip()
-        if not body_html:
+        text = _render_template(step.get("text") or "", ctx).strip()
+        if not text:
             return
-        thread_id = str(_get_by_path(ctx, "event.payload.thread_id") or "").strip() or None
-        self.agent.send_email(to_email, subject, body_html, thread_id=thread_id)
+
+        location = str(_get_by_path(ctx, "chat.location") or _get_by_path(ctx, "event.payload.location") or "Unknown").strip() or "Unknown"
+        receiving_phone_id = str(_get_by_path(ctx, "chat.receiving_phone_id") or _get_by_path(ctx, "event.payload.receiving_phone_id") or "").strip() or None
+        conn_id = str(step.get("connection_id") or "").strip()
+        if conn_id and conn_id not in ("system_whatsapp",):
+            conn = self._find_connection(conn_id, "whatsapp")
+            if conn:
+                fields = conn.get("fields") if isinstance(conn.get("fields"), dict) else {}
+                phone_id = str(fields.get("phoneNumberId") or "").strip()
+                if phone_id:
+                    receiving_phone_id = phone_id
+        ok, _ = self.agent.send_whatsapp_message(to_phone, text=text, location=location, receiving_phone_id=receiving_phone_id)
+
+        chat_id = str(_get_by_path(ctx, "chat.chat_id") or _get_by_path(ctx, "event.payload.chat_id") or "").strip()
+        if ok and chat_id:
+            try:
+                import chat_db
+
+                chat_db.add_message(chat_id=chat_id, sender_type="agent", text=text, status="sent", source="WhatsApp")
+            except Exception:
+                pass
 
     def _mark_sent_from_script_result(self, ctx: dict, result):
         """Propagate workflow script `sent: True` so sync callers can skip AI drafts."""
@@ -954,22 +1105,26 @@ class AutomationEngine:
         return True
 
     def _step_http_request(self, step: dict, ctx: dict):
+        # Inject connection secrets into ctx before URL/body template render.
+        headers = step.get("headers") or {}
+        if not isinstance(headers, dict):
+            headers = {}
+        ctx.pop("_http_basic", None)
+        seed_headers = {str(k): (v if not isinstance(v, str) else v) for k, v in headers.items() if k}
+        rendered_headers = self._apply_connection_auth(step, seed_headers, ctx)
+
         method = str(step.get("method") or "POST").strip().upper()
         url = _render_template(step.get("url") or "", ctx).strip()
         if not url:
             raise Exception("http_request_missing_url")
 
-        headers = step.get("headers") or {}
-        if not isinstance(headers, dict):
-            headers = {}
-        rendered_headers = {}
-        for k, v in headers.items():
-            if not k:
-                continue
+        final_headers = {}
+        for k, v in rendered_headers.items():
             if isinstance(v, str):
-                rendered_headers[str(k)] = _render_template(v, ctx)
+                final_headers[str(k)] = _render_template(v, ctx)
             else:
-                rendered_headers[str(k)] = str(v)
+                final_headers[str(k)] = str(v)
+        rendered_headers = final_headers
 
         body = step.get("body")
         output_key = str(step.get("output_key") or "result").strip()
@@ -989,8 +1144,13 @@ class AutomationEngine:
             timeout_s = 15.0
         timeout_s = max(1.0, min(timeout_s, 300.0))
 
+        auth = None
+        basic = ctx.get("_http_basic")
+        if isinstance(basic, (list, tuple)) and len(basic) == 2:
+            auth = (str(basic[0] or ""), str(basic[1] or ""))
+
         def _send(**kwargs):
-            res = requests.request(method, url, headers=rendered_headers, timeout=timeout_s, **kwargs)
+            res = requests.request(method, url, headers=rendered_headers, timeout=timeout_s, auth=auth, **kwargs)
             sc = int(getattr(res, "status_code", 0) or 0)
             if sc >= 400:
                 try:
@@ -1032,7 +1192,11 @@ class AutomationEngine:
                     rendered_body[k] = _render_template(v, ctx)
                 else:
                     rendered_body[k] = v
-            _send(json=rendered_body)
+            ct = str(rendered_headers.get("content-type") or rendered_headers.get("Content-Type") or "").lower()
+            if "application/x-www-form-urlencoded" in ct:
+                _send(data=rendered_body)
+            else:
+                _send(json=rendered_body)
             return
 
         _send(data=str(body))

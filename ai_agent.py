@@ -30264,6 +30264,163 @@ Prefer the MarkItDown Extraction section below when present.
                 logging.error(f"Error in GET /api/automation/scripts: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        @app.route('/api/automation/connections', methods=['GET', 'POST', 'OPTIONS'])
+        def api_automation_connections():
+            """
+            List / create FTS-native app connections for the Workflow Canvas.
+            Never imports Make.com credentials — only system settings + user-stored secrets.
+            """
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import uuid
+                import chat_db
+
+                def _read_store():
+                    raw = chat_db.get_setting("automation_app_connections")
+                    try:
+                        data = json.loads(raw) if isinstance(raw, str) and str(raw).strip() else (raw or {})
+                    except Exception:
+                        data = {}
+                    if not isinstance(data, dict):
+                        data = {}
+                    items = data.get("items") if isinstance(data.get("items"), list) else []
+                    return data, [x for x in items if isinstance(x, dict)]
+
+                def _write_store(items):
+                    chat_db.set_setting("automation_app_connections", json.dumps({"items": items}, ensure_ascii=False))
+
+                def _system_connections(type_filter=""):
+                    out = []
+                    tf = str(type_filter or "").strip().lower()
+
+                    def add(cid, ctype, label, status="system"):
+                        if tf and ctype != tf:
+                            return
+                        out.append({
+                            "id": cid,
+                            "type": ctype,
+                            "label": label,
+                            "status": status,
+                            "source": "system",
+                        })
+
+                    # Airtable system table
+                    if getattr(self, "table", None) is not None:
+                        add("system_airtable", "airtable", "FTS Airtable (system)", "connected")
+                    else:
+                        add("system_airtable", "airtable", "FTS Airtable (configure in Settings)", "draft")
+
+                    # Gmail / email accounts
+                    try:
+                        for acc in _get_dashboard_email_accounts() or []:
+                            if not isinstance(acc, dict):
+                                continue
+                            aid = str(acc.get("id") or "").strip()
+                            if not aid:
+                                continue
+                            email = str(acc.get("email") or acc.get("label") or aid).strip()
+                            st = str(acc.get("connectionStatus") or "ready").strip() or "ready"
+                            add(aid, "gmail", f"Gmail · {email}", st)
+                            add(aid, "outlook", f"Outlook/Email · {email}", st)
+                    except Exception:
+                        add("system_gmail", "gmail", "Gmail (from Settings)", "ready")
+
+                    # WhatsApp Meta / channels
+                    try:
+                        raw_wa = chat_db.get_setting("whatsapp_channels") or chat_db.get_setting("dashboard_whatsapp_channels")
+                        wa_items = []
+                        if isinstance(raw_wa, str) and raw_wa.strip():
+                            parsed = json.loads(raw_wa)
+                            wa_items = parsed if isinstance(parsed, list) else (parsed.get("items") if isinstance(parsed, dict) else [])
+                        elif isinstance(raw_wa, list):
+                            wa_items = raw_wa
+                        elif isinstance(raw_wa, dict):
+                            wa_items = raw_wa.get("items") or raw_wa.get("channels") or []
+                        for ch in wa_items or []:
+                            if not isinstance(ch, dict):
+                                continue
+                            cid = str(ch.get("id") or ch.get("phoneNumberId") or "").strip()
+                            if not cid:
+                                continue
+                            label = str(ch.get("label") or ch.get("displayPhone") or cid).strip()
+                            add(cid, "whatsapp", f"WhatsApp · {label}", str(ch.get("connectionStatus") or "ready"))
+                    except Exception:
+                        add("system_whatsapp", "whatsapp", "WhatsApp (system default)", "ready")
+
+                    add("system_deepseek", "deepseek", "DeepSeek (FTS AI router)", "connected")
+                    add("system_gemini", "gemini", "Google Gemini (FTS AI router)", "connected")
+                    add("system_openai", "openai", "OpenAI (FTS AI router)", "connected")
+                    return out
+
+                if request.method == 'GET':
+                    type_filter = str(request.args.get("type") or "").strip().lower()
+                    _, user_items = _read_store()
+                    public_user = []
+                    for it in user_items:
+                        ctype = str(it.get("type") or "").strip().lower()
+                        if type_filter and ctype != type_filter:
+                            continue
+                        fields = it.get("fields") if isinstance(it.get("fields"), dict) else {}
+                        hints = {}
+                        for k, v in fields.items():
+                            if k in ("token", "accessToken", "authToken") or "secret" in str(k).lower() or "password" in str(k).lower():
+                                continue
+                            hints[str(k)] = str(v)[:120]
+                        public_user.append({
+                            "id": str(it.get("id") or ""),
+                            "type": ctype,
+                            "label": str(it.get("label") or ctype),
+                            "status": str(it.get("status") or "ready"),
+                            "source": "user",
+                            "hints": hints,
+                        })
+                    system = _system_connections(type_filter)
+                    return jsonify({"status": "success", "data": system + public_user}), 200
+
+                # POST — create/update user connection
+                payload = request.get_json(silent=True) or {}
+                actor = payload.get("actor") or {}
+                if str(actor.get("role") or "").strip().lower() != "admin":
+                    return jsonify({"status": "error", "message": "Admin only"}), 403
+
+                ctype = str(payload.get("type") or "").strip().lower()
+                label = str(payload.get("label") or "").strip() or ctype
+                fields = payload.get("fields") if isinstance(payload.get("fields"), dict) else {}
+                conn_id = str(payload.get("id") or "").strip() or f"conn_{uuid.uuid4().hex[:12]}"
+                if not ctype:
+                    return jsonify({"status": "error", "message": "Missing type"}), 400
+
+                _, items = _read_store()
+                found = False
+                for it in items:
+                    if str(it.get("id") or "") == conn_id:
+                        it["type"] = ctype
+                        it["label"] = label
+                        it["fields"] = fields
+                        it["status"] = "ready"
+                        it["updated_at"] = datetime.utcnow().isoformat()
+                        found = True
+                        break
+                if not found:
+                    items.append({
+                        "id": conn_id,
+                        "type": ctype,
+                        "label": label,
+                        "fields": fields,
+                        "status": "ready",
+                        "source": "user",
+                        "created_at": datetime.utcnow().isoformat(),
+                    })
+                _write_store(items)
+                return jsonify({
+                    "status": "success",
+                    "data": {"id": conn_id, "type": ctype, "label": label, "status": "ready", "source": "user"},
+                }), 200
+            except Exception as e:
+                logging.error(f"Error in /api/automation/connections: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
         @app.route('/api/automation/compose_module', methods=['POST', 'OPTIONS'])
         def api_automation_compose_module():
             """

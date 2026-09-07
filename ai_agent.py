@@ -30094,7 +30094,40 @@ Prefer the MarkItDown Extraction section below when present.
                 wf_payload = payload.get("workflow")
                 if not isinstance(wf_payload, dict):
                     wf_payload = payload
-                saved = automation_db.upsert_workflow(wf_payload)
+
+                # Ensure webhook owner is the saving user (no cross-user collision)
+                try:
+                    tcfg = wf_payload.get("trigger_config") if isinstance(wf_payload.get("trigger_config"), dict) else {}
+                    if str(wf_payload.get("trigger_type") or "").strip().lower() == "manual":
+                        owner = str(actor.get("username") or actor.get("id") or tcfg.get("webhook_owner") or "").strip()
+                        if owner:
+                            tcfg = dict(tcfg)
+                            tcfg["webhook_owner"] = owner
+                            # Brand webhook under the actor's company (not a fixed FTS public path)
+                            company_id = company_tenancy.resolve_company_id(
+                                username=actor.get("username") or owner,
+                                user_id=actor.get("id") or actor.get("user_id") or owner,
+                            )
+                            company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
+                            tcfg["webhook_company_id"] = company_tenancy.normalize_company_id(company.get("id"))
+                            tcfg["webhook_company_slug"] = company_tenancy.resolve_webhook_public_slug(
+                                company, username=owner
+                            )
+                            wf_payload = dict(wf_payload)
+                            wf_payload["trigger_config"] = tcfg
+                except Exception:
+                    pass
+
+                try:
+                    saved = automation_db.upsert_workflow(wf_payload)
+                except ValueError as ve:
+                    msg = str(ve)
+                    if msg.startswith("webhook_slug_in_use:"):
+                        return jsonify({
+                            "status": "error",
+                            "message": f"Webhook already used by another workflow: {msg.split(':', 1)[-1]}",
+                        }), 409
+                    raise
                 return jsonify({"status": "success", "data": saved}), 200
             except Exception as e:
                 logging.error(f"Error in POST /api/automation/workflows: {e}", exc_info=True)
@@ -30355,11 +30388,19 @@ Prefer the MarkItDown Extraction section below when present.
 
                 if request.method == 'GET':
                     type_filter = str(request.args.get("type") or "").strip().lower()
+                    owner_filter = str(request.args.get("owner") or "").strip()
                     _, user_items = _read_store()
                     public_user = []
                     for it in user_items:
                         ctype = str(it.get("type") or "").strip().lower()
                         if type_filter and ctype != type_filter:
+                            continue
+                        item_owner = str(it.get("owner") or (it.get("fields") or {}).get("owner") or "").strip()
+                        # Per-user isolation: webhooks never leak across users (even legacy empty owner)
+                        if type_filter == "webhook" and owner_filter:
+                            if not item_owner or item_owner.lower() != owner_filter.lower():
+                                continue
+                        elif owner_filter and item_owner and item_owner.lower() != owner_filter.lower():
                             continue
                         fields = it.get("fields") if isinstance(it.get("fields"), dict) else {}
                         hints = {}
@@ -30367,15 +30408,26 @@ Prefer the MarkItDown Extraction section below when present.
                             if k in ("token", "accessToken", "authToken") or "secret" in str(k).lower() or "password" in str(k).lower():
                                 continue
                             hints[str(k)] = str(v)[:120]
+                        if item_owner:
+                            hints["owner"] = item_owner
                         public_user.append({
                             "id": str(it.get("id") or ""),
                             "type": ctype,
                             "label": str(it.get("label") or ctype),
                             "status": str(it.get("status") or "ready"),
                             "source": "user",
+                            "owner": item_owner,
                             "hints": hints,
                         })
-                    system = _system_connections(type_filter)
+                    system = [] if type_filter == "webhook" else _system_connections(type_filter)
+                    # Also expose this user's workflow webhooks for reuse
+                    if type_filter in ("", "webhook") and owner_filter:
+                        try:
+                            import automation_db as _adb
+                            for wh in _adb.list_webhooks_for_owner(owner_filter):
+                                public_user.append(wh)
+                        except Exception:
+                            pass
                     return jsonify({"status": "success", "data": system + public_user}), 200
 
                 # POST — create/update user connection
@@ -30388,8 +30440,19 @@ Prefer the MarkItDown Extraction section below when present.
                 label = str(payload.get("label") or "").strip() or ctype
                 fields = payload.get("fields") if isinstance(payload.get("fields"), dict) else {}
                 conn_id = str(payload.get("id") or "").strip() or f"conn_{uuid.uuid4().hex[:12]}"
+                owner = str(payload.get("owner") or actor.get("username") or actor.get("id") or "").strip()
                 if not ctype:
                     return jsonify({"status": "error", "message": "Missing type"}), 400
+
+                if ctype == "webhook":
+                    import automation_db as _adb
+                    slug = _adb.normalize_webhook_slug(str(fields.get("slug") or fields.get("webhook_slug") or label or ""))
+                    owner_n = _adb.normalize_webhook_owner(owner)
+                    if not slug:
+                        return jsonify({"status": "error", "message": "Missing webhook slug"}), 400
+                    fields = {**fields, "slug": slug, "owner": owner_n, "path": f"{owner_n}/{slug}"}
+                    owner = owner_n
+                    label = label or slug
 
                 _, items = _read_store()
                 found = False
@@ -30398,6 +30461,7 @@ Prefer the MarkItDown Extraction section below when present.
                         it["type"] = ctype
                         it["label"] = label
                         it["fields"] = fields
+                        it["owner"] = owner
                         it["status"] = "ready"
                         it["updated_at"] = datetime.utcnow().isoformat()
                         found = True
@@ -30408,6 +30472,7 @@ Prefer the MarkItDown Extraction section below when present.
                         "type": ctype,
                         "label": label,
                         "fields": fields,
+                        "owner": owner,
                         "status": "ready",
                         "source": "user",
                         "created_at": datetime.utcnow().isoformat(),
@@ -30415,10 +30480,157 @@ Prefer the MarkItDown Extraction section below when present.
                 _write_store(items)
                 return jsonify({
                     "status": "success",
-                    "data": {"id": conn_id, "type": ctype, "label": label, "status": "ready", "source": "user"},
+                    "data": {
+                        "id": conn_id,
+                        "type": ctype,
+                        "label": label,
+                        "status": "ready",
+                        "source": "user",
+                        "owner": owner,
+                        "hints": {k: fields.get(k) for k in ("slug", "owner", "path") if fields.get(k)},
+                    },
                 }), 200
             except Exception as e:
                 logging.error(f"Error in /api/automation/connections: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/automation/webhook/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
+        @app.route('/api/hooks/<company_slug>/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
+        def api_automation_user_webhook(owner, slug, company_slug=None):
+            """
+            Public webhook URL for Canvas workflows.
+            Preferred (company-branded): /api/hooks/{company_slug}/{owner}/{slug}
+            Legacy: /api/automation/webhook/{owner}/{slug}
+            Company path is resolved first so tenants are isolated and FTS brand can be hidden
+            via company.connections.webhookPublicBase.
+            """
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import automation_db
+
+                owner_n = automation_db.normalize_webhook_owner(owner)
+                slug_n = automation_db.normalize_webhook_slug(slug)
+                if not owner_n or not slug_n:
+                    return jsonify({"status": "error", "message": "Invalid webhook path"}), 400
+
+                company = None
+                company_id = None
+                if company_slug:
+                    company = company_tenancy.find_company_by_public_slug(company_slug)
+                    if not company:
+                        return jsonify({"status": "error", "message": "Company webhook not found"}), 404
+                    company_id = company_tenancy.normalize_company_id(company.get("id"))
+                    # Owner must belong to this company (prevent cross-tenant hits)
+                    if not company_tenancy.user_belongs_to_company(
+                        username=owner_n, user_id=owner_n, company_id=company_id
+                    ):
+                        # Also allow exact webhook_owner stored on workflow even if dashboard user renamed
+                        # (checked after workflow lookup below). Soft-fail only when no workflow match.
+                        pass
+
+                public_base = "https://api.ftstravels.com"
+                try:
+                    public_base = self._get_dashboard_oauth_public_base_url().rstrip("/")
+                except Exception:
+                    pass
+
+                if company:
+                    url = company_tenancy.build_company_webhook_url(
+                        company, owner_n, slug_n, fallback_api_base=public_base, username=owner_n
+                    )
+                else:
+                    # Legacy path: resolve company from owner when possible for branded URL in GET
+                    owner_company_id = company_tenancy.resolve_company_id(username=owner_n, user_id=owner_n)
+                    company = company_tenancy.get_company(owner_company_id) or company_tenancy.default_fts_company()
+                    company_id = company_tenancy.normalize_company_id(company.get("id"))
+                    url = company_tenancy.build_company_webhook_url(
+                        company, owner_n, slug_n, fallback_api_base=public_base, username=owner_n
+                    )
+
+                if request.method == 'GET':
+                    wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=False)
+                    co_slug = company_tenancy.resolve_webhook_public_slug(company, username=owner_n) if company else None
+                    return jsonify({
+                        "status": "success",
+                        "data": {
+                            "url": url,
+                            "owner": owner_n,
+                            "slug": slug_n,
+                            "company_id": company_id,
+                            "company_slug": co_slug,
+                            "webhook_public": co_slug,
+                            "company_name": (company or {}).get("name"),
+                            "path": f"{co_slug}/{owner_n}/{slug_n}" if co_slug else f"{owner_n}/{slug_n}",
+                            "workflow_id": (wf or {}).get("id"),
+                            "workflow_name": (wf or {}).get("name"),
+                            "enabled": bool(int((wf or {}).get("enabled") or 0)) if wf else False,
+                            "method": "POST",
+                            "content_type": "application/json",
+                        },
+                    }), 200
+
+                wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=True)
+                if not wf:
+                    any_wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=False)
+                    if any_wf:
+                        return jsonify({"status": "error", "message": "Webhook workflow is disabled"}), 403
+                    return jsonify({"status": "error", "message": "Webhook not found"}), 404
+
+                # Tenant gate: if company slug provided, workflow owner must match that company
+                if company_slug and company_id:
+                    cfg = {}
+                    try:
+                        raw_cfg = wf.get("trigger_config_json") or wf.get("trigger_config") or {}
+                        if isinstance(raw_cfg, str):
+                            import json as _json
+                            cfg = _json.loads(raw_cfg) if raw_cfg.strip() else {}
+                        elif isinstance(raw_cfg, dict):
+                            cfg = raw_cfg
+                    except Exception:
+                        cfg = {}
+                    cfg_company = company_tenancy.normalize_company_id(
+                        cfg.get("webhook_company_id") or cfg.get("company_id") or ""
+                    ) if (cfg.get("webhook_company_id") or cfg.get("company_id")) else ""
+                    owner_company = company_tenancy.resolve_company_id(username=owner_n, user_id=owner_n)
+                    allowed = False
+                    if cfg_company and cfg_company == company_id:
+                        allowed = True
+                    elif owner_company == company_id:
+                        allowed = True
+                    elif company_tenancy.user_belongs_to_company(username=owner_n, user_id=owner_n, company_id=company_id):
+                        allowed = True
+                    if not allowed:
+                        return jsonify({"status": "error", "message": "Webhook does not belong to this company"}), 404
+
+                data = request.get_json(silent=True)
+                if data is None:
+                    data = {}
+                if not isinstance(data, dict):
+                    data = {"raw": data}
+                payload = {
+                    **data,
+                    "webhook_owner": owner_n,
+                    "webhook_slug": slug_n,
+                    "webhook_path": f"{owner_n}/{slug_n}",
+                    "webhook_company_id": company_id,
+                    "webhook_company_slug": company_tenancy.company_public_slug(company) if company else None,
+                }
+                engine = getattr(self, "automation_engine", None)
+                if not engine:
+                    return jsonify({"status": "error", "message": "Automation engine not available"}), 500
+                res = engine.run_manual(str(wf.get("id")), payload=payload)
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        "workflow_id": wf.get("id"),
+                        "workflow_name": wf.get("name"),
+                        "company_id": company_id,
+                        "result": res,
+                    },
+                }), 200
+            except Exception as e:
+                logging.error(f"Error in /api/automation/webhook: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/automation/compose_module', methods=['POST', 'OPTIONS'])
@@ -39819,14 +40031,30 @@ Write ONE short message only. No JSON. No explanations."""
             if not company:
                 return jsonify({"status": "error", "message": "Company not found"}), 404
             if request.method == 'GET':
+                actor_username = str(request.args.get("actor_username") or "").strip()
+                webhook_public = company_tenancy.resolve_webhook_public_slug(company, username=actor_username)
+                # Keep company publicSlug in sync with registered company name when empty/generic
+                if not str(company.get("publicSlug") or "").strip() or str(company.get("publicSlug")).strip().lower() in ("company",):
+                    derived = company_tenancy.normalize_public_slug(company.get("name") or webhook_public)
+                    if derived and derived != company.get("publicSlug"):
+                        company = dict(company)
+                        company["publicSlug"] = company_tenancy.ensure_unique_public_slug(
+                            derived, company_id=company_id
+                        )
+                        company_tenancy.upsert_company(company)
+                        webhook_public = company_tenancy.resolve_webhook_public_slug(company, username=actor_username)
                 return jsonify({
                     "status": "success",
                     "data": {
                         "companyId": company_id,
                         "companyName": company.get("name"),
+                        "publicSlug": company_tenancy.company_public_slug(company),
+                        "webhookPublic": webhook_public,
+                        "webhookPublicSource": "company" if company_tenancy.normalize_public_slug(company.get("name") or company.get("publicSlug")) == webhook_public or company_tenancy.company_public_slug(company) == webhook_public else "user",
                         "isDefaultCompany": company_tenancy.is_default_company(company_id),
                         "createWithPiEnabled": bool(company.get("createWithPiEnabled")),
                         "connections": company_tenancy.get_connections(company_id),
+                        "webhookPublicBase": company_tenancy.get_connections(company_id).get("webhookPublicBase") or "",
                     },
                 }), 200
             data = request.json or {}
@@ -39838,16 +40066,31 @@ Write ONE short message only. No JSON. No explanations."""
             if actor_role.lower() != "admin":
                 return jsonify({"status": "error", "message": "Only company admins can update connections"}), 403
             raw_conn = data.get("connections") if isinstance(data.get("connections"), dict) else data
+            # Optional public slug; if omitted, derive dynamically from company name (or actor username)
+            if data.get("publicSlug") is not None and str(data.get("publicSlug") or "").strip():
+                company["publicSlug"] = company_tenancy.normalize_public_slug(
+                    data.get("publicSlug"), fallback=company.get("name") or company_id
+                )
+                company_tenancy.upsert_company(company)
+            else:
+                actor_uname = str(actor.get("username") or request.args.get("actor_username") or "").strip()
+                derived = company_tenancy.resolve_webhook_public_slug(company, username=actor_uname)
+                company["publicSlug"] = company_tenancy.ensure_unique_public_slug(derived, company_id=company_id)
+                company_tenancy.upsert_company(company)
             saved = company_tenancy.save_connections(company_id, raw_conn)
             saved_conn = company_tenancy.get_connections(company_id)
+            actor_uname = str(actor.get("username") or request.args.get("actor_username") or "").strip()
             return jsonify({
                 "status": "success",
                 "data": {
                     "companyId": company_id,
                     "companyName": saved.get("name"),
+                    "publicSlug": company_tenancy.company_public_slug(saved),
+                    "webhookPublic": company_tenancy.resolve_webhook_public_slug(saved, username=actor_uname),
                     "isDefaultCompany": company_tenancy.is_default_company(company_id),
                     "createWithPiEnabled": bool(saved.get("createWithPiEnabled")),
                     "connections": saved_conn,
+                    "webhookPublicBase": saved_conn.get("webhookPublicBase") or "",
                 },
             }), 200
 

@@ -30,6 +30,8 @@ def empty_connections():
         "transportUrl": "",
         "religiousWaPhoneNumberId": "",
         "religiousWaDisplay": "",
+        # Optional white-label hooks host (no FTS brand). Example: https://hooks.acme-travel.com
+        "webhookPublicBase": "",
     }
 
 
@@ -135,7 +137,134 @@ def sanitize_connections(raw, existing=None) -> dict:
     out["baserowMainUrl"] = sanitize_public_url(out.get("baserowMainUrl"))
     out["baserowReligiousUrl"] = sanitize_public_url(out.get("baserowReligiousUrl"))
     out["transportUrl"] = sanitize_public_url(out.get("transportUrl"))
+    out["webhookPublicBase"] = sanitize_public_url(out.get("webhookPublicBase")).rstrip("/")
     return out
+
+
+def normalize_public_slug(value, fallback="") -> str:
+    raw = str(value or "").strip().lower()
+    s = re.sub(r"[^a-z0-9]+", "-", raw)
+    s = re.sub(r"-{2,}", "-", s).strip("-")
+    if not s:
+        fb = re.sub(r"[^a-z0-9]+", "-", str(fallback or "").strip().lower())
+        fb = re.sub(r"-{2,}", "-", fb).strip("-")
+        s = fb
+    if not s:
+        s = "company"
+    # Never force the public brand token "fts" for non-default companies' fallbacks
+    return s[:64]
+
+
+def ensure_unique_public_slug(desired, company_id=None, companies=None) -> str:
+    cid = normalize_company_id(company_id) if company_id else ""
+    base = normalize_public_slug(desired, fallback=cid or "company") or (cid[:64] if cid else "company")
+    # Avoid generic collisions for non-latin company names
+    if base in ("company", "fts") and cid and not is_default_company(cid):
+        base = normalize_public_slug(cid) or cid[:64]
+    rows = companies if isinstance(companies, list) else load_companies()
+    taken = set()
+    for item in rows:
+        if not isinstance(item, dict):
+            continue
+        other_id = normalize_company_id(item.get("id"))
+        if cid and other_id == cid:
+            continue
+        taken.add(normalize_public_slug(item.get("publicSlug") or item.get("name") or other_id))
+    if base not in taken:
+        return base
+    for i in range(2, 1000):
+        cand = f"{base}-{i}"[:64]
+        if cand not in taken:
+            return cand
+    return f"{base}-{secrets.token_hex(3)}"
+
+
+def find_company_by_public_slug(slug):
+    needle = normalize_public_slug(slug)
+    if not needle:
+        return None
+    for item in load_companies():
+        if normalize_public_slug(item.get("publicSlug") or item.get("name") or item.get("id")) == needle:
+            return item
+    return None
+
+
+def company_public_slug(company_or_id) -> str:
+    if isinstance(company_or_id, dict):
+        company = company_or_id
+    else:
+        company = get_company(company_or_id) or default_fts_company()
+    return normalize_public_slug(company.get("publicSlug") or company.get("name") or company.get("id"))
+
+
+def resolve_webhook_public_slug(company_or_id=None, username="") -> str:
+    """
+    Dynamic public webhook identity:
+    1) registered company publicSlug / name
+    2) else registered username
+    """
+    company = None
+    if isinstance(company_or_id, dict):
+        company = company_or_id
+    elif company_or_id:
+        company = get_company(company_or_id)
+    if company:
+        from_company = normalize_public_slug(
+            company.get("publicSlug") or company.get("name") or company.get("id")
+        )
+        if from_company and from_company not in ("company",):
+            return from_company
+        # Non-latin company names may collapse; prefer id over generic "company"
+        cid = normalize_company_id(company.get("id"))
+        if cid and not is_default_company(cid):
+            from_id = normalize_public_slug(cid)
+            if from_id:
+                return from_id
+        if from_company:
+            return from_company
+    from_user = normalize_public_slug(username)
+    return from_user or "company"
+
+
+def company_webhook_public_base(company_or_id, fallback_api_base="", username="") -> str:
+    """
+    Host used when copying webhook URLs.
+    Optional white-label override in connections.webhookPublicBase;
+    otherwise platform host (path still brands via resolve_webhook_public_slug).
+    """
+    if isinstance(company_or_id, dict):
+        company = company_or_id
+    else:
+        company = get_company(company_or_id) or default_fts_company()
+    conns = sanitize_connections(company.get("connections"))
+    custom = str(conns.get("webhookPublicBase") or "").strip().rstrip("/")
+    if custom:
+        return custom
+    fb = str(fallback_api_base or "").strip().rstrip("/")
+    if fb.endswith("/api"):
+        fb = fb[:-4]
+    return fb
+
+
+def build_company_webhook_url(company_or_id, owner, slug, fallback_api_base="", username="") -> str:
+    company = company_or_id if isinstance(company_or_id, dict) else (get_company(company_or_id) or default_fts_company())
+    co_slug = resolve_webhook_public_slug(company, username=username or owner)
+    owner_n = re.sub(r"[^a-z0-9._-]+", "-", str(owner or "").strip().lower()).strip("-")[:64]
+    slug_n = re.sub(r"[^a-z0-9_-]+", "-", str(slug or "").strip().lower()).strip("-")[:80]
+    if not co_slug or not owner_n or not slug_n:
+        return ""
+    base = company_webhook_public_base(company, fallback_api_base=fallback_api_base, username=username or owner)
+    if not base:
+        base = "https://api.ftstravels.com"
+    return f"{base}/api/hooks/{co_slug}/{owner_n}/{slug_n}"
+
+
+def user_belongs_to_company(username=None, user_id=None, company_id=None) -> bool:
+    cid = normalize_company_id(company_id)
+    user = find_dashboard_user(username=username, user_id=user_id)
+    if not user:
+        return False
+    return user_company_id(user) == cid
 
 
 def _normalize_company_record(item, previous=None) -> dict:
@@ -151,9 +280,18 @@ def _normalize_company_record(item, previous=None) -> dict:
         flag = coerce_bool(src.get("createWithPiEnabled"), default=False)
     connections_src = src.get("connections") if "connections" in src else prev.get("connections")
     created_at = str(src.get("createdAt") or prev.get("createdAt") or "").strip() or _now_iso()
+    name = str(src.get("name") or prev.get("name") or cid).strip() or cid
+    # Keep stable slug when possible; uniqueness is enforced in load_companies/upsert.
+    if "publicSlug" in src and src.get("publicSlug") is not None:
+        public_slug = normalize_public_slug(src.get("publicSlug"), fallback=name or cid)
+    elif prev.get("publicSlug"):
+        public_slug = normalize_public_slug(prev.get("publicSlug"), fallback=name or cid)
+    else:
+        public_slug = normalize_public_slug(name or cid)
     return {
         "id": cid,
-        "name": str(src.get("name") or prev.get("name") or cid).strip() or cid,
+        "name": name,
+        "publicSlug": public_slug,
         "createdByUsername": str(src.get("createdByUsername") or prev.get("createdByUsername") or "").strip(),
         "createdAt": created_at,
         "createWithPiEnabled": flag,
@@ -165,6 +303,7 @@ def default_fts_company():
     return {
         "id": DEFAULT_COMPANY_ID,
         "name": "FTS Travels",
+        "publicSlug": "fts-travels",
         "createdByUsername": "admin",
         "createdAt": _now_iso(),
         "createWithPiEnabled": False,
@@ -178,11 +317,13 @@ def public_company(company) -> dict:
     return {
         "id": cid,
         "name": str(item.get("name") or cid),
+        "publicSlug": company_public_slug(item),
         "createdByUsername": str(item.get("createdByUsername") or ""),
         "createdAt": str(item.get("createdAt") or ""),
         "createWithPiEnabled": bool(item.get("createWithPiEnabled")),
         "isDefaultCompany": is_default_company(cid),
         "connections": sanitize_connections(item.get("connections")),
+        "webhookPublicBase": str(sanitize_connections(item.get("connections")).get("webhookPublicBase") or ""),
     }
 
 
@@ -195,6 +336,7 @@ def load_companies():
         companies = []
     cleaned = []
     seen = set()
+    dirty = False
     for item in companies:
         if not isinstance(item, dict):
             continue
@@ -205,6 +347,17 @@ def load_companies():
         cleaned.append(_normalize_company_record(item))
     if DEFAULT_COMPANY_ID not in seen:
         cleaned.insert(0, default_fts_company())
+        dirty = True
+    for idx, item in enumerate(cleaned):
+        peers = cleaned[:idx] + cleaned[idx + 1 :]
+        desired = item.get("publicSlug") or item.get("name") or item.get("id")
+        slug = ensure_unique_public_slug(desired, company_id=item.get("id"), companies=peers)
+        if slug != item.get("publicSlug"):
+            item = dict(item)
+            item["publicSlug"] = slug
+            cleaned[idx] = item
+            dirty = True
+    if dirty:
         save_companies(cleaned)
     return cleaned
 
@@ -239,11 +392,22 @@ def upsert_company(company):
     for idx, item in enumerate(companies):
         if item.get("id") == cid:
             next_item = _normalize_company_record(company, previous=item)
+            peers = companies[:idx] + companies[idx + 1 :]
+            next_item["publicSlug"] = ensure_unique_public_slug(
+                next_item.get("publicSlug") or next_item.get("name") or cid,
+                company_id=cid,
+                companies=peers,
+            )
             companies[idx] = next_item
             found = True
             break
     if not found:
         next_item = _normalize_company_record(company)
+        next_item["publicSlug"] = ensure_unique_public_slug(
+            next_item.get("publicSlug") or next_item.get("name") or cid,
+            company_id=cid,
+            companies=companies,
+        )
         companies.append(next_item)
     save_companies(companies)
     return next_item
@@ -251,9 +415,11 @@ def upsert_company(company):
 
 def create_company(name, created_by_username=""):
     company_name = str(name or "").strip() or "New Company"
+    cid = new_company_id()
     item = {
-        "id": new_company_id(),
+        "id": cid,
         "name": company_name,
+        "publicSlug": ensure_unique_public_slug(company_name, company_id=cid),
         "createdByUsername": str(created_by_username or "").strip(),
         "createdAt": _now_iso(),
         "createWithPiEnabled": False,

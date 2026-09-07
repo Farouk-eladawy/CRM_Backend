@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import re
 import uuid
 from datetime import datetime
 
@@ -106,6 +107,110 @@ def get_workflow(workflow_id: str):
     return dict(row) if row else None
 
 
+def _parse_trigger_config(wf: dict) -> dict:
+    raw = (wf or {}).get("trigger_config_json") or "{}"
+    try:
+        cfg = json.loads(raw) if isinstance(raw, str) else (raw or {})
+    except Exception:
+        cfg = {}
+    return cfg if isinstance(cfg, dict) else {}
+
+
+def normalize_webhook_owner(owner: str) -> str:
+    s = re.sub(r"[^a-z0-9_-]+", "-", str(owner or "user").strip().lower())
+    s = re.sub(r"-{2,}", "-", s).strip("-_")
+    return (s or "user")[:64]
+
+
+def normalize_webhook_slug(slug: str) -> str:
+    s = re.sub(r"[^a-z0-9_-]+", "-", str(slug or "").strip().lower())
+    s = re.sub(r"-{2,}", "-", s).strip("-_")
+    return s[:80]
+
+
+def find_workflow_by_webhook(owner: str, slug: str, enabled_only: bool = True):
+    """
+    Resolve a canvas/manual workflow by per-user webhook path.
+    Matching keys in trigger_config_json:
+      - webhook_owner + webhook_slug
+      - or webhook_path == "{owner}/{slug}"
+    """
+    owner_n = normalize_webhook_owner(owner)
+    slug_n = normalize_webhook_slug(slug)
+    if not owner_n or not slug_n:
+        return None
+    path = f"{owner_n}/{slug_n}"
+    candidates = []
+    for wf in list_workflows():
+        if str(wf.get("trigger_type") or "").strip().lower() not in ("manual",):
+            continue
+        if enabled_only and not int(wf.get("enabled") or 0):
+            continue
+        cfg = _parse_trigger_config(wf)
+        cfg_owner = normalize_webhook_owner(str(cfg.get("webhook_owner") or ""))
+        cfg_slug = normalize_webhook_slug(str(cfg.get("webhook_slug") or ""))
+        cfg_path = str(cfg.get("webhook_path") or "").strip().lower()
+        if cfg_path == path or (cfg_owner == owner_n and cfg_slug == slug_n):
+            candidates.append(wf)
+    if not candidates:
+        return None
+
+    def _score(wf):
+        cfg = _parse_trigger_config(wf)
+        exact = 1 if str(cfg.get("webhook_path") or "").strip().lower() == path else 0
+        return (exact, str(wf.get("updated_at") or ""))
+
+    candidates.sort(key=_score, reverse=True)
+    return candidates[0]
+
+
+def list_webhooks_for_owner(owner: str):
+    """List webhook endpoints owned by a user (from workflows + for picker reuse)."""
+    owner_n = normalize_webhook_owner(owner)
+    out = []
+    seen = set()
+    for wf in list_workflows():
+        if str(wf.get("trigger_type") or "").strip().lower() != "manual":
+            continue
+        cfg = _parse_trigger_config(wf)
+        cfg_owner = normalize_webhook_owner(str(cfg.get("webhook_owner") or ""))
+        cfg_slug = normalize_webhook_slug(str(cfg.get("webhook_slug") or ""))
+        if not cfg_slug:
+            continue
+        if cfg_owner and cfg_owner != owner_n:
+            continue
+        # Legacy rows without owner: skip (avoid leaking across users)
+        if not cfg_owner:
+            continue
+        path = str(cfg.get("webhook_path") or f"{cfg_owner}/{cfg_slug}").strip().lower()
+        if path in seen:
+            continue
+        seen.add(path)
+        out.append(
+            {
+                "id": f"wfhook_{wf.get('id')}",
+                "type": "webhook",
+                "label": f"{wf.get('name') or cfg_slug} · {cfg_slug}",
+                "status": "connected" if int(wf.get("enabled") or 0) else "ready",
+                "source": "workflow",
+                "workflow_id": wf.get("id"),
+                "hints": {
+                    "slug": cfg_slug,
+                    "owner": cfg_owner,
+                    "path": path,
+                    "company_id": str(cfg.get("webhook_company_id") or ""),
+                    "company_slug": str(cfg.get("webhook_company_slug") or ""),
+                    "url_path": (
+                        f"/api/hooks/{cfg.get('webhook_company_slug')}/{cfg_owner}/{cfg_slug}"
+                        if cfg.get("webhook_company_slug")
+                        else f"/api/automation/webhook/{cfg_owner}/{cfg_slug}"
+                    ),
+                },
+            }
+        )
+    return out
+
+
 def upsert_workflow(payload: dict):
     payload = payload or {}
     wid = str(payload.get("id") or "").strip() or str(uuid.uuid4())
@@ -121,6 +226,24 @@ def upsert_workflow(payload: dict):
         trigger_config = {}
     if not isinstance(steps, list):
         steps = []
+
+    # Normalize per-user webhook path so URLs never collide across users
+    if str(trigger_type).lower() == "manual":
+        owner = normalize_webhook_owner(str(trigger_config.get("webhook_owner") or ""))
+        slug = normalize_webhook_slug(str(trigger_config.get("webhook_slug") or ""))
+        if slug:
+            if not owner:
+                owner = "user"
+            trigger_config["webhook_owner"] = owner
+            trigger_config["webhook_slug"] = slug
+            trigger_config["webhook_path"] = f"{owner}/{slug}"
+            # Block another workflow of same owner from stealing the slug (unless same id)
+            existing_hook = find_workflow_by_webhook(owner, slug, enabled_only=False)
+            if existing_hook and str(existing_hook.get("id") or "") != wid:
+                raise ValueError(f"webhook_slug_in_use:{owner}/{slug}")
+        else:
+            trigger_config.pop("webhook_slug", None)
+            trigger_config.pop("webhook_path", None)
 
     now = _utc_now()
     with sqlite3.connect(DB_FILE, timeout=30.0) as conn:

@@ -364,12 +364,32 @@ class AutomationEngine:
         except Exception:
             workflows = []
 
+        event_company = ""
+        try:
+            event_company = automation_db.normalize_workflow_company_id(
+                (payload or {}).get("company_id") or (payload or {}).get("companyId") or ""
+            )
+            # Empty payload company means "unknown" — do not default to fts here or we
+            # would skip non-FTS workflows incorrectly. Only filter when explicitly set.
+            raw_cid = str((payload or {}).get("company_id") or (payload or {}).get("companyId") or "").strip()
+            if not raw_cid:
+                event_company = ""
+        except Exception:
+            event_company = ""
+
         for wf in workflows:
             try:
                 if int(wf.get("enabled") or 0) != 1:
                     continue
                 if str(wf.get("trigger_type") or "").strip().lower() != str(event_type or "").strip().lower():
                     continue
+
+                if event_company:
+                    try:
+                        if automation_db.workflow_company_id(wf) != event_company:
+                            continue
+                    except Exception:
+                        pass
 
                 trigger_cfg = {}
                 try:

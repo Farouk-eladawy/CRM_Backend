@@ -197,6 +197,60 @@ def company_public_slug(company_or_id) -> str:
     return normalize_public_slug(company.get("publicSlug") or company.get("name") or company.get("id"))
 
 
+HOOKS_PUBLIC_BASE_SETTING_KEY = "automation_hooks_public_base"
+# Internal API hosts that must NEVER be shown as the public webhook URL.
+INTERNAL_API_HOST_MARKERS = (
+    "api.ftstravels.com",
+    "localhost",
+    "127.0.0.1",
+)
+
+
+def get_hooks_public_base(fallback="") -> str:
+    """
+    Public gateway host for webhooks (hides api.ftstravels.com).
+    Priority: env WEBHOOK_PUBLIC_BASE / HOOKS_PUBLIC_BASE → setting → fallback (if not internal).
+    """
+    import os
+
+    for key in ("WEBHOOK_PUBLIC_BASE", "HOOKS_PUBLIC_BASE"):
+        env_v = sanitize_public_url(os.environ.get(key) or "").rstrip("/")
+        if env_v:
+            return env_v
+    try:
+        import chat_db
+
+        raw = chat_db.get_setting(HOOKS_PUBLIC_BASE_SETTING_KEY)
+        if isinstance(raw, dict):
+            raw = raw.get("url") or raw.get("base") or ""
+        stored = sanitize_public_url(raw).rstrip("/")
+        if stored:
+            return stored
+    except Exception:
+        pass
+    fb = sanitize_public_url(fallback).rstrip("/")
+    if fb.endswith("/api"):
+        fb = fb[:-4]
+    # Never advertise the internal API host as the "public" webhook base
+    low = fb.lower()
+    if any(m in low for m in INTERNAL_API_HOST_MARKERS):
+        return ""
+    return fb
+
+
+def set_hooks_public_base(url: str) -> str:
+    import chat_db
+
+    cleaned = sanitize_public_url(url).rstrip("/")
+    chat_db.set_setting(HOOKS_PUBLIC_BASE_SETTING_KEY, cleaned)
+    return cleaned
+
+
+def is_internal_api_host(url_or_host: str) -> bool:
+    low = str(url_or_host or "").strip().lower()
+    return any(m in low for m in INTERNAL_API_HOST_MARKERS)
+
+
 def resolve_webhook_public_slug(company_or_id=None, username="") -> str:
     """
     Dynamic public webhook identity:
@@ -228,9 +282,8 @@ def resolve_webhook_public_slug(company_or_id=None, username="") -> str:
 
 def company_webhook_public_base(company_or_id, fallback_api_base="", username="") -> str:
     """
-    Host used when copying webhook URLs.
-    Optional white-label override in connections.webhookPublicBase;
-    otherwise platform host (path still brands via resolve_webhook_public_slug).
+    Host shown to end users for webhooks.
+    Never returns api.ftstravels.com — use company override or global hooks gateway.
     """
     if isinstance(company_or_id, dict):
         company = company_or_id
@@ -238,15 +291,65 @@ def company_webhook_public_base(company_or_id, fallback_api_base="", username=""
         company = get_company(company_or_id) or default_fts_company()
     conns = sanitize_connections(company.get("connections"))
     custom = str(conns.get("webhookPublicBase") or "").strip().rstrip("/")
-    if custom:
+    if custom and not is_internal_api_host(custom):
         return custom
-    fb = str(fallback_api_base or "").strip().rstrip("/")
-    if fb.endswith("/api"):
-        fb = fb[:-4]
+    global_base = get_hooks_public_base(fallback="")
+    if global_base:
+        return global_base
+    # Last resort: only allow fallback if it is already a non-internal host
+    fb = get_hooks_public_base(fallback=fallback_api_base)
     return fb
 
 
-def build_company_webhook_url(company_or_id, owner, slug, fallback_api_base="", username="") -> str:
+def list_companies_admin_view():
+    """Companies list with membership counts for Admin Manager UI."""
+    users = load_dashboard_users()
+    out = []
+    for item in list_public_companies():
+        cid = normalize_company_id(item.get("id"))
+        members = []
+        for u in users:
+            if not isinstance(u, dict):
+                continue
+            if user_company_id(u) != cid:
+                continue
+            members.append(
+                {
+                    "username": str(u.get("username") or ""),
+                    "name": str(u.get("name") or u.get("username") or ""),
+                    "role": str(u.get("role") or ""),
+                }
+            )
+        row = dict(item)
+        row["userCount"] = len(members)
+        row["users"] = members
+        row["hooksPublicBase"] = company_webhook_public_base(item)
+        out.append(row)
+    return out
+
+
+def build_opaque_webhook_url(token: str, company_or_id=None, fallback_api_base="", username="") -> str:
+    """Public URL that does not reveal api.ftstravels.com or internal path structure."""
+    tok = str(token or "").strip()
+    if not tok:
+        return ""
+    base = company_webhook_public_base(company_or_id, fallback_api_base=fallback_api_base, username=username)
+    if not base:
+        return ""
+    return f"{base}/h/{tok}"
+
+
+def build_company_webhook_url(company_or_id, owner, slug, fallback_api_base="", username="", token="") -> str:
+    """
+    Prefer opaque /h/{token} on the public hooks host.
+    Readable /api/hooks/... paths are internal only (not for end-user copy).
+    """
+    if token:
+        opaque = build_opaque_webhook_url(
+            token, company_or_id=company_or_id, fallback_api_base=fallback_api_base, username=username or owner
+        )
+        if opaque:
+            return opaque
     company = company_or_id if isinstance(company_or_id, dict) else (get_company(company_or_id) or default_fts_company())
     co_slug = resolve_webhook_public_slug(company, username=username or owner)
     owner_n = re.sub(r"[^a-z0-9._-]+", "-", str(owner or "").strip().lower()).strip("-")[:64]
@@ -255,7 +358,7 @@ def build_company_webhook_url(company_or_id, owner, slug, fallback_api_base="", 
         return ""
     base = company_webhook_public_base(company, fallback_api_base=fallback_api_base, username=username or owner)
     if not base:
-        base = "https://api.ftstravels.com"
+        return ""
     return f"{base}/api/hooks/{co_slug}/{owner_n}/{slug_n}"
 
 

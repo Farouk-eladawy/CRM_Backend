@@ -9993,6 +9993,14 @@ Conversation:
                         "receiving_phone_id": receiving_phone_id,
                         "incoming_external_message_id": incoming_external_message_id,
                     }
+                    try:
+                        import chat_db as _chat_db_co
+                        _conv = _chat_db_co.get_conversation(self._current_chat_id) or {}
+                        _cid = str(_conv.get("company_id") or "").strip()
+                        if _cid:
+                            event_payload["company_id"] = company_tenancy.normalize_company_id(_cid)
+                    except Exception:
+                        pass
                     # Religious locations: run message_received workflows synchronously for ANY
                     # messaging channel (Facebook/WhatsApp/…) so keyword + Religious KB paths match.
                     draft_locations = set(self.config.get("auto_reply_draft_locations", []) or [])
@@ -30054,8 +30062,16 @@ Prefer the MarkItDown Extraction section below when present.
             try:
                 import automation_db
 
-                items = automation_db.list_workflows()
-                return jsonify({"status": "success", "data": items}), 200
+                actor_username = str(request.args.get("actor_username") or "").strip()
+                if not actor_username:
+                    return jsonify({"status": "error", "message": "actor_username required"}), 400
+                company_id = company_tenancy.resolve_company_id(username=actor_username)
+                items = automation_db.list_workflows(company_id=company_id)
+                return jsonify({
+                    "status": "success",
+                    "data": items,
+                    "companyId": company_tenancy.normalize_company_id(company_id),
+                }), 200
             except Exception as e:
                 logging.error(f"Error in /api/automation/workflows: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
@@ -30065,8 +30081,16 @@ Prefer the MarkItDown Extraction section below when present.
             try:
                 import automation_db
 
+                actor_username = str(request.args.get("actor_username") or "").strip()
+                if not actor_username:
+                    return jsonify({"status": "error", "message": "actor_username required"}), 400
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(username=actor_username)
+                )
                 wf = automation_db.get_workflow(workflow_id)
                 if not wf:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
+                if automation_db.workflow_company_id(wf) != company_id:
                     return jsonify({"status": "error", "message": "Not found"}), 404
                 runs = []
                 try:
@@ -30095,6 +30119,22 @@ Prefer the MarkItDown Extraction section below when present.
                 if not isinstance(wf_payload, dict):
                     wf_payload = payload
 
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=actor.get("username") or actor.get("id"),
+                        user_id=actor.get("id") or actor.get("user_id"),
+                    )
+                )
+                wf_payload = dict(wf_payload)
+                wf_payload["company_id"] = company_id
+
+                # Block cross-tenant overwrite
+                existing_id = str(wf_payload.get("id") or "").strip()
+                if existing_id:
+                    existing = automation_db.get_workflow(existing_id)
+                    if existing and automation_db.workflow_company_id(existing) != company_id:
+                        return jsonify({"status": "error", "message": "Workflow not found for this company"}), 404
+
                 # Ensure webhook owner is the saving user (no cross-user collision)
                 try:
                     tcfg = wf_payload.get("trigger_config") if isinstance(wf_payload.get("trigger_config"), dict) else {}
@@ -30103,18 +30143,16 @@ Prefer the MarkItDown Extraction section below when present.
                         if owner:
                             tcfg = dict(tcfg)
                             tcfg["webhook_owner"] = owner
-                            # Brand webhook under the actor's company (not a fixed FTS public path)
-                            company_id = company_tenancy.resolve_company_id(
-                                username=actor.get("username") or owner,
-                                user_id=actor.get("id") or actor.get("user_id") or owner,
-                            )
                             company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
-                            tcfg["webhook_company_id"] = company_tenancy.normalize_company_id(company.get("id"))
+                            tcfg["webhook_company_id"] = company_id
                             tcfg["webhook_company_slug"] = company_tenancy.resolve_webhook_public_slug(
                                 company, username=owner
                             )
-                            wf_payload = dict(wf_payload)
                             wf_payload["trigger_config"] = tcfg
+                    else:
+                        tcfg = dict(tcfg) if isinstance(tcfg, dict) else {}
+                        tcfg["webhook_company_id"] = company_id
+                        wf_payload["trigger_config"] = tcfg
                 except Exception:
                     pass
 
@@ -30127,7 +30165,28 @@ Prefer the MarkItDown Extraction section below when present.
                             "status": "error",
                             "message": f"Webhook already used by another workflow: {msg.split(':', 1)[-1]}",
                         }), 409
+                    if msg.startswith("workflow_company_mismatch:"):
+                        return jsonify({"status": "error", "message": "Workflow not found for this company"}), 404
                     raise
+                # Attach public gateway URL (never api.ftstravels.com when hooks base is set)
+                try:
+                    cfg = saved.get("trigger_config") if isinstance(saved.get("trigger_config"), dict) else {}
+                    if not cfg:
+                        import json as _json
+                        cfg = _json.loads(str(saved.get("trigger_config_json") or "{}"))
+                    tok = str(cfg.get("webhook_public_token") or "")
+                    company = company_tenancy.get_company(cfg.get("webhook_company_id") or company_id) or company_tenancy.default_fts_company()
+                    public_url = company_tenancy.build_opaque_webhook_url(
+                        tok, company_or_id=company, username=str(cfg.get("webhook_owner") or "")
+                    )
+                    if isinstance(saved, dict):
+                        saved = dict(saved)
+                        saved["trigger_config"] = cfg if isinstance(cfg, dict) else {}
+                        saved["public_webhook_url"] = public_url
+                        saved["webhook_public_token"] = tok
+                        saved["company_id"] = automation_db.workflow_company_id(saved)
+                except Exception:
+                    pass
                 return jsonify({"status": "success", "data": saved}), 200
             except Exception as e:
                 logging.error(f"Error in POST /api/automation/workflows: {e}", exc_info=True)
@@ -30224,6 +30283,15 @@ Prefer the MarkItDown Extraction section below when present.
                 role = str(actor.get("role") or "").strip().lower()
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=actor.get("username") or actor.get("id"),
+                        user_id=actor.get("id") or actor.get("user_id"),
+                    )
+                )
+                existing = automation_db.get_workflow(workflow_id)
+                if not existing or automation_db.workflow_company_id(existing) != company_id:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
                 enabled = bool(payload.get("enabled"))
                 wf = automation_db.set_enabled(workflow_id, enabled)
                 if not wf:
@@ -30238,11 +30306,22 @@ Prefer the MarkItDown Extraction section below when present.
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             try:
+                import automation_db
+
                 payload = request.get_json(silent=True) or {}
                 actor = payload.get("actor") or {}
                 role = str(actor.get("role") or "").strip().lower()
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=actor.get("username") or actor.get("id"),
+                        user_id=actor.get("id") or actor.get("user_id"),
+                    )
+                )
+                existing = automation_db.get_workflow(workflow_id)
+                if not existing or automation_db.workflow_company_id(existing) != company_id:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
 
                 extra_payload = payload.get("payload")
                 if extra_payload is None or not isinstance(extra_payload, dict):
@@ -30268,6 +30347,15 @@ Prefer the MarkItDown Extraction section below when present.
                 role = str(actor.get("role") or "").strip().lower()
                 if role != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=actor.get("username") or actor.get("id"),
+                        user_id=actor.get("id") or actor.get("user_id"),
+                    )
+                )
+                existing = automation_db.get_workflow(workflow_id)
+                if not existing or automation_db.workflow_company_id(existing) != company_id:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
                 ok = automation_db.delete_workflow(workflow_id)
                 if not ok:
                     return jsonify({"status": "error", "message": "Not found"}), 404
@@ -30494,20 +30582,138 @@ Prefer the MarkItDown Extraction section below when present.
                 logging.error(f"Error in /api/automation/connections: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
-        @app.route('/api/automation/webhook/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
-        @app.route('/api/hooks/<company_slug>/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
-        def api_automation_user_webhook(owner, slug, company_slug=None):
+        def _hooks_lock_internal_paths():
+            """When a public hooks gateway is configured, block using api.ftstravels.com webhook paths."""
+            try:
+                public_hooks = company_tenancy.get_hooks_public_base()
+                if not public_hooks:
+                    return None
+                host = str(request.host or "").split(":")[0].strip().lower()
+                if not company_tenancy.is_internal_api_host(host) and "ftstravels" not in host:
+                    return None
+                # Allow only if the request Host is the public hooks host
+                from urllib.parse import urlparse
+
+                pub_host = (urlparse(public_hooks).hostname or "").lower()
+                if pub_host and host == pub_host:
+                    return None
+                return jsonify({
+                    "status": "error",
+                    "message": "Use your public webhook URL (gateway). Direct API host webhooks are disabled.",
+                }), 404
+            except Exception:
+                return None
+
+        def _run_manual_webhook_workflow(wf, extra_payload=None):
+            import automation_db
+
+            cfg = automation_db._parse_trigger_config(wf)
+            owner_n = automation_db.normalize_webhook_owner(str(cfg.get("webhook_owner") or ""))
+            slug_n = automation_db.normalize_webhook_slug(str(cfg.get("webhook_slug") or ""))
+            company_id = company_tenancy.normalize_company_id(
+                cfg.get("webhook_company_id") or company_tenancy.resolve_company_id(username=owner_n, user_id=owner_n)
+            )
+            company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
+            data = request.get_json(silent=True)
+            if data is None:
+                data = {}
+            if not isinstance(data, dict):
+                data = {"raw": data}
+            payload = {
+                **data,
+                **(extra_payload if isinstance(extra_payload, dict) else {}),
+                "webhook_owner": owner_n,
+                "webhook_slug": slug_n,
+                "webhook_path": f"{owner_n}/{slug_n}" if owner_n and slug_n else "",
+                "webhook_company_id": company_id,
+                "webhook_company_slug": company_tenancy.resolve_webhook_public_slug(company, username=owner_n),
+                "webhook_public_token": str(cfg.get("webhook_public_token") or ""),
+            }
+            engine = getattr(self, "automation_engine", None)
+            if not engine:
+                return jsonify({"status": "error", "message": "Automation engine not available"}), 500
+            res = engine.run_manual(str(wf.get("id")), payload=payload)
+            return jsonify({
+                "status": "success",
+                "data": {
+                    "workflow_id": wf.get("id"),
+                    "workflow_name": wf.get("name"),
+                    "company_id": company_id,
+                    "result": res,
+                },
+            }), 200
+
+        @app.route('/h/<token>', methods=['GET', 'POST', 'OPTIONS'])
+        @app.route('/api/h/<token>', methods=['GET', 'POST', 'OPTIONS'])
+        def api_automation_opaque_webhook(token):
             """
-            Public webhook URL for Canvas workflows.
-            Preferred (company-branded): /api/hooks/{company_slug}/{owner}/{slug}
-            Legacy: /api/automation/webhook/{owner}/{slug}
-            Company path is resolved first so tenants are isolated and FTS brand can be hidden
-            via company.connections.webhookPublicBase.
+            Public gateway webhook — opaque token only.
+            This is the URL end-users should copy. Does not expose api.ftstravels.com path layout.
             """
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             try:
                 import automation_db
+
+                tok = automation_db.normalize_webhook_public_token(token)
+                if not tok:
+                    return jsonify({"status": "error", "message": "Invalid webhook"}), 404
+
+                wf = automation_db.find_workflow_by_webhook_token(tok, enabled_only=False)
+                if not wf:
+                    return jsonify({"status": "error", "message": "Webhook not found"}), 404
+
+                cfg = automation_db._parse_trigger_config(wf)
+                owner_n = automation_db.normalize_webhook_owner(str(cfg.get("webhook_owner") or ""))
+                slug_n = automation_db.normalize_webhook_slug(str(cfg.get("webhook_slug") or ""))
+                company_id = company_tenancy.normalize_company_id(
+                    cfg.get("webhook_company_id")
+                    or company_tenancy.resolve_company_id(username=owner_n, user_id=owner_n)
+                )
+                company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
+                public_url = company_tenancy.build_opaque_webhook_url(
+                    tok, company_or_id=company, username=owner_n
+                )
+
+                if request.method == 'GET':
+                    return jsonify({
+                        "status": "success",
+                        "data": {
+                            "url": public_url,
+                            "token": tok,
+                            "method": "POST",
+                            "content_type": "application/json",
+                            "workflow_id": wf.get("id"),
+                            "workflow_name": wf.get("name"),
+                            "enabled": bool(int(wf.get("enabled") or 0)),
+                            "company_id": company_id,
+                            "company_name": company.get("name"),
+                        },
+                    }), 200
+
+                if not int(wf.get("enabled") or 0):
+                    return jsonify({"status": "error", "message": "Webhook workflow is disabled"}), 403
+                return _run_manual_webhook_workflow(wf, extra_payload={"webhook_public_token": tok})
+            except Exception as e:
+                logging.error(f"Error in /h/<token> webhook: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/automation/webhook/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
+        @app.route('/api/hooks/<company_slug>/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
+        def api_automation_user_webhook(owner, slug, company_slug=None):
+            """
+            Internal/legacy webhook paths. When hooks public base is set, POST on the
+            internal API host is blocked — use /h/{token} on the public gateway instead.
+            """
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import automation_db
+
+                if request.method == 'POST':
+                    locked = _hooks_lock_internal_paths()
+                    if locked is not None:
+                        return locked
 
                 owner_n = automation_db.normalize_webhook_owner(owner)
                 slug_n = automation_db.normalize_webhook_slug(slug)
@@ -30521,117 +30727,87 @@ Prefer the MarkItDown Extraction section below when present.
                     if not company:
                         return jsonify({"status": "error", "message": "Company webhook not found"}), 404
                     company_id = company_tenancy.normalize_company_id(company.get("id"))
-                    # Owner must belong to this company (prevent cross-tenant hits)
-                    if not company_tenancy.user_belongs_to_company(
-                        username=owner_n, user_id=owner_n, company_id=company_id
-                    ):
-                        # Also allow exact webhook_owner stored on workflow even if dashboard user renamed
-                        # (checked after workflow lookup below). Soft-fail only when no workflow match.
-                        pass
 
-                public_base = "https://api.ftstravels.com"
-                try:
-                    public_base = self._get_dashboard_oauth_public_base_url().rstrip("/")
-                except Exception:
-                    pass
-
-                if company:
-                    url = company_tenancy.build_company_webhook_url(
-                        company, owner_n, slug_n, fallback_api_base=public_base, username=owner_n
-                    )
-                else:
-                    # Legacy path: resolve company from owner when possible for branded URL in GET
+                if not company:
                     owner_company_id = company_tenancy.resolve_company_id(username=owner_n, user_id=owner_n)
                     company = company_tenancy.get_company(owner_company_id) or company_tenancy.default_fts_company()
                     company_id = company_tenancy.normalize_company_id(company.get("id"))
-                    url = company_tenancy.build_company_webhook_url(
-                        company, owner_n, slug_n, fallback_api_base=public_base, username=owner_n
-                    )
+
+                wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=False)
+                tok = ""
+                if wf:
+                    tok = str(automation_db._parse_trigger_config(wf).get("webhook_public_token") or "")
+                url = company_tenancy.build_company_webhook_url(
+                    company, owner_n, slug_n, username=owner_n, token=tok
+                )
 
                 if request.method == 'GET':
-                    wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=False)
-                    co_slug = company_tenancy.resolve_webhook_public_slug(company, username=owner_n) if company else None
+                    co_slug = company_tenancy.resolve_webhook_public_slug(company, username=owner_n)
                     return jsonify({
                         "status": "success",
                         "data": {
                             "url": url,
+                            "public_url": url,
+                            "token": tok or None,
                             "owner": owner_n,
                             "slug": slug_n,
                             "company_id": company_id,
                             "company_slug": co_slug,
                             "webhook_public": co_slug,
                             "company_name": (company or {}).get("name"),
-                            "path": f"{co_slug}/{owner_n}/{slug_n}" if co_slug else f"{owner_n}/{slug_n}",
                             "workflow_id": (wf or {}).get("id"),
                             "workflow_name": (wf or {}).get("name"),
                             "enabled": bool(int((wf or {}).get("enabled") or 0)) if wf else False,
                             "method": "POST",
                             "content_type": "application/json",
+                            "note": "Prefer the opaque public_url (/h/token) on your hooks gateway host.",
                         },
                     }), 200
 
-                wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=True)
-                if not wf:
-                    any_wf = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=False)
-                    if any_wf:
+                wf_on = automation_db.find_workflow_by_webhook(owner_n, slug_n, enabled_only=True)
+                if not wf_on:
+                    if wf:
                         return jsonify({"status": "error", "message": "Webhook workflow is disabled"}), 403
                     return jsonify({"status": "error", "message": "Webhook not found"}), 404
 
-                # Tenant gate: if company slug provided, workflow owner must match that company
                 if company_slug and company_id:
-                    cfg = {}
-                    try:
-                        raw_cfg = wf.get("trigger_config_json") or wf.get("trigger_config") or {}
-                        if isinstance(raw_cfg, str):
-                            import json as _json
-                            cfg = _json.loads(raw_cfg) if raw_cfg.strip() else {}
-                        elif isinstance(raw_cfg, dict):
-                            cfg = raw_cfg
-                    except Exception:
-                        cfg = {}
+                    cfg = automation_db._parse_trigger_config(wf_on)
                     cfg_company = company_tenancy.normalize_company_id(
                         cfg.get("webhook_company_id") or cfg.get("company_id") or ""
                     ) if (cfg.get("webhook_company_id") or cfg.get("company_id")) else ""
                     owner_company = company_tenancy.resolve_company_id(username=owner_n, user_id=owner_n)
-                    allowed = False
-                    if cfg_company and cfg_company == company_id:
-                        allowed = True
-                    elif owner_company == company_id:
-                        allowed = True
-                    elif company_tenancy.user_belongs_to_company(username=owner_n, user_id=owner_n, company_id=company_id):
-                        allowed = True
+                    allowed = (
+                        (cfg_company and cfg_company == company_id)
+                        or owner_company == company_id
+                        or company_tenancy.user_belongs_to_company(username=owner_n, user_id=owner_n, company_id=company_id)
+                    )
                     if not allowed:
                         return jsonify({"status": "error", "message": "Webhook does not belong to this company"}), 404
 
-                data = request.get_json(silent=True)
-                if data is None:
-                    data = {}
-                if not isinstance(data, dict):
-                    data = {"raw": data}
-                payload = {
-                    **data,
-                    "webhook_owner": owner_n,
-                    "webhook_slug": slug_n,
-                    "webhook_path": f"{owner_n}/{slug_n}",
-                    "webhook_company_id": company_id,
-                    "webhook_company_slug": company_tenancy.company_public_slug(company) if company else None,
-                }
-                engine = getattr(self, "automation_engine", None)
-                if not engine:
-                    return jsonify({"status": "error", "message": "Automation engine not available"}), 500
-                res = engine.run_manual(str(wf.get("id")), payload=payload)
-                return jsonify({
-                    "status": "success",
-                    "data": {
-                        "workflow_id": wf.get("id"),
-                        "workflow_name": wf.get("name"),
-                        "company_id": company_id,
-                        "result": res,
-                    },
-                }), 200
+                return _run_manual_webhook_workflow(wf_on)
             except Exception as e:
                 logging.error(f"Error in /api/automation/webhook: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/admin/hooks_public_base', methods=['GET', 'POST', 'OPTIONS'])
+        def api_admin_hooks_public_base():
+            """Admin Manager: set the public webhook gateway host (hides api.ftstravels.com)."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            _actor_user, err = _require_primary_admin_actor()
+            if err:
+                return err
+            if request.method == 'GET':
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        "hooksPublicBase": company_tenancy.get_hooks_public_base(),
+                        "example": f"{company_tenancy.get_hooks_public_base() or 'https://hooks.your-domain.com'}/h/TOKEN",
+                    },
+                }), 200
+            data = request.get_json(silent=True) or {}
+            saved = company_tenancy.set_hooks_public_base(str(data.get("hooksPublicBase") or data.get("url") or ""))
+            return jsonify({"status": "success", "data": {"hooksPublicBase": saved}}), 200
 
         @app.route('/api/automation/compose_module', methods=['POST', 'OPTIONS'])
         def api_automation_compose_module():
@@ -40043,6 +40219,7 @@ Write ONE short message only. No JSON. No explanations."""
                         )
                         company_tenancy.upsert_company(company)
                         webhook_public = company_tenancy.resolve_webhook_public_slug(company, username=actor_username)
+                hooks_base = company_tenancy.company_webhook_public_base(company, username=actor_username)
                 return jsonify({
                     "status": "success",
                     "data": {
@@ -40050,6 +40227,7 @@ Write ONE short message only. No JSON. No explanations."""
                         "companyName": company.get("name"),
                         "publicSlug": company_tenancy.company_public_slug(company),
                         "webhookPublic": webhook_public,
+                        "hooksPublicBase": hooks_base,
                         "webhookPublicSource": "company" if company_tenancy.normalize_public_slug(company.get("name") or company.get("publicSlug")) == webhook_public or company_tenancy.company_public_slug(company) == webhook_public else "user",
                         "isDefaultCompany": company_tenancy.is_default_company(company_id),
                         "createWithPiEnabled": bool(company.get("createWithPiEnabled")),
@@ -40109,14 +40287,63 @@ Write ONE short message only. No JSON. No explanations."""
                 return None, (jsonify({"status": "error", "message": "Admin Manager only"}), 403)
             return actor_user, None
 
-        @app.route('/api/admin/companies', methods=['GET', 'OPTIONS'])
+        @app.route('/api/admin/companies', methods=['GET', 'POST', 'OPTIONS'])
         def api_admin_companies():
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             _actor_user, err = _require_primary_admin_actor()
             if err:
                 return err
-            return jsonify({"status": "success", "data": company_tenancy.list_public_companies()}), 200
+            if request.method == 'GET':
+                return jsonify({"status": "success", "data": company_tenancy.list_companies_admin_view()}), 200
+            data = request.json or {}
+            name = str(data.get("name") or data.get("companyName") or "").strip()
+            if not name:
+                return jsonify({"status": "error", "message": "Company name is required"}), 400
+            created = company_tenancy.create_company(
+                name,
+                created_by_username=str((_actor_user or {}).get("username") or ""),
+            )
+            if data.get("publicSlug"):
+                created["publicSlug"] = company_tenancy.ensure_unique_public_slug(
+                    data.get("publicSlug"), company_id=created.get("id")
+                )
+                created = company_tenancy.upsert_company(created)
+            if data.get("webhookPublicBase") is not None or data.get("connections"):
+                conns = created.get("connections") if isinstance(created.get("connections"), dict) else {}
+                if data.get("webhookPublicBase") is not None:
+                    conns = {**conns, "webhookPublicBase": str(data.get("webhookPublicBase") or "").strip()}
+                if isinstance(data.get("connections"), dict):
+                    conns = {**conns, **data.get("connections")}
+                created = company_tenancy.save_connections(created.get("id"), conns)
+            return jsonify({"status": "success", "data": company_tenancy.public_company(created)}), 200
+
+        @app.route('/api/admin/companies/<company_id>', methods=['POST', 'PATCH', 'OPTIONS'])
+        def api_admin_company_update(company_id):
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            _actor_user, err = _require_primary_admin_actor()
+            if err:
+                return err
+            company = company_tenancy.get_company(company_id)
+            if not company:
+                return jsonify({"status": "error", "message": "Company not found"}), 404
+            data = request.json or {}
+            if data.get("name") is not None:
+                company["name"] = str(data.get("name") or "").strip() or company.get("name")
+            if data.get("publicSlug") is not None:
+                company["publicSlug"] = company_tenancy.ensure_unique_public_slug(
+                    data.get("publicSlug") or company.get("name"),
+                    company_id=company.get("id"),
+                )
+            if data.get("createWithPiEnabled") is not None:
+                company["createWithPiEnabled"] = company_tenancy.coerce_bool(data.get("createWithPiEnabled"), default=False)
+            saved = company_tenancy.upsert_company(company)
+            if data.get("webhookPublicBase") is not None:
+                conns = company_tenancy.get_connections(company_id)
+                conns["webhookPublicBase"] = str(data.get("webhookPublicBase") or "").strip()
+                saved = company_tenancy.save_connections(company_id, conns)
+            return jsonify({"status": "success", "data": company_tenancy.public_company(saved)}), 200
 
         @app.route('/api/admin/companies/<company_id>/features', methods=['POST', 'OPTIONS'])
         def api_admin_company_features(company_id):
@@ -40134,6 +40361,25 @@ Write ONE short message only. No JSON. No explanations."""
             except ValueError as e:
                 return jsonify({"status": "error", "message": str(e)}), 404
             return jsonify({"status": "success", "data": company_tenancy.public_company(saved)}), 200
+
+        @app.route('/api/automation/public_hooks_base', methods=['GET', 'OPTIONS'])
+        def api_automation_public_hooks_base():
+            """Any dashboard admin can read the public hooks gateway host for copy URLs."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                company_id = _actor_company_id_from_request()
+                company = company_tenancy.get_company(company_id) or company_tenancy.default_fts_company()
+                base = company_tenancy.company_webhook_public_base(company)
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        "hooksPublicBase": base,
+                        "configured": bool(base),
+                    },
+                }), 200
+            except Exception as e:
+                return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/auto_reply_settings', methods=['GET', 'POST', 'OPTIONS'])
         def api_auto_reply_settings():
@@ -44224,6 +44470,9 @@ Draft to optimize:
                                                         "location": loc,
                                                         "receiving_phone_id": phone_id if phone_id else "",
                                                         "incoming_external_message_id": msg_id,
+                                                        "company_id": company_tenancy.normalize_company_id(
+                                                            (chat_conv or {}).get("company_id")
+                                                        ),
                                                     }) or {}
                                                     if isinstance(sync_result, dict) and sync_result.get("sent"):
                                                         try:

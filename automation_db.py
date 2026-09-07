@@ -1,11 +1,20 @@
 import sqlite3
 import json
 import re
+import secrets
 import uuid
 from datetime import datetime
 
 from fts_paths import get_data_path
 DB_FILE = get_data_path('chat_history.db')
+
+# Keep in sync with company_tenancy.DEFAULT_COMPANY_ID (avoid hard import cycles at module load)
+_DEFAULT_COMPANY_ID = "fts"
+
+_WORKFLOW_SELECT_COLS = (
+    "id, name, description, enabled, category, company_id, trigger_type, trigger_config_json, steps_json, "
+    "created_at, updated_at, last_run_at, last_error"
+)
 
 
 def _utc_now():
@@ -17,6 +26,32 @@ def _normalize_category(value):
     if raw == "internal":
         return "internal"
     return "customer"
+
+
+def normalize_workflow_company_id(value) -> str:
+    cid = str(value or "").strip().lower()
+    return cid or _DEFAULT_COMPANY_ID
+
+
+def _parse_trigger_config(wf: dict) -> dict:
+    raw = (wf or {}).get("trigger_config_json") or (wf or {}).get("trigger_config") or "{}"
+    try:
+        cfg = json.loads(raw) if isinstance(raw, str) else (raw or {})
+    except Exception:
+        cfg = {}
+    return cfg if isinstance(cfg, dict) else {}
+
+
+def workflow_company_id(wf: dict) -> str:
+    """Resolve company ownership for a workflow row (column → trigger_config → FTS default)."""
+    if not isinstance(wf, dict):
+        return _DEFAULT_COMPANY_ID
+    cid = str(wf.get("company_id") or wf.get("companyId") or "").strip()
+    if cid:
+        return normalize_workflow_company_id(cid)
+    cfg = _parse_trigger_config(wf)
+    cid = str(cfg.get("webhook_company_id") or cfg.get("company_id") or "").strip()
+    return normalize_workflow_company_id(cid)
 
 
 def init_db():
@@ -34,6 +69,7 @@ def init_db():
                 description TEXT,
                 enabled INTEGER NOT NULL DEFAULT 0,
                 category TEXT NOT NULL DEFAULT 'customer',
+                company_id TEXT NOT NULL DEFAULT 'fts',
                 trigger_type TEXT NOT NULL,
                 trigger_config_json TEXT NOT NULL DEFAULT '{}',
                 steps_json TEXT NOT NULL DEFAULT '[]',
@@ -66,23 +102,70 @@ def init_db():
             cols = [str(r[1]) for r in c.execute("PRAGMA table_info(automation_workflows)").fetchall()]
             if "category" not in cols:
                 c.execute("ALTER TABLE automation_workflows ADD COLUMN category TEXT NOT NULL DEFAULT 'customer'")
+            if "company_id" not in cols:
+                c.execute(
+                    "ALTER TABLE automation_workflows ADD COLUMN company_id TEXT NOT NULL DEFAULT 'fts'"
+                )
+                cols.append("company_id")
+            # Backfill company_id from webhook_company_id when present
+            if "company_id" in cols:
+                rows = c.execute(
+                    "SELECT id, company_id, trigger_config_json FROM automation_workflows"
+                ).fetchall() or []
+                for rid, cur_cid, tcfg_raw in rows:
+                    want = normalize_workflow_company_id(cur_cid)
+                    try:
+                        cfg = json.loads(tcfg_raw) if isinstance(tcfg_raw, str) else (tcfg_raw or {})
+                    except Exception:
+                        cfg = {}
+                    if isinstance(cfg, dict):
+                        from_cfg = str(cfg.get("webhook_company_id") or cfg.get("company_id") or "").strip()
+                        if from_cfg:
+                            want = normalize_workflow_company_id(from_cfg)
+                    if normalize_workflow_company_id(cur_cid) != want:
+                        c.execute(
+                            "UPDATE automation_workflows SET company_id = ? WHERE id = ?",
+                            (want, rid),
+                        )
+            try:
+                c.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_automation_workflows_company_id ON automation_workflows(company_id)"
+                )
+            except Exception:
+                pass
         except Exception:
             pass
         conn.commit()
 
 
-def list_workflows():
+def list_workflows(company_id=None):
+    """
+    List workflows. When company_id is set, return only that tenant's rows.
+    When None, return all (scheduler / internal engine use).
+    """
     with sqlite3.connect(DB_FILE, timeout=30.0) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        c.execute(
-            """
-            SELECT id, name, description, enabled, category, trigger_type, trigger_config_json, steps_json,
-                   created_at, updated_at, last_run_at, last_error
-            FROM automation_workflows
-            ORDER BY updated_at DESC, created_at DESC
-            """
-        )
+        cid = str(company_id or "").strip()
+        if cid:
+            cid_n = normalize_workflow_company_id(cid)
+            c.execute(
+                f"""
+                SELECT {_WORKFLOW_SELECT_COLS}
+                FROM automation_workflows
+                WHERE lower(coalesce(nullif(trim(company_id), ''), 'fts')) = ?
+                ORDER BY updated_at DESC, created_at DESC
+                """,
+                (cid_n,),
+            )
+        else:
+            c.execute(
+                f"""
+                SELECT {_WORKFLOW_SELECT_COLS}
+                FROM automation_workflows
+                ORDER BY updated_at DESC, created_at DESC
+                """
+            )
         rows = c.fetchall() or []
     return [dict(r) for r in rows]
 
@@ -94,9 +177,8 @@ def get_workflow(workflow_id: str):
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute(
-            """
-            SELECT id, name, description, enabled, category, trigger_type, trigger_config_json, steps_json,
-                   created_at, updated_at, last_run_at, last_error
+            f"""
+            SELECT {_WORKFLOW_SELECT_COLS}
             FROM automation_workflows
             WHERE id = ?
             LIMIT 1
@@ -105,15 +187,6 @@ def get_workflow(workflow_id: str):
         )
         row = c.fetchone()
     return dict(row) if row else None
-
-
-def _parse_trigger_config(wf: dict) -> dict:
-    raw = (wf or {}).get("trigger_config_json") or "{}"
-    try:
-        cfg = json.loads(raw) if isinstance(raw, str) else (raw or {})
-    except Exception:
-        cfg = {}
-    return cfg if isinstance(cfg, dict) else {}
 
 
 def normalize_webhook_owner(owner: str) -> str:
@@ -126,6 +199,38 @@ def normalize_webhook_slug(slug: str) -> str:
     s = re.sub(r"[^a-z0-9_-]+", "-", str(slug or "").strip().lower())
     s = re.sub(r"-{2,}", "-", s).strip("-_")
     return s[:80]
+
+
+def new_webhook_public_token() -> str:
+    """Opaque public token — never expose internal API host/path structure to end users."""
+    return secrets.token_urlsafe(24)
+
+
+def normalize_webhook_public_token(token: str) -> str:
+    t = str(token or "").strip()
+    # urlsafe base64 alphabet
+    if not re.fullmatch(r"[A-Za-z0-9_\-]{16,128}", t):
+        return ""
+    return t
+
+
+def find_workflow_by_webhook_token(token: str, enabled_only: bool = True):
+    tok = normalize_webhook_public_token(token)
+    if not tok:
+        return None
+    candidates = []
+    for wf in list_workflows():
+        if str(wf.get("trigger_type") or "").strip().lower() not in ("manual",):
+            continue
+        if enabled_only and not int(wf.get("enabled") or 0):
+            continue
+        cfg = _parse_trigger_config(wf)
+        if normalize_webhook_public_token(str(cfg.get("webhook_public_token") or "")) == tok:
+            candidates.append(wf)
+    if not candidates:
+        return None
+    candidates.sort(key=lambda w: str(w.get("updated_at") or ""), reverse=True)
+    return candidates[0]
 
 
 def find_workflow_by_webhook(owner: str, slug: str, enabled_only: bool = True):
@@ -200,10 +305,15 @@ def list_webhooks_for_owner(owner: str):
                     "path": path,
                     "company_id": str(cfg.get("webhook_company_id") or ""),
                     "company_slug": str(cfg.get("webhook_company_slug") or ""),
+                    "token": str(cfg.get("webhook_public_token") or ""),
                     "url_path": (
-                        f"/api/hooks/{cfg.get('webhook_company_slug')}/{cfg_owner}/{cfg_slug}"
-                        if cfg.get("webhook_company_slug")
-                        else f"/api/automation/webhook/{cfg_owner}/{cfg_slug}"
+                        f"/h/{cfg.get('webhook_public_token')}"
+                        if cfg.get("webhook_public_token")
+                        else (
+                            f"/api/hooks/{cfg.get('webhook_company_slug')}/{cfg_owner}/{cfg_slug}"
+                            if cfg.get("webhook_company_slug")
+                            else f"/api/automation/webhook/{cfg_owner}/{cfg_slug}"
+                        )
                     ),
                 },
             }
@@ -227,6 +337,22 @@ def upsert_workflow(payload: dict):
     if not isinstance(steps, list):
         steps = []
 
+    # Tenant ownership — never migrate an existing workflow to another company via upsert
+    company_id = normalize_workflow_company_id(
+        payload.get("company_id")
+        or payload.get("companyId")
+        or trigger_config.get("webhook_company_id")
+        or (existing.get("company_id") if existing else None)
+        or _DEFAULT_COMPANY_ID
+    )
+    if existing:
+        existing_cid = workflow_company_id(existing)
+        if existing_cid != company_id:
+            raise ValueError(f"workflow_company_mismatch:{existing_cid}")
+        company_id = existing_cid
+    trigger_config = dict(trigger_config)
+    trigger_config["webhook_company_id"] = company_id
+
     # Normalize per-user webhook path so URLs never collide across users
     if str(trigger_type).lower() == "manual":
         owner = normalize_webhook_owner(str(trigger_config.get("webhook_owner") or ""))
@@ -237,6 +363,21 @@ def upsert_workflow(payload: dict):
             trigger_config["webhook_owner"] = owner
             trigger_config["webhook_slug"] = slug
             trigger_config["webhook_path"] = f"{owner}/{slug}"
+            # Stable opaque public token (gateway URL) — do not recycle across workflows
+            existing_tok = normalize_webhook_public_token(str(trigger_config.get("webhook_public_token") or ""))
+            if not existing_tok and existing:
+                prev_cfg = _parse_trigger_config(existing)
+                existing_tok = normalize_webhook_public_token(str(prev_cfg.get("webhook_public_token") or ""))
+            if not existing_tok:
+                # Ensure uniqueness across workflows
+                for _ in range(8):
+                    cand = new_webhook_public_token()
+                    clash = find_workflow_by_webhook_token(cand, enabled_only=False)
+                    if not clash or str(clash.get("id") or "") == wid:
+                        existing_tok = cand
+                        break
+                existing_tok = existing_tok or new_webhook_public_token()
+            trigger_config["webhook_public_token"] = existing_tok
             # Block another workflow of same owner from stealing the slug (unless same id)
             existing_hook = find_workflow_by_webhook(owner, slug, enabled_only=False)
             if existing_hook and str(existing_hook.get("id") or "") != wid:
@@ -256,10 +397,10 @@ def upsert_workflow(payload: dict):
         c.execute(
             """
             INSERT OR REPLACE INTO automation_workflows (
-                id, name, description, enabled, category, trigger_type, trigger_config_json, steps_json,
+                id, name, description, enabled, category, company_id, trigger_type, trigger_config_json, steps_json,
                 created_at, updated_at, last_run_at, last_error
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT last_run_at FROM automation_workflows WHERE id = ?), NULL),
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT last_run_at FROM automation_workflows WHERE id = ?), NULL),
                     COALESCE((SELECT last_error FROM automation_workflows WHERE id = ?), NULL))
             """,
             (
@@ -268,6 +409,7 @@ def upsert_workflow(payload: dict):
                 description,
                 enabled,
                 category,
+                company_id,
                 trigger_type,
                 json.dumps(trigger_config, ensure_ascii=False),
                 json.dumps(steps, ensure_ascii=False),

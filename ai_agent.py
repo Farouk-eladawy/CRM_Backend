@@ -30389,7 +30389,7 @@ Prefer the MarkItDown Extraction section below when present.
         def api_automation_connections():
             """
             List / create FTS-native app connections for the Workflow Canvas.
-            Never imports Make.com credentials — only system settings + user-stored secrets.
+            Isolated per company — never leak another tenant's channels or secrets.
             """
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
@@ -30397,8 +30397,28 @@ Prefer the MarkItDown Extraction section below when present.
                 import uuid
                 import chat_db
 
-                def _read_store():
-                    raw = chat_db.get_setting("automation_app_connections")
+                def _actor_company_and_user():
+                    username = str(request.args.get("actor_username") or "").strip()
+                    payload = request.get_json(silent=True) if request.method == "POST" else None
+                    actor = {}
+                    if isinstance(payload, dict):
+                        actor = payload.get("actor") if isinstance(payload.get("actor"), dict) else {}
+                        username = username or str(actor.get("username") or payload.get("actor_username") or "").strip()
+                    company_id = company_tenancy.resolve_company_id(
+                        username=username or None,
+                        user_id=str(actor.get("id") or actor.get("user_id") or "").strip() or None,
+                    )
+                    return company_tenancy.normalize_company_id(company_id), username, actor
+
+                def _store_key(company_id):
+                    cid = company_tenancy.normalize_company_id(company_id)
+                    if company_tenancy.is_default_company(cid):
+                        return "automation_app_connections"
+                    return f"automation_app_connections__{cid}"
+
+                def _read_store(company_id):
+                    key = _store_key(company_id)
+                    raw = chat_db.get_setting(key)
                     try:
                         data = json.loads(raw) if isinstance(raw, str) and str(raw).strip() else (raw or {})
                     except Exception:
@@ -30406,35 +30426,96 @@ Prefer the MarkItDown Extraction section below when present.
                     if not isinstance(data, dict):
                         data = {}
                     items = data.get("items") if isinstance(data.get("items"), list) else []
-                    return data, [x for x in items if isinstance(x, dict)]
+                    # Legacy: default company may still hold unscoped items; keep them as FTS-only
+                    cleaned = []
+                    for x in items:
+                        if not isinstance(x, dict):
+                            continue
+                        item_cid = company_tenancy.normalize_company_id(
+                            x.get("company_id") or x.get("companyId") or company_id
+                        )
+                        if company_tenancy.is_default_company(company_id):
+                            # FTS store: include items tagged fts or missing company
+                            if item_cid != company_tenancy.DEFAULT_COMPANY_ID and str(x.get("company_id") or x.get("companyId") or "").strip():
+                                if item_cid != company_id:
+                                    continue
+                        else:
+                            if item_cid != company_id:
+                                continue
+                        cleaned.append(x)
+                    return data, cleaned
 
-                def _write_store(items):
-                    chat_db.set_setting("automation_app_connections", json.dumps({"items": items}, ensure_ascii=False))
+                def _write_store(company_id, items):
+                    stamped = []
+                    cid = company_tenancy.normalize_company_id(company_id)
+                    for it in items:
+                        if not isinstance(it, dict):
+                            continue
+                        row = dict(it)
+                        row["company_id"] = cid
+                        stamped.append(row)
+                    chat_db.set_setting(_store_key(cid), json.dumps({"items": stamped}, ensure_ascii=False))
 
-                def _system_connections(type_filter=""):
+                def _system_connections(company_id, type_filter=""):
                     out = []
                     tf = str(type_filter or "").strip().lower()
+                    cid = company_tenancy.normalize_company_id(company_id)
+                    is_fts = company_tenancy.is_default_company(cid)
+                    company = company_tenancy.get_company(cid) or (
+                        company_tenancy.default_fts_company() if is_fts else {}
+                    )
+                    company_name = str((company or {}).get("name") or cid).strip() or cid
 
-                    def add(cid, ctype, label, status="system"):
+                    def add(conn_id, ctype, label, status="system"):
                         if tf and ctype != tf:
                             return
                         out.append({
-                            "id": cid,
+                            "id": conn_id,
                             "type": ctype,
                             "label": label,
                             "status": status,
                             "source": "system",
+                            "company_id": cid,
                         })
 
-                    # Airtable system table
-                    if getattr(self, "table", None) is not None:
-                        add("system_airtable", "airtable", "FTS Airtable (system)", "connected")
-                    else:
-                        add("system_airtable", "airtable", "FTS Airtable (configure in Settings)", "draft")
-
-                    # Gmail / email accounts
+                    # Company-linked systems (Baserow / Transport) — never cross-tenant
                     try:
-                        for acc in _get_dashboard_email_accounts() or []:
+                        conns = company_tenancy.get_connections(cid)
+                        if conns.get("baserowMainUrl"):
+                            add(f"{cid}_baserow_main", "baserow", f"{company_name} · Baserow Main", "connected")
+                        if conns.get("baserowReligiousUrl"):
+                            add(f"{cid}_baserow_religious", "baserow", f"{company_name} · Baserow Religious", "connected")
+                        if conns.get("transportUrl"):
+                            add(f"{cid}_transport", "http", f"{company_name} · Transport", "connected")
+                        if conns.get("religiousWaPhoneNumberId"):
+                            add(
+                                f"{cid}_religious_wa",
+                                "whatsapp",
+                                f"{company_name} · Religious WA ({conns.get('religiousWaDisplay') or conns.get('religiousWaPhoneNumberId')})",
+                                "ready",
+                            )
+                    except Exception:
+                        pass
+
+                    # Channel settings for THIS company only
+                    try:
+                        ch_settings = _get_channel_settings_for_company(cid) or {}
+                    except Exception:
+                        ch_settings = {}
+
+                    # Airtable: FTS system table only for default company
+                    if is_fts:
+                        if getattr(self, "table", None) is not None:
+                            add("system_airtable", "airtable", "FTS Airtable (system)", "connected")
+                        else:
+                            add("system_airtable", "airtable", "FTS Airtable (configure in Settings)", "draft")
+
+                    # Email accounts from company channel settings
+                    try:
+                        accounts = ch_settings.get("emailAccounts") if isinstance(ch_settings, dict) else None
+                        if not isinstance(accounts, list):
+                            accounts = []
+                        for acc in accounts:
                             if not isinstance(acc, dict):
                                 continue
                             aid = str(acc.get("id") or "").strip()
@@ -30442,48 +30523,63 @@ Prefer the MarkItDown Extraction section below when present.
                                 continue
                             email = str(acc.get("email") or acc.get("label") or aid).strip()
                             st = str(acc.get("connectionStatus") or "ready").strip() or "ready"
-                            add(aid, "gmail", f"Gmail · {email}", st)
-                            add(aid, "outlook", f"Outlook/Email · {email}", st)
+                            add(f"{cid}_{aid}", "gmail", f"Gmail · {email}", st)
+                            add(f"{cid}_{aid}", "outlook", f"Outlook/Email · {email}", st)
                     except Exception:
-                        add("system_gmail", "gmail", "Gmail (from Settings)", "ready")
+                        pass
 
-                    # WhatsApp Meta / channels
+                    # WhatsApp accounts from company channel settings
                     try:
-                        raw_wa = chat_db.get_setting("whatsapp_channels") or chat_db.get_setting("dashboard_whatsapp_channels")
-                        wa_items = []
-                        if isinstance(raw_wa, str) and raw_wa.strip():
-                            parsed = json.loads(raw_wa)
-                            wa_items = parsed if isinstance(parsed, list) else (parsed.get("items") if isinstance(parsed, dict) else [])
-                        elif isinstance(raw_wa, list):
-                            wa_items = raw_wa
-                        elif isinstance(raw_wa, dict):
-                            wa_items = raw_wa.get("items") or raw_wa.get("channels") or []
+                        wa_items = ch_settings.get("whatsappAccounts") if isinstance(ch_settings, dict) else None
+                        if not isinstance(wa_items, list):
+                            wa_items = []
+                        # Legacy FTS-only global keys — only when viewing FTS company
+                        if is_fts and not wa_items:
+                            raw_wa = chat_db.get_setting("whatsapp_channels") or chat_db.get_setting("dashboard_whatsapp_channels")
+                            if isinstance(raw_wa, str) and raw_wa.strip():
+                                parsed = json.loads(raw_wa)
+                                wa_items = parsed if isinstance(parsed, list) else (parsed.get("items") if isinstance(parsed, dict) else [])
+                            elif isinstance(raw_wa, list):
+                                wa_items = raw_wa
+                            elif isinstance(raw_wa, dict):
+                                wa_items = raw_wa.get("items") or raw_wa.get("channels") or []
                         for ch in wa_items or []:
                             if not isinstance(ch, dict):
                                 continue
-                            cid = str(ch.get("id") or ch.get("phoneNumberId") or "").strip()
-                            if not cid:
+                            wa_id = str(ch.get("id") or ch.get("phoneNumberId") or "").strip()
+                            if not wa_id:
                                 continue
-                            label = str(ch.get("label") or ch.get("displayPhone") or cid).strip()
-                            add(cid, "whatsapp", f"WhatsApp · {label}", str(ch.get("connectionStatus") or "ready"))
+                            label = str(ch.get("label") or ch.get("displayPhone") or ch.get("phoneNumberId") or wa_id).strip()
+                            add(f"{cid}_{wa_id}", "whatsapp", f"WhatsApp · {label}", str(ch.get("connectionStatus") or "ready"))
                     except Exception:
-                        add("system_whatsapp", "whatsapp", "WhatsApp (system default)", "ready")
+                        pass
 
-                    add("system_deepseek", "deepseek", "DeepSeek (FTS AI router)", "connected")
-                    add("system_gemini", "gemini", "Google Gemini (FTS AI router)", "connected")
-                    add("system_openai", "openai", "OpenAI (FTS AI router)", "connected")
+                    # Platform AI routers stay on FTS only (other companies add their own API keys)
+                    if is_fts:
+                        add("system_deepseek", "deepseek", "DeepSeek (FTS AI router)", "connected")
+                        add("system_gemini", "gemini", "Google Gemini (FTS AI router)", "connected")
+                        add("system_openai", "openai", "OpenAI (FTS AI router)", "connected")
                     return out
+
+                company_id, actor_username, actor = _actor_company_and_user()
+                if request.method == 'GET' and not actor_username:
+                    return jsonify({"status": "error", "message": "actor_username required"}), 400
 
                 if request.method == 'GET':
                     type_filter = str(request.args.get("type") or "").strip().lower()
                     owner_filter = str(request.args.get("owner") or "").strip()
-                    _, user_items = _read_store()
+                    _, user_items = _read_store(company_id)
                     public_user = []
                     for it in user_items:
                         ctype = str(it.get("type") or "").strip().lower()
                         if type_filter and ctype != type_filter:
                             continue
                         item_owner = str(it.get("owner") or (it.get("fields") or {}).get("owner") or "").strip()
+                        item_cid = company_tenancy.normalize_company_id(
+                            it.get("company_id") or it.get("companyId") or company_id
+                        )
+                        if item_cid != company_id:
+                            continue
                         # Per-user isolation: webhooks never leak across users (even legacy empty owner)
                         if type_filter == "webhook" and owner_filter:
                             if not item_owner or item_owner.lower() != owner_filter.lower():
@@ -30505,24 +30601,49 @@ Prefer the MarkItDown Extraction section below when present.
                             "status": str(it.get("status") or "ready"),
                             "source": "user",
                             "owner": item_owner,
+                            "company_id": item_cid,
                             "hints": hints,
                         })
-                    system = [] if type_filter == "webhook" else _system_connections(type_filter)
-                    # Also expose this user's workflow webhooks for reuse
+                    system = [] if type_filter == "webhook" else _system_connections(company_id, type_filter)
+                    # Also expose this user's workflow webhooks for reuse (same company only)
                     if type_filter in ("", "webhook") and owner_filter:
                         try:
                             import automation_db as _adb
                             for wh in _adb.list_webhooks_for_owner(owner_filter):
-                                public_user.append(wh)
+                                wh_cid = company_tenancy.normalize_company_id(
+                                    wh.get("company_id") or (wh.get("hints") or {}).get("company_id") or ""
+                                )
+                                # list_webhooks_for_owner may not include company — resolve from workflow
+                                if not str(wh.get("company_id") or "").strip():
+                                    try:
+                                        wf = _adb.get_workflow(str(wh.get("workflow_id") or wh.get("id") or ""))
+                                        if wf:
+                                            wh_cid = _adb.workflow_company_id(wf)
+                                    except Exception:
+                                        wh_cid = company_id
+                                if wh_cid and wh_cid != company_id:
+                                    continue
+                                public_user.append({**wh, "company_id": company_id})
                         except Exception:
                             pass
-                    return jsonify({"status": "success", "data": system + public_user}), 200
+                    return jsonify({
+                        "status": "success",
+                        "data": system + public_user,
+                        "companyId": company_id,
+                    }), 200
 
-                # POST — create/update user connection
+                # POST — create/update user connection (scoped to actor company)
                 payload = request.get_json(silent=True) or {}
                 actor = payload.get("actor") or {}
                 if str(actor.get("role") or "").strip().lower() != "admin":
                     return jsonify({"status": "error", "message": "Admin only"}), 403
+
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=actor.get("username") or actor_username,
+                        user_id=actor.get("id") or actor.get("user_id"),
+                    )
+                )
 
                 ctype = str(payload.get("type") or "").strip().lower()
                 label = str(payload.get("label") or "").strip() or ctype
@@ -30542,14 +30663,21 @@ Prefer the MarkItDown Extraction section below when present.
                     owner = owner_n
                     label = label or slug
 
-                _, items = _read_store()
+                _, items = _read_store(company_id)
                 found = False
                 for it in items:
                     if str(it.get("id") or "") == conn_id:
+                        # Never allow editing another company's connection via id collision
+                        existing_cid = company_tenancy.normalize_company_id(
+                            it.get("company_id") or it.get("companyId") or company_id
+                        )
+                        if existing_cid != company_id:
+                            continue
                         it["type"] = ctype
                         it["label"] = label
                         it["fields"] = fields
                         it["owner"] = owner
+                        it["company_id"] = company_id
                         it["status"] = "ready"
                         it["updated_at"] = datetime.utcnow().isoformat()
                         found = True
@@ -30561,11 +30689,12 @@ Prefer the MarkItDown Extraction section below when present.
                         "label": label,
                         "fields": fields,
                         "owner": owner,
+                        "company_id": company_id,
                         "status": "ready",
                         "source": "user",
                         "created_at": datetime.utcnow().isoformat(),
                     })
-                _write_store(items)
+                _write_store(company_id, items)
                 return jsonify({
                     "status": "success",
                     "data": {
@@ -30575,6 +30704,7 @@ Prefer the MarkItDown Extraction section below when present.
                         "status": "ready",
                         "source": "user",
                         "owner": owner,
+                        "company_id": company_id,
                         "hints": {k: fields.get(k) for k in ("slug", "owner", "path") if fields.get(k)},
                     },
                 }), 200
@@ -40318,13 +40448,24 @@ Write ONE short message only. No JSON. No explanations."""
                 created = company_tenancy.save_connections(created.get("id"), conns)
             return jsonify({"status": "success", "data": company_tenancy.public_company(created)}), 200
 
-        @app.route('/api/admin/companies/<company_id>', methods=['POST', 'PATCH', 'OPTIONS'])
+        @app.route('/api/admin/companies/<company_id>', methods=['POST', 'PATCH', 'DELETE', 'OPTIONS'])
         def api_admin_company_update(company_id):
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
             _actor_user, err = _require_primary_admin_actor()
             if err:
                 return err
+            if request.method == 'DELETE':
+                try:
+                    result = company_tenancy.delete_company(company_id)
+                    return jsonify({"status": "success", "data": result}), 200
+                except ValueError as ve:
+                    msg = str(ve)
+                    if msg == "cannot_delete_default_company":
+                        return jsonify({"status": "error", "message": "Cannot delete the default FTS company"}), 400
+                    if msg == "company_not_found":
+                        return jsonify({"status": "error", "message": "Company not found"}), 404
+                    return jsonify({"status": "error", "message": msg}), 400
             company = company_tenancy.get_company(company_id)
             if not company:
                 return jsonify({"status": "error", "message": "Company not found"}), 404

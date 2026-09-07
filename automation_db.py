@@ -299,11 +299,12 @@ def list_webhooks_for_owner(owner: str):
                 "status": "connected" if int(wf.get("enabled") or 0) else "ready",
                 "source": "workflow",
                 "workflow_id": wf.get("id"),
+                "company_id": workflow_company_id(wf),
                 "hints": {
                     "slug": cfg_slug,
                     "owner": cfg_owner,
                     "path": path,
-                    "company_id": str(cfg.get("webhook_company_id") or ""),
+                    "company_id": str(cfg.get("webhook_company_id") or workflow_company_id(wf) or ""),
                     "company_slug": str(cfg.get("webhook_company_slug") or ""),
                     "token": str(cfg.get("webhook_public_token") or ""),
                     "url_path": (

@@ -1,6 +1,6 @@
 # Hourly private-repo backup.
 # main branch: project files + small secrets (no force-push).
-# crm-data branch / GitHub Release: latest database zip only.
+# GitHub Release crm-data-latest: latest database zip only.
 $ErrorActionPreference = "Continue"
 $PSNativeCommandUseErrorActionPreference = $false
 
@@ -11,8 +11,9 @@ $LogFile = Join-Path $Root "hourly_github_backup.log"
 $LockFile = Join-Path $Root ".hourly_github_backup.lock"
 $ZipPath = Join-Path $Root "hourly_data_backup\fts_crm_data_latest.zip"
 $Stamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$GitHubFileLimit = 95MB
 $Origin = "https://github.com/Farouk-eladawy/CRM_Backend.git"
+$Repo = "Farouk-eladawy/CRM_Backend"
+$ReleaseTag = "crm-data-latest"
 
 $ForceCommit = @(
     "config.json",
@@ -41,6 +42,70 @@ function Invoke-Git {
     $output = & git @GitArgs 2>&1
     $code = $LASTEXITCODE
     return @{ Code = $code; Output = ($output | Out-String).Trim() }
+}
+
+function Get-GhPath {
+    $fromPath = Get-Command gh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+    $candidates = @(
+        $fromPath,
+        (Join-Path $Root "tools\gh\gh.exe"),
+        (Join-Path $env:ProgramFiles "GitHub CLI\gh.exe"),
+        (Join-Path ${env:ProgramFiles(x86)} "GitHub CLI\gh.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs\GitHub CLI\gh.exe"),
+        (Join-Path $env:LOCALAPPDATA "GitHub CLI\gh.exe")
+    )
+    foreach ($candidate in $candidates) {
+        if ($candidate -and (Test-Path -LiteralPath $candidate)) {
+            return $candidate
+        }
+    }
+    return $null
+}
+
+function Invoke-Gh {
+    param(
+        [Parameter(Mandatory = $true)][string]$GhPath,
+        [Parameter(ValueFromRemainingArguments = $true)][string[]]$GhArgs
+    )
+    $output = & $GhPath @GhArgs 2>&1
+    return @{ Code = $LASTEXITCODE; Output = ($output | Out-String).Trim() }
+}
+
+function Publish-DataZipRelease {
+    param(
+        [Parameter(Mandatory = $true)][string]$FilePath
+    )
+    $ghPath = Get-GhPath
+    if (-not $ghPath) {
+        Write-BackupLog "ERROR: GitHub CLI (gh) is missing. Run setup_github_release_backup.bat once, then gh auth login."
+        return $false
+    }
+
+    $auth = Invoke-Gh -GhPath $ghPath auth status
+    if ($auth.Code -ne 0) {
+        Write-BackupLog ("ERROR: GitHub CLI is not logged in. Run setup_github_release_backup.bat once. " + $auth.Output)
+        return $false
+    }
+
+    Write-BackupLog "INFO: uploading zip to GitHub Release $ReleaseTag on $Repo"
+    $view = Invoke-Gh -GhPath $ghPath release view $ReleaseTag --repo $Repo
+    if ($view.Code -ne 0) {
+        $create = Invoke-Gh -GhPath $ghPath release create $ReleaseTag $FilePath --repo $Repo --title "FTS CRM latest data" --notes "Rolling private snapshot. Replaced every hour. Contains DB + config + Gmail tokens."
+        if ($create.Code -ne 0) {
+            Write-BackupLog ("ERROR: gh release create failed. " + $create.Output)
+            return $false
+        }
+        Write-BackupLog "OK: created GitHub Release $ReleaseTag and uploaded data zip"
+        return $true
+    }
+
+    $upload = Invoke-Gh -GhPath $ghPath release upload $ReleaseTag $FilePath --repo $Repo --clobber
+    if ($upload.Code -ne 0) {
+        Write-BackupLog ("ERROR: gh release upload failed. " + $upload.Output)
+        return $false
+    }
+    Write-BackupLog "OK: uploaded data zip to GitHub Release $ReleaseTag"
+    return $true
 }
 
 if (Test-Path -LiteralPath $LockFile) {
@@ -136,50 +201,9 @@ try {
     $zipSize = (Get-Item -LiteralPath $ZipPath).Length
     Write-BackupLog ("INFO: data zip size {0:N1} MB" -f ($zipSize / 1MB))
 
-    if (Test-Command "gh") {
-        & gh release view crm-data-latest >$null 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            & gh release create crm-data-latest $ZipPath --title "FTS CRM latest data" --notes "Rolling private snapshot. Replaced every hour. Contains DB + config + Gmail tokens."
-        } else {
-            & gh release upload crm-data-latest $ZipPath --clobber
-        }
-        if ($LASTEXITCODE -eq 0) {
-            Write-BackupLog "OK: uploaded data zip to GitHub Release crm-data-latest"
-            exit 0
-        }
-        Write-BackupLog "WARN: gh release upload failed, trying crm-data branch."
-    }
-
-    if ($zipSize -gt $GitHubFileLimit) {
-        Write-BackupLog "ERROR: zip is over GitHub git file limit (100MB). Install GitHub CLI and run gh auth login so the zip can go to a Release instead of git history."
+    if (-not (Publish-DataZipRelease -FilePath $ZipPath)) {
         exit 1
     }
-
-    $tmp = Join-Path $env:TEMP "fts-crm-data-backup"
-    if (Test-Path -LiteralPath $tmp) {
-        Remove-Item -LiteralPath $tmp -Recurse -Force
-    }
-    New-Item -ItemType Directory -Path $tmp | Out-Null
-    Copy-Item -LiteralPath $ZipPath -Destination (Join-Path $tmp "fts_crm_data_latest.zip")
-
-    Push-Location -LiteralPath $tmp
-    try {
-        & git init | Out-Null
-        & git add fts_crm_data_latest.zip
-        & git -c user.email="backup@local" -c user.name="Hourly Backup" commit -m "Latest data snapshot $Stamp"
-        & git remote add origin $Origin
-        & git branch -M crm-data
-        & git push --force origin crm-data
-        if ($LASTEXITCODE -ne 0) {
-            Write-BackupLog "ERROR: force-push of crm-data branch failed."
-            exit 1
-        }
-        Write-BackupLog "OK: replaced crm-data branch with latest zip only"
-    }
-    finally {
-        Pop-Location
-    }
-
     exit 0
 }
 catch {

@@ -20,6 +20,7 @@ NEW_COMPANY_ALLOWED_TABS = [
     "religious_operation",
     "religious_wa_campaigns",
     "transport_operation",
+    "automation",
 ]
 
 
@@ -529,6 +530,69 @@ def create_company(name, created_by_username=""):
         "connections": empty_connections(),
     }
     return upsert_company(item)
+
+
+def delete_company(company_id, *, reassign_users_to=DEFAULT_COMPANY_ID):
+    """
+    Remove a tenant company. Default FTS company cannot be deleted.
+    Linked users are moved to reassign_users_to (usually FTS).
+    """
+    import chat_db
+
+    cid = normalize_company_id(company_id)
+    if is_default_company(cid):
+        raise ValueError("cannot_delete_default_company")
+    company = get_company(cid)
+    if not company:
+        raise ValueError("company_not_found")
+
+    target = normalize_company_id(reassign_users_to)
+    if target == cid:
+        target = DEFAULT_COMPANY_ID
+    if not get_company(target) and not is_default_company(target):
+        target = DEFAULT_COMPANY_ID
+
+    users = load_dashboard_users()
+    moved = 0
+    next_users = []
+    for u in users:
+        if not isinstance(u, dict):
+            continue
+        row = dict(u)
+        if user_company_id(row) == cid:
+            row["companyId"] = target
+            row["company_id"] = target
+            moved += 1
+        next_users.append(row)
+    if moved:
+        chat_db.set_setting("dashboard_users", json.dumps(next_users, ensure_ascii=False))
+
+    companies = [c for c in load_companies() if normalize_company_id(c.get("id")) != cid]
+    save_companies(companies)
+
+    # Drop company-scoped settings keys when present
+    try:
+        for base_key in COMPANY_SCOPED_SETTING_KEYS:
+            scoped = scoped_setting_key(base_key, cid)
+            if scoped != base_key:
+                try:
+                    chat_db.set_setting(scoped, "")
+                except Exception:
+                    pass
+        # Company-scoped automation app connections store
+        try:
+            chat_db.set_setting(f"automation_app_connections__{cid}", "")
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+    return {
+        "deletedId": cid,
+        "deletedName": str(company.get("name") or cid),
+        "reassignedUsers": moved,
+        "reassignedTo": target,
+    }
 
 
 def get_connections(company_id) -> dict:

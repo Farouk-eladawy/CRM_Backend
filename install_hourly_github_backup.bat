@@ -8,7 +8,8 @@ echo ========================================================
 echo.
 echo This creates a Windows Task Scheduler job that runs every hour.
 echo main branch: project files + config + Gmail tokens + railway_vars.
-echo Database zip: latest copy only (Release or crm-data branch).
+echo Database zip: GitHub Release crm-data-latest (not Git).
+echo First time only: run setup_github_release_backup.bat
 echo It will NOT delete .git and will NOT force-push main.
 echo.
 

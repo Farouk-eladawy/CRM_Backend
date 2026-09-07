@@ -8,6 +8,7 @@ import os
 import shutil
 import sqlite3
 import sys
+import tempfile
 import time
 import zipfile
 from datetime import datetime
@@ -114,10 +115,8 @@ def collect_secret_globs() -> list[str]:
 
 def main() -> int:
     os.makedirs(BUNDLE_DIR, exist_ok=True)
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    stage_dir = os.path.join(BUNDLE_DIR, "stage-{0}-{1}".format(stamp, os.getpid()))
-    os.makedirs(stage_dir, exist_ok=True)
-    cleanup_stage_dirs(keep_path=stage_dir)
+    cleanup_stage_dirs()
+    stage_dir = tempfile.mkdtemp(prefix="fts-crm-backup-")
 
     copied = []
     missing = []

@@ -1781,8 +1781,33 @@ class AutomationEngine:
                 final_headers[str(k)] = str(v)
         rendered_headers = final_headers
 
+        # Make-like query parameters (JSON object → URL query string).
+        query = step.get("query")
+        if isinstance(query, dict) and query:
+            from urllib.parse import urlencode, urlsplit, urlunsplit, parse_qsl
+
+            parts = urlsplit(url)
+            merged = dict(parse_qsl(parts.query, keep_blank_values=True))
+            for qk, qv in query.items():
+                if qv is None:
+                    continue
+                if isinstance(qv, str):
+                    merged[str(qk)] = _render_template(qv, ctx)
+                else:
+                    merged[str(qk)] = str(qv)
+            url = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(merged, doseq=True), parts.fragment))
+
         body = step.get("body")
         output_key = str(step.get("output_key") or "result").strip()
+        parse_response = step.get("parse_response")
+        if parse_response is None:
+            parse_response = True
+        fail_on_http_error = step.get("fail_on_http_error")
+        if fail_on_http_error is None:
+            fail_on_http_error = True
+        allow_redirects = step.get("allow_redirects")
+        if allow_redirects is None:
+            allow_redirects = True
 
         # Prefer in-process script execution for local automation run_script URLs.
         # Avoids HTTP self-call deadlocks/races that let AI insert a late PROPOSED_DRAFT.
@@ -1805,9 +1830,17 @@ class AutomationEngine:
             auth = (str(basic[0] or ""), str(basic[1] or ""))
 
         def _send(**kwargs):
-            res = requests.request(method, url, headers=rendered_headers, timeout=timeout_s, auth=auth, **kwargs)
+            res = requests.request(
+                method,
+                url,
+                headers=rendered_headers,
+                timeout=timeout_s,
+                auth=auth,
+                allow_redirects=bool(allow_redirects),
+                **kwargs,
+            )
             sc = int(getattr(res, "status_code", 0) or 0)
-            if sc >= 400:
+            if fail_on_http_error and sc >= 400:
                 try:
                     body_text = (res.text or "")[:1500]
                 except Exception:
@@ -1817,7 +1850,7 @@ class AutomationEngine:
                 if output_key:
                     ct = str(res.headers.get("content-type") or "").lower()
                     parsed = None
-                    if "application/json" in ct:
+                    if parse_response and "application/json" in ct:
                         try:
                             parsed = res.json()
                             ctx["vars"][output_key] = parsed

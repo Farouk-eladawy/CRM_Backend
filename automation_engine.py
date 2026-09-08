@@ -1375,6 +1375,8 @@ class AutomationEngine:
             "type": str(conn.get("type") or ""),
             "token": token,
             "baseUrl": base_url,
+            "webhookUrl": str(fields.get("webhookUrl") or "").strip(),
+            "bridgeSecret": str(fields.get("bridgeSecret") or "").strip(),
             "accountSid": account_sid,
             "fromNumber": from_number,
             "accountId": str(fields.get("accountId") or conn.get("id") or ""),
@@ -1399,7 +1401,7 @@ class AutomationEngine:
         token = cctx.get("token") or ""
         ctype = str(cctx.get("type") or conn_type).lower()
         h = dict(headers or {})
-        if ctype in ("airtable", "slack", "stripe", "google_sheets", "notion", "deepseek", "gemini", "openai") and token:
+        if ctype in ("airtable", "slack", "stripe", "google_sheets", "notion", "deepseek", "gemini", "openai", "activepieces") and token:
             h.setdefault("Authorization", f"Bearer {token}")
         elif ctype == "baserow" and token:
             h.setdefault("Authorization", f"Token {token}")

@@ -250,6 +250,181 @@ class AutomationEngine:
         self._schedule_state = {}
         self._lock = threading.Lock()
         self._tick_last = 0.0
+        # Make-like Run once for webhooks: token -> wait session
+        self._run_once_waits = {}
+
+    def arm_run_once_wait(self, workflow_id: str, token: str, timeout_seconds: int = 90) -> dict:
+        """Arm one-shot wait for the next webhook POST (Make Run once → Waiting for data)."""
+        tok = automation_db.normalize_webhook_public_token(token)
+        wid = str(workflow_id or "").strip()
+        if not tok or not wid:
+            return {"ok": False, "error": "missing_token_or_workflow"}
+        timeout_seconds = max(15, min(int(timeout_seconds or 90), 300))
+        now = time.time()
+        with self._lock:
+            # Clear expired sessions
+            dead = []
+            for k, v in self._run_once_waits.items():
+                if not isinstance(v, dict):
+                    dead.append(k)
+                    continue
+                if float(v.get("expires_at") or 0) < now and str(v.get("status") or "") == "waiting":
+                    v["status"] = "timeout"
+                    v["logs"] = list(v.get("logs") or []) + [
+                        {"t": _utc_now(), "msg": "Exceeded maximum wait time."}
+                    ]
+                if str(v.get("status") or "") in ("timeout", "stopped", "completed") and float(v.get("expires_at") or 0) < now - 120:
+                    dead.append(k)
+            for k in dead:
+                self._run_once_waits.pop(k, None)
+
+            session = {
+                "workflow_id": wid,
+                "token": tok,
+                "status": "waiting",
+                "created_at": now,
+                "expires_at": now + timeout_seconds,
+                "timeout_seconds": timeout_seconds,
+                "result": None,
+                "payload": None,
+                "logs": [
+                    {"t": _utc_now(), "msg": "Preparing scenario for running."},
+                    {"t": _utc_now(), "msg": "Requesting execution."},
+                    {"t": _utc_now(), "msg": "The request was accepted. Waiting for data."},
+                ],
+            }
+            self._run_once_waits[tok] = session
+            return {
+                "ok": True,
+                "status": "waiting",
+                "token": tok,
+                "workflow_id": wid,
+                "timeout_seconds": timeout_seconds,
+                "logs": session["logs"],
+            }
+
+    def stop_run_once_wait(self, workflow_id: str = "", token: str = "") -> dict:
+        tok = automation_db.normalize_webhook_public_token(token)
+        wid = str(workflow_id or "").strip()
+        with self._lock:
+            session = None
+            if tok and tok in self._run_once_waits:
+                session = self._run_once_waits.get(tok)
+            elif wid:
+                for k, v in self._run_once_waits.items():
+                    if isinstance(v, dict) and str(v.get("workflow_id") or "") == wid and str(v.get("status") or "") == "waiting":
+                        session = v
+                        tok = k
+                        break
+            if not session:
+                return {"ok": True, "status": "idle"}
+            if str(session.get("status") or "") == "waiting":
+                session["status"] = "stopped"
+                session["logs"] = list(session.get("logs") or []) + [
+                    {"t": _utc_now(), "msg": "Scenario was stopped."}
+                ]
+            return {
+                "ok": True,
+                "status": str(session.get("status") or "stopped"),
+                "logs": list(session.get("logs") or []),
+                "token": tok,
+            }
+
+    def get_run_once_wait(self, workflow_id: str = "", token: str = "") -> dict:
+        tok = automation_db.normalize_webhook_public_token(token)
+        wid = str(workflow_id or "").strip()
+        now = time.time()
+        with self._lock:
+            session = None
+            if tok and tok in self._run_once_waits:
+                session = self._run_once_waits.get(tok)
+            elif wid:
+                for k, v in self._run_once_waits.items():
+                    if isinstance(v, dict) and str(v.get("workflow_id") or "") == wid:
+                        session = v
+                        tok = k
+                        break
+            if not session:
+                return {"ok": True, "status": "idle", "logs": []}
+            if str(session.get("status") or "") == "waiting" and float(session.get("expires_at") or 0) < now:
+                session["status"] = "timeout"
+                session["logs"] = list(session.get("logs") or []) + [
+                    {"t": _utc_now(), "msg": "Exceeded maximum wait time."}
+                ]
+            return {
+                "ok": True,
+                "status": str(session.get("status") or "idle"),
+                "token": tok,
+                "workflow_id": str(session.get("workflow_id") or ""),
+                "logs": list(session.get("logs") or []),
+                "result": session.get("result"),
+                "operations": (session.get("result") or {}).get("operations")
+                if isinstance(session.get("result"), dict)
+                else [],
+            }
+
+    def consume_run_once_wait_if_armed(self, token: str, payload: dict = None):
+        """
+        If Run once is waiting for this webhook token, run the workflow once and
+        complete the wait session (works even when the scenario is Inactive — like Make).
+        Returns (handled: bool, response_dict_or_None).
+        """
+        tok = automation_db.normalize_webhook_public_token(token)
+        if not tok:
+            return False, None
+        with self._lock:
+            session = self._run_once_waits.get(tok)
+            if not session or str(session.get("status") or "") != "waiting":
+                return False, None
+            now = time.time()
+            if float(session.get("expires_at") or 0) < now:
+                session["status"] = "timeout"
+                session["logs"] = list(session.get("logs") or []) + [
+                    {"t": _utc_now(), "msg": "Exceeded maximum wait time."}
+                ]
+                return True, {
+                    "ok": False,
+                    "error": "wait_timeout",
+                    "status": "timeout",
+                }
+            # Claim the wait so duplicate POSTs don't double-run
+            session["status"] = "running"
+            session["logs"] = list(session.get("logs") or []) + [
+                {"t": _utc_now(), "msg": "The scenario was initialized."}
+            ]
+            wid = str(session.get("workflow_id") or "")
+
+        try:
+            res = self.run_manual(wid, payload=payload or {})
+        except Exception as e:
+            with self._lock:
+                session = self._run_once_waits.get(tok) or {}
+                session["status"] = "error"
+                session["result"] = {"ok": False, "error": str(e)}
+                session["logs"] = list(session.get("logs") or []) + [
+                    {"t": _utc_now(), "msg": f"The scenario run failed: {e}"},
+                ]
+                self._run_once_waits[tok] = session
+            return True, {"ok": False, "error": str(e), "status": "error"}
+
+        with self._lock:
+            session = self._run_once_waits.get(tok) or {}
+            session["status"] = "completed"
+            session["payload"] = payload or {}
+            session["result"] = res if isinstance(res, dict) else {"ok": True, "raw": res}
+            session["logs"] = list(session.get("logs") or []) + [
+                {"t": _utc_now(), "msg": "The scenario was finalized."},
+                {"t": _utc_now(), "msg": "The scenario run was completed."},
+            ]
+            self._run_once_waits[tok] = session
+        return True, {
+            "ok": True,
+            "status": "completed",
+            "result": session.get("result"),
+            "operations": (session.get("result") or {}).get("operations")
+            if isinstance(session.get("result"), dict)
+            else [],
+        }
 
     def emit_message_received(self, payload: dict):
         try:
@@ -466,39 +641,39 @@ class AutomationEngine:
             steps = []
 
         err = None
+        ctx["_exec_ops"] = []
+        try:
+            tcfg = {}
+            try:
+                raw_tcfg = wf.get("trigger_config")
+                if isinstance(raw_tcfg, dict):
+                    tcfg = raw_tcfg
+                else:
+                    tcfg = json.loads(str(wf.get("trigger_config_json") or "{}"))
+                if not isinstance(tcfg, dict):
+                    tcfg = {}
+            except Exception:
+                tcfg = {}
+            self._record_operation(
+                ctx,
+                {
+                    "type": "trigger",
+                    "_canvas_node_id": tcfg.get("_canvas_node_id"),
+                    "_module_id": tcfg.get("_module_id"),
+                    "_label": tcfg.get("_label"),
+                    "trigger_type": event_type,
+                },
+                output={"type": event_type, "payload": event_payload or {}},
+                status="success",
+            )
+        except Exception:
+            pass
+
         try:
             for step in steps:
                 if not isinstance(step, dict):
                     continue
-                stype = str(step.get("type") or "").strip().lower()
-                if not stype:
-                    continue
-                if stype == "guard":
-                    self._step_guard(step, ctx)
-                elif stype == "ai":
-                    self._step_ai(step, ctx)
-                elif stype == "airtable_update":
-                    self._step_airtable_update(step, ctx)
-                elif stype == "send_whatsapp":
-                    self._step_send_whatsapp(step, ctx)
-                elif stype == "send_email":
-                    self._step_send_email(step, ctx)
-                elif stype == "http_request":
-                    self._step_http_request(step, ctx)
-                elif stype == "send_internal_notification":
-                    self._step_send_internal_notification(step, ctx)
-                elif stype in ("keyword_reply", "visual_keyword_reply"):
-                    self._step_keyword_reply(step, ctx)
-                elif stype == "set_variable":
-                    self._step_set_variable(step, ctx)
-                elif stype == "text_parser":
-                    self._step_text_parser(step, ctx)
-                elif stype == "json_parse":
-                    self._step_json_parse(step, ctx)
-                elif stype == "sleep":
-                    self._step_sleep(step, ctx)
-                else:
-                    continue
+                self._dispatch_step(step, ctx)
             try:
                 automation_db.touch_run_success(wid)
             except Exception:
@@ -521,11 +696,229 @@ class AutomationEngine:
                     final_payload = event_payload.copy() if isinstance(event_payload, dict) else {}
                     if ctx.get("vars"):
                         final_payload["result"] = ctx["vars"]
+                    if ctx.get("_exec_ops"):
+                        final_payload["operations"] = ctx.get("_exec_ops")
                     automation_db.finish_run(run_id, "success" if not err else "error", error=err, payload=final_payload)
                 except Exception:
                     pass
         sent = bool((ctx.get("vars") or {}).get("_workflow_sent"))
-        return {"ok": err is None, "error": err, "sent": sent}
+        return {
+            "ok": err is None,
+            "error": err,
+            "sent": sent,
+            "operations": list(ctx.get("_exec_ops") or []),
+        }
+
+    def _json_size_bytes(self, value) -> int:
+        try:
+            return len(json.dumps(value, ensure_ascii=False, default=str).encode("utf-8"))
+        except Exception:
+            try:
+                return len(str(value).encode("utf-8"))
+            except Exception:
+                return 0
+
+    def _safe_clone(self, value, depth: int = 0):
+        if depth > 6:
+            return str(value)[:200]
+        if value is None or isinstance(value, (bool, int, float, str)):
+            return value
+        if isinstance(value, dict):
+            out = {}
+            for i, (k, v) in enumerate(value.items()):
+                if i >= 40:
+                    out["…"] = f"+{len(value) - 40} keys"
+                    break
+                sk = str(k)
+                if any(x in sk.lower() for x in ("token", "password", "secret", "api_key", "authorization")):
+                    out[sk] = "***"
+                else:
+                    out[sk] = self._safe_clone(v, depth + 1)
+            return out
+        if isinstance(value, (list, tuple)):
+            return [self._safe_clone(v, depth + 1) for v in list(value)[:40]]
+        return str(value)[:300]
+
+    def _record_operation(self, ctx: dict, step: dict, output=None, status: str = "success", error: str = None):
+        try:
+            ops = ctx.get("_exec_ops")
+            if not isinstance(ops, list):
+                ops = []
+                ctx["_exec_ops"] = ops
+            out = self._safe_clone(output if output is not None else {})
+            op = {
+                "index": len(ops) + 1,
+                "nodeId": str(step.get("_canvas_node_id") or "").strip() or None,
+                "moduleId": str(step.get("_module_id") or "").strip() or None,
+                "label": str(step.get("_label") or "").strip() or None,
+                "stepType": str(step.get("type") or "").strip().lower(),
+                "status": status,
+                "bytes": self._json_size_bytes(out),
+                "output": out,
+            }
+            if error:
+                op["error"] = str(error)[:500]
+            ops.append(op)
+        except Exception:
+            pass
+
+    def _build_step_output(self, stype: str, step: dict, ctx: dict):
+        stype = str(stype or "").lower()
+        vars_map = ctx.get("vars") if isinstance(ctx.get("vars"), dict) else {}
+        if stype == "http_request":
+            out = {
+                "type": "http_request",
+                "method": step.get("method") or "POST",
+                "url": step.get("url") or "",
+                "headers": step.get("headers") if isinstance(step.get("headers"), dict) else {},
+                "timeout_seconds": step.get("timeout_seconds") or 30,
+                "body": step.get("body"),
+            }
+            ok = str(step.get("output_key") or "").strip()
+            if ok and ok in vars_map:
+                out["response"] = vars_map.get(ok)
+            return out
+        if stype == "guard":
+            return {"type": "guard", "path": step.get("path"), "passed": True}
+        if stype == "router":
+            return {
+                "type": "router",
+                "route": vars_map.get("_router_route"),
+                "label": vars_map.get("_router_label"),
+                "mode": step.get("mode") or "first_match",
+            }
+        if stype in ("send_whatsapp", "send_email", "send_internal_notification"):
+            return {
+                "type": stype,
+                "to": step.get("to"),
+                "text": step.get("text") or step.get("html") or step.get("message"),
+                "subject": step.get("subject"),
+            }
+        if stype == "set_variable":
+            key = str(step.get("key") or "value")
+            return {"type": "set_variable", "key": key, "value": vars_map.get(key)}
+        if stype in ("text_parser", "json_parse", "ai"):
+            ok = str(
+                step.get("output_key")
+                or ("parsed" if stype == "text_parser" else "json" if stype == "json_parse" else "ai")
+            )
+            return {"type": stype, "output_key": ok, "value": vars_map.get(ok)}
+        if stype == "sleep":
+            return {"type": "sleep", "seconds": step.get("seconds") or 1}
+        return {"type": stype or "step", "vars": self._safe_clone(vars_map)}
+
+    def _dispatch_step(self, step: dict, ctx: dict):
+        stype = str(step.get("type") or "").strip().lower()
+        if not stype:
+            return
+        try:
+            if stype == "guard":
+                self._step_guard(step, ctx)
+            elif stype == "router":
+                self._step_router(step, ctx)
+            elif stype == "ai":
+                self._step_ai(step, ctx)
+            elif stype == "airtable_update":
+                self._step_airtable_update(step, ctx)
+            elif stype == "send_whatsapp":
+                self._step_send_whatsapp(step, ctx)
+            elif stype == "send_email":
+                self._step_send_email(step, ctx)
+            elif stype == "http_request":
+                self._step_http_request(step, ctx)
+            elif stype == "send_internal_notification":
+                self._step_send_internal_notification(step, ctx)
+            elif stype in ("keyword_reply", "visual_keyword_reply"):
+                self._step_keyword_reply(step, ctx)
+            elif stype == "set_variable":
+                self._step_set_variable(step, ctx)
+            elif stype == "text_parser":
+                self._step_text_parser(step, ctx)
+            elif stype == "json_parse":
+                self._step_json_parse(step, ctx)
+            elif stype == "sleep":
+                self._step_sleep(step, ctx)
+            else:
+                return
+            self._record_operation(ctx, step, output=self._build_step_output(stype, step, ctx), status="success")
+        except StopWorkflow as sw:
+            self._record_operation(
+                ctx,
+                step,
+                output={"type": stype, "stopped": True, "reason": str(sw)},
+                status="stopped",
+                error=str(sw),
+            )
+            raise
+        except Exception as e:
+            self._record_operation(ctx, step, output={"type": stype}, status="error", error=str(e))
+            raise
+
+    def _eval_router_filter(self, filt, ctx: dict) -> bool:
+        """Make-like route filter. None/empty filter = always match (fallback)."""
+        if filt is None:
+            return True
+        if not isinstance(filt, dict):
+            return True
+        path = str(filt.get("field") or filt.get("path") or "event.payload.message_body").strip()
+        op = str(filt.get("op") or "contains").strip().lower()
+        raw_val = _get_by_path(ctx, path)
+        s = "" if raw_val is None else str(raw_val)
+        ci = filt.get("case_insensitive")
+        ci = True if ci is None else bool(ci)
+        needle = "" if filt.get("value") is None else str(filt.get("value"))
+        hay = s.lower() if ci else s
+        nd = needle.lower() if ci else needle
+
+        if op in ("empty", "is_empty"):
+            return not s.strip()
+        if op in ("nonempty", "not_empty", "exists"):
+            return bool(s.strip())
+        if op in ("eq", "equals", "=="):
+            return hay == nd
+        if op == "regex":
+            if not needle.strip():
+                return True
+            flags = re.IGNORECASE if ci else 0
+            return bool(re.search(needle, s, flags))
+        # default: contains
+        if not nd:
+            return True
+        return nd in hay
+
+    def _step_router(self, step: dict, ctx: dict):
+        routes = step.get("routes")
+        if not isinstance(routes, list):
+            routes = []
+        mode = str(step.get("mode") or "first_match").strip().lower()
+        matched_any = False
+        for route in routes:
+            if not isinstance(route, dict):
+                continue
+            filt = route.get("filter", None)
+            if filt == "":
+                filt = None
+            if not self._eval_router_filter(filt, ctx):
+                continue
+            matched_any = True
+            route_id = str(route.get("id") or "").strip()
+            route_label = str(route.get("label") or route_id).strip()
+            try:
+                if not isinstance(ctx.get("vars"), dict):
+                    ctx["vars"] = {}
+                ctx["vars"]["_router_route"] = route_id
+                ctx["vars"]["_router_label"] = route_label
+            except Exception:
+                pass
+            nested = route.get("steps")
+            if isinstance(nested, list):
+                for nested_step in nested:
+                    if isinstance(nested_step, dict):
+                        self._dispatch_step(nested_step, ctx)
+            if mode != "all_matching":
+                return
+        if not matched_any:
+            raise StopWorkflow("router_no_match")
 
     def _is_human_active_chat(self, chat_id: str) -> bool:
         try:

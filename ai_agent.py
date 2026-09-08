@@ -30335,6 +30335,91 @@ Prefer the MarkItDown Extraction section below when present.
                 logging.error(f"Error in /api/automation/workflows/<id>/run: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        @app.route('/api/automation/workflows/<workflow_id>/run-once/arm', methods=['POST', 'OPTIONS'])
+        def api_arm_automation_run_once(workflow_id):
+            """Make-like Run once for Custom webhook: arm wait-for-data session."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import automation_db
+
+                payload = request.get_json(silent=True) or {}
+                actor = payload.get("actor") or {}
+                role = str(actor.get("role") or "").strip().lower()
+                if role != "admin":
+                    return jsonify({"status": "error", "message": "Admin only"}), 403
+                company_id = company_tenancy.normalize_company_id(
+                    company_tenancy.resolve_company_id(
+                        username=actor.get("username") or actor.get("id"),
+                        user_id=actor.get("id") or actor.get("user_id"),
+                    )
+                )
+                existing = automation_db.get_workflow(workflow_id)
+                if not existing or automation_db.workflow_company_id(existing) != company_id:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
+                cfg = automation_db._parse_trigger_config(existing)
+                tok = str(cfg.get("webhook_public_token") or payload.get("token") or "").strip()
+                if not tok:
+                    return jsonify({"status": "error", "message": "Webhook token missing — save scenario first"}), 400
+                engine = getattr(self, "automation_engine", None)
+                if not engine:
+                    return jsonify({"status": "error", "message": "Automation engine not available"}), 500
+                timeout_seconds = payload.get("timeout_seconds") or 90
+                res = engine.arm_run_once_wait(str(existing.get("id")), tok, timeout_seconds=timeout_seconds)
+                return jsonify({"status": "success", "data": res}), 200
+            except Exception as e:
+                logging.error(f"Error in run-once/arm: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/automation/workflows/<workflow_id>/run-once/status', methods=['GET', 'OPTIONS'])
+        def api_status_automation_run_once(workflow_id):
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import automation_db
+
+                actor_username = request.args.get("actor_username") or request.args.get("username") or ""
+                # Soft auth: company-scoped workflow ownership
+                existing = automation_db.get_workflow(workflow_id)
+                if not existing:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
+                engine = getattr(self, "automation_engine", None)
+                if not engine:
+                    return jsonify({"status": "error", "message": "Automation engine not available"}), 500
+                cfg = automation_db._parse_trigger_config(existing)
+                tok = str(cfg.get("webhook_public_token") or request.args.get("token") or "").strip()
+                res = engine.get_run_once_wait(workflow_id=str(existing.get("id")), token=tok)
+                return jsonify({"status": "success", "data": res}), 200
+            except Exception as e:
+                logging.error(f"Error in run-once/status: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/automation/workflows/<workflow_id>/run-once/stop', methods=['POST', 'OPTIONS'])
+        def api_stop_automation_run_once(workflow_id):
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                import automation_db
+
+                payload = request.get_json(silent=True) or {}
+                actor = payload.get("actor") or {}
+                role = str(actor.get("role") or "").strip().lower()
+                if role != "admin":
+                    return jsonify({"status": "error", "message": "Admin only"}), 403
+                existing = automation_db.get_workflow(workflow_id)
+                if not existing:
+                    return jsonify({"status": "error", "message": "Not found"}), 404
+                engine = getattr(self, "automation_engine", None)
+                if not engine:
+                    return jsonify({"status": "error", "message": "Automation engine not available"}), 500
+                cfg = automation_db._parse_trigger_config(existing)
+                tok = str(cfg.get("webhook_public_token") or payload.get("token") or "").strip()
+                res = engine.stop_run_once_wait(workflow_id=str(existing.get("id")), token=tok)
+                return jsonify({"status": "success", "data": res}), 200
+            except Exception as e:
+                logging.error(f"Error in run-once/stop: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
         @app.route('/api/automation/workflows/<workflow_id>', methods=['DELETE', 'OPTIONS'])
         def api_delete_automation_workflow(workflow_id):
             if request.method == 'OPTIONS':
@@ -31044,6 +31129,39 @@ Prefer the MarkItDown Extraction section below when present.
                             "company_name": company.get("name"),
                         },
                     }), 200
+
+                # Make-like Run once: if dashboard armed a wait, accept POST even when Inactive
+                engine = getattr(self, "automation_engine", None)
+                if engine:
+                    data = request.get_json(silent=True)
+                    if data is None:
+                        data = {}
+                    if not isinstance(data, dict):
+                        data = {"raw": data}
+                    cfg_wait = automation_db._parse_trigger_config(wf)
+                    owner_w = automation_db.normalize_webhook_owner(str(cfg_wait.get("webhook_owner") or ""))
+                    slug_w = automation_db.normalize_webhook_slug(str(cfg_wait.get("webhook_slug") or ""))
+                    wait_payload = {
+                        **data,
+                        "webhook_owner": owner_w,
+                        "webhook_slug": slug_w,
+                        "webhook_path": f"{owner_w}/{slug_w}" if owner_w and slug_w else "",
+                        "webhook_company_id": company_id,
+                        "webhook_company_slug": company_tenancy.resolve_webhook_public_slug(company, username=owner_w),
+                        "webhook_public_token": tok,
+                    }
+                    handled, wait_res = engine.consume_run_once_wait_if_armed(tok, payload=wait_payload)
+                    if handled:
+                        return jsonify({
+                            "status": "success" if (wait_res or {}).get("ok", True) else "error",
+                            "data": {
+                                "workflow_id": wf.get("id"),
+                                "workflow_name": wf.get("name"),
+                                "company_id": company_id,
+                                "run_once": True,
+                                "result": wait_res,
+                            },
+                        }), 200 if (wait_res or {}).get("ok", True) else 400
 
                 if not int(wf.get("enabled") or 0):
                     return jsonify({"status": "error", "message": "Webhook workflow is disabled"}), 403

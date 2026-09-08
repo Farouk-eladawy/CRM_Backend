@@ -30634,8 +30634,22 @@ Prefer the MarkItDown Extraction section below when present.
                             wa_id = str(ch.get("id") or ch.get("phoneNumberId") or "").strip()
                             if not wa_id:
                                 continue
+                            phone_id = str(ch.get("phoneNumberId") or wa_id).strip()
                             label = str(ch.get("label") or ch.get("displayPhone") or ch.get("phoneNumberId") or wa_id).strip()
-                            add(f"{cid}_{wa_id}", "whatsapp", f"WhatsApp · {label}", str(ch.get("connectionStatus") or "ready"))
+                            routing = str(ch.get("routingLocation") or ch.get("location") or "").strip()
+                            out.append({
+                                "id": f"{cid}_{wa_id}",
+                                "type": "whatsapp",
+                                "label": f"WhatsApp · {label}" + (f" ({routing})" if routing else ""),
+                                "status": str(ch.get("connectionStatus") or "ready"),
+                                "source": "system",
+                                "company_id": cid,
+                                "hints": {
+                                    "phoneNumberId": phone_id,
+                                    "routingLocation": routing,
+                                    "displayPhone": str(ch.get("phoneNumber") or ch.get("displayPhone") or "").strip(),
+                                },
+                            })
                     except Exception:
                         pass
 
@@ -36565,6 +36579,74 @@ Write ONE short message only. No JSON. No explanations."""
                     },
                 }), 200
             except Exception as e:
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/whatsapp/senders', methods=['GET', 'OPTIONS'])
+        def api_get_whatsapp_senders():
+            """List Meta WhatsApp Sender IDs (phone number IDs) for Workflow Builder — Make-like Sender picker."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                company_id = company_tenancy.resolve_company_id(
+                    username=str(request.args.get("actor_username") or "").strip() or None,
+                )
+                company_id = company_tenancy.normalize_company_id(company_id)
+                senders = []
+                seen = set()
+
+                def _add(phone_number_id, label="", routing="", display=""):
+                    pid = str(phone_number_id or "").strip()
+                    if not pid or pid in seen:
+                        return
+                    seen.add(pid)
+                    senders.append({
+                        "id": pid,
+                        "phoneNumberId": pid,
+                        "label": str(label or display or pid).strip() or pid,
+                        "routingLocation": str(routing or "").strip(),
+                        "displayPhone": str(display or "").strip(),
+                    })
+
+                # Channel settings accounts
+                try:
+                    ch = _get_channel_settings_for_company(company_id) or {}
+                    wa_items = ch.get("whatsappAccounts") if isinstance(ch, dict) else None
+                    if isinstance(wa_items, list):
+                        for item in wa_items:
+                            if not isinstance(item, dict):
+                                continue
+                            _add(
+                                item.get("phoneNumberId") or item.get("id"),
+                                label=item.get("label") or item.get("verified_name"),
+                                routing=item.get("routingLocation") or item.get("location"),
+                                display=item.get("phoneNumber") or item.get("displayPhone"),
+                            )
+                except Exception:
+                    pass
+
+                # Legacy config phone_number_ids (FTS)
+                try:
+                    if company_tenancy.is_default_company(company_id):
+                        wa_cfg = (self.config.get("whatsapp") or {}) if isinstance(getattr(self, "config", None), dict) else {}
+                        phone_number_ids = wa_cfg.get("phone_number_ids") or {}
+                        phone_id_locations = wa_cfg.get("phone_id_locations") or {}
+                        if isinstance(phone_number_ids, dict):
+                            for loc_key, raw_pid in phone_number_ids.items():
+                                pid = str(raw_pid or "").strip()
+                                routing = str(
+                                    (phone_id_locations.get(pid) if isinstance(phone_id_locations, dict) else "")
+                                    or loc_key
+                                    or ""
+                                ).strip()
+                                if str(loc_key).lower() == "default" and not routing:
+                                    routing = "NeedHelp"
+                                _add(pid, label=f"Meta {routing or loc_key}", routing=routing)
+                except Exception:
+                    pass
+
+                return jsonify({"status": "success", "data": senders}), 200
+            except Exception as e:
+                logging.error(f"Error in /api/whatsapp/senders: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/whatsapp/process_unread', methods=['POST'])

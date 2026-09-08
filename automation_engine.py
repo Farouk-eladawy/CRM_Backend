@@ -788,11 +788,26 @@ class AutomationEngine:
                 "mode": step.get("mode") or "first_match",
             }
         if stype in ("send_whatsapp", "send_email", "send_internal_notification"):
+            last = vars_map.get("_last_whatsapp_send") if stype == "send_whatsapp" else None
+            if isinstance(last, dict):
+                return {
+                    "type": stype,
+                    "to": last.get("to") or step.get("to"),
+                    "mode": last.get("mode"),
+                    "template_name": last.get("template_name"),
+                    "template_language": last.get("template_language"),
+                    "text": last.get("text") or step.get("text") or step.get("html") or step.get("message"),
+                    "subject": step.get("subject"),
+                    "location": last.get("location"),
+                    "receiving_phone_id": last.get("receiving_phone_id"),
+                }
             return {
                 "type": stype,
                 "to": step.get("to"),
                 "text": step.get("text") or step.get("html") or step.get("message"),
                 "subject": step.get("subject"),
+                "message_mode": step.get("message_mode"),
+                "template_name": step.get("template_name"),
             }
         if stype == "set_variable":
             key = str(step.get("key") or "value")
@@ -1245,6 +1260,108 @@ class AutomationEngine:
             return {"id": "system_airtable", "type": "airtable", "fields": {}, "source": "system"}
         if ctype in ("gmail", "outlook") or cid.startswith("legacy_gmail") or cid.startswith("gmail_"):
             return {"id": cid or "system_gmail", "type": ctype or "gmail", "fields": {"accountId": cid}, "source": "system"}
+
+        # System / channel WhatsApp accounts (connection id often ends with phoneNumberId)
+        if cid and ctype in ("", "whatsapp"):
+            wa = self._resolve_system_whatsapp_connection(cid, company_id)
+            if wa:
+                return wa
+        return None
+
+    def _resolve_system_whatsapp_connection(self, connection_id: str, company_id: str = ""):
+        """Map workflow connection_id → phoneNumberId / location from company channel settings."""
+        cid = str(connection_id or "").strip()
+        if not cid or cid in ("system_whatsapp",):
+            return None
+
+        def _match_and_return(phone_id, routing="", label="", access_token=""):
+            phone_id = str(phone_id or "").strip()
+            if not phone_id:
+                return None
+            return {
+                "id": cid,
+                "type": "whatsapp",
+                "source": "system",
+                "fields": {
+                    "phoneNumberId": phone_id,
+                    "routingLocation": str(routing or "").strip(),
+                    "accessToken": str(access_token or "").strip(),
+                    "label": str(label or phone_id).strip(),
+                },
+            }
+
+        # 1) Agent legacy config phone_number_ids
+        try:
+            wa_cfg = (getattr(self.agent, "config", {}) or {}).get("whatsapp") or {}
+            phone_number_ids = wa_cfg.get("phone_number_ids") if isinstance(wa_cfg, dict) else {}
+            phone_id_locations = wa_cfg.get("phone_id_locations") if isinstance(wa_cfg, dict) else {}
+            if isinstance(phone_number_ids, dict):
+                for loc_key, raw_pid in phone_number_ids.items():
+                    pid = str(raw_pid or "").strip()
+                    if not pid:
+                        continue
+                    if cid.endswith(f"_{pid}") or cid == pid or cid.endswith(f"_{str(loc_key)}"):
+                        routing = str(
+                            (phone_id_locations.get(pid) if isinstance(phone_id_locations, dict) else "")
+                            or loc_key
+                            or ""
+                        ).strip()
+                        found = _match_and_return(pid, routing=routing, label=f"Meta {routing or loc_key}")
+                        if found:
+                            return found
+        except Exception:
+            pass
+
+        # 2) Company channel settings (whatsappAccounts)
+        try:
+            import chat_db
+            import company_tenancy
+
+            company = (
+                automation_db.normalize_workflow_company_id(company_id)
+                if company_id
+                else company_tenancy.DEFAULT_COMPANY_ID
+            )
+            key = "channel_settings"
+            if not company_tenancy.is_default_company(company):
+                key = f"channel_settings__{company}"
+            raw = chat_db.get_setting(key)
+            data = {}
+            if isinstance(raw, str) and raw.strip():
+                data = json.loads(raw)
+            elif isinstance(raw, dict):
+                data = raw
+            wa_items = data.get("whatsappAccounts") if isinstance(data, dict) else None
+            if not isinstance(wa_items, list):
+                wa_items = []
+            for ch in wa_items:
+                if not isinstance(ch, dict):
+                    continue
+                wa_id = str(ch.get("id") or ch.get("phoneNumberId") or "").strip()
+                phone_id = str(ch.get("phoneNumberId") or wa_id).strip()
+                if not phone_id:
+                    continue
+                if (
+                    cid.endswith(f"_{phone_id}")
+                    or cid.endswith(f"_{wa_id}")
+                    or cid in (phone_id, wa_id, f"{company}_{wa_id}", f"{company}_{phone_id}")
+                ):
+                    return _match_and_return(
+                        phone_id,
+                        routing=str(ch.get("routingLocation") or ch.get("location") or "").strip(),
+                        label=str(ch.get("label") or ch.get("displayPhone") or phone_id).strip(),
+                        access_token=str(ch.get("accessToken") or "").strip(),
+                    )
+        except Exception:
+            pass
+
+        # Fallback: connection id suffix looks like a Meta phone number id
+        try:
+            suffix = cid.split("_")[-1].strip()
+            if suffix.isdigit() and len(suffix) >= 10:
+                return _match_and_return(suffix)
+        except Exception:
+            pass
         return None
 
     def _connection_ctx(self, conn: dict):
@@ -1423,16 +1540,51 @@ class AutomationEngine:
         to_phone = _render_template(step.get("to") or "", ctx).strip()
         if not to_phone:
             to_phone = str(_get_by_path(ctx, "event.payload.sender_identifier") or "").strip()
-        to_phone = to_phone.replace("+", "").replace(" ", "")
+        to_phone = to_phone.replace("+", "").replace(" ", "").replace("-", "")
         if not to_phone:
             raise Exception("send_whatsapp_missing_to")
 
-        text = _render_template(step.get("text") or "", ctx).strip()
-        if not text:
-            return
+        mode = str(step.get("message_mode") or "").strip().lower()
+        template_name = _render_template(step.get("template_name") or "", ctx).strip()
+        if not mode:
+            mode = "template" if template_name else "text"
 
-        location = str(_get_by_path(ctx, "chat.location") or _get_by_path(ctx, "event.payload.location") or "Unknown").strip() or "Unknown"
-        receiving_phone_id = str(_get_by_path(ctx, "chat.receiving_phone_id") or _get_by_path(ctx, "event.payload.receiving_phone_id") or "").strip() or None
+        text = _render_template(step.get("text") or "", ctx).strip()
+        template_language = _render_template(step.get("template_language") or "en", ctx).strip() or "en"
+
+        template_variables = step.get("template_variables")
+        if template_variables is None and step.get("template_variables_json"):
+            raw_vars = step.get("template_variables_json")
+            if isinstance(raw_vars, str) and raw_vars.strip():
+                try:
+                    template_variables = json.loads(_render_template(raw_vars, ctx))
+                except Exception:
+                    template_variables = None
+        if isinstance(template_variables, dict):
+            rendered_vars = {}
+            for k, v in template_variables.items():
+                rendered_vars[str(k)] = _render_template(v, ctx) if isinstance(v, str) else v
+            template_variables = rendered_vars
+
+        if mode == "template":
+            if not template_name:
+                raise Exception("send_whatsapp_missing_template")
+        elif not text:
+            raise Exception("send_whatsapp_missing_text")
+
+        location = str(
+            _render_template(step.get("location") or "", ctx).strip()
+            or _get_by_path(ctx, "chat.location")
+            or _get_by_path(ctx, "event.payload.location")
+            or "Unknown"
+        ).strip() or "Unknown"
+        receiving_phone_id = str(
+            _render_template(step.get("receiving_phone_id") or "", ctx).strip()
+            or _get_by_path(ctx, "chat.receiving_phone_id")
+            or _get_by_path(ctx, "event.payload.receiving_phone_id")
+            or ""
+        ).strip() or None
+
         conn_id = str(step.get("connection_id") or "").strip()
         if conn_id and conn_id not in ("system_whatsapp",):
             conn = self._find_connection(
@@ -1443,16 +1595,67 @@ class AutomationEngine:
             if conn:
                 fields = conn.get("fields") if isinstance(conn.get("fields"), dict) else {}
                 phone_id = str(fields.get("phoneNumberId") or "").strip()
-                if phone_id:
+                if phone_id and not receiving_phone_id:
                     receiving_phone_id = phone_id
-        ok, _ = self.agent.send_whatsapp_message(to_phone, text=text, location=location, receiving_phone_id=receiving_phone_id)
+                elif phone_id and receiving_phone_id and phone_id != receiving_phone_id:
+                    # Explicit Sender ID wins (Make behavior)
+                    pass
+                loc_hint = str(fields.get("routingLocation") or fields.get("location") or "").strip()
+                if loc_hint and (not location or location == "Unknown"):
+                    location = loc_hint
+
+        if mode == "template" and not receiving_phone_id and (not location or location == "Unknown"):
+            raise Exception(
+                "send_whatsapp_missing_sender: select Sender ID (Meta phone number) like Make"
+            )
+
+        ok, err = self.agent.send_whatsapp_message(
+            to_phone,
+            text=None if mode == "template" else text,
+            location=location,
+            template_name=template_name if mode == "template" else None,
+            template_language=template_language,
+            template_variables=template_variables if mode == "template" else None,
+            receiving_phone_id=receiving_phone_id,
+        )
+        if not ok:
+            detail = ""
+            try:
+                if isinstance(err, dict):
+                    detail = str(
+                        ((err.get("json") or {}).get("error") or {}).get("message")
+                        or err.get("body")
+                        or err.get("code")
+                        or err
+                    )[:400]
+                else:
+                    detail = str(err or "")[:400]
+            except Exception:
+                detail = "send_failed"
+            raise Exception(f"send_whatsapp_failed:{detail or 'unknown'}")
+
+        # Stash rendered summary for operation inspector
+        ctx.setdefault("vars", {})["_last_whatsapp_send"] = {
+            "to": to_phone,
+            "mode": mode,
+            "template_name": template_name if mode == "template" else None,
+            "template_language": template_language if mode == "template" else None,
+            "text": text if mode == "text" else None,
+            "location": location,
+            "receiving_phone_id": receiving_phone_id,
+        }
 
         chat_id = str(_get_by_path(ctx, "chat.chat_id") or _get_by_path(ctx, "event.payload.chat_id") or "").strip()
         if ok and chat_id:
             try:
                 import chat_db
 
-                chat_db.add_message(chat_id=chat_id, sender_type="agent", text=text, status="sent", source="WhatsApp")
+                log_text = (
+                    f"[Sent WhatsApp] Template: {template_name}"
+                    if mode == "template"
+                    else text
+                )
+                chat_db.add_message(chat_id=chat_id, sender_type="agent", text=log_text, status="sent", source="WhatsApp")
             except Exception:
                 pass
 

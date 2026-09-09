@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-08T12:05:30.023414",
-    "original": "تمام يا فندم، وصلني رقم حضرتك 01117619089 ✅\n\nهتتصل بيك المبيعات في أقرب وقت عشان نشرحلك تفاصيل برنامج حج طيران الاقتصادي وخطوات تثبيت المكان بسعر الخصم — والخصم ساري أسبوع واحد بس أو لحد اكتمال الحصة، أيهما أقرب.\n\nفي انتظار مكالمتنا لحضرتك، أو لو حابب أي استفسار تاني أنا في خدمتك.",
-    "corrected": "تم التواصل",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-08T12:21:00.200262",
     "original": "اسم شركتنا هو FTS Travels للسياحة 🕋 بنقدم برامج الحج والعمرة بأسعار رسمية بعد نزول ضوابط الوزارة.\n\nعندنا برامج حج متاحة دلوقتي:\n🚌 حج بري — ٢٢٠ ألف جنيه (بدل ٢٣٠)\n✈️ طيران اقتصادي — ٢٤٥ ألف (بدل ٢٧٠)\n✈️ طيران تحسين — ٢٧٥ ألف (بدل ٣٠٤)\n\nحضرتك مهتم بأي برنامج تحديدًا؟ أو ممكن أساعدك في حاجة تانية؟",
     "corrected": "اف تي اس للسياحة - ترخيص وزارة السياحة رقم 2089",
@@ -597,6 +591,12 @@
     "timestamp": "2026-09-09T11:11:16.787550",
     "original": "أهلاً بحضرتك، نظام التقديم للحج بقي واضح ورسمي بعد نزول ضوابط الوزارة:\n\nالتسجيل مفتوح من ٤ سبتمبر لغاية ٢٧ سبتمبر، والقرعة الإلكترونية يوم ٣٠ سبتمبر. عشان تثبت مكانك في البرنامج، بتسدد جدية الحجز اللي بتتخصم من إجمالي البرنامج، ولو القرعة ما طلعتش، الجدية بتتسترد حسب الضوابط.\n\nحضرتك كنت سألت قبل كده عن برامج الحج — عشان أقدر أحددلك أنسب برنامج وأبعثلك التفاصيل كاملة، ممكن تقولي: الحجز ده لحضرتك شخصيًا ولا لحد من الأسرة؟ وإيه رقم الموبايل عشان أكلمك أشرحلك خطوات التقديم بالتفصيل؟",
     "corrected": "الشكر لله يا فندم، وربنا يكتبها لنا جميعًا 🤲\n\nبخصوص سؤالك عن النظام — الضوابط نزلت رسميًا والتقديم مفتوح من ٤ سبتمبر لغاية ٢٧ سبتمبر، والقرعة الإلكترونية يوم ٣٠ سبتمبر. تثبيت المكان بيتم بسداد جدية الحجز اللي بتتخصم من إجمالي البرنامج، ولو القرعة ما طلعتش، الجدية بتتسترد حسب الضوابط.\n\nعشان أحددلك البرنامج الأنسب لحضرتك، ممكن تقولي: الحجز ده لحضرتك شخصيًا ولا لحد من الأسرة؟ وإيه رقم الموبايل عشان أكلمك أشرحلك خطوات التقديم بالتفصيل؟",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-09T11:56:02.111308",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Sue,\n\nThank you for your message.\n\nWe are pleased to confirm that pickup is available from the Titanic Beach Spa and Aqua Park hotel. Please note that your booking was made through Viator, and as such, their terms and conditions apply.\n\nYour exact pickup time will be sent to you one day before your trip. Kindly monitor your messages and email for this update.\n\nShould you have any further questions, please do not hesitate to reach out.\n\nBest regards,\nFTS Travels",
     "context": "UI Manual Edit"
   }
 ]

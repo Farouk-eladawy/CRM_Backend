@@ -107,7 +107,7 @@ HOURS_STAGE2_MAX = 23.75  # هامش أمان 15 دقيقة قبل قفل ناف
 WINDOW_HOURS = 24.0       # نافذة Meta الكاملة: بعدها توقف نهائي
 
 # حد أقصى للإرسال في كل تشغيل (حتى لا يتجاوز timeout الـ http_request)
-MAX_SENDS_PER_RUN = 20
+MAX_SENDS_PER_RUN_DEFAULT = 80
 
 # الـ tags المستخدمة عند التحويل للبشر
 TAG_HOT_LEAD = "new-ads-hot-lead"
@@ -156,6 +156,12 @@ TARGET_AD_IDS = _cfg_ad_ids()
 STAGE1_HOURS = _cfg_float("stage1_hours", HOURS_STAGE1)
 STAGE2_HOURS = _cfg_float("stage2_hours", HOURS_STAGE2)
 STAGE2_SAFE_MAX = min(_cfg_float("stage2_safe_max_hours", HOURS_STAGE2_MAX), WINDOW_HOURS)
+try:
+    MAX_SENDS_PER_RUN = int(_CFG.get("max_sends_per_run") or MAX_SENDS_PER_RUN_DEFAULT)
+except Exception:
+    MAX_SENDS_PER_RUN = MAX_SENDS_PER_RUN_DEFAULT
+if MAX_SENDS_PER_RUN < 1:
+    MAX_SENDS_PER_RUN = MAX_SENDS_PER_RUN_DEFAULT
 
 
 # =============================================================================
@@ -437,14 +443,20 @@ def _target_stage(elapsed_h: float, highest_sent: int):
     """جدول القرارات — يُعيد رقم المتابعة المستحقة (1/2) أو None.
     القاعدة: لا ترسل أكثر من رسالة واحدة في الدورة الواحدة، ولا تكرر رسالة
     سبق إرسالها، والحد الأقصى رسالتان.
+
+    ملاحظة: المتابعة 1 تُرسل في أي وقت بعد 3 ساعات طالما لم تُرسل بعد
+    (حتى داخل نافذة المرحلة 2) حتى لا تُتخطى بسبب تأخر الجدولة.
+    المتابعة 2 من STAGE2_HOURS حتى STAGE2_SAFE_MAX.
     """
     if elapsed_h < STAGE1_HOURS:
         return None                                     # أقل من 3 ساعات: انتظر
+    if highest_sent < 1 and elapsed_h < WINDOW_HOURS:
+        return 1                                        # لم تُرسل المتابعة 1 بعد → أرسلها أولاً
     if elapsed_h < STAGE2_HOURS:
-        return 1 if highest_sent < 1 else None          # 3 إلى أقل من 23 و0 مرسل → المتابعة 1
+        return None                                     # بعد المتابعة 1: انتظر حتى STAGE2
     if elapsed_h < STAGE2_SAFE_MAX:
-        return 2 if highest_sent < 2 else None          # 23 → 23.75 و0 أو 1 → المتابعة 2
-    return None  # >= 23.75 ساعة: لا نرسل (نافذة الـ 24 ساعة على وشك الإغلاق)
+        return 2 if highest_sent < 2 else None          # نافذة المتابعة 2
+    return None  # هامش أمان قبل إغلاق نافذة Meta
 
 
 def _stage_message(stage: int) -> str:
@@ -661,25 +673,40 @@ def run(agent, payload: dict = None) -> dict:
             if entry is None:
                 entry = _init_entry(last_customer_text, last_customer_ts, now_iso)
                 chats[chat_id] = entry
-                processed_chats += 1
                 if optout_anytime is not None:
                     entry["handled"] = True
                     entry["handled_reason"] = "optout_anytime"
                     actions["stop_optout"] += 1
-                elif phone_anytime is not None:
+                    entry["updated_at"] = now_iso
+                    processed_chats += 1
+                    if not dry_run:
+                        _save_state(state)
+                    continue
+                if phone_anytime is not None:
                     entry["handled"] = True
                     entry["handled_reason"] = f"phone_anytime:{phone_anytime}"
                     _transfer_to_customer_service(chat_id, reason="hot_lead_phone", phone=phone_anytime, dry_run=dry_run)
                     actions["stop_phone"] += 1
-                elif booking_anytime is not None:
+                    entry["updated_at"] = now_iso
+                    processed_chats += 1
+                    if not dry_run:
+                        _save_state(state)
+                    continue
+                if booking_anytime is not None:
                     entry["handled"] = True
                     entry["handled_reason"] = "booking_done"
                     _transfer_to_customer_service(chat_id, reason="booking_done", dry_run=dry_run)
                     actions["stop_booking"] += 1
+                    entry["updated_at"] = now_iso
+                    processed_chats += 1
+                    if not dry_run:
+                        _save_state(state)
+                    continue
+                # لا إيقاف فوري → أكمل لنفس منطق الإرسال في هذه الدورة
+                # (سابقاً كان continue يؤخر الإرسال لدورة لاحقة وقد تفوت نافذة Meta)
                 entry["updated_at"] = now_iso
                 if not dry_run:
                     _save_state(state)
-                continue
 
             # ===== كشف رد جديد من العميل أثناء المتابعة =====
             prev_ts = _parse_dt(entry.get("last_customer_reply"))

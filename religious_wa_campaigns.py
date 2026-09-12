@@ -123,6 +123,7 @@ def _connect():
             claimed_at TEXT,
             sent_at TEXT,
             error TEXT,
+            message_id TEXT,
             UNIQUE(campaign_id, phone)
         )
         """
@@ -138,7 +139,17 @@ def _connect():
             conn.execute("UPDATE campaigns SET company_id = 'fts' WHERE company_id IS NULL OR TRIM(company_id) = ''")
         except Exception:
             pass
+    try:
+        rcols = [row[1] for row in conn.execute("PRAGMA table_info(recipients)").fetchall()]
+    except Exception:
+        rcols = []
+    if "message_id" not in rcols:
+        try:
+            conn.execute("ALTER TABLE recipients ADD COLUMN message_id TEXT")
+        except Exception:
+            pass
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_campaigns_company ON campaigns(company_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_recipients_message_id ON recipients(message_id)")
     return conn
 
 
@@ -553,28 +564,125 @@ def _claim(campaign_id: str, phone: str) -> bool:
         return cur.rowcount > 0
 
 
-def _mark(campaign_id: str, phone: str, status: str, error: str = None, chat_id: str = None):
+def _mark(campaign_id: str, phone: str, status: str, error: str = None, chat_id: str = None, message_id: str = None):
     now = _now()
+    mid = str(message_id or "").strip() or None
     with _connect() as conn:
         if status == "sent":
             conn.execute(
                 """
                 UPDATE recipients
-                SET status = 'sent', sent_at = ?, error = NULL, chat_id = COALESCE(?, chat_id)
+                SET status = 'sent', sent_at = ?, error = NULL,
+                    chat_id = COALESCE(?, chat_id),
+                    message_id = COALESCE(?, message_id)
                 WHERE campaign_id = ? AND phone = ?
                 """,
-                (now, chat_id, campaign_id, phone),
+                (now, chat_id, mid, campaign_id, phone),
             )
         else:
             conn.execute(
                 """
                 UPDATE recipients
-                SET status = ?, error = ?, chat_id = COALESCE(?, chat_id)
+                SET status = ?, error = ?, chat_id = COALESCE(?, chat_id),
+                    message_id = COALESCE(?, message_id)
                 WHERE campaign_id = ? AND phone = ?
                 """,
-                (status, _truncate(error or "", 1500), chat_id, campaign_id, phone),
+                (status, _truncate(error or "", 1500), chat_id, mid, campaign_id, phone),
             )
         conn.commit()
+
+
+def _normalize_phone_digits(value: str) -> str:
+    digits = "".join(ch for ch in str(value or "") if ch.isdigit())
+    if digits.startswith("00"):
+        digits = digits[2:]
+    if len(digits) == 11 and digits.startswith("0"):
+        digits = "20" + digits[1:]
+    return digits
+
+
+def handle_meta_delivery_failure(
+    message_id: str = None,
+    recipient: str = None,
+    code: str = "",
+    title: str = "",
+    message: str = "",
+    details: str = "",
+) -> dict:
+    """
+    Meta accepted the send (UI shows Sent) then reported status=failed via webhook.
+    Mark the campaign recipient failed and auto-stop any still-sending campaign.
+    """
+    mid = str(message_id or "").strip()
+    phone_digits = _normalize_phone_digits(recipient)
+    chunks = []
+    if mid:
+        chunks.append(f"message_id={mid}")
+    if phone_digits or recipient:
+        chunks.append(f"recipient={phone_digits or recipient}")
+    if code:
+        chunks.append(f"code={code}")
+    if title:
+        chunks.append(f"title={title}")
+    if message:
+        chunks.append(f"message={message}")
+    if details:
+        chunks.append(f"details={details}")
+    err_txt = _truncate(" | ".join(chunks) if chunks else "Meta delivery failed", 1500)
+    row = None
+    with _connect() as conn:
+        if mid:
+            row = conn.execute(
+                """
+                SELECT r.campaign_id, r.phone, r.status, c.status AS campaign_status
+                FROM recipients r
+                JOIN campaigns c ON c.id = r.campaign_id
+                WHERE r.message_id = ?
+                ORDER BY COALESCE(r.sent_at, r.claimed_at, '') DESC
+                LIMIT 1
+                """,
+                (mid,),
+            ).fetchone()
+        if row is None and phone_digits:
+            # Fallback: recent "sent" in an active/recent campaign for this phone
+            candidates = conn.execute(
+                """
+                SELECT r.campaign_id, r.phone, r.status, c.status AS campaign_status, r.sent_at
+                FROM recipients r
+                JOIN campaigns c ON c.id = r.campaign_id
+                WHERE r.status IN ('sent', 'sending')
+                  AND c.status IN ('sending', 'cancelled', 'completed')
+                ORDER BY COALESCE(r.sent_at, r.claimed_at, '') DESC
+                LIMIT 80
+                """
+            ).fetchall()
+            for cand in candidates:
+                if _normalize_phone_digits(cand["phone"]) == phone_digits or (
+                    phone_digits and phone_digits.endswith(_normalize_phone_digits(cand["phone"])[-9:])
+                ):
+                    row = cand
+                    break
+    if row is None:
+        return {"matched": False, "stopped": False, "reason": "no matching campaign recipient"}
+
+    campaign_id = str(row["campaign_id"])
+    phone = str(row["phone"])
+    _mark(campaign_id, phone, "failed", err_txt, message_id=mid or None)
+    camp_status = str(row["campaign_status"] or "").strip().lower()
+    stopped = False
+    if camp_status == "sending" or _is_campaign_running(campaign_id):
+        _auto_stop_campaign(
+            campaign_id,
+            f"Auto-stopped after Meta delivery failure to {phone}: {err_txt}",
+        )
+        stopped = True
+    return {
+        "matched": True,
+        "stopped": stopped,
+        "campaign_id": campaign_id,
+        "phone": phone,
+        "error": err_txt,
+    }
 
 
 def _set_campaign_status(campaign_id: str, status: str, error: str = None):
@@ -697,7 +805,17 @@ def _send_loop(agent, campaign_id: str):
 
             uncertain = bool(isinstance(meta, dict) and meta.get("uncertain"))
             if ok or uncertain:
-                _mark(campaign_id, phone, "sent", chat_id=chat_id)
+                wa_mid = ""
+                if isinstance(meta, dict):
+                    wa_mid = str(meta.get("message_id") or "").strip()
+                    if not wa_mid:
+                        try:
+                            msgs = (meta.get("json") or {}).get("messages") if isinstance(meta.get("json"), dict) else None
+                            if isinstance(msgs, list) and msgs:
+                                wa_mid = str((msgs[0] or {}).get("id") or "").strip()
+                        except Exception:
+                            wa_mid = ""
+                _mark(campaign_id, phone, "sent", chat_id=chat_id, message_id=wa_mid or None)
                 sent_n += 1
                 status_txt = "sent"
                 if send_type == "template":

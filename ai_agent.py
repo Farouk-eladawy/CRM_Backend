@@ -45491,6 +45491,23 @@ Draft to optimize:
                                     error_message or "No message",
                                     error_details or "No details",
                                 )
+                                # Religious WA campaigns: Meta may accept send then fail delivery
+                                # (e.g. code 130472). Mark recipient failed + auto-stop campaign.
+                                try:
+                                    from religious_wa_campaigns import handle_meta_delivery_failure
+                                    handle_meta_delivery_failure(
+                                        message_id=str(mid or "").strip(),
+                                        recipient=recipient_id,
+                                        code=error_code,
+                                        title=error_title,
+                                        message=error_message,
+                                        details=error_details,
+                                    )
+                                except Exception as camp_ex:
+                                    logging.warning(
+                                        "religious_wa_campaigns delivery failure hook skipped: %s",
+                                        camp_ex,
+                                    )
                     except Exception:
                         pass
 

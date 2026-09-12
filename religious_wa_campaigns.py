@@ -19,6 +19,34 @@ RELIGIOUS_PHONE_ID = "1214164541774422"
 RELIGIOUS_DISPLAY = "+201094728015"
 DB_FILE = get_data_path("religious_wa_campaigns.db")
 
+# Recipient-level Meta codes: mark failed and continue the campaign.
+RECIPIENT_SKIP_CODES = frozenset({
+    "131026",  # Message undeliverable
+    "131047",  # Re-engagement / outside 24h window
+    "131049",  # Marketing message limit / healthy ecosystem
+    "130472",  # User number part of experiment / marketing limit
+    "131051",  # Unsupported message type
+})
+
+# Account-level Meta codes: auto-stop the whole campaign.
+ACCOUNT_STOP_CODES = frozenset({
+    "131042",  # Business payment / billing
+    "131048",  # Account messaging limit
+    "131056",  # Spam / account rate limit
+    "133010",  # Phone number registration issues
+    "131000",  # Generic / internal Meta error (treat as account-wide)
+    "190",     # Access token
+    "10",      # Permission / API
+    "200",     # Permission
+})
+
+RATE_LIMIT_CODE = "130429"
+RATE_LIMIT_RETRIES = 2
+RATE_LIMIT_SLEEP_SEC = 20.0
+CONSECUTIVE_FAIL_STOP = 10
+# Permanent undeliverable — excluded from "Retry failed" by default.
+NO_RETRY_CODES = frozenset({"131026"})
+
 _OMRA_BODY = (
     "السلام عليكم ورحمة الله وبركاته 🌙\n\n"
     "بشرى سارة لحضرتك من شركة FTS للسياحة 🎁\n\n"
@@ -148,8 +176,14 @@ def _connect():
             conn.execute("ALTER TABLE recipients ADD COLUMN message_id TEXT")
         except Exception:
             pass
+    if "error_code" not in rcols:
+        try:
+            conn.execute("ALTER TABLE recipients ADD COLUMN error_code TEXT")
+        except Exception:
+            pass
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_campaigns_company ON campaigns(company_id)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_recipients_message_id ON recipients(message_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_rwc_recipients_error_code ON recipients(campaign_id, error_code)")
     return conn
 
 
@@ -291,13 +325,66 @@ def _format_send_error(meta, phone: str = None) -> str:
     return _truncate(text, 1500)
 
 
-def _is_campaign_blocking_failure(err_txt: str, meta=None) -> bool:
+def _extract_error_code(meta=None, err_txt: str = "") -> str:
+    """Pull Meta error code from send meta payload or formatted error text."""
+    if isinstance(meta, dict):
+        parts = _extract_meta_error_parts(meta)
+        code = str(parts.get("code") or "").strip()
+        if code:
+            return code
+        err = meta.get("error") if isinstance(meta.get("error"), dict) else {}
+        if isinstance(err, dict) and err.get("code") is not None:
+            return str(err.get("code")).strip()
+        body = meta.get("json") if isinstance(meta.get("json"), dict) else None
+        if isinstance(body, dict):
+            nested = body.get("error") if isinstance(body.get("error"), dict) else {}
+            if nested.get("code") is not None:
+                return str(nested.get("code")).strip()
+    text = str(err_txt or "")
+    m = re.search(r"(?:^|[|\s])code=(\d+)\b", text, flags=re.IGNORECASE)
+    if m:
+        return m.group(1)
+    m = re.search(r"\b(?:error\s*#?\s*|code\s+)(\d{2,6})\b", text, flags=re.IGNORECASE)
+    if m:
+        return m.group(1)
+    return ""
+
+
+def _is_recipient_skip_code(code: str) -> bool:
+    return str(code or "").strip() in RECIPIENT_SKIP_CODES
+
+
+def _is_account_blocking_code(code: str) -> bool:
+    return str(code or "").strip() in ACCOUNT_STOP_CODES
+
+
+def _is_campaign_blocking_failure(err_txt: str, meta=None, consecutive_same: int = 0) -> bool:
     """
-    Stop the whole campaign after a failed send.
-    Account/billing issues always block; user requested auto-stop on any send failure
-    so operators can fix Meta/config before continuing.
+    Auto-stop only for account-wide Meta issues, or when the same error
+    repeats more than CONSECUTIVE_FAIL_STOP times in a row during the send loop.
+    Recipient-level codes (e.g. 131026) never stop the campaign.
     """
-    return True
+    code = _extract_error_code(meta, err_txt)
+    if _is_recipient_skip_code(code) or code == RATE_LIMIT_CODE:
+        return False
+    if _is_account_blocking_code(code):
+        return True
+    if consecutive_same > CONSECUTIVE_FAIL_STOP:
+        return True
+    # Billing keywords without a numeric code (legacy Meta payloads)
+    joined = str(err_txt or "").lower()
+    if any(
+        x in joined
+        for x in (
+            "business eligibility",
+            "payment method",
+            "billing",
+            "unpaid invoice",
+            "account has been restricted",
+        )
+    ):
+        return True
+    return False
 
 
 def campaign_counts(campaign_id: str) -> dict:
@@ -306,13 +393,23 @@ def campaign_counts(campaign_id: str) -> dict:
             "SELECT status, COUNT(*) AS n FROM recipients WHERE campaign_id = ? GROUP BY status",
             (campaign_id,),
         ).fetchall()
+        fail_rows = conn.execute(
+            """
+            SELECT error_code, error
+            FROM recipients
+            WHERE campaign_id = ? AND status = 'failed'
+            """,
+            (campaign_id,),
+        ).fetchall()
     out = {
         "total": 0,
         "pending": 0,
         "sending": 0,
         "sent": 0,
+        "delivered": 0,
         "failed": 0,
         "skipped": 0,
+        "failed_by_code": {},
     }
     for r in rows:
         st = str(r["status"] or "")
@@ -320,6 +417,13 @@ def campaign_counts(campaign_id: str) -> dict:
         out["total"] += n
         if st in out:
             out[st] = n
+    # "Sent" in UI summary = API accepted + later confirmed delivered
+    out["sent_or_delivered"] = int(out.get("sent") or 0) + int(out.get("delivered") or 0)
+    failed_by_code = {}
+    for r in fail_rows:
+        code = str(r["error_code"] or "").strip() or _extract_error_code(None, r["error"] or "") or "unknown"
+        failed_by_code[code] = int(failed_by_code.get(code) or 0) + 1
+    out["failed_by_code"] = dict(sorted(failed_by_code.items(), key=lambda kv: (-kv[1], kv[0])))
     return out
 
 
@@ -564,30 +668,57 @@ def _claim(campaign_id: str, phone: str) -> bool:
         return cur.rowcount > 0
 
 
-def _mark(campaign_id: str, phone: str, status: str, error: str = None, chat_id: str = None, message_id: str = None):
+def _mark(
+    campaign_id: str,
+    phone: str,
+    status: str,
+    error: str = None,
+    chat_id: str = None,
+    message_id: str = None,
+    error_code: str = None,
+):
     now = _now()
     mid = str(message_id or "").strip() or None
+    ecode = str(error_code or "").strip() or None
     with _connect() as conn:
         if status == "sent":
             conn.execute(
                 """
                 UPDATE recipients
-                SET status = 'sent', sent_at = ?, error = NULL,
+                SET status = 'sent', sent_at = ?, error = NULL, error_code = NULL,
                     chat_id = COALESCE(?, chat_id),
                     message_id = COALESCE(?, message_id)
                 WHERE campaign_id = ? AND phone = ?
                 """,
                 (now, chat_id, mid, campaign_id, phone),
             )
-        else:
+        elif status == "delivered":
             conn.execute(
                 """
                 UPDATE recipients
-                SET status = ?, error = ?, chat_id = COALESCE(?, chat_id),
+                SET status = 'delivered',
+                    sent_at = COALESCE(sent_at, ?),
+                    error = NULL, error_code = NULL,
+                    chat_id = COALESCE(?, chat_id),
+                    message_id = COALESCE(?, message_id)
+                WHERE campaign_id = ? AND phone = ?
+                  AND status IN ('sent', 'sending', 'delivered')
+                """,
+                (now, chat_id, mid, campaign_id, phone),
+            )
+        else:
+            # Backfill error_code from error text when caller did not pass it.
+            if not ecode and error:
+                ecode = _extract_error_code(None, error) or None
+            conn.execute(
+                """
+                UPDATE recipients
+                SET status = ?, error = ?, error_code = ?,
+                    chat_id = COALESCE(?, chat_id),
                     message_id = COALESCE(?, message_id)
                 WHERE campaign_id = ? AND phone = ?
                 """,
-                (status, _truncate(error or "", 1500), chat_id, mid, campaign_id, phone),
+                (status, _truncate(error or "", 1500), ecode, chat_id, mid, campaign_id, phone),
             )
         conn.commit()
 
@@ -601,6 +732,77 @@ def _normalize_phone_digits(value: str) -> str:
     return digits
 
 
+def _find_recipient_row(message_id: str = None, recipient: str = None, statuses=None):
+    mid = str(message_id or "").strip()
+    phone_digits = _normalize_phone_digits(recipient)
+    status_list = list(statuses or ("sent", "sending", "delivered", "failed"))
+    placeholders = ",".join("?" * len(status_list))
+    with _connect() as conn:
+        if mid:
+            row = conn.execute(
+                f"""
+                SELECT r.campaign_id, r.phone, r.status, c.status AS campaign_status
+                FROM recipients r
+                JOIN campaigns c ON c.id = r.campaign_id
+                WHERE r.message_id = ?
+                ORDER BY COALESCE(r.sent_at, r.claimed_at, '') DESC
+                LIMIT 1
+                """,
+                (mid,),
+            ).fetchone()
+            if row:
+                return row
+        if phone_digits:
+            candidates = conn.execute(
+                f"""
+                SELECT r.campaign_id, r.phone, r.status, c.status AS campaign_status, r.sent_at
+                FROM recipients r
+                JOIN campaigns c ON c.id = r.campaign_id
+                WHERE r.status IN ({placeholders})
+                  AND c.status IN ('sending', 'cancelled', 'completed')
+                ORDER BY COALESCE(r.sent_at, r.claimed_at, '') DESC
+                LIMIT 80
+                """,
+                tuple(status_list),
+            ).fetchall()
+            for cand in candidates:
+                cand_digits = _normalize_phone_digits(cand["phone"])
+                if cand_digits == phone_digits or (
+                    phone_digits and cand_digits and phone_digits.endswith(cand_digits[-9:])
+                ):
+                    return cand
+    return None
+
+
+def handle_meta_delivery_status(
+    message_id: str = None,
+    recipient: str = None,
+    status: str = "",
+) -> dict:
+    """Update campaign recipient when Meta reports delivered/read (non-failure)."""
+    st = str(status or "").strip().lower()
+    if st not in ("delivered", "read"):
+        return {"matched": False, "updated": False}
+    row = _find_recipient_row(message_id=message_id, recipient=recipient, statuses=("sent", "sending", "delivered"))
+    if row is None:
+        return {"matched": False, "updated": False}
+    if str(row["status"] or "").lower() == "failed":
+        return {"matched": True, "updated": False, "reason": "already_failed"}
+    _mark(
+        str(row["campaign_id"]),
+        str(row["phone"]),
+        "delivered",
+        message_id=str(message_id or "").strip() or None,
+    )
+    return {
+        "matched": True,
+        "updated": True,
+        "campaign_id": str(row["campaign_id"]),
+        "phone": str(row["phone"]),
+        "status": "delivered",
+    }
+
+
 def handle_meta_delivery_failure(
     message_id: str = None,
     recipient: str = None,
@@ -611,17 +813,18 @@ def handle_meta_delivery_failure(
 ) -> dict:
     """
     Meta accepted the send (UI shows Sent) then reported status=failed via webhook.
-    Mark the campaign recipient failed and auto-stop any still-sending campaign.
+    Mark the recipient failed. Auto-stop only for account-level Meta codes.
     """
     mid = str(message_id or "").strip()
     phone_digits = _normalize_phone_digits(recipient)
+    err_code = str(code or "").strip()
     chunks = []
     if mid:
         chunks.append(f"message_id={mid}")
     if phone_digits or recipient:
         chunks.append(f"recipient={phone_digits or recipient}")
-    if code:
-        chunks.append(f"code={code}")
+    if err_code:
+        chunks.append(f"code={err_code}")
     if title:
         chunks.append(f"title={title}")
     if message:
@@ -629,51 +832,23 @@ def handle_meta_delivery_failure(
     if details:
         chunks.append(f"details={details}")
     err_txt = _truncate(" | ".join(chunks) if chunks else "Meta delivery failed", 1500)
-    row = None
-    with _connect() as conn:
-        if mid:
-            row = conn.execute(
-                """
-                SELECT r.campaign_id, r.phone, r.status, c.status AS campaign_status
-                FROM recipients r
-                JOIN campaigns c ON c.id = r.campaign_id
-                WHERE r.message_id = ?
-                ORDER BY COALESCE(r.sent_at, r.claimed_at, '') DESC
-                LIMIT 1
-                """,
-                (mid,),
-            ).fetchone()
-        if row is None and phone_digits:
-            # Fallback: recent "sent" in an active/recent campaign for this phone
-            candidates = conn.execute(
-                """
-                SELECT r.campaign_id, r.phone, r.status, c.status AS campaign_status, r.sent_at
-                FROM recipients r
-                JOIN campaigns c ON c.id = r.campaign_id
-                WHERE r.status IN ('sent', 'sending')
-                  AND c.status IN ('sending', 'cancelled', 'completed')
-                ORDER BY COALESCE(r.sent_at, r.claimed_at, '') DESC
-                LIMIT 80
-                """
-            ).fetchall()
-            for cand in candidates:
-                if _normalize_phone_digits(cand["phone"]) == phone_digits or (
-                    phone_digits and phone_digits.endswith(_normalize_phone_digits(cand["phone"])[-9:])
-                ):
-                    row = cand
-                    break
+    row = _find_recipient_row(message_id=mid, recipient=recipient, statuses=("sent", "sending", "delivered"))
     if row is None:
         return {"matched": False, "stopped": False, "reason": "no matching campaign recipient"}
 
     campaign_id = str(row["campaign_id"])
     phone = str(row["phone"])
-    _mark(campaign_id, phone, "failed", err_txt, message_id=mid or None)
+    _mark(campaign_id, phone, "failed", err_txt, message_id=mid or None, error_code=err_code or None)
     camp_status = str(row["campaign_status"] or "").strip().lower()
     stopped = False
-    if camp_status == "sending" or _is_campaign_running(campaign_id):
+    # Delivery webhooks for recipient-level codes must NOT stop the campaign.
+    should_stop = _is_account_blocking_code(err_code) and (
+        camp_status == "sending" or _is_campaign_running(campaign_id)
+    )
+    if should_stop:
         _auto_stop_campaign(
             campaign_id,
-            f"Auto-stopped after Meta delivery failure to {phone}: {err_txt}",
+            f"Auto-stopped after Meta account delivery failure to {phone}: {err_txt}",
         )
         stopped = True
     return {
@@ -682,6 +857,7 @@ def handle_meta_delivery_failure(
         "campaign_id": campaign_id,
         "phone": phone,
         "error": err_txt,
+        "error_code": err_code,
     }
 
 
@@ -749,6 +925,31 @@ def _send_loop(agent, campaign_id: str):
                 ).fetchall()
             ]
         sent_n = 0
+        consecutive_same = 0
+        last_fail_code = None
+
+        def _do_send(phone_number):
+            if send_type == "template":
+                return agent.send_whatsapp_message(
+                    phone_number,
+                    text="",
+                    location=RELIGIOUS_LOCATION,
+                    template_name=camp.get("template_name"),
+                    template_language=camp.get("template_language") or "en",
+                    receiving_phone_id=RELIGIOUS_PHONE_ID,
+                    template_header_media_url=camp.get("template_header_media_url") or None,
+                    template_header_media_type=camp.get("template_header_media_type") or "image",
+                    template_variables=camp.get("template_variables") or None,
+                    _template_phone_fallback=False,
+                )
+            return agent.send_whatsapp_message(
+                phone_number,
+                text=camp.get("text_body") or "",
+                location=RELIGIOUS_LOCATION,
+                receiving_phone_id=RELIGIOUS_PHONE_ID,
+                _template_phone_fallback=False,
+            )
+
         for idx, phone in enumerate(phones):
             if not _is_campaign_running(campaign_id):
                 stopped_early = True
@@ -764,8 +965,14 @@ def _send_loop(agent, campaign_id: str):
                 chat_id = _ensure_conversation(phone)
             except Exception as e:
                 err_txt = _format_send_error(str(e), phone=phone)
-                _mark(campaign_id, phone, "failed", err_txt)
-                if _is_campaign_blocking_failure(err_txt):
+                err_code = _extract_error_code(None, err_txt)
+                _mark(campaign_id, phone, "failed", err_txt, error_code=err_code or None)
+                if err_code and err_code == last_fail_code:
+                    consecutive_same += 1
+                else:
+                    consecutive_same = 1
+                    last_fail_code = err_code or "setup"
+                if _is_campaign_blocking_failure(err_txt, consecutive_same=consecutive_same):
                     _auto_stop_campaign(
                         campaign_id,
                         f"Auto-stopped: conversation setup failed for {phone} — {err_txt}",
@@ -777,31 +984,44 @@ def _send_loop(agent, campaign_id: str):
             ok = False
             meta = None
             err_txt = ""
+            err_code = ""
             try:
-                if send_type == "template":
-                    ok, meta = agent.send_whatsapp_message(
-                        phone,
-                        text="",
-                        location=RELIGIOUS_LOCATION,
-                        template_name=camp.get("template_name"),
-                        template_language=camp.get("template_language") or "en",
-                        receiving_phone_id=RELIGIOUS_PHONE_ID,
-                        template_header_media_url=camp.get("template_header_media_url") or None,
-                        template_header_media_type=camp.get("template_header_media_type") or "image",
-                        template_variables=camp.get("template_variables") or None,
-                        _template_phone_fallback=False,
-                    )
-                else:
-                    ok, meta = agent.send_whatsapp_message(
-                        phone,
-                        text=camp.get("text_body") or "",
-                        location=RELIGIOUS_LOCATION,
-                        receiving_phone_id=RELIGIOUS_PHONE_ID,
-                        _template_phone_fallback=False,
-                    )
+                ok, meta = _do_send(phone)
             except Exception as e:
                 ok = False
                 meta = str(e)
+
+            # Rate limit (130429): short retries, then mark failed and continue.
+            if not ok and not (isinstance(meta, dict) and meta.get("uncertain")):
+                tentative_err = _format_send_error(meta, phone=phone)
+                tentative_code = _extract_error_code(meta, tentative_err)
+                if tentative_code == RATE_LIMIT_CODE:
+                    for attempt in range(RATE_LIMIT_RETRIES):
+                        log.warning(
+                            "Campaign %s rate-limited (130429) on %s — retry %s/%s after %.0fs",
+                            campaign_id,
+                            phone,
+                            attempt + 1,
+                            RATE_LIMIT_RETRIES,
+                            RATE_LIMIT_SLEEP_SEC,
+                        )
+                        time.sleep(RATE_LIMIT_SLEEP_SEC)
+                        if not _is_campaign_running(campaign_id):
+                            stopped_early = True
+                            break
+                        try:
+                            ok, meta = _do_send(phone)
+                        except Exception as e:
+                            ok = False
+                            meta = str(e)
+                        if ok or (isinstance(meta, dict) and meta.get("uncertain")):
+                            break
+                        tentative_err = _format_send_error(meta, phone=phone)
+                        tentative_code = _extract_error_code(meta, tentative_err)
+                        if tentative_code != RATE_LIMIT_CODE:
+                            break
+                    if stopped_early:
+                        break
 
             uncertain = bool(isinstance(meta, dict) and meta.get("uncertain"))
             if ok or uncertain:
@@ -818,6 +1038,8 @@ def _send_loop(agent, campaign_id: str):
                 _mark(campaign_id, phone, "sent", chat_id=chat_id, message_id=wa_mid or None)
                 sent_n += 1
                 status_txt = "sent"
+                consecutive_same = 0
+                last_fail_code = None
                 if send_type == "template":
                     body_txt = ""
                     if isinstance(meta, dict):
@@ -831,9 +1053,15 @@ def _send_loop(agent, campaign_id: str):
                     header = str(camp.get("text_body") or "").strip() or f"[Religious Campaign {campaign_id[:8]}] Text"
             else:
                 err_txt = _format_send_error(meta, phone=phone)
-                _mark(campaign_id, phone, "failed", err_txt, chat_id=chat_id)
+                err_code = _extract_error_code(meta, err_txt)
+                _mark(campaign_id, phone, "failed", err_txt, chat_id=chat_id, error_code=err_code or None)
                 status_txt = "error"
                 header = f"[Religious Campaign {campaign_id[:8]}] FAILED - {err_txt[:200]}"
+                if err_code and err_code == last_fail_code:
+                    consecutive_same += 1
+                else:
+                    consecutive_same = 1
+                    last_fail_code = err_code or "unknown"
 
             if chat_id:
                 try:
@@ -849,10 +1077,15 @@ def _send_loop(agent, campaign_id: str):
                 except Exception as e:
                     log.warning("log message failed for %s: %s", phone, e)
 
-            if status_txt == "error" and _is_campaign_blocking_failure(err_txt, meta):
+            if status_txt == "error" and _is_campaign_blocking_failure(
+                err_txt, meta, consecutive_same=consecutive_same
+            ):
+                reason_extra = ""
+                if consecutive_same > CONSECUTIVE_FAIL_STOP:
+                    reason_extra = f" (same error {consecutive_same}x in a row)"
                 _auto_stop_campaign(
                     campaign_id,
-                    f"Auto-stopped after send failure to {phone}: {err_txt}",
+                    f"Auto-stopped after send failure to {phone}{reason_extra}: {err_txt}",
                 )
                 stopped_early = True
                 break
@@ -878,7 +1111,12 @@ def _send_loop(agent, campaign_id: str):
             _RUNNING.discard(campaign_id)
 
 
-def start_campaign(agent, campaign_id: str, retry_failed: bool = False) -> dict:
+def start_campaign(
+    agent,
+    campaign_id: str,
+    retry_failed: bool = False,
+    exclude_undeliverable: bool = True,
+) -> dict:
     camp = get_campaign(campaign_id)
     if not camp:
         raise ValueError("campaign not found")
@@ -888,10 +1126,25 @@ def start_campaign(agent, campaign_id: str, retry_failed: bool = False) -> dict:
         _RUNNING.add(campaign_id)
     if retry_failed:
         with _connect() as conn:
-            conn.execute(
-                "UPDATE recipients SET status = 'pending', error = NULL WHERE campaign_id = ? AND status = 'failed'",
-                (campaign_id,),
-            )
+            if exclude_undeliverable:
+                # Do not retry permanent undeliverable numbers (131026) — they fail again.
+                rows = conn.execute(
+                    "SELECT id, error, error_code FROM recipients WHERE campaign_id = ? AND status = 'failed'",
+                    (campaign_id,),
+                ).fetchall()
+                for row in rows:
+                    code = str(row["error_code"] or "").strip() or _extract_error_code(None, row["error"] or "")
+                    if code in NO_RETRY_CODES:
+                        continue
+                    conn.execute(
+                        "UPDATE recipients SET status = 'pending', error = NULL, error_code = NULL WHERE id = ?",
+                        (row["id"],),
+                    )
+            else:
+                conn.execute(
+                    "UPDATE recipients SET status = 'pending', error = NULL, error_code = NULL WHERE campaign_id = ? AND status = 'failed'",
+                    (campaign_id,),
+                )
             conn.commit()
     _set_campaign_status(campaign_id, "sending")
     t = threading.Thread(target=_send_loop, args=(agent, campaign_id), daemon=True)
@@ -1139,7 +1392,15 @@ def register_routes(app, agent):
             if err:
                 return err
             payload = request.get_json(silent=True) or {}
-            camp = start_campaign(agent, campaign_id, retry_failed=bool(payload.get("retry_failed")))
+            exclude_undeliverable = payload.get("exclude_undeliverable")
+            if exclude_undeliverable is None:
+                exclude_undeliverable = True
+            camp = start_campaign(
+                agent,
+                campaign_id,
+                retry_failed=bool(payload.get("retry_failed")),
+                exclude_undeliverable=bool(exclude_undeliverable),
+            )
             return jsonify({"status": "success", "data": camp}), 200
         except ValueError as e:
             return jsonify({"status": "error", "message": str(e)}), 400

@@ -45454,16 +45454,30 @@ Draft to optimize:
                             mstatus = st.get("status")
                             if mid and mstatus:
                                 chat_db.update_message_status_by_external_id(mid, mstatus)
-                            if str(mstatus or "").strip().lower() == "failed":
+                            mstatus_l = str(mstatus or "").strip().lower()
+                            recipient_id = str(st.get("recipient_id") or "").strip()
+                            if mstatus_l in ("delivered", "read"):
+                                try:
+                                    from religious_wa_campaigns import handle_meta_delivery_status
+                                    handle_meta_delivery_status(
+                                        message_id=str(mid or "").strip(),
+                                        recipient=recipient_id,
+                                        status=mstatus_l,
+                                    )
+                                except Exception as camp_ex:
+                                    logging.warning(
+                                        "religious_wa_campaigns delivery status hook skipped: %s",
+                                        camp_ex,
+                                    )
+                            if mstatus_l == "failed":
                                 errors = st.get("errors") if isinstance(st.get("errors"), list) else []
                                 first_error = errors[0] if errors and isinstance(errors[0], dict) else {}
                                 error_code = str(first_error.get("code") or "").strip()
                                 error_title = str(first_error.get("title") or "").strip()
                                 error_message = str(first_error.get("message") or "").strip()
                                 error_details = str(((first_error.get("error_data") or {}) if isinstance(first_error.get("error_data"), dict) else {}).get("details") or "").strip()
-                                recipient_id = str(st.get("recipient_id") or "").strip()
                                 log_fn = logging.error
-                                if error_code in {"131026", "131049"}:
+                                if error_code in {"131026", "131049", "130472", "131047", "131051"}:
                                     log_fn = logging.warning
                                 log_fn(
                                     "WhatsApp delivery failed via Meta status webhook | "
@@ -45475,8 +45489,8 @@ Draft to optimize:
                                     error_message or "No message",
                                     error_details or "No details",
                                 )
-                                # Religious WA campaigns: Meta may accept send then fail delivery
-                                # (e.g. code 130472). Mark recipient failed + auto-stop campaign.
+                                # Religious WA campaigns: mark recipient failed; auto-stop only
+                                # for account-level Meta codes (not per-recipient undeliverable).
                                 try:
                                     from religious_wa_campaigns import handle_meta_delivery_failure
                                     handle_meta_delivery_failure(

@@ -1401,7 +1401,7 @@ class AutomationEngine:
         token = cctx.get("token") or ""
         ctype = str(cctx.get("type") or conn_type).lower()
         h = dict(headers or {})
-        if ctype in ("airtable", "slack", "stripe", "google_sheets", "notion", "deepseek", "gemini", "openai", "activepieces") and token:
+        if ctype in ("airtable", "slack", "stripe", "google_sheets", "notion", "deepseek", "gemini", "openai") and token:
             h.setdefault("Authorization", f"Bearer {token}")
         elif ctype == "baserow" and token:
             h.setdefault("Authorization", f"Token {token}")

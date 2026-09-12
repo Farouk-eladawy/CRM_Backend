@@ -30572,8 +30572,8 @@ Prefer the MarkItDown Extraction section below when present.
                             add(f"{cid}_baserow_religious", "baserow", f"{company_name} · Baserow Religious", "connected")
                         if conns.get("transportUrl"):
                             add(f"{cid}_transport", "http", f"{company_name} · Transport", "connected")
-                        if conns.get("activepiecesUrl"):
-                            add(f"{cid}_activepieces", "activepieces", f"{company_name} · Activepieces", "connected")
+                        if conns.get("n8nUrl"):
+                            add(f"{cid}_n8n", "http", f"{company_name} · n8n", "connected")
                         if conns.get("religiousWaPhoneNumberId"):
                             add(
                                 f"{cid}_religious_wa",
@@ -30945,20 +30945,6 @@ Prefer the MarkItDown Extraction section below when present.
                             ok = r.status_code < 400
                             detail = f"http_{r.status_code}"
                             verify_status = "connected" if ok else "invalid"
-                    elif ctype == "activepieces":
-                        webhook_url = str(fields.get("webhookUrl") or "").strip()
-                        bridge_secret = str(fields.get("bridgeSecret") or "").strip()
-                        api = (base_url or "").rstrip("/")
-                        if not api or not webhook_url:
-                            raise ValueError("missing_base_or_webhook")
-                        if "/api/v1/webhooks/" not in webhook_url:
-                            raise ValueError("webhook_url_invalid")
-                        if not bridge_secret:
-                            raise ValueError("missing_bridge_secret")
-                        r = requests.get(api, timeout=12, allow_redirects=True)
-                        ok = r.status_code < 500
-                        detail = f"http_{r.status_code}"
-                        verify_status = "connected" if ok else "invalid"
                     elif ctype == "supabase":
                         if not token or not base_url:
                             raise ValueError("missing_token_or_url")
@@ -31054,10 +31040,10 @@ Prefer the MarkItDown Extraction section below when present.
         @app.route('/api/automation/activepieces/bridge', methods=['POST', 'OPTIONS'])
         def api_automation_activepieces_bridge():
             """
-            Activepieces → CRM channel bridge.
+            External automation → CRM channel bridge (used by n8n HTTP steps).
             Uses existing WhatsApp / Email senders in FTS — no duplicate Meta/Gmail links required.
-            Auth: header X-FTS-Bridge-Secret (or Authorization: Bearer <secret>) must match an
-            Activepieces connection's bridgeSecret for the company.
+            Auth: header X-FTS-Bridge-Secret (or Authorization: Bearer <secret>) must match a
+            stored automation connection's bridgeSecret for the company.
             """
             if request.method == 'OPTIONS':
                 return jsonify({"status": "success"}), 200
@@ -31118,8 +31104,6 @@ Prefer the MarkItDown Extraction section below when present.
                 for cid in scan_ids:
                     _cid, items = _load_ap_items(cid)
                     for it in items:
-                        if str(it.get("type") or "").strip().lower() != "activepieces":
-                            continue
                         fields = it.get("fields") if isinstance(it.get("fields"), dict) else {}
                         expected = str(fields.get("bridgeSecret") or "").strip()
                         if expected and _secrets.compare_digest(expected, secret):
@@ -31150,9 +31134,9 @@ Prefer the MarkItDown Extraction section below when present.
                     ctx = {
                         "company_id": matched_company,
                         "vars": {},
-                        "event": {"type": "activepieces_bridge", "payload": payload},
+                        "event": {"type": "crm_channel_bridge", "payload": payload},
                         "chat": {},
-                        "workflow": {"id": "activepieces_bridge"},
+                        "workflow": {"id": "crm_channel_bridge"},
                     }
                     engine._step_send_whatsapp(step, ctx)
                     return jsonify({"status": "success", "data": {"action": "send_whatsapp", "company_id": matched_company}}), 200
@@ -31168,9 +31152,9 @@ Prefer the MarkItDown Extraction section below when present.
                     ctx = {
                         "company_id": matched_company,
                         "vars": {},
-                        "event": {"type": "activepieces_bridge", "payload": payload},
+                        "event": {"type": "crm_channel_bridge", "payload": payload},
                         "chat": {},
-                        "workflow": {"id": "activepieces_bridge"},
+                        "workflow": {"id": "crm_channel_bridge"},
                     }
                     engine._step_send_email(step, ctx)
                     return jsonify({"status": "success", "data": {"action": "send_email", "company_id": matched_company}}), 200

@@ -20,7 +20,6 @@ NEW_COMPANY_ALLOWED_TABS = [
     "religious_operation",
     "religious_wa_campaigns",
     "transport_operation",
-    "activepieces_operation",
     "n8n_operation",
     "automation",
 ]
@@ -31,7 +30,6 @@ def empty_connections():
         "baserowMainUrl": "",
         "baserowReligiousUrl": "",
         "transportUrl": "",
-        "activepiecesUrl": "",
         "n8nUrl": "",
         "religiousWaPhoneNumberId": "",
         "religiousWaDisplay": "",
@@ -142,7 +140,6 @@ def sanitize_connections(raw, existing=None) -> dict:
     out["baserowMainUrl"] = sanitize_public_url(out.get("baserowMainUrl"))
     out["baserowReligiousUrl"] = sanitize_public_url(out.get("baserowReligiousUrl"))
     out["transportUrl"] = sanitize_public_url(out.get("transportUrl"))
-    out["activepiecesUrl"] = sanitize_public_url(out.get("activepiecesUrl"))
     out["n8nUrl"] = sanitize_public_url(out.get("n8nUrl"))
     out["webhookPublicBase"] = sanitize_public_url(out.get("webhookPublicBase")).rstrip("/")
     return out

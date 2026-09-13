@@ -159612,3 +159612,44 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BBB3CEE5A02370192A"
+    },
+    "keyId": "3EB0BBB3CEE5A02370192A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "FTS Change Watch\nA change was detected on the page\n\nplatform.ella.fund\nhttps://www.timeanddate.com/worldclock/egypt/cairo\n\nTime: 2026-09-13T18:33:12.062Z\nChange type: text\n\nSnippet:\nTime Zone & Clock Changes in Cairo, Egypt \n 12 \n 3 \n 6 \n 9 \n 1 \n 2 \n 4 \n 5 \n 7 \n 8 \n 10 \n 11 \n Sign in \n News News Home \n Astronomy News \n Time Zone News \n Calendar & Holiday News \n Newsletter \n Live events \n World Clock Main World Clock \n Extended World Clock \n Personal World Clock \n Clock for Your Site \n UTC Time \n Time Zones Time Zones Home \n Time Zone Converter \n Meeting Planner \n Event Time A\n\nPreview: https://n8n.ftstravels.com/cw-fetch/screenshots/31/2026-09-13T18-33-11-975Z.png"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789151594,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789324395,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T11:33:16.109Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

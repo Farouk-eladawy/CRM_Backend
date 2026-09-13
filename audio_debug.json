@@ -159407,3 +159407,208 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB02764BD188440FEF27C"
+    },
+    "keyId": "3EB02764BD188440FEF27C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "FTS Change Watch\nA change was detected on the page\n\nplatform.ella.fund\nhttps://www.timeanddate.com/worldclock/egypt/cairo\n\nTime: 2026-09-13T17:35:15.372Z\nChange type: text\n\nSnippet:\n12 3 6 9 1 2 4 5 7 8 10 11 | 20:35:13 | EEST | Sunday, 13 September 2026 | Fullscreen\n---\nCountry: | Egypt | Lat/Long: | 30°03'N / 31°14'E | Elevation: | 22 m | Currency: | Egyptian Pound (EGP) | Languages: | Arabic | Country Code: | +20\n---\n°C | Weather | 32 °C | 38 / 23 °C | Tue 15. | 37 / 22 °C | Wed 16. | 38 / 24 °C | Weather by CustomWeather, © 2026 | More weather details\n\nPreview: https://n8n.ftstravels.com/cw-fetch/screenshots/31/2026-09-13T17-35-15-334Z.png"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789148121,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789320922,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T10:35:22.946Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB06B542E9F34CD079EB2"
+    },
+    "keyId": "3EB06B542E9F34CD079EB2",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:3922 in append_to_chat_log\nLogger: root\nReason: Failed to append to chat log: ('422 Client Error: Unprocessable Entity for url: https://api.airtable.com/v0/appTp5YgSp9DV2HYc/List/rec3BRWn92dtzGkOs', '{\\'type\\': \\'INVALID_VALUE_FOR_COLUMN\\', \\'message\\': \\'Field \"AI Chat Log\" cannot accept the provided value\\'}')\nAt: 2026-09-13 10:35:44"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789148145,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789320945,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T10:35:46.931Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB08B49D5B61CC0FEFF6B"
+    },
+    "keyId": "3EB08B49D5B61CC0FEFF6B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "FTS Change Watch\nA change was detected on the page\n\nplatform.ella.fund\nhttps://www.timeanddate.com/worldclock/egypt/cairo\n\nTime: 2026-09-13T18:04:12.980Z\nChange type: text (visual diff 0.03%)\n\nSnippet:\n12 3 6 9 1 2 4 5 7 8 10 11 | 21:04:08 | EEST | Sunday, 13 September 2026 | Fullscreen\n---\nCountry: | Egypt | Lat/Long: | 30°03'N / 31°14'E | Elevation: | 22 m | Currency: | Egyptian Pound (EGP) | Languages: | Arabic | Country Code: | +20\n---\n°C | Weather | 31 °C | 38 / 23 °C | Tue 15. | 37 / 22 °C | Wed 16. | 38 / 24 °C | Weather by CustomWeather, © 2026 | More weather details\n\nPreview: https://n8n.ftstravels.com/cw-fetch/screenshots/31/2026-09-13T18-04-11-165Z.png"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789149857,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789322658,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T11:04:19.127Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB050DFFB2D9A043EF043"
+    },
+    "keyId": "3EB050DFFB2D9A043EF043",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:5011 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-09-13 11:04:35"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789149875,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789322675,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T11:04:36.399Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0C4DCC26A8A2F4B217D"
+    },
+    "keyId": "3EB0C4DCC26A8A2F4B217D",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:8969 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-09-13 11:04:38"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789149878,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789322678,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T11:04:39.397Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

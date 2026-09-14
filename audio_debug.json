@@ -160350,3 +160350,126 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0F79B68CE95485EF05D"
+    },
+    "keyId": "3EB0F79B68CE95485EF05D",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*getyourguide.com*\nhttps://www.getyourguide.com/hurghada-l403/hurghada-yacht-cruise-dolphin-3-island-with-seafood-lunch-t888318/?ranking_uuid=e09e6700-e984-4c8b-a1c8-21edfbe5c3d1\n\nTime: 2026-09-14 15:49:36 UTC\nType: visual · visual 3.34%\n\nSnippet:\nHurghada: Yacht Cruise, Dolphin Watching and 3 Islands With Seafood Lunch · Guide: English · Book now, pay later · Cancel for free until Oct 22 · Pickup area · Starting time · F...\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789228178,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789400979,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T08:49:40.025Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB001FE9CD6A56C491CD8"
+    },
+    "keyId": "3EB001FE9CD6A56C491CD8",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*worldometers.info*\nhttps://www.worldometers.info/time/cairo-governorate-egypt/\n\nTime: 2026-09-14 16:01:34 UTC\nType: text + visual · visual 6.03%\n\nSnippet:\nCairo · 12h 24h · 12h · 24h · Analog Digital · Analog · Digital · 0 · 7 · : · 1 · 3 · PM · Monday, September 14, 2026\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789228896,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789401697,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T09:01:37.979Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D9F056BA28D6D0DAC3"
+    },
+    "keyId": "3EB0D9F056BA28D6D0DAC3",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*worldometers.info*\nhttps://www.worldometers.info/time/cairo-governorate-egypt/\n\nTime: 2026-09-14 16:10:14 UTC\nType: text + visual · visual 7.61%\n\nSnippet:\nCairo · 12h 24h · 12h · 24h · Analog Digital · Analog · Digital · 0 · 7 · : · 1 · 8 · PM · Monday, September 14, 2026\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789229415,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789402216,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T09:10:17.750Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

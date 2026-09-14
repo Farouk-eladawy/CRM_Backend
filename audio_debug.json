@@ -160678,3 +160678,167 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BC5EDDA4CCBB50201D"
+    },
+    "keyId": "3EB0BC5EDDA4CCBB50201D",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*worldometers.info*\nhttps://www.worldometers.info/time/cairo-governorate-egypt/\n\nTime: 2026-09-14 17:30:20 UTC\nType: text + visual · visual 3.96%\n\nSnippet:\nCairo · 12h 24h · 12h · 24h · Analog Digital · Analog · Digital · 0 · 8 · : · 3 · 1 · PM · Monday, September 14, 2026\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789234222,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789407024,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T10:30:25.058Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB03188BA4A61E53B511D"
+    },
+    "keyId": "3EB03188BA4A61E53B511D",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*worldometers.info*\nhttps://www.worldometers.info/time/cairo-governorate-egypt/\n\nTime: 2026-09-14 17:40:15 UTC\nType: text + visual · visual 4.22%\n\nSnippet:\nCairo · 12h 24h · 12h · 24h · Analog Digital · Analog · Digital · 0 · 8 · : · 4 · 9 · PM · Monday, September 14, 2026\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789234818,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789407619,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T10:40:20.474Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0390B3D2C3D9AB52FCC"
+    },
+    "keyId": "3EB0390B3D2C3D9AB52FCC",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*worldometers.info*\nhttps://www.worldometers.info/time/cairo-governorate-egypt/\n\nTime: 2026-09-14 17:55:22 UTC\nType: text + visual · visual 5.26%\n\nSnippet:\nCairo · 12h 24h · 12h · 24h · Analog Digital · Analog · Digital · 0 · 8 · : · 5 · 1 · PM · Monday, September 14, 2026\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789235723,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789408524,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T10:55:25.735Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0944D5BD7FBD11434CA"
+    },
+    "keyId": "3EB0944D5BD7FBD11434CA",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*worldometers.info*\nhttps://www.worldometers.info/time/cairo-governorate-egypt/\n\nTime: 2026-09-14 18:05:15 UTC\nType: text + visual · visual 1.97%\n\nSnippet:\nCairo · 12h 24h · 12h · 24h · Analog Digital · Analog · Digital · 0 · 9 · : · 5 · 1 · PM · Monday, September 14, 2026\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789236317,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789409118,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-14T11:05:19.543Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

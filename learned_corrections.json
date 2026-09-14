@@ -1,23 +1,5 @@
 [
   {
-    "timestamp": "2026-09-13T03:45:24.654790",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you for providing your traveler details. I have safely noted the following for your booking:\n\n- **Travelers:** Vivien Lakatos, István Farkas\n- **Hotel:** Serenity Alpha Beach\n- **Room Number:** 2235",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-13T03:45:56.822825",
-    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you for providing your traveler details. I have safely noted the following for your booking:\n\n- **Travelers:** Jean-Luc Bellert, Rachel Bellert, Hervé Gascon, Anne Gascon (4 Adults)\n- **Hotel:** Magic Beach Hotel Hurghada\n- **Room Numbers:** Not yet available\n\nYour booking might take a few minutes to sync fully to our system from the booking platform. Rest assured, I have recorded your details in my memory, and they will be automatically linked to your reservation once it arrives.\n\nYour confirmed pickup time will be sent to you via WhatsApp and Email the day before your trip, typically by 6:00 PM.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-13T03:48:01.727089",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Dear Firdous,\n\nThank you for your message and for confirming your hotel details.\n\nWe are pleased to confirm that your pickup time is scheduled for 00:25 (12:25 AM) on the night of your trip. Our driver will meet you at the lobby of Cleopatra Luxury Resort Makadi Bay, and we have your room number (3008) on file.\n\nPlease be ready at the pickup point a few minutes before the scheduled time to ensure a smooth departure.\n\nIf you have any further questions, please do not hesitate to reach out.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-13T04:02:28.649831",
     "original": "وصلني رقم حضرتك 🙏 تم تسجيله عندنا، وفريق المبيعات هيتواصل مع حضرتك على الواتساب في أقرب وقت يشرحلك كل تفاصيل برامج الحج والأسعار الرسمية وخطوات التثبيت.\n\nلو حابب تسرّع الأمور، قولّي حضرتك مهتم ببرنامج إيه بالظبط — البري ولا الطيران — وأنا أجهزلك التفاصيل حالًا.\n\nمع خالص التحية،\nمسؤول المبيعات عبدالرحمن إبراهيم",
     "corrected": "سيتم التواصل",
@@ -596,6 +578,24 @@
   {
     "timestamp": "2026-09-13T21:52:29.631912",
     "original": "أهلًا بحضرتك 🕋 يسعدني أشرحلك برامج الحج المتاحة حاليًا بعد نزول ضوابط الوزارة رسميًا:\n\nحج بري — ٢٢٠ ألف جنيه بدل ٢٣٠ (خصم ١٠ آلاف) — ١٧ يوم — جدية الحجز ٥٠٬١٥٠ جنيه، وتذكرة العبّارة تُضاف بسعرها.\n\nحج طيران اقتصادي — ٢٤٥ ألف بدل ٢٧٠ (خصم ٢٥ ألف) — ١٧ يوم — جدية ٨٠٬١٥٠ جنيه، والتذكرة تُضاف بسعرها.\n\nحج طيران تحسين — ٢٧٥ ألف بدل ٣٠٤ (خصم ٢٩ ألف) — ١٩ يوم، وأهم ميزة فيه ٧ أيام إقامة على ساحة الحرم مباشرة بعد المناسك — جدية ٨٠٬١٥٠ جنيه.\n\nوالخصم ساري أسبوع واحد بس أو لحد اكتمال الحصة، والتسجيل بيقفل ٢٧ سبتمبر، والقرعة نتيجتها ٣٠ سبتمبر.\n\nحضرتك بتفكر في أنهي برنامج فيهم؟ وأسهل حاجة أشرحلك التفاصيل كاملة في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞\n\nمع خالص التحية،\nمسؤول المبيعات هنادي محمد",
+    "corrected": "اهلا بيك ياافندم معاك هنادي من شركة اف تي اس 🌸",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-13T22:29:43.105271",
+    "original": "تمام يا فندم، سجلت بيانات حضرتك: عبد العاطي أحمد حمودة — 01032895570.\n\nبخصوص الحج البري، حصة الشركة الأولى اكتملت الحمد لله قبل نزول الضوابط، ومع نزول ضوابط الوزارة رسميًا فتحنا حصة إضافية والتسجيل فيها متاح دلوقتي:\nسعر الوزارة الرسمي للبري ٢٣٠ ألف جنيه، وسعرك مع خصم الحجز المبكر ٢٢٠ ألف — والخصم ساري لمدة أسبوع واحد بس أو لحد اكتمال الحصة الإضافية، أيهما أقرب.\nتذكرة العبّارة ذهاب وعودة بتتضاف بسعرها وقت الحجز، والأولوية بترتيب تثبيت جدية الحجز لأن الأعداد محدودة.\n\nأسهل حاجة أشرحلك خطوات التثبيت كلها في مكالمة دقيقتين — ينفع أكلم حضرتك على نفس الرقم ده؟ 📞",
+    "corrected": "تم التواصل واتشرفت بمعرفة حضرتك جدا 🌸",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-13T22:30:24.833754",
+    "original": "وصلني استفسار حضرتك بصوت، لكن للأسف مش قادر أسمع الرسائل الصوتية من هنا 🙏\n\nعشان أقدر أساعدك بشكل دقيق، ممكن تكتبلي استفسارك في رسالة نصية قصيرة؟ ولو حابب، أسهل حاجة إني أكلمك دقيقتين وأجاوبك على كل حاجة — أكلم حضرتك على أي رقم؟ 📞\n\nمع خالص التحية،\nمسؤول المبيعات هنادي محمد",
+    "corrected": "صباح الفل 🌸",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-13T22:47:29.573694",
+    "original": "أهلًا بحضرتك 🕋 يسعدني أخدمك في FTS للسياحة.\n\nبخصوص رقم التواصل — الأفضل إن حضرتك تبعتلي رقم الواتساب بتاعك، وأنا هخلي فريق المبيعات يكلمك عليه في أسرع وقت ويشرحلك كل التفاصيل والأسعار الرسمية.\n\nوفي نفس الوقت، عشان أجاوبك على السؤال الصح من أول مرة — حضرتك مهتم ببرامج الحج ولا العمرة؟\n\nمع خالص التحية،\nمسؤول المبيعات هنادي محمد",
     "corrected": "اهلا بيك ياافندم معاك هنادي من شركة اف تي اس 🌸",
     "context": "UI Manual Edit"
   }

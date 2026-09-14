@@ -159899,3 +159899,44 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0FAF106E929EDD54225"
+    },
+    "keyId": "3EB0FAF106E929EDD54225",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:3922 in append_to_chat_log\nLogger: root\nReason: Failed to append to chat log: ('422 Client Error: Unprocessable Entity for url: https://api.airtable.com/v0/appTp5YgSp9DV2HYc/List/rec3BRWn92dtzGkOs', '{\\'type\\': \\'INVALID_VALUE_FOR_COLUMN\\', \\'message\\': \\'Field \"AI Chat Log\" cannot accept the provided value\\'}')\nAt: 2026-09-13 21:19:05"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789186745,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789359546,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-13T21:19:07.142Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-14T02:21:05.562988",
-    "original": "تمام يا فندم 🌸 سجلت رقم حضرتك: 01277123535\n\nهنكلم حضرتك على الواتساب في أقرب وقت إن شاء الله، وهنشرحلك كل تفاصيل برنامج الحج الطيران الاقتصادي والأسعار الرسمية وخطوات تثبيت الحجز.\n\nمتاح أتواصل مع حضرتك دلوقتي؟",
-    "corrected": "سيتم الواصل",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-14T02:35:16.964765",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you so much for your kind words! We are thrilled to hear that you and Thiago had such a wonderful time on the City Tour & Bazaar with Optional Sand Museum Visit, and that your guide made the experience so helpful and informative. It was truly a pleasure having you with us.\n\nIf you have a moment, we would be very grateful if you could share your experience as a review on GetYourGuide — your feedback helps other travelers discover this tour and means a lot to our team.\n\nWe hope to see you again on your next visit to Egypt!",
@@ -597,6 +591,12 @@
     "timestamp": "2026-09-14T21:12:57.603756",
     "original": "كلام صاحب حضرتك صح في جزء منه، بس فيه تفصيلة مهمة لازم تكون دقيقة فيها:\n\nشهادة التحركات لو مثبوت فيها إن حضرتك حجيت، فده معناه إن الرقم القومي بتاعك مسجّل عند الوزارة إنك أديت الفريضة — وبالتالي مش هينفع تدخل قرعة السياحة تاني، لأن الوزارة بتطبق قاعدة القناة الواحدة والسيستم بيرفض الرقم تلقائيًا.\n\nبس ده مش معناه إن الباب مقفول — المتاح لحضرتك هو مسار الحج المباشر بتأشيرة مباشرة، من غير أي قرعة خالص. يعني مفيش انتظار نتيجة ولا احتمال رفض، والبرنامج نفسه هو نفس برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nالسعر بعد نزول ضوابط ١٤٤٨: ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وعدد التأشيرات محدود كل سنة وبيخلص بالأسبقية.\n\nأسهل حاجة أوضحلك تفاصيل المسار ده وخطواته في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟",
     "corrected": "ممكن صورة البطاقه اكشف عليها لحضرتك",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-14T21:58:26.478163",
+    "original": "أيوه يا فندم، حالتك واضحة — حضرتك حجيت قبل كده واسمك مسجل على السيستم، وده معناه إن مسار القرعة مش متاح لحضرتك بسبب قاعدة القناة الواحدة. المتاح لحضرتك هو الحج المباشر بتأشيرة مباشرة من غير قرعة خالص.\n\nالبرنامج نفسه هو نفس برنامج طيران التحسين بالظبط — ١٩ يوم، مدينة ثم قطار الحرمين لمكة، مخيمات مكيفة، وبعد المناسك ٧ أيام إقامة على ساحة الحرم مباشرة. الفرق الوحيد إن التأشيرة مباشرة، فحجزك مؤكد ومفيش انتظار نتيجة ولا احتمال رفض.\n\nالسعر ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وعدد التأشيرات محدود كل سنة والأولوية بالأسبقية.\n\nعشان أشرحلك خطوات التثبيت بالتفصيل وأحسبلك كل حاجة صح، أكلم حضرتك دقيقتين — رقم حضرتك عليه واتساب؟",
+    "corrected": "عادي ياافندم المهم نوصل المناسب لحضرتك",
     "context": "UI Manual Edit"
   }
 ]

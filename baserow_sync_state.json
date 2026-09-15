@@ -46,7 +46,7 @@
       "last_result": "noop"
     },
     "main::Reservation close": {
-      "last_run": "2026-09-15T20:09:29.000Z",
+      "last_run": "2026-09-15T21:14:28.000Z",
       "last_modified_cursor": "2026-09-01T04:08:06.000Z",
       "last_created": 0,
       "last_updated": 102,
@@ -64,7 +64,7 @@
       "last_result": "noop"
     },
     "main::Aegypten-Ausfluege Requests": {
-      "last_run": "2026-09-15T20:09:30.000Z",
+      "last_run": "2026-09-15T21:14:28.000Z",
       "last_modified_cursor": "2026-09-01T04:08:54.000Z",
       "last_created": 0,
       "last_updated": 630,
@@ -208,7 +208,7 @@
       "last_result": "noop"
     },
     "main::Audio_Content": {
-      "last_run": "2026-09-15T20:09:30.000Z",
+      "last_run": "2026-09-15T21:14:28.000Z",
       "last_modified_cursor": "2026-09-01T04:10:53.000Z",
       "last_created": 0,
       "last_updated": 30,
@@ -235,7 +235,7 @@
       "last_result": "ok"
     },
     "main::Sales_Performance_Reviews": {
-      "last_run": "2026-09-15T20:09:30.000Z",
+      "last_run": "2026-09-15T21:14:28.000Z",
       "last_modified_cursor": "2026-09-01T04:12:43.000Z",
       "last_created": 0,
       "last_updated": 1,
@@ -348,7 +348,7 @@
       "last_result": "noop"
     },
     "main::GYG Analytics": {
-      "last_run": "2026-09-15T20:09:29.000Z",
+      "last_run": "2026-09-15T21:14:28.000Z",
       "last_modified_cursor": "2026-09-01T12:08:03.000Z",
       "last_created": 23,
       "last_updated": 0,
@@ -386,11 +386,11 @@
     "main::List": {
       "baserow_table_id": 60,
       "id_field": "Record ID",
-      "last_modified_cursor": "2026-09-15T20:05:31.000Z",
-      "last_run": "2026-09-15T20:05:31.000Z",
-      "last_result": "ok",
+      "last_modified_cursor": "2026-09-15T21:07:16.000Z",
+      "last_run": "2026-09-15T21:14:25.000Z",
+      "last_result": "noop",
       "last_created": 1,
-      "last_updated": 0,
+      "last_updated": 2,
       "natural_key": "Booking Nr."
     }
   },

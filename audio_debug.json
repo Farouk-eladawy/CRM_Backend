@@ -161908,3 +161908,85 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB03FE201EB26CCFA2603"
+    },
+    "keyId": "3EB03FE201EB26CCFA2603",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Airtable\nSource: ai_agent.py:3922 in append_to_chat_log\nLogger: root\nReason: Failed to append to chat log: ('422 Client Error: Unprocessable Entity for url: https://api.airtable.com/v0/appTp5YgSp9DV2HYc/List/rec3BRWn92dtzGkOs', '{\\'type\\': \\'INVALID_VALUE_FOR_COLUMN\\', \\'message\\': \\'Field \"AI Chat Log\" cannot accept the provided value\\'}')\nAt: 2026-09-15 07:28:20"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789309700,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789482500,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-15T07:28:21.943Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0BE3B1E80FEBD820E19"
+    },
+    "keyId": "3EB0BE3B1E80FEBD820E19",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*getyourguide.com*\nhttps://www.getyourguide.com/sharm-el-sheikh-l408/sharm-el-sheikh-city-highlights-shopping-tour-wtransfers-t1197318/?ranking_uuid=e6d58c29-92ac-4251-8c94-9cd5b7721dca\n\nTime: 2026-09-15 14:29:21 UTC\nType: text\n\nSnippet:\nSharm: City Tour & Mosque, Cathedral experience w/Old Market - 2026 (Verified Reviews) Skip to main content Search EN/USD $ Profile Explore Sharm el-Sheikh Places to see Things ...\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789309764,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789482565,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-15T07:29:25.954Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

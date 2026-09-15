@@ -162031,3 +162031,44 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB07E832D3DDE461679D5"
+    },
+    "keyId": "3EB07E832D3DDE461679D5",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "*FTS Change Watch*\nA change was detected\n\n*Sharm El Sheikh City Highlights Shopping Tour Wtransfers T1197318*\nhttps://www.getyourguide.com/sharm-el-sheikh-l408/sharm-el-sheikh-city-highlights-shopping-tour-wtransfers-t1197318/?ranking_uuid=e6d58c29-92ac-4251-8c94-9cd5b7721dca\n\nTime: 2026-09-15 16:53:00 UTC\nType: text · visual 0.00%\n\nWhat changed:\nNew or updated text appeared: “5 5 out of 5 stars R Ralyatou – France May 24, 2026 - Verified booking A superb day trip with Emad and the driver”.\n• Updated text: 5 5 out of 5 stars R Ralyatou – France May 24, 2026 - Verified booking A superb day trip with Emad and the driver\n\nScreenshot attached"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789318383,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789491183,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-15T09:53:04.677Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

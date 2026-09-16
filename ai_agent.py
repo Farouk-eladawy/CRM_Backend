@@ -37,6 +37,8 @@ from airtable_fields import FieldIds, LeadFieldIds, ReligiousLeadFieldIds, ID_TO
 
 # Define Fixed Cairo Offset (UTC+3) - Summer Time / Standard Adjustment
 CAIRO_OFFSET = timedelta(hours=3)
+# Airtable long-text fields reject writes above this size (API 422 INVALID_VALUE_FOR_COLUMN).
+AIRTABLE_LONG_TEXT_MAX_CHARS = 100000
 
 # Meta Cloud API customer-care window: rolling 24 hours from the last inbound
 # customer message. Not calendar midnight. Applies to every Meta WhatsApp number.
@@ -3722,6 +3724,27 @@ class AIAgent:
                 return "Hurghada/Cairo"
         return derived
 
+    def _fit_airtable_long_text(self, text, max_chars=None):
+        """
+        Keep text within Airtable long-text size so PATCH does not return
+        422 INVALID_VALUE_FOR_COLUMN ("cannot accept the provided value").
+        Prefers the newest tail (recent chat entries).
+        """
+        limit = int(max_chars or AIRTABLE_LONG_TEXT_MAX_CHARS)
+        s = "" if text is None else (text if isinstance(text, str) else str(text))
+        if limit < 1 or len(s) <= limit:
+            return s
+        marker = "\n[...earlier AI Chat Log truncated to fit Airtable 100k limit...]\n"
+        budget = limit - len(marker)
+        if budget < 1:
+            return s[-limit:]
+        # Prefer cutting on a newline near the keep boundary so entries stay readable.
+        tail = s[-budget:]
+        nl = tail.find("\n")
+        if 0 <= nl < min(2000, max(0, len(tail) // 4)):
+            tail = tail[nl + 1 :]
+        return marker + tail
+
     def append_to_chat_log(self, record_id, message, sender="AI", source="System", table_name=None, skip_local_sync=False):
         """
         Unified helper to append messages to Airtable Chat Log and Session Cache.
@@ -3734,7 +3757,12 @@ class AIAgent:
         with self.mutex.lock(record_id):
             try:
                 timestamp = (datetime.now(timezone.utc).replace(tzinfo=None) + CAIRO_OFFSET).strftime("%Y-%m-%d %H:%M:%S")
-                log_entry = f"\n[{timestamp}] [{source} - {sender}]: {message}"
+                safe_message = "" if message is None else str(message)
+                # Leave room for timestamp/header inside the Airtable long-text limit.
+                max_msg = max(1000, AIRTABLE_LONG_TEXT_MAX_CHARS - 500)
+                if len(safe_message) > max_msg:
+                    safe_message = safe_message[: max_msg - 80] + "\n[...message truncated for Airtable limit...]"
+                log_entry = f"\n[{timestamp}] [{source} - {sender}]: {safe_message}"
                 
                 # 1. Update Airtable
                 table = self.table
@@ -3787,7 +3815,17 @@ class AIAgent:
                          or ""
                      )
 
-                new_log = current_log + "\n" + log_entry
+                new_log = (current_log or "") + "\n" + log_entry
+                fitted_log = self._fit_airtable_long_text(new_log)
+                if len(fitted_log) != len(new_log):
+                    logging.warning(
+                        "AI Chat Log for %s trimmed from %s to %s chars (Airtable long-text max=%s)",
+                        record_id,
+                        len(new_log),
+                        len(fitted_log),
+                        AIRTABLE_LONG_TEXT_MAX_CHARS,
+                    )
+                    new_log = fitted_log
                 
                 update_data = {FieldIds.AI_CHAT_LOG: new_log}
                 # For Leads, map to Lead Field ID if needed
@@ -3819,12 +3857,31 @@ class AIAgent:
                             break
                         except Exception as update_err:
                             last_update_error = update_err
-                            err_text = str(update_err or "").lower()
-                            is_retriable = (
-                                "retriable_error" in err_text
-                                or "503" in err_text
-                                or "service unavailable" in err_text
+                            err_text = str(update_err or "")
+                            err_l = err_text.lower()
+                            is_size_reject = (
+                                "invalid_value_for_column" in err_l
+                                and "ai chat log" in err_l
+                                and "cannot accept the provided value" in err_l
                             )
+                            is_retriable = (
+                                "retriable_error" in err_l
+                                or "503" in err_l
+                                or "service unavailable" in err_l
+                            )
+                            if is_size_reject and attempt < 3:
+                                # Measured overflow / edge case: keep a smaller recent tail and retry.
+                                shrink_to = max(20000, AIRTABLE_LONG_TEXT_MAX_CHARS - (15000 * attempt))
+                                field_key = next(iter(update_data.keys()))
+                                shrunk = self._fit_airtable_long_text(update_data[field_key], max_chars=shrink_to)
+                                update_data = {field_key: shrunk}
+                                logging.warning(
+                                    "AI Chat Log update for %s rejected by Airtable size; retrying with %s chars (attempt %s)",
+                                    record_id,
+                                    len(shrunk),
+                                    attempt + 1,
+                                )
+                                continue
                             if attempt >= 3 or not is_retriable:
                                 raise
                             time.sleep(0.8 * attempt)

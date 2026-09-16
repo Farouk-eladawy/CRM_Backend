@@ -38,7 +38,8 @@ from airtable_fields import FieldIds, LeadFieldIds, ReligiousLeadFieldIds, ID_TO
 # Define Fixed Cairo Offset (UTC+3) - Summer Time / Standard Adjustment
 CAIRO_OFFSET = timedelta(hours=3)
 # Airtable long-text fields reject writes above this size (API 422 INVALID_VALUE_FOR_COLUMN).
-AIRTABLE_LONG_TEXT_MAX_CHARS = 100000
+# Measured: exactly 100000 chars can still be rejected for some UTF-8 payloads; keep a small margin.
+AIRTABLE_LONG_TEXT_MAX_CHARS = 99000
 
 # Meta Cloud API customer-care window: rolling 24 hours from the last inbound
 # customer message. Not calendar midnight. Applies to every Meta WhatsApp number.
@@ -3724,26 +3725,68 @@ class AIAgent:
                 return "Hurghada/Cairo"
         return derived
 
-    def _fit_airtable_long_text(self, text, max_chars=None):
+    def _append_local_chat_log_archive(self, record_id, discarded_head):
+        """Append discarded AI Chat Log head to chat_log_archives/{record_id}.txt."""
+        if not record_id or not discarded_head:
+            return
+        try:
+            arch_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chat_log_archives")
+            os.makedirs(arch_dir, exist_ok=True)
+            path = os.path.join(arch_dir, f"{record_id}.txt")
+            stamp = (datetime.now(timezone.utc).replace(tzinfo=None) + CAIRO_OFFSET).strftime("%Y-%m-%d %H:%M:%S")
+            sep = f"\n\n===== archived {stamp} discarded_chars={len(discarded_head)} =====\n\n"
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(sep)
+                f.write(discarded_head if isinstance(discarded_head, str) else str(discarded_head))
+        except Exception as archive_err:
+            logging.warning("Failed to append local chat log archive for %s: %s", record_id, archive_err)
+
+    def _merge_chat_log_archive_text(self, existing_archive, discarded_head):
+        """Append discarded head into archive text and keep within Airtable 100k."""
+        discarded = "" if discarded_head is None else (
+            discarded_head if isinstance(discarded_head, str) else str(discarded_head)
+        )
+        if not discarded.strip():
+            return existing_archive if isinstance(existing_archive, str) else ("" if existing_archive is None else str(existing_archive))
+        stamp = (datetime.now(timezone.utc).replace(tzinfo=None) + CAIRO_OFFSET).strftime("%Y-%m-%d %H:%M:%S")
+        chunk = f"\n\n===== archived {stamp} discarded_chars={len(discarded)} =====\n\n{discarded}"
+        base = "" if existing_archive is None else (
+            existing_archive if isinstance(existing_archive, str) else str(existing_archive)
+        )
+        # Do not pass record_id: avoid recursive local re-archive while fitting the archive field.
+        fitted, _discarded = self._fit_airtable_long_text(base + chunk, record_id=None)
+        return fitted
+
+    def _fit_airtable_long_text(self, text, max_chars=None, record_id=None):
         """
         Keep text within Airtable long-text size so PATCH does not return
         422 INVALID_VALUE_FOR_COLUMN ("cannot accept the provided value").
         Prefers the newest tail (recent chat entries).
+        Returns (fitted_text, discarded_head). discarded_head is "" when no trim.
+        When trimming, also appends discarded head to local archive file.
         """
         limit = int(max_chars or AIRTABLE_LONG_TEXT_MAX_CHARS)
         s = "" if text is None else (text if isinstance(text, str) else str(text))
         if limit < 1 or len(s) <= limit:
-            return s
+            return s, ""
         marker = "\n[...earlier AI Chat Log truncated to fit Airtable 100k limit...]\n"
         budget = limit - len(marker)
         if budget < 1:
-            return s[-limit:]
+            discarded = s[:-limit] if len(s) > limit else ""
+            if discarded and record_id:
+                self._append_local_chat_log_archive(record_id, discarded)
+            return s[-limit:], discarded
         # Prefer cutting on a newline near the keep boundary so entries stay readable.
-        tail = s[-budget:]
+        start = len(s) - budget
+        tail = s[start:]
         nl = tail.find("\n")
         if 0 <= nl < min(2000, max(0, len(tail) // 4)):
-            tail = tail[nl + 1 :]
-        return marker + tail
+            start = start + nl + 1
+            tail = s[start:]
+        discarded = s[:start]
+        if discarded and record_id:
+            self._append_local_chat_log_archive(record_id, discarded)
+        return marker + tail, discarded
 
     def append_to_chat_log(self, record_id, message, sender="AI", source="System", table_name=None, skip_local_sync=False):
         """
@@ -3816,10 +3859,10 @@ class AIAgent:
                      )
 
                 new_log = (current_log or "") + "\n" + log_entry
-                fitted_log = self._fit_airtable_long_text(new_log)
-                if len(fitted_log) != len(new_log):
+                fitted_log, discarded_head = self._fit_airtable_long_text(new_log, record_id=record_id)
+                if discarded_head:
                     logging.warning(
-                        "AI Chat Log for %s trimmed from %s to %s chars (Airtable long-text max=%s)",
+                        "AI Chat Log for %s trimmed from %s to %s chars (Airtable long-text max=%s); archiving discarded head",
                         record_id,
                         len(new_log),
                         len(fitted_log),
@@ -3846,6 +3889,16 @@ class AIAgent:
                          None
                      )
                      update_data = {religious_log_field: new_log} if religious_log_field else None
+                elif discarded_head and not is_religious_leads and effective_table_name != LEADS_TABLE_NAME:
+                    # List table: also append discarded head into AI Chat Log Archive.
+                    existing_archive = (
+                        self.get_field_value(rec.get("fields") or {}, FieldIds.AI_CHAT_LOG_ARCHIVE)
+                        or (rec.get("fields") or {}).get("AI Chat Log Archive")
+                        or ""
+                    )
+                    update_data[FieldIds.AI_CHAT_LOG_ARCHIVE] = self._merge_chat_log_archive_text(
+                        existing_archive, discarded_head
+                    )
                 
                 if update_data:
                     update_ok = False
@@ -3872,9 +3925,28 @@ class AIAgent:
                             if is_size_reject and attempt < 3:
                                 # Measured overflow / edge case: keep a smaller recent tail and retry.
                                 shrink_to = max(20000, AIRTABLE_LONG_TEXT_MAX_CHARS - (15000 * attempt))
-                                field_key = next(iter(update_data.keys()))
-                                shrunk = self._fit_airtable_long_text(update_data[field_key], max_chars=shrink_to)
-                                update_data = {field_key: shrunk}
+                                log_key = FieldIds.AI_CHAT_LOG
+                                if effective_table_name == LEADS_TABLE_NAME:
+                                    log_key = LeadFieldIds.AI_CHAT_LOG
+                                elif is_religious_leads:
+                                    log_key = next(iter(update_data.keys()))
+                                current_for_shrink = update_data.get(log_key) or new_log
+                                shrunk, more_discarded = self._fit_airtable_long_text(
+                                    current_for_shrink, max_chars=shrink_to, record_id=record_id
+                                )
+                                update_data[log_key] = shrunk
+                                if (
+                                    more_discarded
+                                    and not is_religious_leads
+                                    and effective_table_name != LEADS_TABLE_NAME
+                                ):
+                                    prev_arch = update_data.get(FieldIds.AI_CHAT_LOG_ARCHIVE) or (
+                                        self.get_field_value(rec.get("fields") or {}, FieldIds.AI_CHAT_LOG_ARCHIVE)
+                                        or ""
+                                    )
+                                    update_data[FieldIds.AI_CHAT_LOG_ARCHIVE] = self._merge_chat_log_archive_text(
+                                        prev_arch, more_discarded
+                                    )
                                 logging.warning(
                                     "AI Chat Log update for %s rejected by Airtable size; retrying with %s chars (attempt %s)",
                                     record_id,

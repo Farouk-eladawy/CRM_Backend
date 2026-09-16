@@ -116,6 +116,7 @@ class FieldIds:
     INVOICE_REQUEST_DATE = "fldx4H3HZ1loBt7ZC"
     INVOICE_REQUESTED_BY = "fldDaUv0t4kDPOA4u"
     AI_CHAT_LOG = "AI Chat Log"
+    AI_CHAT_LOG_ARCHIVE = "AI Chat Log Archive"
     LOCAL_DRIVER = "fldtCWmlaWWlq7SDd"
     COUPON = "fldIXg0wCQ2KqFmnG"
     CONTACTS = "fldU2tOjTxrnxIRty"
@@ -282,6 +283,7 @@ ID_TO_READABLE_NAME = {
     FieldIds.INVOICE_REQUEST_DATE: "Invoice Request Date",
     FieldIds.INVOICE_REQUESTED_BY: "Invoice Requested By",
     FieldIds.AI_CHAT_LOG: "AI Chat Log",
+    FieldIds.AI_CHAT_LOG_ARCHIVE: "AI Chat Log Archive",
     FieldIds.LOCAL_DRIVER: "Local Driver",
     FieldIds.COUPON: "Coupon",
     FieldIds.CONTACTS: "Contacts",

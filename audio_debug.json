@@ -164327,3 +164327,85 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D8FCA86103AEABC005"
+    },
+    "keyId": "3EB0D8FCA86103AEABC005",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Time.is 19:35*\nhttps://time.is/\n\n*Important*\nThe displayed time changed from 07:15:32 to 08:20:31.\n\n• Time: 07:15:32 → 08:20:31\n\nA total of *1* change detected.\n\nScreenshot attached\n\nOpen page: https://time.is/\nOpen WATCH: https://watcher.tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789539645,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789712446,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-17T23:20:47.291Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0CB85E267A65A52C9F5"
+    },
+    "keyId": "3EB0CB85E267A65A52C9F5",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Marsa Alam Valley Of The Kings And Karnak Temples Luxor Tour*\nhttps://www.viator.com/tours/Marsa-Alam/Marsa-Alam-Valley-of-the-Kings-and-Karnak-Temples-Luxor-Tour/d25556-14976P125\n\n*Important*\nText and appearance both changed in the monitored section.\n\nA total of *1* change detected.\n\nScreenshot attached\n\nOpen page: https://www.viator.com/tours/Marsa-Alam/Marsa-Alam-Valley-of-the-Kings-and-Karnak-Temples-Luxor-Tour/d25556-14976P125\nOpen WATCH: https://watcher.tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789541156,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789713956,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-17T23:45:57.610Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

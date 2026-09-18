@@ -1,0 +1,67 @@
+
+
+===== archived 2026-09-19 00:36:50 discarded_chars=1994 =====
+
+[SYSTEM]: New Lead Created. Initial Message: Make [https://cdn.make.com/img/make/make-logo-150x48@2x.png]
+Make [https://cdn.make.com/img/make/make-logo-dark-150x48@2x.png]
+
+
+THE SCENARIO SEND AUTO GUIDE TICKETS HAS BEEN STOPPED.
+
+Your scenario Send Auto Guide Tickets has been stopped due to an error.
+
+ * Reason: Scenario has been deactivated because of an error.
+ * Scenario: Send Auto Guide Tickets
+   [https://us2.make.com/265034/scenarios/3827742/logs]
+ * Organization: My Organization [https://us2.make.com/organization/2465462]
+ * Team: My Team [https://us2.make.com/265034/team]
+
+To see more details, click here
+[https://us2.make.com/265034/scenarios/3827742/edit].
+
+The error requires your intervention. The scenario will remain stopped until you
+fix the issue.
+
+If you have questions or need help, please contact us.
+
+Need any help? Contact us [https://www.make.com/en/ticket]
+
+[https://cdn.make.com/img/make/ico-twt.png]
+[https://cdn.make.com/img/make/ico-twt-light.png]
+[https://twitter.com/make_hq]
+
+[https://cdn.make.com/img/make/ico-fcb.png]
+[https://cdn.make.com/img/make/ico-fcb-light.png]
+[https://facebook.com/itsMakeHQ]
+
+[https://cdn.make.com/img/make/ico-lnk.png]
+[https://cdn.make.com/img/make/ico-lnk-light.png]
+[https://www.linkedin.com/company/itsmakehq]
+
+[https://cdn.make.com/img/make/ico-ins.png]
+[https://cdn.make.com/img/make/ico-ins-light.png]
+[https://www.instagram.com/itsmakehq]
+
+[https://cdn.make.com/img/make/ico-ytb.png]
+[https://cdn.make.com/img/make/ico-ytb-light.png]
+[https://www.youtube.com/channel/UC8KWRrf8wqyowmWhXJ9DRjQ]
+
+Need assistance? Our care team [https://www.make.com/en/ticket] is here to
+help.Celonis s.r.o., Menclova 2538/2, 180 00 Prague, CzechiaPrivacy Policy
+[https://www.make.com/en/privacy-notice] | Terms & Conditions
+[https://www.make.com/en/terms-and-conditions]
+
+[api://notifications/mark-as-read-pixel.gif?id=39942769&amp;user=2649595&amp;sign=d51ec24e8134552eed3d32bcdb2b15f1]
+
+
+===== archived 2026-09-19 00:36:57 discarded_chars=296 =====
+
+
+[...earlier AI Chat Log truncated to fit Airtable 100k limit...]
+ 
+
+[2026-01-24 18:20:17] [Email - User]: Make [https://cdn.make.com/img/make/make-logo-150x48@2x.png]
+Make [https://cdn.make.com/img/make/make-logo-dark-150x48@2x.png]
+
+
+THE SCENARIO SEND AUTO GUIDE TICKETS HAS BEEN STOPPED.

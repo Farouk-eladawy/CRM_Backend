@@ -164122,3 +164122,85 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB01D601E533F99A1D37D"
+    },
+    "keyId": "3EB01D601E533F99A1D37D",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Marsa Alam Valley Of The Kings And Karnak Temples Luxor Tour*\nhttps://www.viator.com/tours/Marsa-Alam/Marsa-Alam-Valley-of-the-Kings-and-Karnak-Temples-Luxor-Tour/d25556-14976P125\n\n*Important*\nThe selected area the star rating changed from 5 to 1, and the displayed starting price has been updated from €132.47 to €124.16.\n\n~~€132.47~~ → *€124.16*\n\n• star rating: 5 → 1\n• starting price: €132.47 → €124.16\n\nA total of *2* changes detected.\n\nScreenshot attached\n\nOpen page: https://www.viator.com/tours/Marsa-Alam/Marsa-Alam-Valley-of-the-Kings-and-Karnak-Temples-Luxor-Tour/d25556-14976P125\nOpen WATCH: https://watcher.tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789519099,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789691900,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-17T17:38:20.825Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D406D523BD79B088F8"
+    },
+    "keyId": "3EB0D406D523BD79B088F8",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Time.is 19:35*\nhttps://time.is/\n\n*Important*\nThe displayed time changed from 02:40:30 to 02:55:11.\n\n• Time: 02:40:30 → 02:55:11\n\nA total of *1* change detected.\n\nScreenshot attached\n\nOpen page: https://time.is/\nOpen WATCH: https://watcher.tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789520124,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789692925,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-17T17:55:26.457Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

@@ -36970,6 +36970,8 @@ Write ONE short message only. No JSON. No explanations."""
                     template_variables = data.get('template_variables')
                     template_header_media_url = data.get('template_header_media_url')
                     template_header_media_type = data.get('template_header_media_type')
+                    media_url = str(data.get('media_url') or '').strip() or None
+                    media_type = str(data.get('media_type') or '').strip().lower() or None
                     file = None
                 else:
                     chat_id = request.form.get('chat_id')
@@ -37068,8 +37070,10 @@ Write ONE short message only. No JSON. No explanations."""
                     # Personal Evolution WhatsApp is always allowed when user has a connected number
                     _enabled, _routing, _cfg = True, "", {}
                 
-                media_url = None
-                media_type = None
+                json_media_url = media_url if 'media_url' in locals() else None
+                json_media_type = media_type if 'media_type' in locals() else None
+                media_url = json_media_url
+                media_type = json_media_type or ('image' if json_media_url else None)
                 file_content = None
                 filename = None
                 mime_type = None

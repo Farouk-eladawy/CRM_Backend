@@ -19010,6 +19010,12 @@ Conversation:
         except Exception as e:
             logging.error(f"Failed to register booking platform settings routes: {e}", exc_info=True)
 
+        try:
+            from partner_sandbox import register_partner_sandbox_routes
+            register_partner_sandbox_routes(app, agent=self)
+        except Exception as e:
+            logging.error(f"Failed to register partner sandbox API routes: {e}", exc_info=True)
+
         def _public_legal_html_response(filename):
             from flask import Response, send_file
             html_path = os.path.join(SCRIPT_DIR, "static", filename)

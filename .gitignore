@@ -26,6 +26,8 @@ google_reviews_token.json
 .env
 .env.*
 booking_platforms.json
+partner_sandbox_config.json
+partner_sandbox_bookings.json
 .hourly_github_backup.lock
 
 # Virtual Environments

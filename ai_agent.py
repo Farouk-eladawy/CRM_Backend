@@ -4976,21 +4976,30 @@ class AIAgent:
             logging.info("Image provided. Injecting 'openai' into provider order for Vision support.")
             providers_order = ["openai"] + providers_order
             
-        # --- NEW: Force DeepSeek for Religious department ---
-        if location and str(location).lower() == 'religious' and "deepseek_flash" in providers:
-            if not providers_order or providers_order[0] != "deepseek_flash":
-                logging.info("Religious department detected. Prioritizing 'deepseek_flash' in provider order. (Fallback to OpenAI allowed)")
-                providers_order = ["deepseek_flash"] + [p for p in providers_order if p != "deepseek_flash"]
+        # --- Religious: prefer local open-source when available, else DeepSeek Flash ---
+        if location and str(location).lower() == 'religious':
+            if "ollama_local" in providers:
+                logging.info("Religious department: prioritizing 'ollama_local' (cost-save), DeepSeek Flash as fallback.")
+                providers_order = ["ollama_local"] + [p for p in providers_order if p != "ollama_local"]
+            elif "deepseek_flash" in providers:
+                if not providers_order or providers_order[0] != "deepseek_flash":
+                    logging.info("Religious department detected. Prioritizing 'deepseek_flash' in provider order. (Fallback to OpenAI allowed)")
+                    providers_order = ["deepseek_flash"] + [p for p in providers_order if p != "deepseek_flash"]
 
-        # --- DYNAMIC ROUTING: Use Pro for Complex Tasks, Flash for Fast Replies ---
+        # --- DYNAMIC ROUTING: Pro for analysis; local then Flash for replies (cost hybrid) ---
         if system_role in ["analyzer", "structured_mediator"]:
-            # If it's a complex task like data extraction or strict logic, use DeepSeek Pro
+            # Complex extraction / strict logic stays on DeepSeek Pro
             if "deepseek_pro" in providers:
                 providers_order = ["deepseek_pro"] + [p for p in providers_order if p != "deepseek_pro"]
         else:
-            # If it's a standard reply (assistant), use DeepSeek Flash for speed
+            # Standard replies: local Qwen first (free), then DeepSeek Flash, then others
+            preferred = []
+            if "ollama_local" in providers:
+                preferred.append("ollama_local")
             if "deepseek_flash" in providers:
-                providers_order = ["deepseek_flash"] + [p for p in providers_order if p != "deepseek_flash"]
+                preferred.append("deepseek_flash")
+            if preferred:
+                providers_order = preferred + [p for p in providers_order if p not in preferred]
 
         last_error = None
         
@@ -5103,8 +5112,15 @@ class AIAgent:
                         payload["max_completion_tokens"] = payload.pop("max_tokens")
 
             try:
-                # 60s timeout to avoid hanging indefinitely
-                response = requests.post(provider_config['api_url'], headers=headers, json=payload, timeout=60)
+                # Local CPU models may need longer; default 60s for cloud providers
+                req_timeout = provider_config.get("timeout", 60)
+                try:
+                    req_timeout = int(req_timeout)
+                except (TypeError, ValueError):
+                    req_timeout = 60
+                response = requests.post(
+                    provider_config['api_url'], headers=headers, json=payload, timeout=req_timeout
+                )
                 response.raise_for_status()
                 result = response.json()
                 message_obj = (result.get("choices") or [{}])[0].get("message") or {}
@@ -45108,39 +45124,72 @@ Draft to optimize:
                                 msg_body = f"[Customer sent a message of type: {msg_type}]"
                             
                             if msg_body:
-                                # --- NEW PI WORKSPACE BYPASS ---
+                                # --- PI WORKSPACE BYPASS (admin phone) ---
+                                # Admin number was skipping CRM entirely via `continue`, so messages
+                                # never appeared in the inbox. Keep optional PI forward, but always
+                                # fall through to normal CRM save/processing unless the text is
+                                # explicitly prefixed for PI-only handling.
                                 admin_phone = "201010323484"
                                 if str(sender_phone or "").strip().endswith(admin_phone[-10:]):
-                                    # Always route Admin to PI Agentic OS, no need for "PI:" prefix
-                                    logging.info(f"Intercepted message from Admin on customer webhook, routing to PI Agentic OS: {msg_body}")
+                                    text_stripped = str(msg_body or "").strip()
+                                    pi_only = text_stripped.upper().startswith("PI:")
+                                    if pi_only:
+                                        logging.info(
+                                            "Intercepted PI-prefixed admin message on customer webhook, "
+                                            "routing to PI Agentic OS only: %s",
+                                            msg_body,
+                                        )
+                                    else:
+                                        logging.info(
+                                            "Admin phone %s on customer webhook — saving to CRM "
+                                            "(optional PI forward). Body: %s",
+                                            sender_phone,
+                                            msg_body,
+                                        )
+
                                     def process_pi_bypass(text, sender, p_id):
                                         try:
                                             import requests, time
-                                            port = self.config.get("server", {}).get("port", 5000)
-                                            webhook_url = f"http://127.0.0.1:{port}/api/internal_notifications/whatsapp/webhook"
-                                            
-                                            # Simulate Evolution API Payload
+                                            # Must match the Flask webhook port (whatsapp.port), not the
+                                            # missing config.server.port default of 5000.
+                                            port = int(
+                                                (
+                                                    (self.config.get("whatsapp", {}) or {}).get("port")
+                                                    or (self.config.get("server", {}) or {}).get("port")
+                                                    or 5001
+                                                )
+                                            )
+                                            webhook_url = (
+                                                f"http://127.0.0.1:{port}"
+                                                f"/api/internal_notifications/whatsapp/webhook"
+                                            )
                                             payload = {
                                                 "event": "messages.upsert",
                                                 "data": {
                                                     "key": {
                                                         "remoteJid": f"{sender}@s.whatsapp.net",
                                                         "fromMe": False,
-                                                        "id": f"internal_bypass_{int(time.time())}"
+                                                        "id": f"internal_bypass_{int(time.time())}",
                                                     },
                                                     "message": {
                                                         "conversation": text
-                                                    }
-                                                }
+                                                    },
+                                                },
                                             }
                                             requests.post(webhook_url, json=payload, timeout=5)
                                         except Exception as e:
-                                            logging.error(f"Error forwarding admin message to internal webhook: {e}")
-                                    
+                                            logging.error(
+                                                f"Error forwarding admin message to internal webhook: {e}"
+                                            )
+
                                     import threading
-                                    threading.Thread(target=process_pi_bypass, args=(msg_body, sender_phone, phone_id)).start()
-                                    continue # Skip normal processing!
-                                
+                                    threading.Thread(
+                                        target=process_pi_bypass,
+                                        args=(msg_body, sender_phone, phone_id),
+                                    ).start()
+                                    if pi_only:
+                                        continue  # PI-only: do not create a customer CRM thread
+                                    
                                 # Save to DB immediately so it appears in UI
                                 try:
                                     import chat_db

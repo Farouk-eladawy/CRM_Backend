@@ -165434,3 +165434,275 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "AC61381D6C59671911A8C85A59459737",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "AC61381D6C59671911A8C85A59459737",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "🚨منصة قدرة المجانية : https://qudra.arabianaischool.com\n🚨موقع القناة الجديد : https://arabianaischool.com\n🚨اسم النموذج فالمثال : qwen3.5-9b-ud.gguf",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 99,
+            "1": 200,
+            "2": 222,
+            "3": 118,
+            "4": 178,
+            "5": 107,
+            "6": 80,
+            "7": 172,
+            "8": 230,
+            "9": 54
+          },
+          "senderTimestamp": {
+            "low": 1789212969,
+            "high": 0,
+            "unsigned": true
+          },
+          "recipientKeyHash": {
+            "0": 55,
+            "1": 54,
+            "2": 220,
+            "3": 112,
+            "4": 142,
+            "5": 205,
+            "6": 46,
+            "7": 43,
+            "8": 147,
+            "9": 8
+          },
+          "recipientTimestamp": {
+            "low": 1789067577,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 89,
+          "1": 251,
+          "2": 225,
+          "3": 85,
+          "4": 157,
+          "5": 93,
+          "6": 166,
+          "7": 147,
+          "8": 8,
+          "9": 128,
+          "10": 4,
+          "11": 198,
+          "12": 56,
+          "13": 186,
+          "14": 70,
+          "15": 42,
+          "16": 134,
+          "17": 31,
+          "18": 189,
+          "19": 229,
+          "20": 84,
+          "21": 81,
+          "22": 118,
+          "23": 209,
+          "24": 28,
+          "25": 117,
+          "26": 233,
+          "27": 74,
+          "28": 162,
+          "29": 205,
+          "30": 111,
+          "31": 248
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789892950,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "android"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-20T01:29:10.230Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0E9E1409854B9BB3345"
+    },
+    "keyId": "3EB0E9E1409854B9BB3345",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:5156 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-09-20 01:53:53"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789721634,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789894435,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-20T01:53:55.762Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB01656934996EDACC880"
+    },
+    "keyId": "3EB01656934996EDACC880",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:9114 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-09-20 01:53:56"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789721638,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789894438,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-20T01:53:58.966Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB02B7DC9F00482EE311F"
+    },
+    "keyId": "3EB02B7DC9F00482EE311F",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:14016 in send_whatsapp_message\nLogger: root\nReason: Exception sending WhatsApp message: HTTPSConnectionPool(host='graph.facebook.com', port=443): Max retries exceeded with url: /v21.0/946683091540329/message_templates?name=Cancellation%20Reason&access_token=EAALCJ9i07dIBR6rSCF91JwD5vMIgXFKHyEUHHf0hmOmux0f6FTwPoRWgTWKb8xuWzihZActUi0PJsFPprK15R9Qx6lM6bhb3Xia8zBNREhZCDP3VuIHZBWzsiSWJpA5wZBXHZCicUMtSbdiEmr9QbgIaWwZCUQ3Lhoh1oQ5BgPAOPQUfeSjdumwOFSX3gUPwZDZD (Caused by SSLError(SSLError(1, '[SSL] unknown error (_ssl.c:1000)')))\nAt: 2026-09-20 02:00:54"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789722055,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789894855,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-20T02:00:56.311Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB088AB9CE9C4BFD87E28"
+    },
+    "keyId": "3EB088AB9CE9C4BFD87E28",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Webhook\nSource: ai_agent.py:45154 in process_pi_bypass\nLogger: root\nReason: Error forwarding admin message to internal webhook: HTTPConnectionPool(host='127.0.0.1', port=5000): Max retries exceeded with url: /api/internal_notifications/whatsapp/webhook (Caused by NewConnectionError(\"HTTPConnection(host='127.0.0.1', port=5000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))\nAt: 2026-09-20 02:09:47"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789722589,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1789895389,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-20T02:09:50.511Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

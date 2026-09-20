@@ -5255,6 +5255,19 @@ class AIAgent:
         usage = result.get("usage") if isinstance(result, dict) else {}
         if not isinstance(usage, dict):
             usage = {}
+        # Ollama native / compat extras sometimes live outside usage
+        if isinstance(result, dict):
+            if not usage.get("prompt_tokens") and result.get("prompt_eval_count") is not None:
+                usage = dict(usage)
+                usage["prompt_tokens"] = result.get("prompt_eval_count")
+            if not usage.get("completion_tokens") and result.get("eval_count") is not None:
+                usage = dict(usage)
+                usage["completion_tokens"] = result.get("eval_count")
+            # Some Ollama OpenAI-compat builds nest counts under usage differently
+            if not usage.get("prompt_tokens") and usage.get("input_tokens") is not None:
+                usage["prompt_tokens"] = usage.get("input_tokens")
+            if not usage.get("completion_tokens") and usage.get("output_tokens") is not None:
+                usage["completion_tokens"] = usage.get("output_tokens")
         prompt_tokens = 0
         completion_tokens = 0
         total_tokens = 0
@@ -5289,6 +5302,7 @@ class AIAgent:
             prompt_cache_hit_tokens=prompt_cache_hit_tokens,
             prompt_cache_miss_tokens=prompt_cache_miss_tokens,
             created_at=created_at,
+            provider=provider_name,
         )
         department = self._ai_usage_department(location, system_role, usage_department)
         source = self._ai_usage_source(system_role, usage_source)
@@ -46104,6 +46118,119 @@ Draft to optimize:
                     logging.error(f"Failed to auto-start Tiqets/Trip.com API services: {e}")
                     
             threading.Thread(target=_start_tiqets_service, daemon=True).start()
+
+            def _start_ollama_local_service():
+                """Auto-start Ollama serve + warm qwen model (same lifecycle as Tiqets/Evolution)."""
+                try:
+                    import shutil
+                    import urllib.parse
+
+                    providers = ((self.config.get("ai") or {}).get("providers") or {})
+                    ollama_cfg = providers.get("ollama_local") or {}
+                    if not isinstance(ollama_cfg, dict) or not ollama_cfg:
+                        logging.info("[OLLAMA] ollama_local provider not configured — skip auto-start.")
+                        return
+
+                    model = str(ollama_cfg.get("model") or "qwen2.5:3b").strip() or "qwen2.5:3b"
+                    api_url = str(
+                        ollama_cfg.get("api_url") or "http://127.0.0.1:11434/v1/chat/completions"
+                    ).strip()
+                    parsed = urllib.parse.urlparse(api_url)
+                    host = parsed.hostname or "127.0.0.1"
+                    try:
+                        port = int(parsed.port or 11434)
+                    except Exception:
+                        port = 11434
+
+                    ollama_bin = shutil.which("ollama.exe") or shutil.which("ollama")
+                    if not ollama_bin:
+                        logging.warning(
+                            "🚀 [OLLAMA] ollama executable not found in PATH — skip auto-start."
+                        )
+                        return
+
+                    already_up = False
+                    try:
+                        already_up = bool(_port_is_open(host, port, timeout=1.0))
+                    except Exception:
+                        already_up = False
+
+                    if already_up:
+                        logging.info(
+                            f"✅ [OLLAMA] Already reachable at {host}:{port} — warming model {model}."
+                        )
+                    else:
+                        logging.info("🚀 [OLLAMA] Starting ollama serve...")
+                        serve_kwargs = {
+                            "stdin": subprocess.DEVNULL,
+                            "stdout": subprocess.PIPE,
+                            "stderr": subprocess.PIPE,
+                            "text": True,
+                        }
+                        if os.name == "nt":
+                            serve_kwargs["creationflags"] = (
+                                subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+                            )
+                        serve_proc = subprocess.Popen([ollama_bin, "serve"], **serve_kwargs)
+                        self._ollama_serve_proc = serve_proc
+
+                        deadline = time.time() + 45
+                        while time.time() < deadline:
+                            try:
+                                if _port_is_open(host, port, timeout=1.0):
+                                    break
+                            except Exception:
+                                pass
+                            if serve_proc.poll() is not None:
+                                logging.error(
+                                    f"[OLLAMA] serve exited early with code {serve_proc.poll()}"
+                                )
+                                return
+                            time.sleep(1)
+
+                        try:
+                            ready = bool(_port_is_open(host, port, timeout=1.0))
+                        except Exception:
+                            ready = False
+                        if not ready:
+                            logging.error(
+                                f"[OLLAMA] serve started (PID: {serve_proc.pid}) but {host}:{port} not reachable."
+                            )
+                            return
+                        logging.info(
+                            f"✅ [OLLAMA] serve ready (PID: {serve_proc.pid}) on Port {port}."
+                        )
+
+                    # One-shot warm so first CRM reply is faster (equivalent to: ollama run MODEL ...)
+                    logging.info(f"🚀 [OLLAMA] Running: ollama run {model} (warm-up)...")
+                    warm_kwargs = {
+                        "stdin": subprocess.DEVNULL,
+                        "stdout": subprocess.PIPE,
+                        "stderr": subprocess.PIPE,
+                        "text": True,
+                    }
+                    if os.name == "nt":
+                        warm_kwargs["creationflags"] = (
+                            subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+                        )
+                    warm_proc = subprocess.Popen(
+                        [ollama_bin, "run", model, "ok"],
+                        **warm_kwargs,
+                    )
+                    self._ollama_warm_proc = warm_proc
+                    try:
+                        warm_proc.wait(timeout=180)
+                        logging.info(
+                            f"✅ [OLLAMA] Model {model} ready (warm exit={warm_proc.returncode})."
+                        )
+                    except subprocess.TimeoutExpired:
+                        logging.warning(
+                            f"⚠️ [OLLAMA] Model warm still running (PID: {warm_proc.pid}) — agent continues."
+                        )
+                except Exception as e:
+                    logging.error(f"Failed to auto-start Ollama local service: {e}")
+
+            threading.Thread(target=_start_ollama_local_service, daemon=True).start()
         except Exception as embedded_boot_err:
             logging.warning(f"Failed to initialize embedded services auto-start: {embedded_boot_err}")
         # ─── Auto-Reload Monitor (Watchdog) ───

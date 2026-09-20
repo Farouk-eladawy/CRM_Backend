@@ -4598,6 +4598,11 @@ DEFAULT_AI_USAGE_RATES = {
         "gpt-5.6-luna": {"input_per_1m": 2.50, "output_per_1m": 15.00},
         "gpt-5.6-sol": {"input_per_1m": 5.00, "output_per_1m": 20.00},
         "gpt-5.6": {"input_per_1m": 2.50, "output_per_1m": 15.00},
+        # Local / Ollama — free (self-hosted); keep separate from DeepSeek cloud pricing
+        "qwen2.5:3b": {"input_per_1m": 0.0, "output_per_1m": 0.0},
+        "qwen2.5:7b": {"input_per_1m": 0.0, "output_per_1m": 0.0},
+        "qwen2.5": {"input_per_1m": 0.0, "output_per_1m": 0.0},
+        "qwen": {"input_per_1m": 0.0, "output_per_1m": 0.0},
     },
 }
 
@@ -4717,7 +4722,30 @@ def save_ai_usage_rates(raw):
     return rates
 
 
-def _ai_usage_rate_for_model(model_name, rates=None):
+def _ai_provider_family(provider="", model=""):
+    """Group providers for usage reports (DeepSeek cloud vs local Ollama vs OpenAI)."""
+    p = str(provider or "").strip().lower()
+    m = str(model or "").strip().lower()
+    if (
+        "ollama" in p
+        or p.endswith("_local")
+        or p == "local"
+        or m.startswith("qwen")
+        or "qwen2" in m
+    ):
+        return "ollama_local"
+    if "deepseek" in p or m.startswith("deepseek"):
+        return "deepseek"
+    if "openai" in p or m.startswith("gpt-") or m.startswith("o1") or m.startswith("o3"):
+        return "openai"
+    return "other"
+
+
+def _is_local_free_model(model_name="", provider=""):
+    return _ai_provider_family(provider, model_name) == "ollama_local"
+
+
+def _ai_usage_rate_for_model(model_name, rates=None, provider=""):
     rates = rates or get_ai_usage_rates()
     default = rates.get("default") or DEFAULT_AI_USAGE_RATES["default"]
     model = str(model_name or "").strip().lower()
@@ -4733,7 +4761,16 @@ def _ai_usage_rate_for_model(model_name, rates=None):
                 best_key = k
                 best_rates = val
     if isinstance(best_rates, dict):
-        return _upgrade_legacy_model_rates(best_rates, default)
+        # Prefer flat local template when matching local models so DeepSeek cache
+        # defaults are not mixed into free self-hosted pricing.
+        tpl = (
+            {"input_per_1m": 0.0, "output_per_1m": 0.0}
+            if _is_local_free_model(model_name, provider)
+            else default
+        )
+        return _upgrade_legacy_model_rates(best_rates, tpl)
+    if _is_local_free_model(model_name, provider):
+        return {"input_per_1m": 0.0, "output_per_1m": 0.0}
     return _upgrade_legacy_model_rates(default, DEFAULT_AI_USAGE_RATES["default"])
 
 
@@ -4786,9 +4823,12 @@ def estimate_ai_cost_usd(
     prompt_cache_miss_tokens=None,
     created_at=None,
     rates=None,
+    provider="",
 ):
+    if _is_local_free_model(model_name, provider):
+        return 0.0
     rates = rates or get_ai_usage_rates()
-    per = _ai_usage_rate_for_model(model_name, rates)
+    per = _ai_usage_rate_for_model(model_name, rates, provider=provider)
     pt = max(0, int(prompt_tokens or 0))
     ct = max(0, int(completion_tokens or 0))
     hit, miss = _resolve_cache_token_split(pt, prompt_cache_hit_tokens, prompt_cache_miss_tokens)
@@ -4850,9 +4890,12 @@ def record_ai_usage_event(
                 prompt_cache_hit_tokens=hit,
                 prompt_cache_miss_tokens=miss,
                 created_at=created_at,
+                provider=provider,
             )
         else:
             cost_usd = float(cost_usd or 0)
+            if _is_local_free_model(model, provider):
+                cost_usd = 0.0
         pricing_tier = _ai_usage_pricing_tier(created_at)
     except Exception:
         return False
@@ -4941,6 +4984,8 @@ def get_ai_usage_report(from_date=None, to_date=None, company_id=None):
         },
         "by_department": [],
         "by_provider": [],
+        "by_provider_model": [],
+        "by_family": [],
         "by_source": [],
         "internal_tools_breakdown": [],
         "source_labels": AI_USAGE_SOURCE_LABELS,
@@ -4974,6 +5019,7 @@ def get_ai_usage_report(from_date=None, to_date=None, company_id=None):
                     prompt_cache_miss_tokens=row.get("prompt_cache_miss_tokens"),
                     created_at=row.get("created_at"),
                     rates=rates,
+                    provider=row.get("provider"),
                 )
 
             def _bucket_key(row, field):
@@ -4984,7 +5030,14 @@ def get_ai_usage_report(from_date=None, to_date=None, company_id=None):
             buckets_provider = {}
             buckets_source = {}
             buckets_provider_model = {}
+            buckets_family = {}
             buckets_internal_tools = {}
+            family_labels = {
+                "deepseek": "DeepSeek (cloud)",
+                "ollama_local": "Ollama / Local (Qwen)",
+                "openai": "OpenAI",
+                "other": "Other",
+            }
             totals = {
                 "requests": 0,
                 "prompt_tokens": 0,
@@ -5074,6 +5127,38 @@ def get_ai_usage_report(from_date=None, to_date=None, company_id=None):
                 pm["total_tokens"] += tt
                 pm["cost_usd"] += cost
 
+                family = _ai_provider_family(provider, model)
+                fam = buckets_family.setdefault(
+                    family,
+                    {
+                        "family": family,
+                        "label": family_labels.get(family, family),
+                        "label_ar": {
+                            "deepseek": "DeepSeek (سحابة)",
+                            "ollama_local": "Ollama / محلي (Qwen)",
+                            "openai": "OpenAI",
+                            "other": "أخرى",
+                        }.get(family, family),
+                        "requests": 0,
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "prompt_cache_hit_tokens": 0,
+                        "prompt_cache_miss_tokens": 0,
+                        "total_tokens": 0,
+                        "cost_usd": 0.0,
+                        "estimated_requests": 0,
+                    },
+                )
+                fam["requests"] += 1
+                fam["prompt_tokens"] += pt
+                fam["completion_tokens"] += ct
+                fam["prompt_cache_hit_tokens"] += hit
+                fam["prompt_cache_miss_tokens"] += miss
+                fam["total_tokens"] += tt
+                fam["cost_usd"] += cost
+                if estimated:
+                    fam["estimated_requests"] += 1
+
                 dept_key = _bucket_key(row, "department")
                 if dept_key == "Internal Tools":
                     src_key = str(row.get("source") or "analysis").strip() or "analysis"
@@ -5124,6 +5209,7 @@ def get_ai_usage_report(from_date=None, to_date=None, company_id=None):
                 "by_department": _finalize(buckets_dept.values()),
                 "by_provider": _finalize(buckets_provider.values()),
                 "by_provider_model": _finalize(buckets_provider_model.values()),
+                "by_family": _finalize(buckets_family.values()),
                 "by_source": _finalize(buckets_source.values()),
                 "internal_tools_breakdown": _finalize(buckets_internal_tools.values()),
                 "source_labels": AI_USAGE_SOURCE_LABELS,

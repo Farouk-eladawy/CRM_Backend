@@ -238,6 +238,128 @@ def apply_rules_to_message(chat_id: str, message_body: str, location: str = "") 
     return result
 
 
+def scan_past_conversations(
+    dry_run: bool = True,
+    limit_chats: int = 0,
+    only_untagged: bool = False,
+    max_hits: int = 500,
+) -> dict:
+    """Scan Religious customer messages and apply (or preview) keyword tags.
+
+    dry_run=True: report matches only, do not write tags.
+    only_untagged: skip chats that already have any sales tag.
+    """
+    import sqlite3
+
+    import chat_db
+
+    rules = [r for r in list_rules() if r.get("enabled", True)]
+    if not rules:
+        return {"ok": True, "scanned_chats": 0, "hits": [], "tagged": 0, "message": "no_enabled_rules"}
+
+    db_path = chat_db.DB_FILE
+    hits: List[dict] = []
+    tagged = 0
+    scanned = 0
+    skipped_tagged = 0
+
+    try:
+        with sqlite3.connect(db_path, timeout=30.0) as conn:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            sql = """
+                SELECT chat_id, contact_name, sender_identifier
+                FROM conversations
+                WHERE LOWER(COALESCE(location, '')) = 'religious'
+                ORDER BY COALESCE(last_message_time, '') DESC
+            """
+            params: list = []
+            if limit_chats and int(limit_chats) > 0:
+                sql += " LIMIT ?"
+                params.append(int(limit_chats))
+            c.execute(sql, params)
+            chats = [dict(r) for r in c.fetchall()]
+
+            for chat in chats:
+                chat_id = str(chat.get("chat_id") or "").strip()
+                if not chat_id:
+                    continue
+                scanned += 1
+
+                if only_untagged:
+                    st = chat_db.get_sales_state(chat_id) or {}
+                    if _parse_tags(st.get("tags")):
+                        skipped_tagged += 1
+                        continue
+
+                c.execute(
+                    """
+                    SELECT text, timestamp
+                    FROM messages
+                    WHERE chat_id = ?
+                      AND LOWER(COALESCE(sender_type, '')) = 'customer'
+                    ORDER BY timestamp DESC
+                    LIMIT 80
+                    """,
+                    (chat_id,),
+                )
+                best = None
+                for row in c.fetchall():
+                    text = str(row["text"] or "").strip()
+                    if not text:
+                        continue
+                    low = text.lower()
+                    if low.startswith("[customer sent") or low.startswith("[customer shared"):
+                        continue
+                    if low.startswith("[facebook ad referral]") or low.startswith("[facebook referral]"):
+                        continue
+                    matched = match_message(text, rules=rules)
+                    if not matched:
+                        continue
+                    best = {
+                        "chat_id": chat_id,
+                        "customer_name": chat.get("contact_name") or "",
+                        "sender_identifier": chat.get("sender_identifier") or "",
+                        "tag": matched.get("tag"),
+                        "keyword": matched.get("keyword"),
+                        "rule_id": (matched.get("rule") or {}).get("id"),
+                        "message_preview": text[:160],
+                        "message_time": row["timestamp"],
+                    }
+                    break
+
+                if not best:
+                    continue
+
+                if not dry_run:
+                    apply_res = apply_tag_to_chat(chat_id, str(best["tag"]))
+                    best["applied"] = bool(apply_res.get("ok"))
+                    best["added"] = bool(apply_res.get("added"))
+                    if apply_res.get("ok") and apply_res.get("added"):
+                        tagged += 1
+                    elif apply_res.get("ok"):
+                        best["already_had_tag"] = True
+                else:
+                    best["applied"] = False
+
+                hits.append(best)
+                if max_hits and len(hits) >= int(max_hits):
+                    break
+    except Exception as e:
+        log.exception("scan_past_conversations failed")
+        return {"ok": False, "error": str(e), "scanned_chats": scanned, "hits": hits, "tagged": tagged}
+
+    return {
+        "ok": True,
+        "dry_run": bool(dry_run),
+        "scanned_chats": scanned,
+        "skipped_already_tagged": skipped_tagged,
+        "hits_count": len(hits),
+        "tagged": tagged,
+        "hits": hits,
+    }
+
+
 def register_routes(app, agent=None):
     from flask import jsonify, request
 
@@ -279,4 +401,26 @@ def register_routes(app, agent=None):
                 }
             ), 200
         except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    @app.route("/api/religious/contact_tag_rules/scan", methods=["POST", "OPTIONS"])
+    def api_religious_contact_tag_rules_scan():
+        if request.method == "OPTIONS":
+            return _ok_options()
+        try:
+            payload = request.get_json(silent=True) or {}
+            dry_run = payload.get("dry_run")
+            if dry_run is None:
+                dry_run = True
+            result = scan_past_conversations(
+                dry_run=bool(dry_run),
+                limit_chats=int(payload.get("limit_chats") or 0),
+                only_untagged=bool(payload.get("only_untagged") or False),
+                max_hits=int(payload.get("max_hits") or 500),
+            )
+            if not result.get("ok"):
+                return jsonify({"status": "error", "message": result.get("error"), "data": result}), 500
+            return jsonify({"status": "success", "data": result}), 200
+        except Exception as e:
+            log.exception("contact_tag_rules scan")
             return jsonify({"status": "error", "message": str(e)}), 500

@@ -18640,6 +18640,150 @@ Conversation:
                 "instance_name": (cfg or {}).get("instanceName"),
             }
 
+    def send_internal_notifications_whatsapp_media(
+        self,
+        recipient_phone,
+        media_url,
+        media_type="document",
+        caption="",
+        file_name="",
+    ):
+        """
+        Send an actual WhatsApp media attachment via the Internal Notifications
+        Evolution instance (image / document / video / audio).
+        """
+        ok, meta = self.send_internal_notifications_whatsapp_media_detailed(
+            recipient_phone,
+            media_url,
+            media_type=media_type,
+            caption=caption,
+            file_name=file_name,
+        )
+        self._last_internal_notify_send_meta = meta
+        return ok
+
+    def send_internal_notifications_whatsapp_media_detailed(
+        self,
+        recipient_phone,
+        media_url,
+        media_type="document",
+        caption="",
+        file_name="",
+    ):
+        """
+        Same as send_internal_notifications_whatsapp_media but returns (ok, meta_dict).
+        Uses Evolution /message/sendMedia/{instanceName}.
+        """
+        cfg = self._internal_evolution_cfg_for_notifications()
+        raw_recipient = str(recipient_phone or "").strip()
+        is_group = "@g.us" in raw_recipient.lower()
+        if is_group:
+            to_phone = raw_recipient
+        else:
+            to_phone = re.sub(r"\D", "", raw_recipient)
+        media_url_s = str(media_url or "").strip()
+        caption_s = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", str(caption or "").strip())
+        file_name_s = str(file_name or "").strip()
+
+        mt = str(media_type or "document").strip().lower()
+        if mt.startswith("image") or mt in ("img", "picture", "photo"):
+            evo_type = "image"
+        elif mt.startswith("audio"):
+            evo_type = "audio"
+        elif mt.startswith("video"):
+            evo_type = "video"
+        else:
+            evo_type = "document"
+
+        if not cfg or not to_phone or not media_url_s:
+            meta = {
+                "ok": False,
+                "error": "missing_cfg_phone_or_media",
+                "has_cfg": bool(cfg),
+                "phone": to_phone,
+                "is_group": is_group,
+                "media_url": media_url_s,
+                "mediatype": evo_type,
+            }
+            return False, meta
+
+        import requests
+        url = f"{cfg['providerBaseUrl']}/message/sendMedia/{quote(cfg['instanceName'])}"
+        body = {
+            "number": to_phone,
+            "mediatype": evo_type,
+            "media": media_url_s,
+            "caption": caption_s or "",
+        }
+        if file_name_s and evo_type == "document":
+            body["fileName"] = file_name_s
+        try:
+            resp = requests.post(
+                url,
+                headers={
+                    "Content-Type": "application/json",
+                    "apikey": cfg["apiKey"],
+                },
+                json=body,
+                timeout=45,
+            )
+            status_code = int(resp.status_code or 0)
+            body_text = (resp.text or "")[:800]
+            body_json = None
+            try:
+                body_json = resp.json() if resp.content else None
+            except Exception:
+                body_json = None
+            ok = status_code < 400
+            meta = {
+                "ok": ok,
+                "status_code": status_code,
+                "instance_name": cfg.get("instanceName"),
+                "phone": to_phone,
+                "is_group": is_group,
+                "mediatype": evo_type,
+                "media_url": media_url_s,
+                "file_name": file_name_s or None,
+                "body": body_text,
+                "json": body_json,
+            }
+            if not ok:
+                if is_group:
+                    meta["hint"] = (
+                        "Target is a WhatsApp GROUP. Ensure the Internal Notifications number "
+                        f"({cfg.get('instanceName')}) is still a member of this group."
+                    )
+                else:
+                    meta["hint"] = (
+                        "Evolution rejected sendMedia. Check that the Internal Notifications "
+                        "WhatsApp session is open, the media URL is publicly reachable, "
+                        "and the recipient number is valid."
+                    )
+                logging.warning(
+                    "Internal notifications sendMedia failed via %s (%s) to %s: %s",
+                    cfg.get("instanceName"),
+                    status_code,
+                    to_phone,
+                    body_text[:400],
+                )
+            return ok, meta
+        except Exception as e:
+            logging.warning(
+                "Internal notifications sendMedia exception via %s: %s",
+                (cfg or {}).get("instanceName"),
+                e,
+            )
+            return False, {
+                "ok": False,
+                "error": "exception",
+                "message": str(e),
+                "phone": to_phone,
+                "is_group": is_group,
+                "instance_name": (cfg or {}).get("instanceName"),
+                "mediatype": evo_type,
+                "media_url": media_url_s,
+            }
+
     def resolve_user_evolution_connection(self, username, connection_id=None):
         """Return the first enabled+connected Evolution WhatsApp for a dashboard user."""
         uname = str(username or "").strip()
@@ -28677,6 +28821,12 @@ Rules:
             register_religious_wa_campaigns(app, self)
         except Exception as _rwc_err:
             logging.warning("Religious WhatsApp campaign routes not registered: %s", _rwc_err)
+
+        try:
+            from religious_contact_tag_rules import register_routes as register_religious_contact_tag_rules
+            register_religious_contact_tag_rules(app, self)
+        except Exception as _rctr_err:
+            logging.warning("Religious contact tag rules routes not registered: %s", _rctr_err)
 
         @app.route('/api/quality_reviews/generate_reply', methods=['POST', 'OPTIONS'])
         def generate_quality_reply():
@@ -45889,6 +46039,93 @@ Draft to optimize:
                 }), 500
             except Exception as e:
                 logging.error(f"Error in /api/make/send_notification: {e}")
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/internal_notifications/send_media', methods=['POST', 'OPTIONS'])
+        def api_internal_notifications_send_media():
+            """
+            Send an actual WhatsApp media attachment via the Internal Notifications number.
+            Body JSON:
+              number / phone / to  (required)
+              media / media_url / fileUrl / url  (required, public URL)
+              mediatype / media_type  (image|document|video|audio, default document)
+              caption / text / message  (optional)
+              fileName / file_name  (optional, recommended for documents)
+              dry_run  (optional bool)
+            """
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(app.make_default_options_response())
+            try:
+                data = request.get_json(silent=True) or {}
+                if not isinstance(data, dict):
+                    data = {}
+
+                to_phone = (
+                    data.get("number")
+                    or data.get("phone")
+                    or data.get("to")
+                    or data.get("recipient")
+                    or data.get("phone_number")
+                    or ""
+                )
+                media_url = (
+                    data.get("media")
+                    or data.get("media_url")
+                    or data.get("fileUrl")
+                    or data.get("file_url")
+                    or data.get("url")
+                    or ""
+                )
+                media_type = (
+                    data.get("mediatype")
+                    or data.get("media_type")
+                    or data.get("type")
+                    or "document"
+                )
+                caption = data.get("caption") or data.get("text") or data.get("message") or ""
+                file_name = data.get("fileName") or data.get("file_name") or data.get("filename") or ""
+                dry_run = bool(data.get("dry_run", False))
+
+                to_phone_s = str(to_phone or "").strip()
+                media_url_s = str(media_url or "").strip()
+                if not to_phone_s:
+                    return jsonify({"status": "error", "message": "number/phone is required"}), 400
+                if not media_url_s:
+                    return jsonify({"status": "error", "message": "media/media_url/fileUrl is required"}), 400
+
+                if dry_run:
+                    return jsonify({
+                        "status": "success",
+                        "data": {
+                            "ok": True,
+                            "dry_run": True,
+                            "phone": to_phone_s,
+                            "media_url": media_url_s,
+                            "mediatype": str(media_type or "document"),
+                            "caption": str(caption or ""),
+                            "file_name": str(file_name or "") or None,
+                        },
+                    }), 200
+
+                ok, meta = self.send_internal_notifications_whatsapp_media_detailed(
+                    to_phone_s,
+                    media_url_s,
+                    media_type=media_type,
+                    caption=caption,
+                    file_name=file_name,
+                )
+                if not ok:
+                    return jsonify({
+                        "status": "error",
+                        "message": (meta or {}).get("hint")
+                        or (meta or {}).get("message")
+                        or (meta or {}).get("error")
+                        or "sendMedia failed",
+                        "data": meta or {},
+                    }), 502
+                return jsonify({"status": "success", "data": meta or {"ok": True}}), 200
+            except Exception as e:
+                logging.error(f"Error in /api/internal_notifications/send_media: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
         @app.route('/api/internal_notifications/webhook/<slug>', methods=['POST', 'OPTIONS'])

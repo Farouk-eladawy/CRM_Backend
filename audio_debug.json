@@ -173387,3 +173387,300 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB061F7AA2BD67D2F3F4C"
+    },
+    "keyId": "3EB061F7AA2BD67D2F3F4C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "imageMessage": {
+        "interactiveAnnotations": [],
+        "scanLengths": [],
+        "annotations": [],
+        "url": "https://mmg.whatsapp.net/o1/v/t24/f2/m237/AQM2wO3O8NLA9caEF0B-PL4y3elcpOrK3TCiUiX8Z_Hof26DF__nklt_e6ktXrHXCwvdhv0sVhD7A4eNZQKZd2pBvLuJjerCcf0zjhaBug?ccb=9-4&oh=01_Q5Aa5gFJoLUG9GVfyd_pAap7N4-nMog-nO2nm6Bk67WygkcZwQ&oe=6ADA5CB8&_nc_sid=e6ed6c&mms3=true",
+        "mimetype": "image/jpeg",
+        "caption": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Hurghada City Tour Shops Marina Markets Mosque And Church*\nhttps://www.viator.com/tours/Hurghada/Hurghada-City-tour-shops-Marina-Markets-Mosque-and-church/d800-5627352P5\n\n*Important*\nThe look of the monitored section changed (about 1.0% visual difference).\n\nA total of *1* change detected.\n\nOpen page: https://www.viator.com/tours/Hurghada/Hurghada-City-tour-shops-Marina-Markets-Mosque-and-church/d800-5627352P5\nOpen WATCH: https://watcher.tourcare.ai",
+        "fileSha256": {
+          "0": 139,
+          "1": 199,
+          "2": 85,
+          "3": 22,
+          "4": 200,
+          "5": 212,
+          "6": 251,
+          "7": 172,
+          "8": 36,
+          "9": 105,
+          "10": 169,
+          "11": 133,
+          "12": 61,
+          "13": 56,
+          "14": 212,
+          "15": 32,
+          "16": 87,
+          "17": 86,
+          "18": 83,
+          "19": 158,
+          "20": 234,
+          "21": 229,
+          "22": 33,
+          "23": 157,
+          "24": 118,
+          "25": 152,
+          "26": 183,
+          "27": 168,
+          "28": 137,
+          "29": 77,
+          "30": 52,
+          "31": 204
+        },
+        "fileLength": {
+          "low": 977,
+          "high": 0,
+          "unsigned": true
+        },
+        "mediaKey": {
+          "0": 247,
+          "1": 128,
+          "2": 145,
+          "3": 190,
+          "4": 196,
+          "5": 236,
+          "6": 171,
+          "7": 30,
+          "8": 59,
+          "9": 100,
+          "10": 135,
+          "11": 188,
+          "12": 85,
+          "13": 228,
+          "14": 199,
+          "15": 226,
+          "16": 140,
+          "17": 6,
+          "18": 3,
+          "19": 53,
+          "20": 27,
+          "21": 115,
+          "22": 134,
+          "23": 145,
+          "24": 162,
+          "25": 98,
+          "26": 163,
+          "27": 215,
+          "28": 59,
+          "29": 179,
+          "30": 3,
+          "31": 149
+        },
+        "fileEncSha256": {
+          "0": 101,
+          "1": 123,
+          "2": 138,
+          "3": 120,
+          "4": 18,
+          "5": 46,
+          "6": 81,
+          "7": 225,
+          "8": 55,
+          "9": 26,
+          "10": 176,
+          "11": 129,
+          "12": 61,
+          "13": 42,
+          "14": 113,
+          "15": 58,
+          "16": 67,
+          "17": 214,
+          "18": 226,
+          "19": 177,
+          "20": 46,
+          "21": 92,
+          "22": 213,
+          "23": 43,
+          "24": 253,
+          "25": 39,
+          "26": 157,
+          "27": 218,
+          "28": 174,
+          "29": 239,
+          "30": 112,
+          "31": 22
+        },
+        "directPath": "/o1/v/t24/f2/m237/AQM2wO3O8NLA9caEF0B-PL4y3elcpOrK3TCiUiX8Z_Hof26DF__nklt_e6ktXrHXCwvdhv0sVhD7A4eNZQKZd2pBvLuJjerCcf0zjhaBug?ccb=9-4&oh=01_Q5Aa5gFJoLUG9GVfyd_pAap7N4-nMog-nO2nm6Bk67WygkcZwQ&oe=6ADA5CB8&_nc_sid=e6ed6c",
+        "mediaKeyTimestamp": {
+          "low": 1790115651,
+          "high": 0,
+          "unsigned": false
+        },
+        "contextInfo": {
+          "mentionedJid": [],
+          "groupMentions": [],
+          "ephemeralSettingTimestamp": {
+            "low": 1789942851,
+            "high": 0,
+            "unsigned": false
+          },
+          "disappearingMode": {
+            "initiator": 0
+          }
+        }
+      },
+      "base64": "/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCABRBOYDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//9k="
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789942851,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "imageMessage",
+    "messageTimestamp": 1790115651,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-22T15:20:52.389Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0106852AB90A7976517"
+    },
+    "keyId": "3EB0106852AB90A7976517",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hello [MR/ Ahmady],\n\nI hope you're doing well.\n\nHere is the Daily Report for today:\nReport_Standard_2026-09-23.html\nhttps://res.cloudinary.com/dqlurfwet/raw/upload/v1790117542/gquudszwg6b2dvssjdsh.html"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789944743,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790117545,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-22T15:52:25.627Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB06EA26F3D532483D140"
+    },
+    "keyId": "3EB06EA26F3D532483D140",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hello [MR/ Ahmady],\n\nI hope you're doing well.\n\nHere is the Daily Report for today:\nReport_Manager_2026-09-23.html\nhttps://res.cloudinary.com/dqlurfwet/raw/upload/v1790117545/lmececvx6vmz1oqowehu.html"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789944746,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790117547,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-22T15:52:27.995Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0F1A0E48C6867484E6B"
+    },
+    "keyId": "3EB0F1A0E48C6867484E6B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:45673 in process_grouped_messages\nLogger: root\nReason: Error in background WhatsApp processing: argument of type 'NoneType' is not iterable\nAt: 2026-09-22 16:11:20"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789945881,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790118681,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-22T16:11:22.514Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

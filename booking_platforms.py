@@ -1,8 +1,8 @@
 """
 Dashboard-managed booking-platform settings (Viator, GYG, Headout, Tiqets, ...).
 
-Persisted in booking_platforms.json. Viator connection fields also sync into
-config.json viator_supplier so the Supplier API picks them up immediately.
+Persisted in booking_platforms.json. Viator / GYG / Tiqets connection fields also
+sync into config.json (*_supplier sections) so supplier APIs pick them up after restart.
 """
 
 from __future__ import annotations
@@ -250,6 +250,27 @@ def _save_company_platform_store(company_id: str, data: dict) -> None:
     )
 
 
+def _merge_tiqets_config_json_defaults(settings: dict) -> dict:
+    """If booking_platforms.json has no api_key, fall back to config.json tiqets_supplier."""
+    merged = dict(settings)
+    if str(merged.get("api_key") or "").strip():
+        return merged
+    config_path = os.path.join(SCRIPT_DIR, get_data_path("config.json"))
+    if not os.path.isfile(config_path):
+        return merged
+    try:
+        with open(config_path, "r", encoding="utf-8") as handle:
+            section = json.load(handle).get("tiqets_supplier") or {}
+        if not isinstance(section, dict):
+            return merged
+        for key in ("api_key", "service_port", "tickets_base_id", "audio_guide_base_url", "enabled"):
+            if key in section and section.get(key) not in (None, "") and not merged.get(key):
+                merged[key] = section[key]
+    except Exception as exc:
+        LOGGER.debug("Could not merge tiqets_supplier from config.json: %s", exc)
+    return merged
+
+
 def get_all_platform_settings(company_id: Optional[str] = None) -> dict:
     import company_tenancy
     if company_id and not company_tenancy.is_default_company(company_id):
@@ -262,6 +283,8 @@ def get_all_platform_settings(company_id: Optional[str] = None) -> dict:
         merged = _default_platform_settings(pid)
         if isinstance(stored.get(pid), dict):
             merged.update(stored[pid])
+        if pid == "tiqets":
+            merged = _merge_tiqets_config_json_defaults(merged)
         out[pid] = merged
     return out
 
@@ -538,6 +561,35 @@ def _sync_gyg_into_config_json(gyg_settings: dict) -> None:
     os.replace(tmp, config_path)
 
 
+def _sync_tiqets_into_config_json(tiqets_settings: dict) -> None:
+    config_path = os.path.join(SCRIPT_DIR, get_data_path("config.json"))
+    if not os.path.isfile(config_path):
+        return
+    try:
+        with open(config_path, "r", encoding="utf-8") as handle:
+            cfg = json.load(handle)
+    except Exception as exc:
+        LOGGER.warning("Could not read config.json for Tiqets sync: %s", exc)
+        return
+    if not isinstance(cfg, dict):
+        return
+    section = cfg.get("tiqets_supplier")
+    if not isinstance(section, dict):
+        section = {}
+        cfg["tiqets_supplier"] = section
+    for key in (
+        "enabled", "api_key", "service_port", "tickets_base_id", "audio_guide_base_url",
+    ):
+        if key in tiqets_settings and tiqets_settings.get(key) not in (None,):
+            if key in SECRET_KEYS and _is_masked(tiqets_settings.get(key)):
+                continue
+            section[key] = tiqets_settings[key]
+    tmp = config_path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        json.dump(cfg, handle, indent=2, ensure_ascii=False)
+    os.replace(tmp, config_path)
+
+
 def save_platform_settings(platform_id: str, incoming: dict, company_id: Optional[str] = None) -> dict:
     import company_tenancy
     allowed = {p["id"] for p in PLATFORM_CATALOG}
@@ -575,6 +627,8 @@ def save_platform_settings(platform_id: str, incoming: dict, company_id: Optiona
             _sync_viator_into_config_json(merged)
         elif platform_id == "getyourguide":
             _sync_gyg_into_config_json(merged)
+        elif platform_id == "tiqets":
+            _sync_tiqets_into_config_json(merged)
         return merged
 
 

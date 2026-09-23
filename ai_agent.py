@@ -46330,16 +46330,39 @@ Draft to optimize:
                     if hasattr(self, 'config') and "airtable" in self.config and "api_key" in self.config["airtable"]:
                         env["AIRTABLE_API_KEY"] = self.config["airtable"]["api_key"]
                         env["AIRTABLE_BASE_ID"] = self.config["airtable"]["base_id"]
-                    
-                    # Start the tiqets service as a subprocess
+                    try:
+                        from tiqets_api import load_tiqets_config, resolve_tiqets_api_key
+                        tiqets_cfg = load_tiqets_config()
+                        if isinstance(getattr(self, "config", None), dict):
+                            file_section = self.config.get("tiqets_supplier")
+                            if isinstance(file_section, dict):
+                                tiqets_cfg.update(file_section)
+                        env["TIQETS_API_KEY"] = resolve_tiqets_api_key(tiqets_cfg)
+                        tickets_base = str(tiqets_cfg.get("tickets_base_id") or "").strip()
+                        if tickets_base:
+                            env["TICKETS_BASE_ID"] = tickets_base
+                    except Exception as tiqets_env_err:
+                        logging.warning("Could not inject Tiqets env from config.json: %s", tiqets_env_err)
+
+                    tiqets_script = os.path.join(SCRIPT_DIR, "tiqets_api.py")
                     process = subprocess.Popen(
-                        [sys.executable, "tiqets_api.py"],
+                        [sys.executable, tiqets_script],
+                        cwd=SCRIPT_DIR,
                         env=env,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        text=True
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
                     )
-                    logging.info(f"✅ [TIQETS] Service started successfully (PID: {process.pid}) on Port 5005.")
+                    time.sleep(1.5)
+                    if process.poll() is not None:
+                        logging.error(
+                            "❌ [TIQETS] Service exited immediately (code=%s). Run: python tiqets_api.py",
+                            process.returncode,
+                        )
+                    else:
+                        logging.info(
+                            "✅ [TIQETS] Service started (PID: %s) on port 5005.",
+                            process.pid,
+                        )
                     
                     # Start the Trip.com service as a subprocess
                     logging.info("🚀 [TRIP.COM] Starting Trip.com API Background Service...")

@@ -242,6 +242,13 @@
     "products_file": "gyg_products.json",
     "async_airtable": true
   },
+  "tiqets_supplier": {
+    "enabled": true,
+    "api_key": "tiqets-fts-api-key-bcff8d934792f84875739cf30f13178a0b73d0fed529995a6177ccb5eefbe07b",
+    "service_port": 5005,
+    "tickets_base_id": "appZLYzQcuH4MDHCI",
+    "audio_guide_base_url": "http://tiqets.ftstravels.com/?GM/ticketId="
+  },
   "facebook_auto_reply_enabled": true,
   "auto_reply_locations": [
     "Sharm",

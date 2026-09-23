@@ -2,11 +2,12 @@ import requests
 import json
 import time
 
-# إعدادات الاتصال
+import tiqets_api as t
+
 BASE_URL = "http://127.0.0.1:5005"
 HEADERS = {
-    "API-Key": "fts_tq_9xK2mP4vL8nR5jW3cQ7hY1bN6dM0sF",
-    "Content-Type": "application/json"
+    "API-Key": t.resolve_tiqets_api_key(t.load_tiqets_config()),
+    "Content-Type": "application/json",
 }
 
 def print_step(step_name):

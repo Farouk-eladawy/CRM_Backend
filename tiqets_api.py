@@ -1,26 +1,108 @@
+import json
 import os
 import uuid
 import datetime
+from typing import Any, Optional
+
 from flask import Flask, request, jsonify, abort
 from pyairtable import Api
 from pyairtable.formulas import match
 
+try:
+    from fts_paths import SCRIPT_DIR, get_data_path
+except Exception:  # pragma: no cover
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    def get_data_path(filename):
+        return os.path.join(SCRIPT_DIR, filename)
+
 app = Flask(__name__)
+
+# Fallback only when config.json, env, and dashboard sync are all empty (legacy installs).
+_LEGACY_DEFAULT_TIQETS_API_KEY = "fts_tq_9xK2mP4vL8nR5jW3cQ7hY1bN6dM0sF"
+
+
+def load_tiqets_config(override: Optional[dict] = None) -> dict[str, Any]:
+    cfg: dict[str, Any] = {
+        "enabled": True,
+        "api_key": "",
+        "service_port": 5005,
+        "tickets_base_id": "appZLYzQcuH4MDHCI",
+        "audio_guide_base_url": "http://tiqets.ftstravels.com/?GM/ticketId=",
+    }
+    try:
+        config_path = os.path.join(SCRIPT_DIR, get_data_path("config.json"))
+        if os.path.isfile(config_path):
+            with open(config_path, "r", encoding="utf-8") as handle:
+                file_cfg = json.load(handle).get("tiqets_supplier") or {}
+            if isinstance(file_cfg, dict):
+                cfg.update(file_cfg)
+    except Exception as exc:
+        print(f"Warning: could not load tiqets_supplier from config.json: {exc}")
+
+    if not str(cfg.get("api_key") or "").strip():
+        try:
+            platforms_path = os.path.join(SCRIPT_DIR, get_data_path("booking_platforms.json"))
+            if os.path.isfile(platforms_path):
+                with open(platforms_path, "r", encoding="utf-8") as handle:
+                    tiqets_saved = (json.load(handle).get("platforms") or {}).get("tiqets") or {}
+                if isinstance(tiqets_saved, dict) and str(tiqets_saved.get("api_key") or "").strip():
+                    cfg["api_key"] = str(tiqets_saved["api_key"]).strip()
+        except Exception as exc:
+            print(f"Warning: could not load Tiqets api_key from booking_platforms.json: {exc}")
+
+    env_key = os.environ.get("TIQETS_API_KEY")
+    if env_key:
+        cfg["api_key"] = env_key.strip()
+
+    env_tickets_base = os.environ.get("TICKETS_BASE_ID")
+    if env_tickets_base:
+        cfg["tickets_base_id"] = env_tickets_base.strip()
+
+    if override:
+        cfg.update(override)
+    return cfg
+
+
+def resolve_tiqets_api_key(cfg: Optional[dict] = None) -> str:
+    merged = cfg if isinstance(cfg, dict) else load_tiqets_config()
+    key = str(merged.get("api_key") or "").strip()
+    if key:
+        return key
+    return _LEGACY_DEFAULT_TIQETS_API_KEY
+
+
+_TIQETS_RUNTIME = load_tiqets_config()
+
+
+def _load_airtable_credentials() -> tuple[str, str]:
+    key = str(os.environ.get("AIRTABLE_API_KEY") or "").strip()
+    base = str(os.environ.get("AIRTABLE_BASE_ID") or "").strip()
+    if key and base and "YOUR_" not in key and "YOUR_" not in base:
+        return key, base
+    try:
+        config_path = os.path.join(SCRIPT_DIR, get_data_path("config.json"))
+        if os.path.isfile(config_path):
+            with open(config_path, "r", encoding="utf-8") as handle:
+                airtable = json.load(handle).get("airtable") or {}
+            if isinstance(airtable, dict):
+                key = str(airtable.get("api_key") or key).strip()
+                base = str(airtable.get("base_id") or base).strip()
+    except Exception as exc:
+        print(f"Warning: could not load Airtable credentials from config.json: {exc}")
+    return key or "YOUR_AIRTABLE_API_KEY", base or "YOUR_AIRTABLE_BASE_ID"
+
 
 # ==========================================
 # ⚙️ الإعدادات (Configuration)
 # ==========================================
-# ضع مفتاح Airtable الخاص بك هنا
-AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY", "YOUR_AIRTABLE_API_KEY")
-# ضع Base ID الخاص بقاعدة بياناتك هنا
-AIRTABLE_BASE_ID = os.environ.get("AIRTABLE_BASE_ID", "YOUR_AIRTABLE_BASE_ID")
+AIRTABLE_API_KEY, AIRTABLE_BASE_ID = _load_airtable_credentials()
 
-# Base ID الخاص بجدول التذاكر الجديد (لأنه تم نقله)
-TICKETS_BASE_ID = os.environ.get("TICKETS_BASE_ID", "appZLYzQcuH4MDHCI")
-
-# مفتاح الحماية الخاص بـ Tiqets (تشاركه معهم)
-# مفتاح احترافي عشوائي تم إنشاؤه لضمان الأمان
-TIQETS_API_KEY = os.environ.get("TIQETS_API_KEY", "fts_tq_9xK2mP4vL8nR5jW3cQ7hY1bN6dM0sF")
+TICKETS_BASE_ID = str(_TIQETS_RUNTIME.get("tickets_base_id") or "appZLYzQcuH4MDHCI")
+TIQETS_API_KEY = resolve_tiqets_api_key(_TIQETS_RUNTIME)
+AUDIO_GUIDE_BASE_URL = str(
+    _TIQETS_RUNTIME.get("audio_guide_base_url") or "http://tiqets.ftstravels.com/?GM/ticketId="
+)
 
 # أسماء الجداول الثابتة
 PRODUCTS_CATALOG_TABLE = "Products_Catalog"
@@ -36,12 +118,14 @@ list_table = api.table(AIRTABLE_BASE_ID, LIST_TABLE)
 # ==========================================
 @app.before_request
 def verify_api_key():
-    # استثناء مسار فحص الصحة (Health check)
     if request.path == "/health":
         return
-        
+    runtime = load_tiqets_config()
+    if not runtime.get("enabled", True):
+        abort(503, description="Tiqets Supplier API is disabled")
+    expected = resolve_tiqets_api_key(runtime)
     api_key = request.headers.get("API-Key")
-    if not api_key or api_key != TIQETS_API_KEY:
+    if not api_key or api_key != expected:
         abort(403, description="Forbidden - Missing or incorrect API key")
 
 # ==========================================
@@ -301,8 +385,7 @@ def confirm_booking():
             
             # إذا كان هناك Audio Guide، نضيف الرابط كباركود إضافي لنفس الشخص
             if has_audio_guide:
-                # Use order_reference for the app link as it's the final confirmed ID
-                audio_guide_url = f"http://tiqets.ftstravels.net/?GM/ticketId={order_reference}"
+                audio_guide_url = f"{AUDIO_GUIDE_BASE_URL}{order_reference}"
                 barcodes.append(audio_guide_url)
             
         # تحديث الحجز في List: استبدال رقم الحجز المؤقت برقم Tiqets النهائي وتحديث الملاحظات
@@ -372,9 +455,15 @@ def cancel_booking(booking_id):
 # ==========================================
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "Tiqets API is running"}), 200
+    runtime = load_tiqets_config()
+    return jsonify({
+        "status": "ok",
+        "service": "tiqets-supplier",
+        "enabled": bool(runtime.get("enabled", True)),
+        "api_key_configured": bool(str(runtime.get("api_key") or "").strip()),
+    }), 200
 
 
 if __name__ == '__main__':
-    # تشغيل السيرفر على البورت 5005 (يمكنك تغييره)
-    app.run(host='0.0.0.0', port=5005, debug=True)
+    port = int(str(_TIQETS_RUNTIME.get("service_port") or 5005))
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)

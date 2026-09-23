@@ -174420,3 +174420,177 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0636DA210EB49BD446A"
+    },
+    "keyId": "3EB0636DA210EB49BD446A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "imageMessage": {
+        "interactiveAnnotations": [],
+        "scanLengths": [],
+        "annotations": [],
+        "url": "https://mmg.whatsapp.net/o1/v/t24/f2/m237/AQN9rbo2GQB_sdXvpZ39Br4PjWKqOczgqEizInALZEZh8h8uCS0hElcDOVunxjFd5h6_aRKETUEEENTtr4-SKbCQNQhr_yPZisb6bp8Shw?ccb=9-4&oh=01_Q5Aa5gGy52yiQgR2x7JiNT1mffdYLUs_Az2jLlXjHalAnJ6UIg&oe=6ADA9493&_nc_sid=e6ed6c&mms3=true",
+        "mimetype": "image/jpeg",
+        "caption": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Hurghada City Tour Shops Marina Markets Mosque And Church*\nhttps://www.viator.com/tours/Hurghada/Hurghada-City-tour-shops-Marina-Markets-Mosque-and-church/d800-5627352P5\n\n*Important*\nThe look of the monitored section changed (about 4.6% visual difference).\n\nA total of *1* change detected.\n\nOpen page: https://www.viator.com/tours/Hurghada/Hurghada-City-tour-shops-Marina-Markets-Mosque-and-church/d800-5627352P5\nOpen WATCH: https://watcher.tourcare.ai",
+        "fileSha256": {
+          "0": 163,
+          "1": 251,
+          "2": 39,
+          "3": 58,
+          "4": 161,
+          "5": 68,
+          "6": 81,
+          "7": 15,
+          "8": 156,
+          "9": 223,
+          "10": 180,
+          "11": 236,
+          "12": 54,
+          "13": 15,
+          "14": 197,
+          "15": 93,
+          "16": 59,
+          "17": 47,
+          "18": 235,
+          "19": 123,
+          "20": 169,
+          "21": 54,
+          "22": 154,
+          "23": 219,
+          "24": 179,
+          "25": 68,
+          "26": 196,
+          "27": 38,
+          "28": 89,
+          "29": 119,
+          "30": 57,
+          "31": 97
+        },
+        "fileLength": {
+          "low": 4513,
+          "high": 0,
+          "unsigned": true
+        },
+        "mediaKey": {
+          "0": 62,
+          "1": 50,
+          "2": 174,
+          "3": 11,
+          "4": 202,
+          "5": 195,
+          "6": 86,
+          "7": 157,
+          "8": 185,
+          "9": 175,
+          "10": 58,
+          "11": 119,
+          "12": 27,
+          "13": 39,
+          "14": 105,
+          "15": 87,
+          "16": 64,
+          "17": 173,
+          "18": 94,
+          "19": 132,
+          "20": 177,
+          "21": 111,
+          "22": 153,
+          "23": 103,
+          "24": 29,
+          "25": 72,
+          "26": 229,
+          "27": 134,
+          "28": 186,
+          "29": 11,
+          "30": 52,
+          "31": 190
+        },
+        "fileEncSha256": {
+          "0": 201,
+          "1": 149,
+          "2": 12,
+          "3": 223,
+          "4": 50,
+          "5": 11,
+          "6": 169,
+          "7": 200,
+          "8": 204,
+          "9": 240,
+          "10": 26,
+          "11": 56,
+          "12": 193,
+          "13": 57,
+          "14": 109,
+          "15": 211,
+          "16": 39,
+          "17": 138,
+          "18": 143,
+          "19": 103,
+          "20": 155,
+          "21": 90,
+          "22": 25,
+          "23": 127,
+          "24": 11,
+          "25": 199,
+          "26": 130,
+          "27": 96,
+          "28": 120,
+          "29": 148,
+          "30": 139,
+          "31": 141
+        },
+        "directPath": "/o1/v/t24/f2/m237/AQN9rbo2GQB_sdXvpZ39Br4PjWKqOczgqEizInALZEZh8h8uCS0hElcDOVunxjFd5h6_aRKETUEEENTtr4-SKbCQNQhr_yPZisb6bp8Shw?ccb=9-4&oh=01_Q5Aa5gGy52yiQgR2x7JiNT1mffdYLUs_Az2jLlXjHalAnJ6UIg&oe=6ADA9493&_nc_sid=e6ed6c",
+        "mediaKeyTimestamp": {
+          "low": 1790130348,
+          "high": 0,
+          "unsigned": false
+        },
+        "contextInfo": {
+          "mentionedJid": [],
+          "groupMentions": [],
+          "ephemeralSettingTimestamp": {
+            "low": 1789957548,
+            "high": 0,
+            "unsigned": false
+          },
+          "disappearingMode": {
+            "initiator": 0
+          }
+        }
+      },
+      "base64": "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"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789957548,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "imageMessage",
+    "messageTimestamp": 1790130348,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-22T19:25:49.414Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

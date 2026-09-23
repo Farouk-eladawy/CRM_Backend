@@ -174246,3 +174246,177 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0427EB0497C9F7031E1"
+    },
+    "keyId": "3EB0427EB0497C9F7031E1",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "imageMessage": {
+        "interactiveAnnotations": [],
+        "scanLengths": [],
+        "annotations": [],
+        "url": "https://mmg.whatsapp.net/o1/v/t24/f2/m238/AQMn2A7jMgPkeGhTajFt-6hqDjIuEAymSKvFGwk8oK3nChafV44W_fHISUiPpde_7m4lScHgmP3Ioo19HzqEnP_O6HRHnARlzI4VAopn0g?ccb=9-4&oh=01_Q5Aa5gGyg4f2U0jPG4S4zCAth4GV8ym3xXhjv6opyHzCZXPpgA&oe=6ADA80BC&_nc_sid=e6ed6c&mms3=true",
+        "mimetype": "image/jpeg",
+        "caption": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Hurghada City Tour Shops Marina Markets Mosque And Church*\nhttps://www.viator.com/tours/Hurghada/Hurghada-City-tour-shops-Marina-Markets-Mosque-and-church/d800-5627352P5\n\n*Important*\nThe look of the monitored section changed (about 1.0% visual difference).\n\nA total of *1* change detected.\n\nOpen page: https://www.viator.com/tours/Hurghada/Hurghada-City-tour-shops-Marina-Markets-Mosque-and-church/d800-5627352P5\nOpen WATCH: https://watcher.tourcare.ai",
+        "fileSha256": {
+          "0": 139,
+          "1": 199,
+          "2": 85,
+          "3": 22,
+          "4": 200,
+          "5": 212,
+          "6": 251,
+          "7": 172,
+          "8": 36,
+          "9": 105,
+          "10": 169,
+          "11": 133,
+          "12": 61,
+          "13": 56,
+          "14": 212,
+          "15": 32,
+          "16": 87,
+          "17": 86,
+          "18": 83,
+          "19": 158,
+          "20": 234,
+          "21": 229,
+          "22": 33,
+          "23": 157,
+          "24": 118,
+          "25": 152,
+          "26": 183,
+          "27": 168,
+          "28": 137,
+          "29": 77,
+          "30": 52,
+          "31": 204
+        },
+        "fileLength": {
+          "low": 977,
+          "high": 0,
+          "unsigned": true
+        },
+        "mediaKey": {
+          "0": 142,
+          "1": 1,
+          "2": 154,
+          "3": 59,
+          "4": 38,
+          "5": 254,
+          "6": 253,
+          "7": 47,
+          "8": 213,
+          "9": 25,
+          "10": 138,
+          "11": 93,
+          "12": 89,
+          "13": 180,
+          "14": 49,
+          "15": 219,
+          "16": 238,
+          "17": 0,
+          "18": 185,
+          "19": 239,
+          "20": 132,
+          "21": 52,
+          "22": 122,
+          "23": 135,
+          "24": 241,
+          "25": 74,
+          "26": 182,
+          "27": 89,
+          "28": 155,
+          "29": 242,
+          "30": 87,
+          "31": 133
+        },
+        "fileEncSha256": {
+          "0": 150,
+          "1": 208,
+          "2": 183,
+          "3": 66,
+          "4": 222,
+          "5": 54,
+          "6": 111,
+          "7": 51,
+          "8": 120,
+          "9": 29,
+          "10": 184,
+          "11": 0,
+          "12": 142,
+          "13": 51,
+          "14": 26,
+          "15": 238,
+          "16": 230,
+          "17": 74,
+          "18": 98,
+          "19": 167,
+          "20": 91,
+          "21": 67,
+          "22": 30,
+          "23": 100,
+          "24": 203,
+          "25": 16,
+          "26": 184,
+          "27": 120,
+          "28": 177,
+          "29": 93,
+          "30": 163,
+          "31": 159
+        },
+        "directPath": "/o1/v/t24/f2/m238/AQMn2A7jMgPkeGhTajFt-6hqDjIuEAymSKvFGwk8oK3nChafV44W_fHISUiPpde_7m4lScHgmP3Ioo19HzqEnP_O6HRHnARlzI4VAopn0g?ccb=9-4&oh=01_Q5Aa5gGyg4f2U0jPG4S4zCAth4GV8ym3xXhjv6opyHzCZXPpgA&oe=6ADA80BC&_nc_sid=e6ed6c",
+        "mediaKeyTimestamp": {
+          "low": 1790125547,
+          "high": 0,
+          "unsigned": false
+        },
+        "contextInfo": {
+          "mentionedJid": [],
+          "groupMentions": [],
+          "ephemeralSettingTimestamp": {
+            "low": 1789952747,
+            "high": 0,
+            "unsigned": false
+          },
+          "disappearingMode": {
+            "initiator": 0
+          }
+        }
+      },
+      "base64": "/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCABRBOYDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//9k="
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1789952747,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "imageMessage",
+    "messageTimestamp": 1790125547,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-22T18:05:48.088Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

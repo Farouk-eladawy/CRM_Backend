@@ -1,23 +1,5 @@
 [
   {
-    "timestamp": "2026-09-23T00:53:17.655941",
-    "original": "أعتذر بشدة عن التأخير في الرد على حضرتك 🙏\n\nبخصوص استفساراتك:\n- تفاصيل الإقامة والفنادق بتختلف حسب البرنامج اللي حضرتك مهتم بيه (بري / طيران اقتصادي / طيران تحسين)، وكل برنامج ليه فنادقه ومستواه.\n- عنوان الشركة: ١٢ هـ / ٤ شارع شوقي عبد المنعم — تقسيم اللاسلكي — المعادي، القاهرة (الدور الثالث).\n- بخصوص فروع في طنطا أو كفر الشيخ، هتأكد لحضرتك من المعلومة دي وأرد عليك.\n\nعشان أقدر أجاوبك على كل التفاصيل بدقة، أسهل حاجة مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "دكتور اشرف احنا فرعنا في القاهره في المعادي",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-23T00:53:48.056082",
-    "original": "Understood. I'll follow these guidelines carefully when responding to users. Here's a quick summary of what we've covered:\n\n1. **Primary Source**: Answer based strictly on the OFFICIAL BOOKING RECORD first.\n2. **Secondary Sources**:\n   - Use INTERNAL TRIPS CATALOG (Source 3) if details are missing and not found in internal sources.\n   - Cross-verify with historical emails to understand how to answer politely and accurately.\n3. **Web Search Strictness**: Only use web searches as a last resort when information is not available from internal sources.\n4. **Investigation & Retention (Priority)**: Gather more details if the user reports a problem or asks for something complex, then check your sources again before escalating.\n5. **Escalation Rules**:\n   - Escalate only if explicitly requested by the user (\"human\", \"agent\").\n   - Escalate when changes need to be made (Date, Room, Phone) and user provides missing details.\n6. **Complaint & Escalation Protocol**: Follow strict governance guidelines for handling complaints and escalations.\n7. **Alcohol Policy**: Do not mention or generate any links related to alcohol unless the user specifically asks about it.\n8. **No Hallucination Rule**: Do not invent information; verify facts from available sources before responding.\n\nI'll ensure all responses adhere strictly to these rules, matching the user's language exactly as requested. Let me know if you need any further assistance or have additional details to include!",
-    "corrected": "حضرتك كنسلت",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-23T00:53:57.750363",
-    "original": "وعليكم السلام ورحمة الله وبركاته 🤲\n\nأهلًا بحضرتك، بخصوص العنوان — للأسف مش متاح عندي هنا في الشات، بس فريق خدمة العملاء هيبعتلك المقر بالتفصيل على الواتساب في أقرب وقت.\n\nممكن تبعتلي رقم الواتساب بتاع حضرتك عشان يوصلك العنوان فورًا؟ 📞",
-    "corrected": "طبعا يا فندم",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-23T00:55:14.991385",
     "original": "تحت أمرك يا فندم 🌹\n\nبما إن حضرتك جاي من إعلان الحج، خليني أسألك سؤال واحد بس عشان أوجّهك للبرنامج الصح:\nحضرتك مهتم ببرامج الحج ولا العمرة؟\n\nولو حابب، ابعتلي رقم الواتساب بتاعك وأنا هكلمك دقيقتين أوضحلك كل التفاصيل والبرامج المتاحة بالأسعار الرسمية.",
     "corrected": "تحت امرك يا فندم",
@@ -597,6 +579,24 @@
     "timestamp": "2026-09-23T11:49:05.992818",
     "original": "تمام يا فندم، ثنائي يعني حضرتك وزوجتك — وده بيخلينا نرشّحلكم برنامج مناسب لاتنين مع بعض، والإقامة في غرفة ثنائية.\n\nعشان أظبطلكم التفاصيل الصح، محتاج أعرف حضرتك مهتم ببرامج الحج ولا العمرة؟",
     "corrected": "ممكن رقم حضرتك",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-23T12:34:36.189780",
+    "original": "مفيش برامج أطول من كده في الحج السياحي يا فندم — أطول مدة معتمدة هي ١٩ يوم في برنامج طيران التحسين (وده اللي فيه ٧ أيام إقامة على ساحة الحرم بعد المناسك)، والبري والاقتصادي ١٧ يوم.\n\nلو حضرتك عايز مدة أطول، ده بيتظبط حسب البرنامج والاحتياج، والأدق إني أكلمك دقيقتين أظبطهالك — أكلم حضرتك على أي رقم؟",
+    "corrected": "اطول فتره بتبقي ١٩ يوم ل برنامج التحسين و بنقعد ٧ ايام كاملين في الحرم في فندق خمس نجوم صف اول",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-23T12:35:10.108504",
+    "original": "أيوه يا فندم، سبق الحج مش مشكلة خالص — بس ليه مسار مختلف.\n\nاللي حج قبل كده مش بيقدر يقدم في قرعة السياحة نفس السنة، لأن الوزارة بتطبق قاعدة القناة الواحدة والسيستم بيرفض الرقم القومي تلقائيًا.\n\nلكن المتاح لحضرتك هو الحج المباشر بتأشيرة مباشرة — من غير أي قرعة خالص، يعني مفيش انتظار نتيجة ولا احتمال رفض. والبرنامج نفسه هو نفس برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك. السعر ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وعدد التأشيرات محدود كل سنة وبيخلص بالأسبقية.\n\nحالة حضرتك ليها تفاصيل في السداد والتسجيل محتاجة مكالمة قصيرة مش رسالة — أكلم حضرتك على أي رقم؟",
+    "corrected": "ايوه يا فندم هيبقي متاح ل حضرتك حج مباشر ان شاء الله",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-09-23T12:36:03.744893",
+    "original": "أيوه يا فندم، التفاصيل متاحة بالكامل ✅\n\nبرنامج حج الطيران الاقتصادي:\n⏳ المدة: ١٧ يوم\n💰 السعر: ٢٤٥ ألف بدل ٢٧٠ ألف (خصم ٢٥ ألف جنيه) — وده السعر النهائي بعد نزول ضوابط الوزارة رسميًا\nوالخصم ساري لمدة أسبوع واحد بس أو لحد اكتمال آخر حصة متاحة للشركة، أيهما أقرب.\nتذكرة الطيران بتتضاف بسعرها وقت الحجز.\n🚄 قطار الحرمين السريع من المدينة لمكة\n\nولو حضرتك تقصد برنامج تاني (بري أو تحسين)، قولّي وأبعتهولك تفاصيله.\n\nأسهل حاجة أشرح لحضرتك كل التفاصيل والفرق بين البرامج في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
+    "corrected": "اه يا فندم في برنامج تحسين بيبقي ١٩ يوم بنقعد ٧ ايام كاملين في فندق ٥ نجوم صف اول علي الحرم",
     "context": "UI Manual Edit"
   }
 ]

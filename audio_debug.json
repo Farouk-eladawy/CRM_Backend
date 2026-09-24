@@ -179953,3 +179953,259 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB037826B1CBCE82E4456"
+    },
+    "keyId": "3EB037826B1CBCE82E4456",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "imageMessage": {
+        "interactiveAnnotations": [],
+        "scanLengths": [],
+        "annotations": [],
+        "url": "https://mmg.whatsapp.net/o1/v/t24/f2/m239/AQOwZLVzQqRDfGvHxoCLTuZSb9XJvow6UI87PGLisoYUQYETEto8DpIA-YdJSmZ6AFRQGrVBf4lGet2WTxKhhgeiY-Ut8Jkiz46bcfnZ7g?ccb=9-4&oh=01_Q5Aa5gEusOnPDoqLdPr-c0a9zZbOGx8DtCMrkE-F6WqQPUQQYg&oe=6ADC773F&_nc_sid=e6ed6c&mms3=true",
+        "mimetype": "image/jpeg",
+        "caption": "🚨 *WATCH* — Follow Competitors\nWe detected a change on\n\n*Current Local Time in Cairo, Egypt*\nhttps://www.timeanddate.com/worldclock/egypt/cairo\n\n*Important*\nThe Cairo clock time changed from 11:27:56 to 12:31:15.\n\n• Time: 11:27:56 → 12:31:15\n• Time zone: EEST → EEST\n• Date: Thursday, 24 September 2026 → Thursday, 24 September 2026\n\nA total of *3* changes detected.\n\nOpen page: https://www.timeanddate.com/worldclock/egypt/cairo\nOpen WATCH: https://watcher.tourcare.ai",
+        "fileSha256": {
+          "0": 47,
+          "1": 174,
+          "2": 202,
+          "3": 39,
+          "4": 15,
+          "5": 247,
+          "6": 31,
+          "7": 154,
+          "8": 134,
+          "9": 222,
+          "10": 172,
+          "11": 124,
+          "12": 86,
+          "13": 22,
+          "14": 95,
+          "15": 245,
+          "16": 4,
+          "17": 188,
+          "18": 129,
+          "19": 60,
+          "20": 78,
+          "21": 155,
+          "22": 113,
+          "23": 4,
+          "24": 209,
+          "25": 41,
+          "26": 27,
+          "27": 133,
+          "28": 23,
+          "29": 141,
+          "30": 11,
+          "31": 161
+        },
+        "fileLength": {
+          "low": 7439,
+          "high": 0,
+          "unsigned": true
+        },
+        "mediaKey": {
+          "0": 169,
+          "1": 91,
+          "2": 51,
+          "3": 70,
+          "4": 179,
+          "5": 99,
+          "6": 205,
+          "7": 213,
+          "8": 102,
+          "9": 255,
+          "10": 131,
+          "11": 106,
+          "12": 15,
+          "13": 112,
+          "14": 7,
+          "15": 104,
+          "16": 50,
+          "17": 154,
+          "18": 118,
+          "19": 97,
+          "20": 9,
+          "21": 174,
+          "22": 169,
+          "23": 92,
+          "24": 12,
+          "25": 186,
+          "26": 89,
+          "27": 143,
+          "28": 18,
+          "29": 27,
+          "30": 28,
+          "31": 171
+        },
+        "fileEncSha256": {
+          "0": 168,
+          "1": 15,
+          "2": 180,
+          "3": 228,
+          "4": 248,
+          "5": 156,
+          "6": 161,
+          "7": 136,
+          "8": 61,
+          "9": 55,
+          "10": 218,
+          "11": 107,
+          "12": 88,
+          "13": 148,
+          "14": 112,
+          "15": 82,
+          "16": 71,
+          "17": 71,
+          "18": 12,
+          "19": 72,
+          "20": 88,
+          "21": 235,
+          "22": 36,
+          "23": 71,
+          "24": 236,
+          "25": 136,
+          "26": 244,
+          "27": 23,
+          "28": 146,
+          "29": 185,
+          "30": 107,
+          "31": 108
+        },
+        "directPath": "/o1/v/t24/f2/m239/AQOwZLVzQqRDfGvHxoCLTuZSb9XJvow6UI87PGLisoYUQYETEto8DpIA-YdJSmZ6AFRQGrVBf4lGet2WTxKhhgeiY-Ut8Jkiz46bcfnZ7g?ccb=9-4&oh=01_Q5Aa5gEusOnPDoqLdPr-c0a9zZbOGx8DtCMrkE-F6WqQPUQQYg&oe=6ADC773F&_nc_sid=e6ed6c",
+        "mediaKeyTimestamp": {
+          "low": 1790242288,
+          "high": 0,
+          "unsigned": false
+        },
+        "contextInfo": {
+          "mentionedJid": [],
+          "groupMentions": [],
+          "ephemeralSettingTimestamp": {
+            "low": 1790069488,
+            "high": 0,
+            "unsigned": false
+          },
+          "disappearingMode": {
+            "initiator": 0
+          }
+        }
+      },
+      "base64": "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"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790069488,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "imageMessage",
+    "messageTimestamp": 1790242288,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-24T02:31:29.949Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0094DB4C0A3F485EB9A"
+    },
+    "keyId": "3EB0094DB4C0A3F485EB9A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:5156 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-09-24 02:49:04"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790070545,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790243345,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-24T02:49:06.652Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0450E9606C264AAF542"
+    },
+    "keyId": "3EB0450E9606C264AAF542",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:9128 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-09-24 02:49:07"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790070548,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790243348,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-24T02:49:09.719Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

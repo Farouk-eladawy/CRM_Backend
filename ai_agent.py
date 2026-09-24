@@ -3340,6 +3340,10 @@ class AIAgent:
                 target_table = self.leads_table
             elif self._is_religious_leads_table(effective_table_name) and self.religious_leads_table:
                 target_table = self.religious_leads_table
+            else:
+                named_table = self._airtable_table_named(effective_table_name)
+                if named_table is not None:
+                    target_table = named_table
 
             if effective_table_name == LEADS_TABLE_NAME or target_table is self.leads_table:
                 updates = self._filter_updates_for_leads_crm(updates)
@@ -3404,14 +3408,20 @@ class AIAgent:
             
             formula = f"{{Booking Nr.}}='{booking_nr}'"
             logging.info(f"DEBUG: Searching Table with formula: {formula}")
-            
-            records = self.table.all(formula=formula)
+
+            company_table, company_table_name = company_tenancy.active_booking_table()
+            search_table = company_table or self.table
+            search_table_name = company_table_name or self.config['airtable']['tables']['main_list']
+            records = search_table.all(formula=formula)
             logging.info(f"DEBUG: Search result count: {len(records)}")
             
             if records:
                 rec = records[0]
-                rec['table_name'] = self.config['airtable']['tables']['main_list']
+                rec['table_name'] = search_table_name
                 return rec
+
+            if company_table is not None:
+                return None
             
             # Check Leads Table
             # SKIP: Leads Table usually does not have "Booking Nr." field. 
@@ -3660,6 +3670,59 @@ class AIAgent:
         except Exception as e:
             logging.warning(f"Failed to log proposed reply for learning: {e}")
 
+    def _open_company_bookings_table(self, company_id):
+        """Return (pyairtable table, table name) for a tenant bookings table, or (None, '')."""
+        if not company_id or company_tenancy.is_default_company(company_id):
+            return None, ""
+        if not getattr(self, "airtable_api", None):
+            return None, ""
+        conn = company_tenancy.get_connections(company_id)
+        table_name = str(conn.get("airtableBookingsTable") or "").strip()
+        base_id = str(conn.get("airtableBaseId") or "").strip() or str(getattr(self, "base_id", "") or "").strip()
+        if not table_name or not base_id:
+            return None, ""
+        cache = getattr(self, "_company_airtable_tables", None)
+        if cache is None:
+            cache = {}
+            self._company_airtable_tables = cache
+        key = (base_id, table_name)
+        if key not in cache:
+            cache[key] = self.airtable_api.table(base_id, table_name)
+        return cache[key], table_name
+
+    def _iter_configured_company_booking_tables(self):
+        seen = set()
+        for company in company_tenancy.load_companies():
+            table, table_name = self._open_company_bookings_table(company.get("id"))
+            if table is None or not table_name or table_name in seen:
+                continue
+            seen.add(table_name)
+            yield table, table_name
+
+    def _is_company_bookings_table_name(self, table_name):
+        name = str(table_name or "").strip()
+        if not name:
+            return False
+        _active, active_name = company_tenancy.active_booking_table()
+        if active_name and name == active_name:
+            return True
+        for _table, known_name in self._iter_configured_company_booking_tables():
+            if known_name == name:
+                return True
+        return False
+
+    def _airtable_table_named(self, table_name):
+        name = str(table_name or "").strip()
+        active_table, active_name = company_tenancy.active_booking_table()
+        if active_table is not None and name and name == active_name:
+            return active_table
+        if not name:
+            return None
+        for table, known_name in self._iter_configured_company_booking_tables():
+            if known_name == name:
+                return table
+        return None
+
     def _get_record_from_any_table(self, record_id):
         """Fetch a record by ID from any of the known tables (Main, Religious, Leads)."""
         if not record_id:
@@ -3667,7 +3730,20 @@ class AIAgent:
 
         # Airtable may return the same record ID from the wrong table URL.
         # Fetch from the first endpoint that responds, then classify by fields.
-        fetchers = [lambda: self.table.get(record_id)]
+        def _fetch_tagged(table, name):
+            found = table.get(record_id)
+            if isinstance(found, dict):
+                found = dict(found)
+                found["table_name"] = name
+            return found
+
+        fetchers = []
+        active_table, active_name = company_tenancy.active_booking_table()
+        if active_table is not None:
+            fetchers.append(lambda table=active_table, name=active_name: _fetch_tagged(table, name))
+        for company_table, company_name in self._iter_configured_company_booking_tables():
+            fetchers.append(lambda table=company_table, name=company_name: _fetch_tagged(table, name))
+        fetchers.append(lambda: self.table.get(record_id))
         if getattr(self, "leads_table", None):
             fetchers.append(lambda: self.leads_table.get(record_id))
         if getattr(self, "religious_leads_table", None):
@@ -3685,6 +3761,9 @@ class AIAgent:
 
         if not isinstance(rec, dict):
             return None
+
+        if self._is_company_bookings_table_name(rec.get("table_name")):
+            return rec
 
         classified = self._classify_airtable_record_table(rec)
         if classified:
@@ -3810,6 +3889,9 @@ class AIAgent:
                 # 1. Update Airtable
                 table = self.table
                 effective_table_name = table_name
+                named_table = self._airtable_table_named(effective_table_name)
+                if named_table is not None:
+                    table = named_table
                 is_religious_leads = bool(
                     self._is_religious_leads_table(effective_table_name) and getattr(self, "religious_leads_table", None)
                 )
@@ -7454,7 +7536,10 @@ User request:
             
             if main_conditions:
                 formula = "OR(" + ",".join(main_conditions) + ")"
-                records = self.table.all(formula=formula)
+                company_table, company_table_name = company_tenancy.active_booking_table()
+                search_table = company_table or self.table
+                search_table_name = company_table_name or self.config['airtable']['tables']['main_list']
+                records = search_table.all(formula=formula)
                 
                 if records:
                     def _main_record_rank(rec):
@@ -7485,13 +7570,16 @@ User request:
                     
                     sorted_records = sorted(records, key=_main_record_rank, reverse=True)
                     rec = sorted_records[0]
-                    rec['table_name'] = self.config['airtable']['tables']['main_list']
+                    rec['table_name'] = search_table_name
                     
                     if len(sorted_records) > 1:
                         rec['other_related_bookings'] = sorted_records[1:]
                         logging.info(f"Found {len(sorted_records)} bookings for this contact. Using most recent: {rec['id']}")
                         
                     return rec
+
+            if company_tenancy.active_booking_table()[0] is not None:
+                return None
             
             # 2. Search Leads Table
             if self.leads_table:
@@ -9883,7 +9971,31 @@ Conversation:
         )
         return True
 
-    def process_unified_message(self, sender_identifier, message_body, history_text, source="Email", subject=None, thread_id=None, history_list=None, location="Unknown", receiving_phone_id=None, skip_db_save=False, mailbox=None, incoming_external_message_id=None, email_account_id=None):
+    def process_unified_message(self, *args, **kwargs):
+        """Bind the sender's company bookings table, then run the shared inbox pipeline."""
+        receiving_phone_id = kwargs.get("receiving_phone_id")
+        email_account_id = kwargs.get("email_account_id")
+        company_id = kwargs.get("company_id")
+        if receiving_phone_id is None and len(args) >= 9:
+            receiving_phone_id = args[8]
+        if email_account_id is None and len(args) >= 12:
+            email_account_id = args[11]
+        resolved = str(company_id or "").strip()
+        if not resolved and receiving_phone_id:
+            resolved = company_tenancy.lookup_company_id_for_phone(receiving_phone_id)
+        elif not resolved and email_account_id:
+            resolved = company_tenancy.lookup_company_id_for_email_account(email_account_id)
+        table, table_name = self._open_company_bookings_table(resolved)
+        company_tenancy.bind_booking_company(resolved, table, table_name)
+        try:
+            if resolved and "company_id" not in kwargs:
+                kwargs = dict(kwargs)
+                kwargs["company_id"] = resolved
+            return self._process_unified_message_body(*args, **kwargs)
+        finally:
+            company_tenancy.unbind_booking_company()
+
+    def _process_unified_message_body(self, sender_identifier, message_body, history_text, source="Email", subject=None, thread_id=None, history_list=None, location="Unknown", receiving_phone_id=None, skip_db_save=False, mailbox=None, incoming_external_message_id=None, email_account_id=None, company_id=None):
         """
         Unified logic for processing messages from Email or WhatsApp.
         Returns a dict with processing results.
@@ -10009,7 +10121,8 @@ Conversation:
                     thread_id=thread_id,
                     receiving_phone_id=receiving_phone_id if receiving_phone_id else "",
                     sales_inbox=True if (source == "Email" and str(mailbox or "").lower() == "sales") else None,
-                    email_account_id=email_account_id if source == "Email" else None
+                    email_account_id=email_account_id if source == "Email" else None,
+                    company_id=company_id
                 )
                 self._current_chat_id = chat_conv['chat_id']
                 try:
@@ -10114,7 +10227,8 @@ Conversation:
                     thread_id=thread_id,
                     receiving_phone_id=receiving_phone_id if receiving_phone_id else "",
                     sales_inbox=True if (source == "Email" and str(mailbox or "").lower() == "sales") else None,
-                    email_account_id=email_account_id if source == "Email" else None
+                    email_account_id=email_account_id if source == "Email" else None,
+                    company_id=company_id
                 )
                 self._current_chat_id = chat_conv['chat_id']
                 try:
@@ -10676,8 +10790,12 @@ Conversation:
 
         # Create Lead record if needed
         dept = "religious" if location and location.lower() == "religious" else "general"
-        should_create_lead = not booking_record and (
-            customer_email or contact_phone or (str(source or "").strip().lower() == "facebook")
+        should_create_lead = (
+            not booking_record
+            and company_tenancy.active_booking_table()[0] is None
+            and (
+                customer_email or contact_phone or (str(source or "").strip().lower() == "facebook")
+            )
         )
         if should_create_lead:
             # If we haven't found a valid name yet via AI, try sender email
@@ -11060,7 +11178,7 @@ Conversation:
         # --- NEW: Extract Image ID and Download for Vision ---
         image_url_for_vision = None
         # Look for [Customer sent an image. Image ID: xyz]
-        img_match = re.search(r'\[Customer sent an image\. Image ID: (\d+)\]', message_body)
+        img_match = re.search(r'\[Customer sent an image\. Image ID:\s*([^\]]+)\]', message_body)
         if img_match:
             img_id = img_match.group(1)
             logging.info(f"Extracting image {img_id} for Vision API processing...")
@@ -11419,6 +11537,9 @@ Conversation:
         Downloads a WhatsApp media file and converts it to a Base64 data URL
         suitable for passing to OpenAI's Vision API.
         """
+        local_url = self._read_evolution_media_data_url(media_id)
+        if local_url:
+            return local_url
         try:
             import requests, base64
             access_token = self._get_whatsapp_access_token()
@@ -12253,6 +12374,11 @@ Conversation:
             location = "Religious"
         elif phone_id:
             location = f"Phone-{str(phone_id)[-4:]}"
+        if str(phone_id or "").startswith("evo:"):
+            evo_acc = company_tenancy.find_customer_whatsapp_account(instance_name=str(phone_id)[4:])
+            routed = str((evo_acc or {}).get("routingLocation") or "").strip()
+            if routed:
+                location = routed
 
         logging.info(f"Processing WhatsApp message from {sender_name} ({sender_phone}) for {location}")
         
@@ -12763,6 +12889,15 @@ Conversation:
     def _resolve_phone_number_id(self, location="Unknown", receiving_phone_id=None):
         """Resolve the correct phone_number_id based on location or receiving_phone_id."""
         import json
+        _override_token, forced_phone_id = company_tenancy.wa_override()
+        if forced_phone_id:
+            incoming = str(receiving_phone_id or "").strip()
+            if (not incoming) or incoming.startswith("evo:") or incoming == str(forced_phone_id):
+                return str(forced_phone_id)
+        if receiving_phone_id and not str(receiving_phone_id).startswith("evo:"):
+            company_acc = company_tenancy.find_customer_whatsapp_account(phone_number_id=str(receiving_phone_id))
+            if company_acc and str(company_acc.get("provider") or "").lower() == "meta":
+                return str(receiving_phone_id).strip()
         phone_number_ids = (self.config.get('whatsapp', {}) or {}).get('phone_number_ids', {}) or (self.config.get('whatsapp', {}) or {}).get('phone_number_ids', {}) or {}
         phone_id_locations = (self.config.get('whatsapp', {}) or {}).get('phone_id_locations', {}) or {}
         known_ids = set(str(v) for v in phone_number_ids.values() if v) | set(str(k) for k in phone_id_locations.keys() if k)
@@ -12968,6 +13103,9 @@ Conversation:
 
     def _get_whatsapp_access_token(self):
         """Get WhatsApp access token with fallback support."""
+        override_token, _forced_phone = company_tenancy.wa_override()
+        if override_token:
+            return override_token
         cfg = self.config.get('whatsapp', {}) or {}
         token = cfg.get('access_token') or cfg.get('verify_token')
         if not token:
@@ -13390,8 +13528,407 @@ Conversation:
             logging.warning(f"Facebook attachment upload exception: {e}")
         return None
 
+    def _evolution_media_root(self):
+        root = os.path.join(os.path.dirname(get_data_path("chat_history.db")), "evolution_media")
+        os.makedirs(root, exist_ok=True)
+        return root
+
+    def _evolution_media_paths(self, media_id):
+        safe = re.sub(r"[^a-zA-Z0-9]", "", str(media_id or ""))
+        if not safe.startswith("evo") or len(safe) < 8:
+            return None, None
+        root = self._evolution_media_root()
+        return os.path.join(root, safe + ".bin"), os.path.join(root, safe + ".mime")
+
+    def save_evolution_customer_media(self, raw_bytes, mime_type="application/octet-stream"):
+        if not raw_bytes:
+            return ""
+        import hashlib
+        digest = hashlib.sha1(raw_bytes).hexdigest()[:24]
+        media_id = "evo" + digest
+        bin_path, mime_path = self._evolution_media_paths(media_id)
+        if not bin_path:
+            return ""
+        if not os.path.exists(bin_path):
+            with open(bin_path, "wb") as handle:
+                handle.write(raw_bytes)
+            with open(mime_path, "w", encoding="utf-8") as handle:
+                handle.write(str(mime_type or "application/octet-stream").split(";")[0].strip() or "application/octet-stream")
+        return media_id
+
+    def _read_evolution_media_bytes(self, media_id):
+        bin_path, mime_path = self._evolution_media_paths(media_id)
+        if not bin_path or not os.path.exists(bin_path):
+            return None
+        mime = "application/octet-stream"
+        try:
+            if mime_path and os.path.exists(mime_path):
+                with open(mime_path, "r", encoding="utf-8") as handle:
+                    mime = str(handle.read() or "").strip() or mime
+        except Exception:
+            pass
+        with open(bin_path, "rb") as handle:
+            return handle.read(), mime
+
+    def _read_evolution_media_data_url(self, media_id):
+        found = self._read_evolution_media_bytes(media_id)
+        if not found:
+            return None
+        raw, mime = found
+        if not raw:
+            return None
+        import base64
+        return "data:" + (mime or "application/octet-stream") + ";base64," + base64.b64encode(raw).decode("utf-8")
+
+    def _decode_media_base64(self, value):
+        if not isinstance(value, str) or not value.strip():
+            return None
+        raw = value.strip()
+        if raw.startswith("data:") and "," in raw:
+            raw = raw.split(",", 1)[1]
+        import base64
+        try:
+            data = base64.b64decode(raw)
+        except Exception:
+            return None
+        return data or None
+
+    def _evolution_unwrap_message(self, blob):
+        msg = {}
+        if isinstance(blob, dict):
+            inner = blob.get("message")
+            msg = inner if isinstance(inner, dict) else blob
+        for _ in range(4):
+            if not isinstance(msg, dict):
+                return {}
+            wrapped = None
+            for key in ("ephemeralMessage", "viewOnceMessage", "viewOnceMessageV2", "documentWithCaptionMessage", "editedMessage"):
+                candidate = msg.get(key)
+                if isinstance(candidate, dict):
+                    wrapped = candidate.get("message") if isinstance(candidate.get("message"), dict) else candidate
+                    break
+            if not isinstance(wrapped, dict):
+                break
+            msg = wrapped
+        return msg if isinstance(msg, dict) else {}
+
+    def _evolution_message_kind(self, blob, msg):
+        declared = str((blob or {}).get("messageType") or "").strip()
+        order = (
+            ("imageMessage", "image"),
+            ("stickerMessage", "sticker"),
+            ("audioMessage", "audio"),
+            ("videoMessage", "video"),
+            ("documentMessage", "document"),
+            ("locationMessage", "location"),
+            ("liveLocationMessage", "location"),
+            ("contactMessage", "contacts"),
+            ("contactsArrayMessage", "contacts"),
+            ("extendedTextMessage", "text"),
+            ("conversation", "text"),
+        )
+        if declared:
+            for key, kind in order:
+                if declared == key:
+                    payload = msg.get(key) if isinstance(msg, dict) else None
+                    return kind, payload if isinstance(payload, dict) else {}
+        if isinstance(msg, dict):
+            for key, kind in order:
+                payload = msg.get(key)
+                if isinstance(payload, dict) or (key == "conversation" and isinstance(payload, str) and payload.strip()):
+                    return kind, payload if isinstance(payload, dict) else {}
+        return "text", {}
+
+    def _evolution_pull_media_bytes(self, account, blob):
+        if isinstance(blob, dict):
+            candidates = [blob.get("base64")]
+            message = blob.get("message")
+            if isinstance(message, dict):
+                candidates.append(message.get("base64"))
+            for candidate in candidates:
+                data = self._decode_media_base64(candidate)
+                if data:
+                    return data
+        acc = account if isinstance(account, dict) else {}
+        base = str(acc.get("providerBaseUrl") or "").strip().rstrip("/")
+        api_key = str(acc.get("apiKey") or "").strip()
+        instance_name = str(acc.get("instanceName") or "").strip()
+        if not base or not api_key or not instance_name or not isinstance(blob, dict):
+            return None
+        try:
+            resp = requests.post(
+                f"{base}/chat/getBase64FromMediaMessage/{quote(instance_name)}",
+                headers={"Content-Type": "application/json", "apikey": api_key},
+                json={"message": blob, "convertToMp4": False},
+                timeout=45,
+            )
+            if int(resp.status_code or 0) >= 400:
+                logging.warning("Evolution getBase64 failed %s: %s", resp.status_code, (resp.text or "")[:300])
+                return None
+            payload = resp.json() if resp.content else {}
+            if not isinstance(payload, dict):
+                return None
+            return self._decode_media_base64(payload.get("base64"))
+        except Exception as exc:
+            logging.warning("Evolution media download failed: %s", exc)
+            return None
+
+    def evolution_customer_message_body(self, account, blob):
+        """Turn an Evolution customer webhook into the same inbox text Meta uses."""
+        msg = self._evolution_unwrap_message(blob)
+        kind, payload = self._evolution_message_kind(blob if isinstance(blob, dict) else {}, msg)
+        caption = ""
+        if isinstance(payload, dict):
+            caption = str(payload.get("caption") or payload.get("text") or "").strip()
+        if kind == "text":
+            if isinstance(msg.get("conversation"), str) and msg.get("conversation").strip():
+                return msg.get("conversation").strip()
+            if isinstance(payload, dict):
+                text = str(payload.get("text") or "").strip()
+                if text:
+                    return text
+            return caption
+        if kind == "location":
+            lat = payload.get("degreesLatitude") if isinstance(payload, dict) else None
+            lng = payload.get("degreesLongitude") if isinstance(payload, dict) else None
+            maps = f"https://maps.google.com/?q={lat},{lng}" if lat is not None and lng is not None else ""
+            return f"[Customer shared a location] {maps}".strip()
+        if kind == "contacts":
+            return "[Customer shared contacts. Count: 1]"
+        mime = "application/octet-stream"
+        filename = "file"
+        if isinstance(payload, dict):
+            mime = str(payload.get("mimetype") or mime).split(";")[0].strip() or mime
+            filename = str(payload.get("fileName") or payload.get("filename") or filename).strip() or filename
+        raw = self._evolution_pull_media_bytes(account, blob if isinstance(blob, dict) else {})
+        media_id = self.save_evolution_customer_media(raw, mime) if raw else ""
+        if kind == "audio":
+            transcript = ""
+            if raw:
+                transcript, _err = self._transcribe_audio_bytes(raw, filename="voice.ogg")
+            parts = []
+            if media_id:
+                parts.append(f"[Customer sent an audio message. Audio ID: {media_id}]")
+            if transcript:
+                parts.append(f"[رسالة صوتية مفرغة]: {transcript}")
+            elif not media_id:
+                parts.append("[Customer sent an audio message. Audio ID: ] تعذر حفظ الرسالة الصوتية")
+            return "\n".join(part for part in parts if part).strip()
+        if kind in ("image", "sticker"):
+            if media_id:
+                body = f"[Customer sent an image. Image ID: {media_id}]"
+                return f"{body}\n{caption}".strip() if caption else body
+            return caption or "[Customer sent an image. Image ID: ]"
+        if kind == "video":
+            if media_id:
+                body = f"[Customer sent a video. Video ID: {media_id}]"
+                return f"{body} {caption}".strip()
+            return f"[Customer sent a video. Video ID: ] {caption}".strip()
+        if media_id:
+            body = f"[Customer sent a document. Document ID: {media_id} | Filename: {filename}]"
+            return f"{body}\n{caption}".strip() if caption else body
+        return caption or f"[Customer sent a document. Document ID:  | Filename: {filename}]"
+
+    def send_company_evolution_whatsapp(
+        self,
+        account,
+        recipient_phone,
+        text=None,
+        media_url=None,
+        media_type=None,
+        media_bytes=None,
+        media_mime=None,
+        media_filename=None,
+    ):
+        """Send text, image, audio, video, or a file through a company's Evolution instance."""
+        acc = account if isinstance(account, dict) else {}
+        to_phone = re.sub(r"\D", "", str(recipient_phone or ""))
+        message_text = str(text or "").strip()
+        media_url_s = str(media_url or "").strip()
+        instance_name = str(acc.get("instanceName") or "").strip()
+        provider_base_url = str(acc.get("providerBaseUrl") or "").strip().rstrip("/")
+        api_key = str(acc.get("apiKey") or "").strip()
+        if not provider_base_url or not api_key:
+            base_cfg = self._internal_evolution_cfg_for_notifications() or {}
+            provider_base_url = provider_base_url or str(base_cfg.get("providerBaseUrl") or "http://127.0.0.1:8080").rstrip("/")
+            api_key = api_key or str(base_cfg.get("apiKey") or "").strip()
+        if not to_phone:
+            return False, {"error": "missing_phone", "message": "Missing recipient phone."}
+        if not api_key or not instance_name:
+            return False, {"error": "missing_evolution_config", "message": "Evolution API config missing for this company."}
+        mt = str(media_type or "").strip().lower()
+        mime = str(media_mime or "").split(";")[0].strip().lower()
+        if not mt and mime:
+            if mime.startswith("image/"):
+                mt = "image"
+            elif mime.startswith("audio/"):
+                mt = "audio"
+            elif mime.startswith("video/"):
+                mt = "video"
+            else:
+                mt = "document"
+        if mt.startswith("image"):
+            evo_type = "image"
+        elif mt.startswith("audio"):
+            evo_type = "audio"
+        elif mt.startswith("video"):
+            evo_type = "video"
+        elif mt:
+            evo_type = "document"
+        else:
+            evo_type = ""
+        media_value = media_url_s
+        if media_bytes:
+            import base64
+            media_value = base64.b64encode(media_bytes).decode("utf-8")
+        if not message_text and not media_value:
+            return False, {"error": "missing_text", "message": "Message text is required."}
+        headers = {"Content-Type": "application/json", "apikey": api_key}
+        try:
+            def _post(path, body):
+                resp = requests.post(
+                    f"{provider_base_url}{path}",
+                    headers=headers,
+                    json=body,
+                    timeout=45,
+                )
+                payload = {}
+                try:
+                    payload = resp.json() if resp.content else {}
+                except Exception:
+                    payload = {"raw": (resp.text or "")[:800]}
+                if int(resp.status_code or 0) >= 400:
+                    return False, {
+                        "error": "evolution_send_failed",
+                        "status_code": int(resp.status_code or 0),
+                        "body": (resp.text or "")[:800],
+                        "instance_name": instance_name,
+                        "json": payload if isinstance(payload, dict) else None,
+                    }
+                message_id = None
+                if isinstance(payload, dict):
+                    key = payload.get("key") if isinstance(payload.get("key"), dict) else {}
+                    message_id = key.get("id") or payload.get("id") or payload.get("messageId")
+                return True, {
+                    "instance_name": instance_name,
+                    "message_id": message_id,
+                    "evolution_response": payload,
+                    "text": message_text,
+                }
+
+            if media_value and evo_type == "audio":
+                ok, meta = _post(
+                    f"/message/sendWhatsAppAudio/{quote(instance_name)}",
+                    {"number": to_phone, "audio": media_value, "encoding": True},
+                )
+                if not ok:
+                    ok, meta = _post(
+                        f"/message/sendMedia/{quote(instance_name)}",
+                        {
+                            "number": to_phone,
+                            "mediatype": "audio",
+                            "mimetype": mime or "audio/ogg",
+                            "media": media_value,
+                            "fileName": str(media_filename or "voice.ogg"),
+                        },
+                    )
+                if ok and message_text:
+                    text_ok, text_meta = _post(
+                        f"/message/sendText/{quote(instance_name)}",
+                        {"number": to_phone, "text": message_text},
+                    )
+                    if not text_ok:
+                        return text_ok, text_meta
+                return ok, meta
+            if media_value:
+                body = {
+                    "number": to_phone,
+                    "mediatype": evo_type or "document",
+                    "media": media_value,
+                    "fileName": str(media_filename or "file"),
+                }
+                if mime:
+                    body["mimetype"] = mime
+                if message_text and evo_type != "audio":
+                    body["caption"] = message_text
+                return _post(f"/message/sendMedia/{quote(instance_name)}", body)
+            return _post(
+                f"/message/sendText/{quote(instance_name)}",
+                {"number": to_phone, "text": message_text},
+            )
+        except Exception as e:
+            logging.error("Company Evolution WhatsApp send failed: %s", e, exc_info=True)
+            return False, {"error": "exception", "message": str(e)}
+
+    def _prepare_company_whatsapp_send(
+        self,
+        recipient_phone,
+        text=None,
+        media_url=None,
+        media_type=None,
+        receiving_phone_id=None,
+        template_name=None,
+        media_bytes=None,
+        media_mime=None,
+        media_filename=None,
+    ):
+        """
+        Route a customer-number reply through Evolution when that account is Evolution.
+        Meta templates stay on Meta and are refused for Evolution customer numbers.
+        """
+        incoming = str(receiving_phone_id or "").strip()
+        acc = None
+        if incoming:
+            acc = company_tenancy.find_customer_whatsapp_account(phone_number_id=incoming)
+        if not acc:
+            cid = company_tenancy.active_booking_company_id()
+            if cid and not company_tenancy.is_default_company(cid):
+                acc = company_tenancy.find_customer_whatsapp_account(company_id=cid)
+        if not acc or company_tenancy.is_default_company(acc.get("companyId")):
+            company_tenancy.clear_wa_override()
+            return None
+        provider = str(acc.get("provider") or "").strip().lower()
+        if provider == "evolution":
+            company_tenancy.clear_wa_override()
+            if template_name:
+                return False, {
+                    "error": "evolution_templates_unsupported",
+                    "message": "Meta templates are not sent on an Evolution customer number.",
+                }
+            return self.send_company_evolution_whatsapp(
+                acc,
+                recipient_phone,
+                text=text,
+                media_url=media_url,
+                media_type=media_type,
+                media_bytes=media_bytes,
+                media_mime=media_mime,
+                media_filename=media_filename,
+            )
+        if template_name:
+            company_tenancy.clear_wa_override()
+            return None
+        if provider == "meta" and str(acc.get("accessToken") or "").strip() and str(acc.get("phoneNumberId") or "").strip():
+            company_tenancy.set_wa_override(acc.get("accessToken"), acc.get("phoneNumberId"))
+            return None
+        company_tenancy.clear_wa_override()
+        return None
+
     def send_whatsapp_message(self, recipient_phone, text=None, location="Unknown", media_url=None, media_type=None, template_name=None, template_language="en", booking_data=None, template_variables=None, receiving_phone_id=None, template_header_media_url=None, template_header_media_type=None, media_bytes=None, media_mime=None, media_filename=None, _template_phone_fallback=True, _tried_phone_number_ids=None, _fallback_from_phone_number_id=None):
         """Send a WhatsApp message via Meta Cloud API"""
+        company_send = self._prepare_company_whatsapp_send(
+            recipient_phone,
+            text=text,
+            media_url=media_url,
+            media_type=media_type,
+            receiving_phone_id=receiving_phone_id,
+            template_name=template_name,
+            media_bytes=media_bytes,
+            media_mime=media_mime,
+            media_filename=media_filename,
+        )
+        if company_send is not None:
+            return company_send
         try:
             import json
             # Resolve the correct phone_number_id using the centralized helper
@@ -14029,6 +14566,8 @@ Conversation:
         except Exception as e:
             logging.error(f"Exception sending WhatsApp message: {e}")
             return False, {"status_code": 500, "body": str(e)}
+        finally:
+            company_tenancy.clear_wa_override()
 
     def send_whatsapp_reaction(self, recipient_phone, reacted_message_id, emoji, location="Unknown", receiving_phone_id=None):
         try:
@@ -36701,6 +37240,25 @@ Write ONE short message only. No JSON. No explanations."""
                 resp.headers["Access-Control-Expose-Headers"] = "Content-Range, Accept-Ranges, Content-Length, Content-Type"
                 return resp
             try:
+                if str(media_id or "").startswith("evo"):
+                    stored = self._read_evolution_media_bytes(media_id)
+                    if not stored:
+                        return jsonify({"error": "Media not found"}), 404
+                    file_bytes, content_type = stored
+                    from flask import send_file
+                    import io
+                    resp = send_file(
+                        io.BytesIO(file_bytes),
+                        mimetype=content_type or "application/octet-stream",
+                        as_attachment=False,
+                    )
+                    origin = request.headers.get("Origin") or "*"
+                    resp.headers["Access-Control-Allow-Origin"] = origin if origin != "null" else "*"
+                    resp.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+                    resp.headers["Access-Control-Allow-Headers"] = "Range, Content-Type, Authorization"
+                    resp.headers["Access-Control-Expose-Headers"] = "Content-Range, Accept-Ranges, Content-Length, Content-Type"
+                    resp.headers["Cache-Control"] = "public, max-age=31536000"
+                    return resp
                 import requests
                 access_token = self._get_whatsapp_access_token()
                 if not access_token:
@@ -37572,7 +38130,14 @@ Write ONE short message only. No JSON. No explanations."""
                         else:
                             texts_to_save.append(f"{prefix}\n{text}".strip())
                         # Skip Meta send path below
-                    elif not template_name:
+                    if template_name and str(receiving_phone_id or "").startswith("evo:"):
+                        return jsonify({
+                            "status": "error",
+                            "message": "قوالب ميتا لا تُرسل من رقم Evolution. أرسل نصاً أو صورة أو صوتاً أو ملفاً.",
+                            "code": "TEMPLATE_REQUIRES_META",
+                        }), 400
+
+                    elif desired_channel != 'whatsapp_internal' and not template_name and not str(receiving_phone_id or "").startswith("evo:"):
                         try:
                             last_ts = None
                             if conv_dict.get('airtable_record_id'):
@@ -41871,6 +42436,45 @@ Write ONE short message only. No JSON. No explanations."""
                         write_key = company_tenancy.scoped_setting_key(key, actor_company_id)
 
                     _write_setting_value(write_key, val)
+                    if str(key) == "dashboard_channel_settings":
+                        channel_company_id = company_tenancy.resolve_company_id(
+                            username=str((actor or {}).get("username") or actor_user_id or "").strip() or None,
+                            user_id=str(actor_user_id or "").strip() or None,
+                        )
+                        if not company_tenancy.is_default_company(channel_company_id):
+                            try:
+                                parsed_channels = val
+                                if isinstance(parsed_channels, str) and parsed_channels.strip():
+                                    parsed_channels = json.loads(parsed_channels)
+                                accounts = parsed_channels.get("whatsappAccounts") if isinstance(parsed_channels, dict) else None
+                                webhook_url = request.host_url.rstrip("/") + "/api/internal_notifications/whatsapp/webhook"
+                                try:
+                                    public_base = str(company_tenancy.get_connections(channel_company_id).get("webhookPublicBase") or "").rstrip("/")
+                                    if public_base:
+                                        webhook_url = public_base + "/api/internal_notifications/whatsapp/webhook"
+                                except Exception:
+                                    pass
+                                if isinstance(accounts, list):
+                                    for acc in accounts:
+                                        if not isinstance(acc, dict):
+                                            continue
+                                        if str(acc.get("provider") or "").strip().lower() != "evolution":
+                                            continue
+                                        if str(acc.get("usage") or "customers") == "internal_notifications":
+                                            continue
+                                        if acc.get("enabled") is False:
+                                            continue
+                                        if not str(acc.get("instanceName") or "").strip():
+                                            continue
+                                        evo_cfg = {
+                                            "providerBaseUrl": acc.get("providerBaseUrl") or "",
+                                            "apiKey": acc.get("apiKey") or "",
+                                            "instanceName": acc.get("instanceName") or "",
+                                            "webhookUrl": webhook_url,
+                                        }
+                                        _ensure_internal_whatsapp_webhook(evo_cfg)
+                            except Exception as evo_hook_err:
+                                logging.warning("Company Evolution webhook setup skipped: %s", evo_hook_err)
                     if str(key) == "dashboard_channel_settings" and company_tenancy.is_default_company(
                         company_tenancy.resolve_company_id(
                             username=str((actor or {}).get("username") or actor_user_id or "").strip() or None,
@@ -42610,6 +43214,184 @@ Write ONE short message only. No JSON. No explanations."""
                 logging.error(f"Error in /api/internal_notifications/user_whatsapp/webhook: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        def _company_evolution_webhook_url(company_id):
+            try:
+                port = int(((self.config.get("whatsapp", {}) or {}).get("port") or 5001))
+            except Exception:
+                port = 5001
+            webhook_url = f"http://127.0.0.1:{port}/api/internal_notifications/whatsapp/webhook"
+            try:
+                public_base = str(company_tenancy.get_connections(company_id).get("webhookPublicBase") or "").rstrip("/")
+                if public_base:
+                    webhook_url = public_base + "/api/internal_notifications/whatsapp/webhook"
+            except Exception:
+                pass
+            return webhook_url
+
+        def _prepare_company_evolution_cfg(account, company_id):
+            account = dict(account or {})
+            instance_name = str(account.get("instanceName") or "").strip()
+            if not instance_name:
+                cid = re.sub(r"[^A-Za-z0-9]+", "", str(company_id or ""))[:12] or "co"
+                aid = re.sub(r"[^A-Za-z0-9]+", "", str(account.get("id") or ""))[-12:] or secrets.token_hex(3)
+                instance_name = f"cust_{cid}_{aid}"[:48]
+            else:
+                instance_name = re.sub(r"[^A-Za-z0-9_-]+", "_", instance_name)[:60]
+            base_url = _sanitize_url_field(account.get("providerBaseUrl")) or _embedded_evolution_base_url()
+            api_key = str(account.get("apiKey") or "").strip() or _embedded_evolution_api_key()
+            webhook_url = _sanitize_url_field(account.get("webhookUrl")) or _company_evolution_webhook_url(company_id)
+            cfg = {
+                "providerBaseUrl": base_url,
+                "apiKey": api_key,
+                "instanceName": instance_name,
+                "webhookUrl": webhook_url,
+            }
+            if _normalize_base_url(base_url) == _normalize_base_url(_embedded_evolution_base_url()):
+                _ensure_embedded_evolution_service_running()
+            return cfg
+
+        def _merge_company_evolution_account(company_id, account, ensure_webhook=False):
+            settings = _get_channel_settings_for_company(company_id)
+            if not isinstance(settings, dict):
+                settings = {}
+            accounts = settings.get("whatsappAccounts")
+            if not isinstance(accounts, list):
+                accounts = []
+            acc_id = str((account or {}).get("id") or "").strip()
+            if not acc_id:
+                raise Exception("account id is required")
+            replaced = False
+            next_accounts = []
+            for item in accounts:
+                if isinstance(item, dict) and str(item.get("id") or "").strip() == acc_id:
+                    merged = dict(item)
+                    merged.update(account)
+                    next_accounts.append(merged)
+                    replaced = True
+                else:
+                    next_accounts.append(item)
+            if not replaced:
+                next_accounts.append(dict(account))
+            settings = dict(settings)
+            settings["whatsappAccounts"] = next_accounts
+            _write_setting_value(company_tenancy.channel_settings_key(company_id), settings)
+            if ensure_webhook:
+                try:
+                    evo_cfg = {
+                        "providerBaseUrl": account.get("providerBaseUrl") or "",
+                        "apiKey": account.get("apiKey") or "",
+                        "instanceName": account.get("instanceName") or "",
+                        "webhookUrl": account.get("webhookUrl") or "",
+                    }
+                    if evo_cfg["instanceName"] and evo_cfg["providerBaseUrl"] and evo_cfg["apiKey"] and evo_cfg["webhookUrl"]:
+                        _ensure_internal_whatsapp_webhook(evo_cfg)
+                except Exception as hook_err:
+                    logging.warning("Company Evolution QR webhook setup skipped: %s", hook_err)
+            return dict(account)
+
+        def _apply_evolution_connect_result(account, cfg, status_code, payload):
+            account = dict(account or {})
+            qr_data = _extract_qr_data(payload)
+            state = _extract_connection_state(payload)
+            ui_status = _map_evolution_state_to_ui(state, qr_data)
+            phone = _extract_connected_whatsapp_number(payload) or ""
+            if ui_status == "connected" and not phone:
+                try:
+                    meta = _fetch_evolution_instance_metadata(cfg, cfg.get("instanceName"))
+                    phone = _extract_connected_whatsapp_number(meta) or ""
+                except Exception:
+                    phone = ""
+            account["provider"] = "evolution"
+            account["providerBaseUrl"] = cfg.get("providerBaseUrl") or ""
+            account["apiKey"] = cfg.get("apiKey") or ""
+            account["instanceName"] = cfg.get("instanceName") or ""
+            account["webhookUrl"] = cfg.get("webhookUrl") or ""
+            account["phoneNumberId"] = f"evo:{account['instanceName']}" if account.get("instanceName") else str(account.get("phoneNumberId") or "")
+            if phone:
+                account["phoneNumber"] = phone
+            if qr_data:
+                account["qrCodeDataUrl"] = qr_data
+                account["lastQrUpdatedAt"] = _utc_iso_now()
+            if ui_status == "connected":
+                account["connectionStatus"] = "connected"
+                account["qrCodeDataUrl"] = ""
+                account["lastConnectedAt"] = _utc_iso_now()
+            elif qr_data or ui_status == "pending_qr":
+                account["connectionStatus"] = "pending_qr"
+            elif ui_status == "error" or int(status_code or 0) >= 400:
+                account["connectionStatus"] = "error"
+            return account
+
+        @app.route('/api/channels/evolution/request_qr', methods=['POST', 'OPTIONS'])
+        def api_channels_evolution_request_qr():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                data = request.get_json(silent=True) or {}
+                actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+                if not str(actor.get("username") or actor.get("id") or "").strip():
+                    return jsonify({"status": "error", "message": "actor is required"}), 400
+                account = data.get("account") if isinstance(data.get("account"), dict) else {}
+                if str(account.get("provider") or "evolution").strip().lower() == "meta":
+                    return jsonify({"status": "error", "message": "QR linking is only for Evolution accounts"}), 400
+                cid = _actor_company_id_from_request()
+                cfg = _prepare_company_evolution_cfg(account, cid)
+                if not str(cfg.get("providerBaseUrl") or "").strip() or not str(cfg.get("apiKey") or "").strip():
+                    return jsonify({"status": "error", "message": "Evolution server is not ready"}), 400
+                create_status_code, create_payload_response = _upsert_internal_whatsapp_instance(cfg)
+                status_code, payload = _evolution_request(
+                    "GET", cfg, f"/instance/connect/{quote(cfg.get('instanceName') or '')}", timeout=25
+                )
+                saved_account = dict(account)
+                saved_account["id"] = str(account.get("id") or f"wa_evolution_{secrets.token_hex(4)}").strip()
+                saved_account["provider"] = "evolution"
+                saved_account["enabled"] = account.get("enabled") is not False
+                saved_account["usage"] = "internal_notifications" if str(account.get("usage") or "") == "internal_notifications" else "customers"
+                saved_account = _apply_evolution_connect_result(saved_account, cfg, status_code, payload)
+                saved_account = _merge_company_evolution_account(cid, saved_account, ensure_webhook=True)
+                return jsonify({
+                    "status": "success",
+                    "data": {
+                        "account": saved_account,
+                        "instance_create_status_code": create_status_code,
+                        "provider_status_code": status_code,
+                    }
+                }), 200
+            except Exception as e:
+                logging.error(f"Error in /api/channels/evolution/request_qr: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        @app.route('/api/channels/evolution/refresh', methods=['POST', 'OPTIONS'])
+        def api_channels_evolution_refresh():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            try:
+                data = request.get_json(silent=True) or {}
+                actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+                if not str(actor.get("username") or actor.get("id") or "").strip():
+                    return jsonify({"status": "error", "message": "actor is required"}), 400
+                account = data.get("account") if isinstance(data.get("account"), dict) else {}
+                cid = _actor_company_id_from_request()
+                instance_name = str(account.get("instanceName") or "").strip()
+                if not instance_name:
+                    return jsonify({"status": "success", "data": {"account": account}}), 200
+                cfg = _prepare_company_evolution_cfg(account, cid)
+                status_code, payload = _evolution_request(
+                    "GET", cfg, f"/instance/connectionState/{quote(instance_name)}", timeout=12
+                )
+                saved_account = _apply_evolution_connect_result(dict(account), cfg, status_code, payload)
+                changed = (
+                    str(saved_account.get("connectionStatus") or "") != str(account.get("connectionStatus") or "")
+                    or str(saved_account.get("phoneNumber") or "") != str(account.get("phoneNumber") or "")
+                    or str(saved_account.get("qrCodeDataUrl") or "") != str(account.get("qrCodeDataUrl") or "")
+                )
+                if changed:
+                    saved_account = _merge_company_evolution_account(cid, saved_account)
+                return jsonify({"status": "success", "data": {"account": saved_account}}), 200
+            except Exception as e:
+                logging.error(f"Error in /api/channels/evolution/refresh: {e}", exc_info=True)
+                return jsonify({"status": "error", "message": str(e)}), 500
+
         @app.route('/api/internal_notifications/whatsapp/request_qr', methods=['POST', 'OPTIONS'])
         def api_internal_notifications_whatsapp_request_qr():
             if request.method == 'OPTIONS':
@@ -42765,6 +43547,60 @@ Write ONE short message only. No JSON. No explanations."""
                 ).strip()
 
                 if instance_name and payload_instance and payload_instance != instance_name:
+                    try:
+                        data_obj_early = payload.get("data") if isinstance(payload, dict) else None
+                        incoming_blob_early = data_obj_early if isinstance(data_obj_early, dict) else payload
+                        from_me_early = _extract_evolution_from_me(incoming_blob_early)
+                        remote_jid_early = _extract_evolution_remote_jid(incoming_blob_early)
+                        sender_phone_early = re.sub(r"\D", "", str(remote_jid_early or ""))
+                        incoming_text_early = _extract_evolution_message_text(incoming_blob_early)
+                        state_early = _extract_connection_state(payload)
+                        qr_early = _extract_qr_data(payload)
+                        next_status_early = _map_evolution_state_to_ui(state_early, qr_early)
+                        detected_phone_early = _extract_connected_whatsapp_number(payload) or ""
+                        if next_status_early == "connected" and not detected_phone_early:
+                            try:
+                                acc_for_phone = company_tenancy.find_customer_whatsapp_account(instance_name=payload_instance)
+                                if isinstance(acc_for_phone, dict):
+                                    phone_cfg = {
+                                        "providerBaseUrl": acc_for_phone.get("providerBaseUrl") or "",
+                                        "apiKey": acc_for_phone.get("apiKey") or "",
+                                        "instanceName": payload_instance,
+                                    }
+                                    phone_meta = _fetch_evolution_instance_metadata(phone_cfg, payload_instance)
+                                    detected_phone_early = _extract_connected_whatsapp_number(phone_meta) or ""
+                            except Exception:
+                                detected_phone_early = ""
+                        company_tenancy.update_evolution_account_connection(
+                            payload_instance,
+                            connection_status=next_status_early or "",
+                            qr_data=qr_early or "",
+                            whatsapp_number=detected_phone_early,
+                        )
+                        acc_early = company_tenancy.find_customer_whatsapp_account(instance_name=payload_instance)
+                        remote_is_group = "@g.us" in str(remote_jid_early or "") or str(remote_jid_early or "").endswith("@broadcast")
+                        inbox_text = ""
+                        if acc_early and not from_me_early and sender_phone_early and not remote_is_group:
+                            inbox_text = self.evolution_customer_message_body(acc_early, incoming_blob_early)
+                        if inbox_text:
+                            sender_name_early = "Guest"
+                            if isinstance(incoming_blob_early, dict):
+                                sender_name_early = str(
+                                    incoming_blob_early.get("pushName")
+                                    or incoming_blob_early.get("pushname")
+                                    or "Guest"
+                                ).strip() or "Guest"
+                            self.process_whatsapp_message(
+                                sender_phone_early,
+                                inbox_text,
+                                sender_name_early,
+                                phone_id=f"evo:{payload_instance}",
+                            )
+                            return jsonify({"status": "success", "message": "company_customer_ingested"}), 200
+                        if acc_early:
+                            return jsonify({"status": "success", "message": "company_evolution_status"}), 200
+                    except Exception as company_wa_err:
+                        logging.error("Company Evolution customer ingest failed: %s", company_wa_err, exc_info=True)
                     return jsonify({"status": "success", "message": "ignored_other_instance"}), 200
 
                 qr_data = _extract_qr_data(payload)

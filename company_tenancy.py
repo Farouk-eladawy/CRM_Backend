@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import secrets
+import threading
 from datetime import datetime, timezone
 
 DEFAULT_COMPANY_ID = "fts"
@@ -35,7 +36,16 @@ def empty_connections():
         "religiousWaDisplay": "",
         # Optional white-label hooks host (no FTS brand). Example: https://hooks.acme-travel.com
         "webhookPublicBase": "",
+        # Company bookings live in their own Airtable table. Empty means "not connected".
+        "airtableBaseId": "",
+        "airtableBookingsTable": "",
     }
+
+# Nile Crystal bookings share the main Airtable base, in table Nile_Crystal_Booking.
+NILE_CRYSTAL_AIRTABLE_BASE_ID = "appTp5YgSp9DV2HYc"
+NILE_CRYSTAL_BOOKINGS_TABLE = "Nile_Crystal_Booking"
+
+_booking_ctx = threading.local()
 
 
 def normalize_company_id(value) -> str:
@@ -598,9 +608,209 @@ def delete_company(company_id, *, reassign_users_to=DEFAULT_COMPANY_ID):
     }
 
 
+def _compact_token(value) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().lower())
+
+
+def _looks_like_nile_crystal(*parts) -> bool:
+    blob = " ".join(str(part or "") for part in parts)
+    return "nilecrystal" in _compact_token(blob)
+
+
+def company_is_nile_crystal(company) -> bool:
+    if not isinstance(company, dict):
+        return False
+    if _looks_like_nile_crystal(
+        company.get("name"),
+        company.get("publicSlug"),
+        company.get("createdByUsername"),
+        company.get("id"),
+    ):
+        return True
+    cid = normalize_company_id(company.get("id"))
+    if is_default_company(cid):
+        return False
+    try:
+        for user in load_dashboard_users():
+            if not isinstance(user, dict):
+                continue
+            if user_company_id(user) != cid:
+                continue
+            if _looks_like_nile_crystal(user.get("username"), user.get("name")):
+                return True
+    except Exception:
+        return False
+    return False
+
+
+def apply_known_booking_defaults(company, connections) -> dict:
+    """Fill Nile Crystal's bookings table when the company has not set one yet."""
+    out = dict(connections or empty_connections())
+    if not isinstance(company, dict) or is_default_company(company.get("id")):
+        return out
+    if not company_is_nile_crystal(company):
+        return out
+    if not str(out.get("airtableBookingsTable") or "").strip():
+        out["airtableBookingsTable"] = NILE_CRYSTAL_BOOKINGS_TABLE
+    if not str(out.get("airtableBaseId") or "").strip():
+        out["airtableBaseId"] = NILE_CRYSTAL_AIRTABLE_BASE_ID
+    return out
+
+
 def get_connections(company_id) -> dict:
     company = get_company(company_id) or default_fts_company()
-    return sanitize_connections(company.get("connections"))
+    return apply_known_booking_defaults(company, sanitize_connections(company.get("connections")))
+
+
+def bind_booking_company(company_id, table=None, table_name=""):
+    stack = getattr(_booking_ctx, "stack", None)
+    if stack is None:
+        stack = []
+        _booking_ctx.stack = stack
+    stack.append((
+        getattr(_booking_ctx, "company_id", None),
+        getattr(_booking_ctx, "table", None),
+        getattr(_booking_ctx, "table_name", None),
+    ))
+    _booking_ctx.company_id = str(company_id or "").strip() or None
+    _booking_ctx.table = table
+    _booking_ctx.table_name = str(table_name or "").strip() or None
+
+
+def unbind_booking_company():
+    stack = getattr(_booking_ctx, "stack", None) or []
+    if not stack:
+        _booking_ctx.company_id = None
+        _booking_ctx.table = None
+        _booking_ctx.table_name = None
+        return
+    company_id, table, table_name = stack.pop()
+    _booking_ctx.company_id = company_id
+    _booking_ctx.table = table
+    _booking_ctx.table_name = table_name
+
+
+def active_booking_company_id():
+    return getattr(_booking_ctx, "company_id", None)
+
+
+def active_booking_table():
+    return getattr(_booking_ctx, "table", None), getattr(_booking_ctx, "table_name", None)
+
+
+def set_wa_override(token=None, phone_number_id=None):
+    _booking_ctx.wa_access_token = str(token or "").strip() or None
+    _booking_ctx.wa_phone_number_id = str(phone_number_id or "").strip() or None
+
+
+def clear_wa_override():
+    _booking_ctx.wa_access_token = None
+    _booking_ctx.wa_phone_number_id = None
+
+
+def wa_override():
+    return (
+        getattr(_booking_ctx, "wa_access_token", None),
+        getattr(_booking_ctx, "wa_phone_number_id", None),
+    )
+
+
+def _iter_company_channel_settings():
+    import chat_db
+
+    for company in load_companies():
+        cid = company.get("id") or DEFAULT_COMPANY_ID
+        raw = chat_db.get_setting(channel_settings_key(cid))
+        settings = _parse_json(raw, {})
+        if not isinstance(settings, dict):
+            settings = {}
+        yield cid, settings
+
+
+def iter_customer_whatsapp_accounts():
+    for cid, settings in _iter_company_channel_settings():
+        accounts = settings.get("whatsappAccounts")
+        if not isinstance(accounts, list):
+            continue
+        for acc in accounts:
+            if not isinstance(acc, dict):
+                continue
+            if str(acc.get("usage") or "customers").strip().lower() == "internal_notifications":
+                continue
+            if acc.get("enabled") is False:
+                continue
+            yield cid, acc
+
+
+def find_customer_whatsapp_account(phone_number_id="", instance_name="", company_id=None):
+    pid = str(phone_number_id or "").strip()
+    inst = str(instance_name or "").strip()
+    if pid.startswith("evo:"):
+        inst = pid[4:].strip()
+        pid = ""
+    wanted_company = normalize_company_id(company_id) if company_id else ""
+    fallback = None
+    for cid, acc in iter_customer_whatsapp_accounts():
+        if wanted_company and normalize_company_id(cid) != wanted_company:
+            continue
+        provider = str(acc.get("provider") or "").strip().lower()
+        row = dict(acc)
+        row["companyId"] = cid
+        if pid and provider == "meta" and str(acc.get("phoneNumberId") or "").strip() == pid:
+            return row
+        if inst and provider == "evolution" and str(acc.get("instanceName") or "").strip() == inst:
+            return row
+        if wanted_company:
+            if bool(acc.get("isDefault")):
+                fallback = row
+            elif fallback is None:
+                fallback = row
+    return fallback if wanted_company and not pid and not inst else None
+
+
+def update_evolution_account_connection(instance_name, connection_status="", qr_data="", whatsapp_number=""):
+    """Store QR / connection state on the company Evolution customer account."""
+    inst = str(instance_name or "").strip()
+    if not inst:
+        return False
+    import chat_db
+
+    phone = re.sub(r"\D", "", str(whatsapp_number or ""))
+    changed = False
+    for cid, settings in _iter_company_channel_settings():
+        accounts = settings.get("whatsappAccounts")
+        if not isinstance(accounts, list):
+            continue
+        next_accounts = []
+        row_changed = False
+        for acc in accounts:
+            if not isinstance(acc, dict):
+                next_accounts.append(acc)
+                continue
+            row = dict(acc)
+            provider = str(row.get("provider") or "").strip().lower()
+            if provider == "evolution" and str(row.get("instanceName") or "").strip() == inst:
+                if connection_status:
+                    row["connectionStatus"] = connection_status
+                if qr_data:
+                    row["qrCodeDataUrl"] = qr_data
+                elif connection_status == "connected":
+                    row["qrCodeDataUrl"] = ""
+                if phone:
+                    row["phoneNumber"] = phone
+                if connection_status == "connected":
+                    row["phoneNumberId"] = f"evo:{inst}"
+                row_changed = True
+            next_accounts.append(row)
+        if row_changed:
+            settings = dict(settings)
+            settings["whatsappAccounts"] = next_accounts
+            chat_db.set_setting(
+                channel_settings_key(cid),
+                json.dumps(settings, ensure_ascii=False),
+            )
+            changed = True
+    return changed
 
 
 def save_connections(company_id, connections):
@@ -700,6 +910,14 @@ def lookup_company_id_for_phone(phone_number_id) -> str:
     pid = str(phone_number_id or "").strip()
     if not pid:
         return DEFAULT_COMPANY_ID
+    if pid.startswith("evo:"):
+        acc = find_customer_whatsapp_account(instance_name=pid[4:])
+        if acc and acc.get("companyId"):
+            return normalize_company_id(acc.get("companyId"))
+        return DEFAULT_COMPANY_ID
+    meta_acc = find_customer_whatsapp_account(phone_number_id=pid)
+    if meta_acc and meta_acc.get("companyId") and not is_default_company(meta_acc.get("companyId")):
+        return normalize_company_id(meta_acc.get("companyId"))
     import chat_db
 
     for company in load_companies():

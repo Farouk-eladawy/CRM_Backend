@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Nile_Crystal_Notification (Cancelled)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "64170f78-b4d9-4020-8b0c-fec59cbeb94e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_nile_crystal_cancelled_v1\",\n  \"view\": \"Cancel Booking\",\n  \"view_id\": \"viwxEmYSikeZnYvPb\",\n  \"table_id\": \"tblb13fhlXdmWKdA5\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"cancel\",\n  \"phones\": [\n    \"+201224686145\"\n  ],\n  \"include_customer_phone\": true,\n  \"max_records\": 25,\n  \"dry_run\": true\n}"
+      },
+      "id": "721a2263-3866-4c42-913d-484c37f5a2aa",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_nile_crystal_cancelled_v1"
+  },
+  "tags": []
+}

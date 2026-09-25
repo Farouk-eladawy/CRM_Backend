@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Offer Bonus FTS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "218cf6bc-695c-4e10-82d8-85683f412b66",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/offer_bonus_fts/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"Offer Get Your Guide2\",\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "ace3be56-e08d-4894-a2fb-7216c6a360b2",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "offer_bonus_fts_v1"
+  },
+  "tags": []
+}

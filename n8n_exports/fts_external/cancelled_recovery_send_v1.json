@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Cancelled Recovery Offer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "d420e486-e5aa-45b0-af15-fbe8f6e96eab",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/cancelled_recovery_fts/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"mode\": \"send\",\n  \"view\": \"Cancelled Recovery Offer\",\n  \"max_records\": 15,\n  \"dry_run\": false,\n  \"template_language\": \"en\",\n  \"template_name\": \"cancelletion_reason\",\n  \"template_name_sharm\": \"cancelletion_reason\",\n  \"redirect_base\": \"https://redirect.ftstravels.com/\",\n  \"retry_cooldown_minutes\": 180\n}"
+      },
+      "id": "67f8941c-cd40-43a1-b545-769ff9f0ad33",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "cancelled_recovery_send_v1"
+  },
+  "tags": []
+}

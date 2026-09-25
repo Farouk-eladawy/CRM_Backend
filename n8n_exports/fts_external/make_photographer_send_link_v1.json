@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Photographer Send Link",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "613cfa21-6f53-46e6-8504-30c633600cd2",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/photographer/bulk_send_link",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"Photographer Link Send\",\n  \"max_records\": 25,\n  \"dry_run\": false,\n  \"notify_whatsapp\": true,\n  \"notify_email\": true,\n  \"whatsapp_template_name\": \"photographers__sent_link\",\n  \"whatsapp_template_language\": \"en\",\n  \"status_field\": \"Status Photographer WhatsApp\",\n  \"done_value\": \"Done\",\n  \"retry_value\": \"Try Again\"\n}"
+      },
+      "id": "3205909f-03fa-4d58-bea6-328fa475677b",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "make_photographer_send_link_v1"
+  },
+  "tags": []
+}

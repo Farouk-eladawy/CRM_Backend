@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | M_Mostafa_(Sharm El-Sheikh) Tomorrow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "38af597f-ab1e-4d4a-bcac-027f32f581d3",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_m_mostafa_ssh_tomorrow_v1\",\n  \"view\": \"M_Mostafa_(Sharm El-Sheikh) Tomorrow\",\n  \"view_id\": \"viwa2DcRJlMC4AqHe\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"both\",\n  \"phones\": [\n    \"+201204222488\"\n  ],\n  \"include_customer_phone\": false,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "fa9fc394-8274-45a0-ac7c-f0a72832dc46",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_m_mostafa_ssh_tomorrow_v1"
+  },
+  "tags": []
+}

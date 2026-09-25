@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Nile_Dinner_Cruise_Last",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "b842d2df-a54d-46f4-9f14-c4773ce07bd5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_nile_dinner_cruise_last_v1\",\n  \"view\": \"Nile_Dinner_Cruise_Last_Min\",\n  \"view_id\": \"viwTgy88AXEGdLl4m\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"last_minute\",\n  \"phones\": [\n    \"+201111281711\"\n  ],\n  \"include_customer_phone\": true,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "ed743e7e-390d-4cab-aa85-7c973eff3491",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_nile_dinner_cruise_last_v1"
+  },
+  "tags": []
+}

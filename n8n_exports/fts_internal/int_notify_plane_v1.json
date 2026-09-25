@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Plane Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "60bc4a81-2f7b-456a-9fac-4cbc3e8a6d1e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_plane_v1\",\n  \"view\": \"Plane Notification\",\n  \"view_id\": \"viw4vgxSBBSA0H0w5\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"last_minute\",\n  \"phones\": [\n    \"+201098700670\",\n    \"+201151956528\",\n    \"+201287049358\"\n  ],\n  \"include_customer_phone\": true,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "25db8aa9-b2b4-45c5-8347-f56d19438fbe",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_plane_v1"
+  },
+  "tags": []
+}

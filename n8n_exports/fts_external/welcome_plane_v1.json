@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Welcome Plane",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "80ef93a4-3bb8-4d6b-9f40-e61636214909",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/welcome_plane/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"Send welcome plane\",\n  \"max_records\": 10,\n  \"dry_run\": false,\n  \"notify_email\": true,\n  \"notify_whatsapp\": true,\n  \"done_value\": \"Done\",\n  \"retry_value\": \"Try Again\",\n  \"follow_sales_field\": \"Follow sales\",\n  \"clear_follow_sales\": true\n}"
+      },
+      "id": "8e12d9ed-383c-4bfa-be3d-60258b83c671",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "welcome_plane_v1"
+  },
+  "tags": []
+}

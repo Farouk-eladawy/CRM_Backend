@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Pickup Reminder 30min",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "d96e4cfc-2c0c-4eb5-af05-93038eaf9fdd",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/pickup_reminder_10min/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"Send_Reminder_Pickup\",\n  \"max_records\": 250,\n  \"dry_run\": false,\n  \"lead_minutes\": 10,\n  \"window_seconds\": 70,\n  \"notify_email\": true,\n  \"notify_whatsapp\": true,\n  \"whatsapp_template_name\": \"our_wayss\",\n  \"whatsapp_template_language\": \"en\",\n  \"quick_reply_payloads\": [\n    \"I'm Ready\"\n  ],\n  \"status_field\": \"Send Reminder Pickup\",\n  \"done_value\": \"Done\",\n  \"retry_value\": \"Try Again\",\n  \"last_sent_field\": \"Last Sent\",\n  \"follow_sales_field\": \"Follow sales\",\n  \"clear_follow_sales\": true,\n  \"default_location\": \"Hurghada/Cairo\",\n  \"timezone\": \"Africa/Cairo\"\n}"
+      },
+      "id": "8fe1738d-11f0-409a-ba7a-0386e9c5e332",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "pickup_reminder_10min_v1"
+  },
+  "tags": []
+}

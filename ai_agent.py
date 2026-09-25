@@ -32020,14 +32020,50 @@ Prefer the MarkItDown Extraction section below when present.
                             "ok": True,
                             "company_id": matched_company,
                             "connection_id": str((matched_conn or {}).get("id") or ""),
-                            "actions": ["send_whatsapp", "send_email", "ping"],
+                            "actions": ["send_whatsapp", "send_email", "run_workflow", "ping"],
                         },
                     }), 200
+
+                if action in ("run_workflow", "run_scheduled_workflow", "workflow"):
+                    import threading as _n8n_threading
+                    from automation_engine import is_religious_workflow as _is_rel_wf
+
+                    workflow_id = str(
+                        payload.get("workflow_id") or payload.get("id") or payload.get("workflowId") or ""
+                    ).strip()
+                    if not workflow_id:
+                        return jsonify({"status": "error", "message": "missing_workflow_id"}), 400
+                    import automation_db as _adb
+                    wf = _adb.get_workflow(workflow_id)
+                    if not wf or _adb.workflow_company_id(wf) != matched_company:
+                        return jsonify({"status": "error", "message": "not_found"}), 404
+                    if _is_rel_wf(wf):
+                        return jsonify({"status": "error", "message": "religious_not_allowed"}), 403
+                    if str(wf.get("trigger_type") or "").strip().lower() != "schedule":
+                        return jsonify({"status": "error", "message": "not_schedule"}), 403
+
+                    def _n8n_run(_wid=workflow_id, _cid=matched_company):
+                        try:
+                            engine.run_from_n8n(_wid, company_id=_cid)
+                        except Exception:
+                            logging.exception("n8n run_workflow failed for %s", _wid)
+
+                    _n8n_threading.Thread(target=_n8n_run, daemon=True).start()
+                    return jsonify({
+                        "status": "success",
+                        "data": {
+                            "ok": True,
+                            "accepted": True,
+                            "action": "run_workflow",
+                            "workflow_id": workflow_id,
+                            "company_id": matched_company,
+                        },
+                    }), 202
 
                 return jsonify({
                     "status": "error",
                     "message": "unknown_action",
-                    "hint": "Use action=send_whatsapp | send_email | ping",
+                    "hint": "Use action=send_whatsapp | send_email | run_workflow | ping",
                 }), 400
             except Exception as e:
                 logging.error(f"Error in /api/automation/activepieces/bridge: {e}", exc_info=True)

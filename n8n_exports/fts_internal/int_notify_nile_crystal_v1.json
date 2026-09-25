@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Nile_Crystal_Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "8a73e9ff-5bf2-4ba8-989f-f989ceb99fff",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_nile_crystal_v1\",\n  \"view\": \"Nile_Dinner_Cruise_Last_Min\",\n  \"view_id\": \"viwlToq37Y7Kb5gHz\",\n  \"table_id\": \"tblb13fhlXdmWKdA5\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"last_minute\",\n  \"phones\": [\n    \"+201224686145\",\n    \"+201111178255\",\n    \"+201225083059\"\n  ],\n  \"include_customer_phone\": true,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "44986f8b-8e7e-4017-ac2c-ae6b46c7a344",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_nile_crystal_v1"
+  },
+  "tags": []
+}

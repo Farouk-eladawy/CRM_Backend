@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | External Cancellation Reason Template - الخارجي (إرسال تمبلت سبب الإلغاء)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "caacc150-7d6b-4844-a151-3aea2b23a3a0",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"external_cancellation.py\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"template_name\": \"Cancellation Reason\",\n  \"template_language\": \"en\",\n  \"max_records\": 50,\n  \"dry_run\": false\n}"
+      },
+      "id": "56ce264b-1380-443f-a167-a3cb65e68f02",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "external_cancellation_reason_v1"
+  },
+  "tags": []
+}

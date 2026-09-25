@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Collecting On Date Trip",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "67543c12-83a9-42ce-adb5-2bf72fba18cd",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_collecting_on_date_trip_v1\",\n  \"view\": \"Collecting On Data Trip\",\n  \"view_id\": \"viwLCrbJAim0LSR1a\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"collecting\",\n  \"phones\": [\n    \"+201128174899\"\n  ],\n  \"include_customer_phone\": false,\n  \"trigger_field\": \"Collecting on date Trip\",\n  \"bootstrap_seen_on_first_run\": true,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "e1809179-fc09-432d-b172-ab91ebc0e724",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_collecting_on_date_trip_v1"
+  },
+  "tags": []
+}

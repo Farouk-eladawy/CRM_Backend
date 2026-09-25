@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Blue Hole, Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "972e74da-9957-46c4-b86a-deb4bc01f48b",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_blue_hole_v1\",\n  \"view\": \"Jeep Adventure Last Min\",\n  \"view_id\": \"viwLyFnyYLuvDnY5c\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"last_minute\",\n  \"phones\": [\n    \"+201099396830\",\n    \"+201115957046\"\n  ],\n  \"include_customer_phone\": false,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "54f5d733-257d-4a95-a96a-c9b9a419bf52",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_blue_hole_v1"
+  },
+  "tags": []
+}

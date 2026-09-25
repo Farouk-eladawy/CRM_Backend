@@ -1,0 +1,77 @@
+{
+  "name": "FTS Internal | Last_min Sharm (Cairo 2-Day)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "0361ddbb-febe-450f-99cc-d9c3d4a6ff4e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/automation/run_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"script_name\": \"internal_view_notify.py\",\n  \"scenario_id\": \"int_notify_lastmin_sharm_cairo2day_v1\",\n  \"view\": \"Last_min Sharm (Cairo 2-Day)\",\n  \"view_id\": \"viwfPtnHh65ywRfk8\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"mode\": \"last_minute\",\n  \"phones\": [\n    \"+201287049358\",\n    \"+201061016429\",\n    \"+201050571165\"\n  ],\n  \"include_customer_phone\": true,\n  \"max_records\": 25,\n  \"dry_run\": false\n}"
+      },
+      "id": "75b751e8-bc3a-4a63-b659-bbb835636b02",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "int_notify_lastmin_sharm_cairo2day_v1"
+  },
+  "tags": []
+}

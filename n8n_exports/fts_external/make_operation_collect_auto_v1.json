@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Operation Collect Auto",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "8ca1c60d-e758-4be2-a829-8f0bef089741",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/collect/bulk_send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"booking for Tomorrow\",\n  \"max_records\": 250,\n  \"dry_run\": false,\n  \"notify_whatsapp\": true,\n  \"notify_email\": true,\n  \"whatsapp_template_name\": \"collect_info\",\n  \"whatsapp_template_language\": \"en\",\n  \"quick_reply_payloads\": [\n    \"Send Details Now\"\n  ],\n  \"status_field\": \"Whatsapp Room & Hotel Sent\",\n  \"done_value\": \"Done\",\n  \"retry_value\": \"Try again\",\n  \"follow_sales_field\": \"Follow sales\",\n  \"clear_follow_sales\": true,\n  \"skip_trip_contains\": [\n    \"QR\",\n    \"Sound\",\n    \"by Bus Hurghada\"\n  ]\n}"
+      },
+      "id": "6c1420c2-414f-4271-9e32-1883d91e66a4",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "make_operation_collect_auto_v1"
+  },
+  "tags": []
+}

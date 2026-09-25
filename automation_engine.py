@@ -27,6 +27,25 @@ def _utc_now():
     return datetime.utcnow().isoformat()
 
 
+def is_religious_workflow(wf) -> bool:
+    """Match dashboard isReligiousWorkflow, with External overrides from name/id/tag."""
+    name = str((wf or {}).get("name") or "")
+    desc = str((wf or {}).get("description") or "")
+    wid = str((wf or {}).get("id") or "")
+    hay = f"{name} {desc}".lower()
+    hay = " ".join(hay.split())
+    if "[external]" in hay or "الخارجي" in name or wid.startswith("external_"):
+        return False
+    return (
+        "religious" in hay
+        or "ديني" in hay
+        or "hajj" in hay
+        or "umrah" in hay
+        or ("حج" in hay and "حجز" not in hay)
+        or "عمرة" in hay
+    )
+
+
 def _get_by_path(obj, path: str):
     if not path:
         return None
@@ -452,6 +471,29 @@ class AutomationEngine:
 
     def run_manual(self, workflow_id: str, payload: dict = None):
         return self._run_workflow_by_id(workflow_id, event_type="manual", event_payload=payload or {})
+
+    def run_from_n8n(self, workflow_id: str, company_id: str = ""):
+        """n8n owns the clock; CRM still executes the stored steps. Ignores enabled=0."""
+        wf = None
+        try:
+            wf = automation_db.get_workflow(workflow_id)
+        except Exception:
+            wf = None
+        if not wf:
+            return {"ok": False, "error": "not_found"}
+        want_company = automation_db.normalize_workflow_company_id(company_id)
+        got_company = automation_db.workflow_company_id(wf)
+        if want_company and got_company != want_company:
+            return {"ok": False, "error": "not_found"}
+        if is_religious_workflow(wf):
+            return {"ok": False, "error": "religious_not_allowed"}
+        if str(wf.get("trigger_type") or "").strip().lower() != "schedule":
+            return {"ok": False, "error": "not_schedule"}
+        return self._run_workflow_by_id(
+            str(wf.get("id") or workflow_id),
+            event_type="schedule",
+            event_payload={"trigger": "n8n", "source": "n8n"},
+        )
 
     def tick(self):
         now = time.time()

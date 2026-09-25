@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Offer Send FTS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "fbaeed3b-c4d6-4bb9-afb0-4314736bd2c4",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/offer_send_fts/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"Offer Get Your Guide\",\n  \"max_records\": 10,\n  \"dry_run\": false,\n  \"template_language\": \"en\",\n  \"template_hurghada_cairo\": \"gift_bounce1\",\n  \"template_sharm\": \"gift_bounce2\",\n  \"redirect_base\": \"https://redirect.ftstravels.com/\",\n  \"offer_status_field\": \"Offer Send Status\",\n  \"follow_sales_field\": \"Follow sales\",\n  \"clear_follow_sales\": true,\n  \"retry_cooldown_minutes\": 180\n}"
+      },
+      "id": "09a0a61c-cbac-46ec-aa7f-1c66a6dc8009",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "offer_send_fts_v1"
+  },
+  "tags": []
+}

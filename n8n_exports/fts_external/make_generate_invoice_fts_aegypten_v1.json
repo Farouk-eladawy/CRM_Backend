@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Ägypten & FTS Invoice",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "f67f51d1-d4a4-4a2a-bd24-eb0fa6928752",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/payments/bulk_create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"Ägypten & FTS Invoice\",\n  \"max_records\": 10,\n  \"only_if_missing_invoice\": true,\n  \"notify_on_existing\": true,\n  \"dry_run\": false,\n  \"amount_field\": \"Net Rate Price (Number Only)\",\n  \"currency_field\": \"Currency\",\n  \"notify_email\": true,\n  \"notify_whatsapp\": true,\n  \"whatsapp_template_name\": \"ftstravels_confirm_payment\",\n  \"whatsapp_template_language\": \"en\"\n}"
+      },
+      "id": "1422bda9-265c-4e82-942c-d7dd455dbe09",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "make_generate_invoice_fts_aegypten_v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,14 @@
+make_photographer_send_link_v1.json
+make_operation_collect_auto_v1.json
+make_send_review_v1.json
+booking_invoice_pickup_v1.json
+booking_pickup_hc_v1.json
+booking_pickup_sharm_v1.json
+booking_qr_attachment_v1.json
+pickup_reminder_10min_v1.json
+welcome_plane_v1.json
+make_generate_invoice_fts_aegypten_v1.json
+offer_bonus_fts_v1.json
+external_cancellation_reason_v1.json
+cancelled_recovery_send_v1.json
+offer_send_fts_v1.json

@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Send Review",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "d4422f8e-d553-4358-8a9f-7e5e74232f91",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/review/bulk_send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"view\": \"For review survey\",\n  \"max_records\": 250,\n  \"dry_run\": false,\n  \"notify_whatsapp\": true,\n  \"notify_email\": true,\n  \"whatsapp_template_name\": \"feedbackk\",\n  \"whatsapp_template_language\": \"en\",\n  \"quick_reply_payloads\": [\n    \"Send Details Now\",\n    \"I had issues\"\n  ],\n  \"status_field\": \"Review WhatsApp & Email Sent\",\n  \"done_value\": \"Done\",\n  \"retry_value\": \"Try Again\",\n  \"review_date_field\": \"Review Date\",\n  \"skip_agency_contains\": [\n    \"Get Your Guide\"\n  ],\n  \"skip_trip_contains\": [\n    \"QR\"\n  ]\n}"
+      },
+      "id": "b4dc2420-7590-444b-87b1-3aed4dfcf3b4",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "make_send_review_v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,77 @@
+{
+  "name": "FTS External | Booking Pickup HC",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "15eb6c27-3727-4231-b1a7-1e71f12780e1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ftstravels.com/api/booking_communications/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"dry_run\": false,\n  \"max_records\": 40,\n  \"send_email\": true,\n  \"send_whatsapp\": true,\n  \"include_invoice_whatsapp\": true,\n  \"template_language\": \"en\",\n  \"views\": [\n    {\n      \"view_name\": \"30Min Pickup Time\",\n      \"default_location\": \"Hurghada/Cairo\",\n      \"max_records\": 40\n    }\n  ],\n  \"templates\": {\n    \"pickup\": {\n      \"default\": \"whatsapp_pickup_time\",\n      \"Sharm\": \"pickup_time_new1\"\n    },\n    \"flight\": {\n      \"default\": \"attachment_pickup\"\n    },\n    \"extra_ticket\": {\n      \"default\": \"fts_ticket\"\n    },\n    \"qr\": {\n      \"default\": \"new_qr_ticket\"\n    },\n    \"qr_with_pickup\": {\n      \"default\": \"qr_tickets_with_pickup\"\n    },\n    \"audio_guide\": {\n      \"default\": \"audio_guide_app\"\n    },\n    \"payment\": {\n      \"default\": \"ftstravels_confirm_payment\"\n    }\n  }\n}"
+      },
+      "id": "1e663efa-ad7f-4aa3-81a9-e4d88dd3754d",
+      "name": "HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Cairo"
+  },
+  "staticData": null,
+  "meta": {
+    "fts_workflow_id": "booking_pickup_hc_v1"
+  },
+  "tags": []
+}

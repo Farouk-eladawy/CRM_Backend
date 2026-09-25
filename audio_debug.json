@@ -194862,3 +194862,126 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0493496DC8A332AA117"
+    },
+    "keyId": "3EB0493496DC8A332AA117",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:5238 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-09-25 10:28:28"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790184508,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790357308,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-25T10:28:29.509Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB01D59D28184BFA1D31D"
+    },
+    "keyId": "3EB01D59D28184BFA1D31D",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:9216 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-09-25 10:28:30"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790184511,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790357311,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-25T10:28:31.699Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB03F78953EB596B591C5"
+    },
+    "keyId": "3EB03F78953EB596B591C5",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:14749 in send_facebook_message\nLogger: root\nReason: Failed to send Facebook message. Meta API Error: {\"error\":{\"message\":\"(#100) No matching user found\",\"type\":\"OAuthException\",\"code\":100,\"error_subcode\":2018001,\"fbtrace_id\":\"AIRNKAJunmrclXOqx2n3XU3\"}}\nAt: 2026-09-25 11:13:12"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790187192,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790359992,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-25T11:13:13.570Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

@@ -1176,8 +1176,6 @@ def resolve_inbound_route(source="", receiving_id="", email_account_id="", compa
 
     if source_l == "email" or (mailbox and source_l not in ("whatsapp", "facebook", "messenger")):
         cid = lookup_company_id_for_email_account(mailbox) if mailbox else (explicit_company or DEFAULT_COMPANY_ID)
-        if mailbox and is_default_company(cid) and explicit_company and not is_default_company(explicit_company):
-            cid = explicit_company
         return _inbound_route("email", cid, mailbox)
 
     if source_l == "whatsapp" or receiving:

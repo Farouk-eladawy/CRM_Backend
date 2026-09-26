@@ -139,20 +139,22 @@ def _normalize_email_identifier(sender_identifier):
     return str(parsed or "").strip().lower()
 
 
-def _find_email_conversation_by_normalized_identifier(cursor, normalized_identifier):
+def _find_email_conversation_by_normalized_identifier(cursor, normalized_identifier, company_id=None):
     normalized_identifier = _normalize_email_identifier(normalized_identifier)
     if not normalized_identifier:
         return None
     like_value = f"%{normalized_identifier.split('::', 1)[0]}%"
+    company_key = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
     cursor.execute(
-        """
+        f"""
         SELECT *
         FROM conversations
         WHERE source = 'Email'
           AND lower(sender_identifier) LIKE ?
+          AND {_COMPANY_ID_SQL} = ?
         ORDER BY last_message_time DESC
         """,
-        (like_value,),
+        (like_value, company_key),
     )
     for row in cursor.fetchall():
         try:
@@ -2123,6 +2125,12 @@ def _company_channel_thread_id(source, thread_id, receiving_phone_id, company_id
 def get_or_create_conversation(source, sender_identifier, contact_name="", airtable_record_id="", location="Unknown", thread_id="", receiving_phone_id="", sales_inbox=None, email_account_id=None, company_id=None):
     resolved_company_id = _resolve_conversation_company_id(company_id, receiving_phone_id, email_account_id)
     thread_id = _company_channel_thread_id(source, thread_id, receiving_phone_id, resolved_company_id)
+    try:
+        import company_tenancy
+        if resolved_company_id and not company_tenancy.is_default_company(resolved_company_id):
+            location = company_tenancy.company_customer_inbox_location(resolved_company_id, "")
+    except Exception:
+        pass
     company_channel_thread = str(thread_id or "").startswith("co:")
     company_scoped_whatsapp = (
         str(source or "").strip().lower() == "whatsapp" and company_channel_thread
@@ -2232,7 +2240,7 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 )
                 row = c.fetchone()
             if not row and normalized_email_identifier:
-                row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier)
+                row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier, resolved_company_id)
         elif company_scoped_whatsapp and sender_identifier:
             clean_identifier = str(sender_identifier).replace('+', '').replace(' ', '').replace('-', '')
             normalized_sender_expr = "REPLACE(REPLACE(REPLACE(sender_identifier, '+', ''), ' ', ''), '-', '')"
@@ -2326,7 +2334,7 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
             )
             row = c.fetchone()
             if not row and normalized_email_identifier:
-                row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier)
+                row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier, resolved_company_id)
         
         if row:
             # Update info if provided
@@ -3314,6 +3322,45 @@ def _sales_score_delta_from_text(text):
         reasons.append("not_interested")
 
     return delta, reasons
+
+def linked_conversation_ids(chat_id):
+    """This chat plus siblings that share the same booking record and company."""
+    chat_id = str(chat_id or "").strip()
+    if not chat_id:
+        return []
+    with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+        c = conn.cursor()
+        c.execute(
+            "SELECT airtable_record_id, company_id FROM conversations WHERE chat_id = ?",
+            (chat_id,),
+        )
+        row = c.fetchone()
+        if not row:
+            return [chat_id]
+        record_id = str(row[0] or "").strip()
+        company_id = str(row[1] or "").strip() or "fts"
+        if not record_id:
+            return [chat_id]
+        c.execute(
+            """
+            SELECT chat_id
+            FROM conversations
+            WHERE airtable_record_id = ?
+              AND COALESCE(NULLIF(company_id, ''), 'fts') = ?
+            """,
+            (record_id, company_id),
+        )
+        ids = [str(item[0]) for item in c.fetchall() if item and item[0]]
+        if chat_id not in ids:
+            ids.append(chat_id)
+        return ids or [chat_id]
+
+
+def delete_proposed_drafts_for_conversation(chat_id):
+    """Hide review drafts on this chat and on grouped chats of the same booking."""
+    for linked_id in linked_conversation_ids(chat_id):
+        delete_proposed_drafts(linked_id)
+
 
 def delete_proposed_drafts(chat_id):
     """Deletes all [PROPOSED_DRAFT] messages for a specific chat to avoid UI clutter."""

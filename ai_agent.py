@@ -4241,8 +4241,9 @@ class AIAgent:
                             # Only sync if it's NOT a direct user message from WhatsApp/Email
                             # because those are already synced locally beforehand to ensure quick UI response.
                             if source not in ["WhatsApp", "Email"] or sender != "User":
-                                # Prevent HUMAN_CORRECTION from showing up as an agent chat bubble in UI
-                                if "[HUMAN_CORRECTION]" not in message:
+                                # Prevent HUMAN_CORRECTION and review drafts from showing up as chat bubbles.
+                                # Draft mode inserts its own [PROPOSED_DRAFT] row. Disabled mode must not.
+                                if "[HUMAN_CORRECTION]" not in message and not str(message or "").lstrip().startswith("[PROPOSED_DRAFT]"):
                                     # Map sender to sender_type
                                     if sender == "User":
                                         s_type = "customer"
@@ -10187,7 +10188,7 @@ Conversation:
         if linked_company_id and not company_tenancy.is_default_company(linked_company_id):
             db_location = company_tenancy.company_customer_inbox_location(
                 linked_company_id,
-                location or (conv or {}).get("location") or "",
+                "",
             )
         booking_nr_val = self.get_field_value(rec.get("fields", {}) or {}, FieldIds.BOOKING_NR) or booking_nr
         contact_name = self.get_field_value(rec.get("fields", {}) or {}, FieldIds.CUSTOMER_NAME) or None
@@ -13067,16 +13068,11 @@ Conversation:
                     except Exception:
                         pass
             else:
-                logging.info(f"WhatsApp processing complete. AI Response (Learning Mode - Not Sent): {result['response_text']}")
-                if result.get('booking_record') and not skip_db_save:
-                    try:
-                        self.log_proposed_reply_for_learning(
-                            result['booking_record']['id'], 
-                            result['response_text'], 
-                            table_name=result['booking_record'].get('table_name')
-                        )
-                    except Exception as e:
-                        logging.warning(f"Could not log proposed reply for learning (WhatsApp): {e}")
+                logging.info(
+                    "WhatsApp auto-reply disabled for location=%s company=%s. No draft was saved.",
+                    location,
+                    chat_company_id,
+                )
             
             # --- FIX: Update Inquiry Type for WhatsApp ---
             if result.get('booking_record') and result.get('inquiry_intent'):
@@ -26102,7 +26098,10 @@ Conversation:
                     chat_db.add_message(chat_id, "agent", saved_text, status="sent", source="whatsapp", external_message_id=ext_id)
                     is_first_saved = False
 
-                chat_db.delete_proposed_drafts(chat_id)
+                if hasattr(chat_db, "delete_proposed_drafts_for_conversation"):
+                    chat_db.delete_proposed_drafts_for_conversation(chat_id)
+                else:
+                    chat_db.delete_proposed_drafts(chat_id)
                 chat_db.update_conversation_info(chat_id, needs_help=False)
 
                 template_used = str(action.get("template_name") or "").strip()
@@ -39486,8 +39485,11 @@ Write ONE short message only. No JSON. No explanations."""
                             external_message_id=ext_id,
                         )
                 
-                # Hide AI proposed draft from UI after sending
-                chat_db.delete_proposed_drafts(chat_id)
+                # Hide AI proposed drafts on this chat and on grouped booking chats.
+                if hasattr(chat_db, "delete_proposed_drafts_for_conversation"):
+                    chat_db.delete_proposed_drafts_for_conversation(chat_id)
+                else:
+                    chat_db.delete_proposed_drafts(chat_id)
                 try:
                     self.cancel_whatsapp_ai_processing(
                         phone=conv_dict.get("sender_identifier"),

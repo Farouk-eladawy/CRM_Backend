@@ -1092,29 +1092,62 @@ def _get_dashboard_email_accounts():
     accounts = settings.get("emailAccounts") if isinstance(settings, dict) else None
     return accounts if isinstance(accounts, list) else []
 
-def _update_dashboard_email_account(account_id, updater):
-    settings = _get_channel_settings()
+def _company_email_settings(company_id=None):
+    cid = company_tenancy.normalize_company_id(company_id)
+    if company_tenancy.is_default_company(cid):
+        return cid, "dashboard_channel_settings", _get_channel_settings()
+    key = company_tenancy.channel_settings_key(cid)
+    raw = _read_setting_value(key)
+    if not isinstance(raw, dict):
+        raw = {}
+    return cid, key, raw
+
+def _find_company_email_account(account_id, company_id=None):
+    wanted = str(account_id or "").strip()
+    if not wanted:
+        return None, company_tenancy.DEFAULT_COMPANY_ID, "dashboard_channel_settings", {}
+    if company_id:
+        cid, key, settings = _company_email_settings(company_id)
+        for item in (settings.get("emailAccounts") or []):
+            if isinstance(item, dict) and str(item.get("id") or "").strip() == wanted:
+                return item, cid, key, settings
+        return None, cid, key, settings
+    for company in company_tenancy.load_companies():
+        cid, key, settings = _company_email_settings(company.get("id"))
+        for item in (settings.get("emailAccounts") or []):
+            if isinstance(item, dict) and str(item.get("id") or "").strip() == wanted:
+                return item, cid, key, settings
+    cid, key, settings = _company_email_settings(company_tenancy.DEFAULT_COMPANY_ID)
+    return None, cid, key, settings
+
+def _save_company_email_account(company_id, account_id, updater):
+    cid, key, settings = _company_email_settings(company_id)
     if not isinstance(settings, dict):
         settings = {}
     accounts = settings.get("emailAccounts")
     if not isinstance(accounts, list):
         accounts = []
+    wanted = str(account_id or "").strip()
     changed = False
     next_accounts = []
     for item in accounts:
         if not isinstance(item, dict):
             next_accounts.append(item)
             continue
-        if str(item.get("id") or "").strip() != str(account_id or "").strip():
+        if str(item.get("id") or "").strip() != wanted:
             next_accounts.append(item)
             continue
         updated = updater(dict(item))
         next_accounts.append(updated if isinstance(updated, dict) else dict(item))
         changed = True
     if changed:
+        settings = dict(settings)
         settings["emailAccounts"] = next_accounts
-        _write_setting_value("dashboard_channel_settings", settings)
+        _write_setting_value(key, settings)
     return changed, settings
+
+def _update_dashboard_email_account(account_id, updater):
+    return _save_company_email_account(company_tenancy.DEFAULT_COMPANY_ID, account_id, updater)
 
 def _get_channel_config(channel_key):
     settings = _get_channel_settings()
@@ -2464,7 +2497,18 @@ class AIAgent:
         if not force and (now_ts - float(getattr(self, "_dynamic_email_services_loaded_at", 0.0) or 0.0) < 5.0):
             return
 
-        email_accounts = _get_dashboard_email_accounts()
+        email_accounts = []
+        seen_ids = set()
+        for company in company_tenancy.load_companies():
+            _cid, _key, settings = _company_email_settings(company.get("id"))
+            for item in (settings.get("emailAccounts") or []):
+                if not isinstance(item, dict):
+                    continue
+                account_id = str(item.get("id") or "").strip()
+                if not account_id or account_id in seen_ids:
+                    continue
+                seen_ids.add(account_id)
+                email_accounts.append(item)
         oauth_tokens = _get_dashboard_email_oauth_tokens()
         credentials_path = self._get_dashboard_oauth_email_credentials_path()
         next_services = {}
@@ -9972,25 +10016,49 @@ Conversation:
         return True
 
     def process_unified_message(self, *args, **kwargs):
-        """Bind the sender's company bookings table, then run the shared inbox pipeline."""
+        """Bind the receiving channel's company bookings table, then run the inbox pipeline."""
+        source = kwargs.get("source")
         receiving_phone_id = kwargs.get("receiving_phone_id")
         email_account_id = kwargs.get("email_account_id")
+        mailbox = kwargs.get("mailbox")
         company_id = kwargs.get("company_id")
+        if source is None and len(args) >= 4:
+            source = args[3]
         if receiving_phone_id is None and len(args) >= 9:
             receiving_phone_id = args[8]
+        if mailbox is None and len(args) >= 11:
+            mailbox = args[10]
         if email_account_id is None and len(args) >= 12:
             email_account_id = args[11]
-        resolved = str(company_id or "").strip()
-        if not resolved and receiving_phone_id:
-            resolved = company_tenancy.lookup_company_id_for_phone(receiving_phone_id)
-        elif not resolved and email_account_id:
-            resolved = company_tenancy.lookup_company_id_for_email_account(email_account_id)
+        facebook_page_ids = []
+        try:
+            facebook_page_ids = [str(((self.config.get("facebook") or {}) if isinstance(self.config, dict) else {}).get("page_id") or "").strip()]
+        except Exception:
+            facebook_page_ids = []
+        route = company_tenancy.resolve_inbound_route(
+            source=source or "",
+            receiving_id=receiving_phone_id or "",
+            email_account_id=email_account_id or mailbox or "",
+            company_id=company_id,
+            known_facebook_page_ids=facebook_page_ids,
+        )
+        resolved = str(route.get("company_id") or "").strip() or company_tenancy.DEFAULT_COMPANY_ID
+        logging.info(
+            "Inbound route channel=%s company=%s name=%s table=%s base=%s receiving=%s",
+            route.get("channel"),
+            resolved,
+            route.get("company_name"),
+            route.get("bookings_table") or ("FTS List" if company_tenancy.is_default_company(resolved) else "-"),
+            route.get("bookings_base_id") or "-",
+            route.get("receiving_id") or "-",
+        )
         table, table_name = self._open_company_bookings_table(resolved)
+        if not table_name:
+            table_name = str(route.get("bookings_table") or "").strip()
         company_tenancy.bind_booking_company(resolved, table, table_name)
         try:
-            if resolved and "company_id" not in kwargs:
-                kwargs = dict(kwargs)
-                kwargs["company_id"] = resolved
+            kwargs = dict(kwargs)
+            kwargs["company_id"] = resolved
             return self._process_unified_message_body(*args, **kwargs)
         finally:
             company_tenancy.unbind_booking_company()
@@ -12392,6 +12460,20 @@ Conversation:
                 (evo_acc or {}).get("companyId"),
                 (evo_acc or {}).get("routingLocation") or "",
             )
+        inbound_route = company_tenancy.resolve_inbound_route(source="WhatsApp", receiving_id=phone_id or "")
+        inbound_company_id = str(inbound_route.get("company_id") or "").strip()
+        if inbound_company_id and not company_tenancy.is_default_company(inbound_company_id):
+            location = company_tenancy.company_customer_inbox_location(
+                inbound_company_id,
+                inbound_route.get("routing_location") or "",
+            )
+        logging.info(
+            "WhatsApp inbound channel=%s company=%s table=%s phone_id=%s",
+            inbound_route.get("channel"),
+            inbound_company_id,
+            inbound_route.get("bookings_table") or ("FTS List" if company_tenancy.is_default_company(inbound_company_id) else "-"),
+            phone_id or "",
+        )
 
         logging.info(f"Processing WhatsApp message from {sender_name} ({sender_phone}) for {location}")
         
@@ -12422,7 +12504,8 @@ Conversation:
                          contact_name=sender_name,
                          airtable_record_id="",
                          location=location,
-                         receiving_phone_id=phone_id if phone_id else ""
+                         receiving_phone_id=phone_id if phone_id else "",
+                         company_id=inbound_company_id
                      )
                      chat_db.add_message(
                          chat_id=chat_conv['chat_id'],
@@ -12455,7 +12538,8 @@ Conversation:
                 contact_name=sender_name,
                 airtable_record_id="",
                 location=location,
-                receiving_phone_id=phone_id if phone_id else ""
+                receiving_phone_id=phone_id if phone_id else "",
+                company_id=inbound_company_id
             )
             
             # Apply Shift-Based Routing for Religious
@@ -35023,6 +35107,50 @@ Write ONE short message only. No JSON. No explanations."""
                 is_religious_chat = location_val == 'Religious'
                 is_religious = is_religious_param or is_religious_chat
 
+                conv_company = ""
+                try:
+                    conv_company = str(conv["company_id"] or "").strip()
+                except Exception:
+                    conv_company = ""
+                if conv_company and not company_tenancy.is_default_company(conv_company):
+                    sender_identifier = str(conv["sender_identifier"] or "").strip()
+                    try:
+                        source_val = conv["source"]
+                    except Exception:
+                        source_val = None
+                    email = sender_identifier if "@" in sender_identifier else None
+                    if email and "<" in email and ">" in email:
+                        email = email.split("<")[1].split(">")[0].strip()
+                    phone = sender_identifier if not email else None
+                    if phone and not self._is_probable_phone_number(phone, source=source_val):
+                        phone = None
+                    record_id = str(conv["airtable_record_id"] or "").strip()
+                    company_table, _company_table_name = self._open_company_bookings_table(conv_company)
+                    records_by_id = {}
+                    if company_table is not None:
+                        if record_id:
+                            try:
+                                primary_rec = company_table.get(record_id)
+                                if primary_rec:
+                                    records_by_id[primary_rec.get("id")] = primary_rec
+                            except Exception as e:
+                                logging.warning("Company booking get(%s) failed: %s", record_id, e)
+                        sibling_formula = self._build_compact_contact_formula(
+                            record_id=None,
+                            email=email,
+                            phone=phone,
+                            email_fields=["Customer personal email", "Customer Email"],
+                            phone_field="Customer Phone",
+                        )
+                        if sibling_formula:
+                            for rec in self._airtable_all_formula_guarded(company_table, sibling_formula, max_records=50):
+                                rid = rec.get("id")
+                                if rid:
+                                    records_by_id[rid] = rec
+                    records = list(records_by_id.values())
+                    sorted_records = sorted(records, key=lambda r: (r.get("fields") or {}).get("Date", "0000-00-00"), reverse=True)
+                    return jsonify({"status": "success", "data": [{"id": r["id"], "fields": r.get("fields") or {}} for r in sorted_records]}), 200
+
                 target_base_id = self.config['airtable'].get('religious_base_id') if is_religious else self.config['airtable']['base_id']
                 
                 religious_views = [
@@ -41563,7 +41691,8 @@ Write ONE short message only. No JSON. No explanations."""
                 if not account_id:
                     return jsonify({"status": "error", "message": "account_id is required"}), 400
 
-                account = next((item for item in _get_dashboard_email_accounts() if isinstance(item, dict) and str(item.get('id') or "").strip() == account_id), None)
+                actor_company_id = _actor_company_id_from_request()
+                account, account_company_id, _key, _settings = _find_company_email_account(account_id, actor_company_id)
                 if not account:
                     return jsonify({"status": "error", "message": "Email account not found"}), 404
 
@@ -41572,6 +41701,7 @@ Write ONE short message only. No JSON. No explanations."""
                 oauth_states = _get_dashboard_email_oauth_states()
                 oauth_states[state] = {
                     "account_id": account_id,
+                    "company_id": account_company_id,
                     "redirect_uri": redirect_uri,
                     "created_at": int(time.time()),
                 }
@@ -41610,6 +41740,7 @@ Write ONE short message only. No JSON. No explanations."""
                     raise Exception("Missing Google authorization code.")
 
                 account_id = str(state_payload.get('account_id') or "").strip()
+                account_company_id = str(state_payload.get('company_id') or "").strip() or company_tenancy.DEFAULT_COMPANY_ID
                 redirect_uri = str(state_payload.get('redirect_uri') or "").strip() or (
                     self._get_dashboard_oauth_public_base_url() + '/api/gmail_accounts/oauth/callback'
                 )
@@ -41629,7 +41760,8 @@ Write ONE short message only. No JSON. No explanations."""
                 oauth_tokens[account_id] = token_payload
                 _save_dashboard_email_oauth_tokens(oauth_tokens)
 
-                _update_dashboard_email_account(
+                _save_company_email_account(
+                    account_company_id,
                     account_id,
                     lambda item: {
                         **item,
@@ -41681,7 +41813,8 @@ Write ONE short message only. No JSON. No explanations."""
                 if not token_json:
                     return jsonify({"status": "error", "message": "token_json is required"}), 400
 
-                account = next((item for item in _get_dashboard_email_accounts() if isinstance(item, dict) and str(item.get('id') or "").strip() == account_id), None)
+                actor_company_id = _actor_company_id_from_request()
+                account, account_company_id, _key, _settings = _find_company_email_account(account_id, actor_company_id)
                 if not account:
                     return jsonify({"status": "error", "message": "Email account not found"}), 404
 
@@ -41700,7 +41833,8 @@ Write ONE short message only. No JSON. No explanations."""
                 oauth_tokens[account_id] = token_payload
                 _save_dashboard_email_oauth_tokens(oauth_tokens)
 
-                _update_dashboard_email_account(
+                _save_company_email_account(
+                    account_company_id,
                     account_id,
                     lambda item: {
                         **item,
@@ -41733,7 +41867,8 @@ Write ONE short message only. No JSON. No explanations."""
                 if not account_id:
                     return jsonify({"status": "error", "message": "account_id is required"}), 400
 
-                account = next((item for item in _get_dashboard_email_accounts() if isinstance(item, dict) and str(item.get('id') or "").strip() == account_id), None)
+                actor_company_id = _actor_company_id_from_request()
+                account, account_company_id, _key, _settings = _find_company_email_account(account_id, actor_company_id)
                 if not account:
                     return jsonify({"status": "error", "message": "Email account not found"}), 404
 
@@ -41741,7 +41876,8 @@ Write ONE short message only. No JSON. No explanations."""
                 oauth_tokens.pop(account_id, None)
                 _save_dashboard_email_oauth_tokens(oauth_tokens)
 
-                _update_dashboard_email_account(
+                _save_company_email_account(
+                    account_company_id,
                     account_id,
                     lambda item: {
                         **item,
@@ -45665,12 +45801,20 @@ Draft to optimize:
                                     loc = routing_value
                                 else:
                                     loc = "Hurghada/Cairo"
+                                fb_route = company_tenancy.resolve_inbound_route(source="Facebook", receiving_id=page_psid)
+                                fb_company_id = str(fb_route.get("company_id") or "").strip()
+                                if fb_company_id and not company_tenancy.is_default_company(fb_company_id):
+                                    loc = company_tenancy.company_customer_inbox_location(
+                                        fb_company_id,
+                                        fb_route.get("routing_location") or "",
+                                    )
                                 chat_conv = chat_db.get_or_create_conversation(
                                     source="Facebook",
                                     sender_identifier=customer_psid,
                                     contact_name=sender_name,
                                     location=loc,
-                                    receiving_phone_id=page_psid if page_psid else ""
+                                    receiving_phone_id=page_psid if page_psid else "",
+                                    company_id=fb_company_id,
                                 )
                                 if chat_conv and sender_name and not self._is_placeholder_facebook_name(sender_name):
                                     existing_name = str(chat_conv.get('contact_name') or '').strip()
@@ -45781,12 +45925,20 @@ Draft to optimize:
                                 loc = routing_value
                             else:
                                 loc = "Hurghada/Cairo"
+                            fb_route = company_tenancy.resolve_inbound_route(source="Facebook", receiving_id=page_psid)
+                            fb_company_id = str(fb_route.get("company_id") or "").strip()
+                            if fb_company_id and not company_tenancy.is_default_company(fb_company_id):
+                                loc = company_tenancy.company_customer_inbox_location(
+                                    fb_company_id,
+                                    fb_route.get("routing_location") or "",
+                                )
                             chat_conv = chat_db.get_or_create_conversation(
                                 source="Facebook",
                                 sender_identifier=customer_psid,
                                 contact_name="",
                                 location=loc,
-                                receiving_phone_id=page_psid if page_psid else ""
+                                receiving_phone_id=page_psid if page_psid else "",
+                                company_id=fb_company_id,
                             )
                             existing_name = str((chat_conv or {}).get('contact_name') or '').strip()
                             sender_name = self._resolve_facebook_sender_name(

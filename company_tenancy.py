@@ -939,8 +939,30 @@ def _iter_email_ids_from_channel_settings(settings):
         for acc in accounts:
             if not isinstance(acc, dict):
                 continue
-            for key in ("id", "email", "address"):
+            for key in ("id", "email", "address", "emailAddress", "label"):
                 val = str(acc.get(key) or "").strip().lower()
+                if val:
+                    yield val
+
+
+def _iter_facebook_page_ids(settings):
+    if not isinstance(settings, dict):
+        return
+    facebook = settings.get("facebook")
+    if isinstance(facebook, dict):
+        for key in ("pageId", "page_id", "id"):
+            val = str(facebook.get(key) or "").strip()
+            if val:
+                yield val
+    for list_key in ("facebookPages", "messengerAccounts", "facebookAccounts"):
+        items = settings.get(list_key)
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            for key in ("pageId", "page_id", "id"):
+                val = str(item.get(key) or "").strip()
                 if val:
                     yield val
 
@@ -990,6 +1012,112 @@ def lookup_company_id_for_email_account(email_account_id) -> str:
             if candidate == needle:
                 return cid
     return DEFAULT_COMPANY_ID
+
+
+def lookup_company_id_for_facebook_page(page_id) -> str:
+    pid = str(page_id or "").strip()
+    if not pid:
+        return ""
+    import chat_db
+
+    for company in load_companies():
+        cid = company.get("id") or DEFAULT_COMPANY_ID
+        raw = chat_db.get_setting(channel_settings_key(cid))
+        settings = _parse_json(raw, {})
+        if not isinstance(settings, dict):
+            settings = {}
+        for candidate in _iter_facebook_page_ids(settings):
+            if candidate == pid:
+                return normalize_company_id(cid)
+    return ""
+
+
+def _bookings_target_for_company(company_id):
+    cid = normalize_company_id(company_id)
+    if is_default_company(cid):
+        return "", ""
+    conn = get_connections(cid)
+    return (
+        str(conn.get("airtableBaseId") or "").strip(),
+        str(conn.get("airtableBookingsTable") or "").strip(),
+    )
+
+
+def _inbound_route(channel, company_id, receiving_id="", account=None):
+    cid = normalize_company_id(company_id)
+    company = get_company(cid) or {}
+    base_id, table_name = _bookings_target_for_company(cid)
+    acc = account if isinstance(account, dict) else {}
+    return {
+        "channel": channel,
+        "company_id": cid,
+        "company_name": str(company.get("name") or ("FTS" if is_default_company(cid) else cid)),
+        "bookings_base_id": base_id,
+        "bookings_table": table_name,
+        "receiving_id": str(receiving_id or "").strip(),
+        "account_label": str(
+            acc.get("label") or acc.get("emailAddress") or acc.get("instanceName") or acc.get("phoneNumber") or ""
+        ).strip(),
+        "routing_location": str(acc.get("routingLocation") or "").strip(),
+    }
+
+
+def resolve_inbound_route(source="", receiving_id="", email_account_id="", company_id=None, known_facebook_page_ids=None):
+    """Decide the connected channel, its company, and that company's bookings table.
+
+    Channel is one of: email, whatsapp_meta, whatsapp_evolution, facebook.
+    The customer's own phone or email is not used. Only the account that received
+    the message is used.
+    """
+    source_l = str(source or "").strip().lower()
+    receiving = str(receiving_id or "").strip()
+    mailbox = str(email_account_id or "").strip()
+    known_pages = {
+        str(item or "").strip()
+        for item in (known_facebook_page_ids or [])
+        if str(item or "").strip()
+    }
+    explicit_company = str(company_id or "").strip()
+
+    if receiving.lower().startswith("evo:") or source_l in ("whatsapp_evolution", "evolution"):
+        instance = receiving[4:].strip() if receiving.lower().startswith("evo:") else receiving
+        account = find_customer_whatsapp_account(instance_name=instance) if instance else None
+        cid = (account or {}).get("companyId") or explicit_company or DEFAULT_COMPANY_ID
+        return _inbound_route("whatsapp_evolution", cid, receiving or (f"evo:{instance}" if instance else ""), account)
+
+    page_company = lookup_company_id_for_facebook_page(receiving) if receiving else ""
+    if source_l in ("facebook", "messenger", "facebook messenger") or page_company or (
+        receiving and receiving in known_pages and source_l not in ("whatsapp", "email")
+    ):
+        cid = page_company or explicit_company or DEFAULT_COMPANY_ID
+        return _inbound_route("facebook", cid, receiving)
+
+    if source_l == "email" or (mailbox and source_l not in ("whatsapp", "facebook", "messenger")):
+        cid = lookup_company_id_for_email_account(mailbox) if mailbox else (explicit_company or DEFAULT_COMPANY_ID)
+        if mailbox and is_default_company(cid) and explicit_company and not is_default_company(explicit_company):
+            cid = explicit_company
+        return _inbound_route("email", cid, mailbox)
+
+    if source_l == "whatsapp" or receiving:
+        account = find_customer_whatsapp_account(phone_number_id=receiving) if receiving else None
+        provider = str((account or {}).get("provider") or "").strip().lower()
+        if provider == "evolution":
+            instance = str((account or {}).get("instanceName") or "").strip()
+            return _inbound_route(
+                "whatsapp_evolution",
+                (account or {}).get("companyId") or explicit_company or DEFAULT_COMPANY_ID,
+                receiving or (f"evo:{instance}" if instance else ""),
+                account,
+            )
+        if account and account.get("companyId"):
+            return _inbound_route("whatsapp_meta", account.get("companyId"), receiving, account)
+        cid = lookup_company_id_for_phone(receiving) if receiving else (explicit_company or DEFAULT_COMPANY_ID)
+        if source_l == "whatsapp" or (receiving and not is_default_company(cid)):
+            return _inbound_route("whatsapp_meta", cid, receiving, account)
+
+    if explicit_company:
+        return _inbound_route(source_l or "email", explicit_company, receiving or mailbox)
+    return _inbound_route(source_l or "whatsapp_meta", DEFAULT_COMPANY_ID, receiving or mailbox)
 
 
 def stamp_user_company(user_obj, company_id):

@@ -39,7 +39,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"script_name\": \"external_cancellation.py\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"template_name\": \"Cancellation Reason\",\n  \"template_language\": \"en\",\n  \"max_records\": 50,\n  \"dry_run\": false\n}"
+        "jsonBody": "{\n  \"script_name\": \"external_cancellation.py\",\n  \"base_id\": \"appTp5YgSp9DV2HYc\",\n  \"table_id\": \"tblJodXmOWKiYqiXS\",\n  \"view_id\": \"viw8oGlhATG9oDdAn\",\n  \"view_name\": \"Cancelled Recovery Offer\",\n  \"template_name\": \"cancelletion_reason\",\n  \"template_language\": \"en\",\n  \"max_records\": 50,\n  \"dry_run\": false\n}"
       },
       "id": "56ce264b-1380-443f-a167-a3cb65e68f02",
       "name": "HTTP",

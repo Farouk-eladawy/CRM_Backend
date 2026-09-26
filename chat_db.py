@@ -5,6 +5,7 @@ import re
 import time
 import json
 import logging
+import threading
 from email.utils import parseaddr
 from datetime import datetime, timedelta, timezone
 try:
@@ -285,6 +286,80 @@ def restore_conversation(chat_id, actor=None):
 def get_cairo_time():
     return (datetime.utcnow() + CAIRO_OFFSET).isoformat()
 
+_CHANNEL_UNIQUE_READY = False
+_CHANNEL_UNIQUE_LOCK = threading.Lock()
+
+
+def ensure_conversations_channel_unique():
+    """Allow the same phone on another company channel.
+
+    The live table was created with UNIQUE(source, sender_identifier), so a
+    Nile Crystal WhatsApp message could not get its own row beside an FTS chat.
+    The replacement key is UNIQUE(source, sender_identifier, thread_id).
+    """
+    global _CHANNEL_UNIQUE_READY
+    if _CHANNEL_UNIQUE_READY:
+        return False
+    with _CHANNEL_UNIQUE_LOCK:
+        if _CHANNEL_UNIQUE_READY:
+            return False
+        with _connect(60.0) as conn:
+            row = conn.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' AND name='conversations'"
+            ).fetchone()
+            sql = str((row[0] if row else "") or "")
+            compact = "".join(sql.split()).lower()
+            if "unique(source,sender_identifier,thread_id)" in compact:
+                _CHANNEL_UNIQUE_READY = True
+                return False
+            cols = list(conn.execute("PRAGMA table_info(conversations)"))
+            if not cols:
+                _CHANNEL_UNIQUE_READY = True
+                return False
+            col_names = []
+            col_defs = []
+            for _cid, name, coltype, _notnull, dflt, pk in cols:
+                col_names.append(name)
+                if pk:
+                    col_defs.append(f'"{name}" {coltype or "TEXT"} PRIMARY KEY')
+                    continue
+                piece = f'"{name}" {coltype or "TEXT"}'
+                if dflt is not None:
+                    piece += f" DEFAULT {dflt}"
+                col_defs.append(piece)
+            col_defs.append("UNIQUE(source, sender_identifier, thread_id)")
+            extras = conn.execute(
+                """
+                SELECT sql FROM sqlite_master
+                WHERE tbl_name='conversations' AND sql IS NOT NULL AND type IN ('index', 'trigger')
+                """
+            ).fetchall()
+            names_sql = ", ".join(f'"{name}"' for name in col_names)
+            conn.execute("PRAGMA foreign_keys=OFF")
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                conn.execute(
+                    f"CREATE TABLE conversations__channel_uniq ({', '.join(col_defs)})"
+                )
+                conn.execute(
+                    f"INSERT INTO conversations__channel_uniq ({names_sql}) SELECT {names_sql} FROM conversations"
+                )
+                conn.execute("DROP TABLE conversations")
+                conn.execute("ALTER TABLE conversations__channel_uniq RENAME TO conversations")
+                for (extra_sql,) in extras:
+                    if extra_sql:
+                        conn.execute(extra_sql)
+                conn.execute("COMMIT")
+            except Exception:
+                try:
+                    conn.execute("ROLLBACK")
+                except Exception:
+                    pass
+                raise
+        _CHANNEL_UNIQUE_READY = True
+        return True
+
+
 def init_db():
     with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
         c = conn.cursor()
@@ -365,6 +440,10 @@ def init_db():
         c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_location_last_message_time ON conversations(location, last_message_time DESC);')
         c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_deleted_at ON conversations(is_deleted, deleted_at);')
         c.execute('CREATE INDEX IF NOT EXISTS idx_conversations_quality_from_location_last_message_time ON conversations(quality_from_location, last_message_time DESC);')
+        try:
+            ensure_conversations_channel_unique()
+        except Exception as uniq_err:
+            logging.warning("Conversation channel unique migration skipped: %s", uniq_err)
         # Messages Table
         c.execute('''
             CREATE TABLE IF NOT EXISTS messages (
@@ -2004,8 +2083,55 @@ def _resolve_conversation_company_id(company_id=None, receiving_phone_id="", ema
         return DEFAULT_COMPANY_ID
 
 
+def _company_channel_thread_id(source, thread_id, receiving_phone_id, company_id):
+    """Give each non-FTS WhatsApp channel its own thread.
+
+    The conversations unique key is (source, sender, thread_id) and does not
+    include company_id. Without a company thread, the same phone is forced
+    onto the existing FTS chat.
+    """
+    if str(source or "").strip().lower() != "whatsapp":
+        source_l = str(source or "").strip().lower()
+        incoming = str(thread_id or "")
+        if incoming.startswith("co:"):
+            return incoming
+        try:
+            import company_tenancy
+            non_default = bool(company_id) and not company_tenancy.is_default_company(company_id)
+        except Exception:
+            non_default = bool(company_id) and str(company_id).strip().lower() not in ("", "fts")
+        if not non_default:
+            return incoming
+        if source_l == "email":
+            return f"co:{company_id}:email:{incoming or 'email'}"
+        if source_l == "facebook":
+            page = str(receiving_phone_id or "").strip() or "page"
+            return f"co:{company_id}:fb:{page}"
+        return incoming
+    phone = str(receiving_phone_id or "").strip()
+    try:
+        import company_tenancy
+        non_default = bool(company_id) and not company_tenancy.is_default_company(company_id)
+    except Exception:
+        non_default = bool(company_id) and str(company_id).strip().lower() not in ("", "fts")
+    if not non_default and not phone.startswith("evo:"):
+        return str(thread_id or "")
+    channel = phone or "whatsapp"
+    return f"co:{company_id}:{channel}"
+
+
 def get_or_create_conversation(source, sender_identifier, contact_name="", airtable_record_id="", location="Unknown", thread_id="", receiving_phone_id="", sales_inbox=None, email_account_id=None, company_id=None):
     resolved_company_id = _resolve_conversation_company_id(company_id, receiving_phone_id, email_account_id)
+    thread_id = _company_channel_thread_id(source, thread_id, receiving_phone_id, resolved_company_id)
+    company_channel_thread = str(thread_id or "").startswith("co:")
+    company_scoped_whatsapp = (
+        str(source or "").strip().lower() == "whatsapp" and company_channel_thread
+    )
+    if company_channel_thread:
+        try:
+            ensure_conversations_channel_unique()
+        except Exception as uniq_err:
+            logging.warning("Conversation channel unique migration skipped: %s", uniq_err)
     with _connect(30.0) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
@@ -2051,7 +2177,7 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
         
         # If airtable_record_id is provided, try to find the existing chat by that FIRST
         # This prevents duplicate chats when a user switches from Email to WhatsApp
-        if airtable_record_id:
+        if airtable_record_id and not company_scoped_whatsapp:
             c.execute(
                 f"""
                 SELECT *
@@ -2107,6 +2233,23 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 row = c.fetchone()
             if not row and normalized_email_identifier:
                 row = _find_email_conversation_by_normalized_identifier(c, normalized_email_identifier)
+        elif company_scoped_whatsapp and sender_identifier:
+            clean_identifier = str(sender_identifier).replace('+', '').replace(' ', '').replace('-', '')
+            normalized_sender_expr = "REPLACE(REPLACE(REPLACE(sender_identifier, '+', ''), ' ', ''), '-', '')"
+            c.execute(
+                f"""
+                SELECT *
+                FROM conversations
+                WHERE source = ?
+                  AND {normalized_sender_expr} = ?
+                  AND COALESCE(thread_id, '') = ?
+                  AND {_COMPANY_ID_SQL} = ?
+                ORDER BY last_message_time DESC
+                LIMIT 1
+                """,
+                (source, clean_identifier, str(thread_id), resolved_company_id),
+            )
+            row = c.fetchone()
         elif source == "WhatsApp" and sender_identifier:
             clean_identifier = str(sender_identifier).replace('+', '').replace(' ', '').replace('-', '')
             normalized_sender_expr = "REPLACE(REPLACE(REPLACE(sender_identifier, '+', ''), ' ', ''), '-', '')"
@@ -2206,7 +2349,8 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 """, (contact_name, airtable_record_id, location, thread_id, clean_identifier, receiving_phone_id, 1 if sales_inbox else 0, email_account_id, row['chat_id']))
                 conn.commit()
             if (
-                str(receiving_phone_id or "").startswith("evo:")
+                company_scoped_whatsapp
+                and str(row["company_id"] or "").strip() == str(resolved_company_id or "").strip()
                 and str(location or "").strip()
                 and str(location).strip().lower() not in ("unknown", "needhelp", "all")
             ):
@@ -2214,11 +2358,11 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                     """
                     UPDATE conversations
                     SET location = ?,
-                        company_id = ?,
                         receiving_phone_id = COALESCE(NULLIF(?, ''), receiving_phone_id)
                     WHERE chat_id = ?
+                      AND COALESCE(NULLIF(company_id, ''), 'fts') = ?
                     """,
-                    (str(location).strip(), resolved_company_id, receiving_phone_id, row["chat_id"]),
+                    (str(location).strip(), receiving_phone_id, row["chat_id"], resolved_company_id),
                 )
                 conn.commit()
             c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
@@ -2253,44 +2397,16 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                     (source, clean_identifier, str(thread_id or "")),
                 )
                 row = c.fetchone()
+                if company_scoped_whatsapp:
+                    scoped = None
+                    if row and str(row["thread_id"] or "") == str(thread_id or "") and (
+                        str(row["company_id"] or "").strip() or DEFAULT_COMPANY_ID
+                    ) == str(resolved_company_id or "").strip():
+                        scoped = row
+                    if scoped:
+                        return dict(scoped)
+                    raise
                 if row:
-                    existing_company = str(row["company_id"] or "").strip() or DEFAULT_COMPANY_ID
-                    try:
-                        import company_tenancy
-                        incoming_company = str(resolved_company_id or "").strip()
-                        if (
-                            str(receiving_phone_id or "").startswith("evo:")
-                            and incoming_company
-                            and not company_tenancy.is_default_company(incoming_company)
-                            and company_tenancy.is_default_company(existing_company)
-                        ):
-                            c.execute(
-                                """
-                                UPDATE conversations
-                                SET company_id = ?,
-                                    receiving_phone_id = COALESCE(NULLIF(?, ''), receiving_phone_id),
-                                    contact_name = COALESCE(NULLIF(?, ''), contact_name),
-                                    location = CASE
-                                        WHEN ? NOT IN ('', 'Unknown', 'NeedHelp', 'All') THEN ?
-                                        ELSE COALESCE(NULLIF(location, 'Unknown'), NULLIF(?, 'Unknown'), 'Unknown')
-                                    END
-                                WHERE chat_id = ?
-                                """,
-                                (
-                                    incoming_company,
-                                    receiving_phone_id,
-                                    contact_name,
-                                    str(location or "").strip(),
-                                    str(location or "").strip(),
-                                    location,
-                                    row["chat_id"],
-                                ),
-                            )
-                            conn.commit()
-                            c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
-                            row = c.fetchone()
-                    except Exception:
-                        pass
                     return dict(row)
                 if source == "Email" and thread_id:
                     c.execute(

@@ -52,14 +52,22 @@ from offer_send_fts import _clean_str, _clean_phone, _short_name
 # القاعدة الأساسية الوحيدة المسموح بها: القسم الخارجي (Main / External)
 DEFAULT_BASE_ID = "appTp5YgSp9DV2HYc"    # Main / External (الرئيسي / الخارجي)
 DEFAULT_TABLE_ID = "tblJodXmOWKiYqiXS"   # جدول List في القاعدة الرئيسية
+DEFAULT_VIEW_ID = "viw8oGlhATG9oDdAn"    # Cancelled Recovery Offer
+DEFAULT_VIEW_NAME = "Cancelled Recovery Offer"
 
 # قواعد أخرى ممنوعة منعاً باتاً (فلترة صفرية - قاعدة 15)
 RELIGIOUS_BASE_ID = "appzc9rxT8kfD0HMp"  # Religious - ممنوع
 TRIPS_BASE_ID = "apphGHAvy5IhAWVw9"      # Trips - ممنوع
 
-# التمبلت المطلوب من المدير
-DEFAULT_TEMPLATE = "Cancellation Reason"
+# الاسم المعتمد داخل ميتا مكتوب بهذا الشكل: cancelletion_reason
+# (حرف e زائد). الاسم الصحيح إملائياً cancellation_reason غير موجود على الحساب.
+DEFAULT_TEMPLATE = "cancelletion_reason"
 DEFAULT_TEMPLATE_LANG = "en"
+_TEMPLATE_NAME_ALIASES = {
+    "cancellation reason": "cancelletion_reason",
+    "cancellation_reason": "cancelletion_reason",
+    "cancelletion_reason": "cancelletion_reason",
+}
 
 # حدود التشغيل (حماية من حظر ميتا + أداء)
 DEFAULT_MAX_RECORDS = 50
@@ -263,14 +271,16 @@ def run(agent, payload: dict = None) -> dict:
     """
     Scheduled Workflow — القسم الخارجي فقط.
     payload:
-      base_id, table_id, template_name, template_language,
+      base_id, table_id, view_id, template_name, template_language,
       max_records, dry_run, default_location, template_variables
     """
     payload = payload or {}
 
     base_id = _clean_str(payload.get("base_id")) or DEFAULT_BASE_ID
     table_id = _clean_str(payload.get("table_id")) or DEFAULT_TABLE_ID
-    template_name = _clean_str(payload.get("template_name")) or DEFAULT_TEMPLATE
+    view_id = _clean_str(payload.get("view_id")) or DEFAULT_VIEW_ID
+    requested_template = _clean_str(payload.get("template_name")) or DEFAULT_TEMPLATE
+    template_name = _TEMPLATE_NAME_ALIASES.get(requested_template.lower(), requested_template)
     template_language = _clean_str(payload.get("template_language")) or DEFAULT_TEMPLATE_LANG
     max_records = max(1, min(int(payload.get("max_records") or DEFAULT_MAX_RECORDS), 200))
     dry_run = bool(payload.get("dry_run", False))
@@ -292,20 +302,12 @@ def run(agent, payload: dict = None) -> dict:
     except Exception as e:
         return {"ok": False, "error": f"resolve_table_failed:{e}"}
 
-    # ===== استعلام دقيق: الحجوزات الملغية فقط (لا نجلب كل الجدول) =====
-    formula = (
-        "OR("
-        "FIND('Cancel', {Booking Status}&''),"
-        "FIND('cancel', {Booking Status}&''),"
-        "FIND('CANCEL', {Booking Status}&''),"
-        "FIND('ملغ', {Booking Status}&'')"
-        ")"
-    )
+    # العرض المحدد فقط: Cancelled Recovery Offer
     try:
-        records = list(table.all(formula=formula, max_records=max_records) or [])
+        records = list(table.all(view=view_id, max_records=max_records) or [])
     except Exception as e:
-        log.error(f"Fetch cancelled bookings failed: {e}")
-        return {"ok": False, "error": f"fetch_failed:{e}"}
+        log.error(f"Fetch view {view_id} failed: {e}")
+        return {"ok": False, "error": f"fetch_failed:{e}", "view_id": view_id}
 
     results = []
     sent = 0
@@ -327,7 +329,7 @@ def run(agent, payload: dict = None) -> dict:
             results.append({"record_id": rid, "status": "skipped", "message": "not_cancelled", "booking_status": status})
             skipped += 1
             continue
-        if not phone:
+        if not phone or len(phone) < 10 or len(phone) > 15:
             results.append({"record_id": rid, "status": "skipped", "message": "missing_phone", "booking_nr": booking_nr})
             skipped += 1
             continue
@@ -396,6 +398,8 @@ def run(agent, payload: dict = None) -> dict:
         "scope": "external_only",
         "base_id": base_id,
         "table_id": table_id,
+        "view_id": view_id,
+        "view_name": DEFAULT_VIEW_NAME,
         "records_fetched": len(records),
         "sent": sent,
         "skipped": skipped,

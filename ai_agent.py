@@ -503,6 +503,8 @@ def _should_suppress_internal_error_alert(record):
         return True
     if "database is locked" in message_text or "database is busy" in message_text:
         return True
+    if "requested entity was not found" in message_text and ("thread" in message_text or "gmail" in message_text):
+        return True
     return False
 
 
@@ -3736,13 +3738,20 @@ class AIAgent:
                 direction="outbound",
                 sales_fallback=str(mailbox).lower() == "sales"
             )
+            if not gmail_svc:
+                audit_utils.mark_draft_processed(draft_id, 'missing_mailbox')
+                continue
             
             # Check if draft still exists
             try:
-                gmail_svc.service.users().drafts().get(userId='me', id=draft_id).execute()
+                gmail_svc._execute_gmail_call(
+                    "gmail draft lookup",
+                    lambda service, draft_id=draft_id: service.users().drafts().get(userId='me', id=draft_id).execute(),
+                    retry_tls=False,
+                )
                 # Draft exists -> Still pending review
                 continue
-            except:
+            except Exception:
                 # Draft gone -> Likely sent (or deleted)
                 pass
             
@@ -8357,14 +8366,10 @@ User request:
         # First, try to determine identity normally based on the language of the message
         assistant_name, assistant_signature = self._assistant_identity_for_text(
             latest_message_body,
-            company_id=company_id,
-            chat_id=getattr(self, "_current_chat_id", None),
+            chat_id=chat_id,
         )
         source = source or getattr(self, "_current_source", None)
-        reply_company = self._resolve_reply_company_id(
-            company_id=company_id,
-            chat_id=getattr(self, "_current_chat_id", None),
-        )
+        reply_company = self._resolve_reply_company_id(chat_id=chat_id)
 
         # Override for Religious location on the FTS account only.
         # WhatsApp Meta Religious: no Farah / no sales-title signature (plain reply)
@@ -12619,7 +12624,7 @@ Conversation:
             logging.warning(f"Failed reconciling proposed drafts for chat {chat_key}: {e}")
         return False
 
-    def process_whatsapp_message(self, sender_phone, message_body, sender_name, phone_id=None, timestamp=None, skip_db_save=False):
+    def process_whatsapp_message(self, sender_phone, message_body, sender_name, phone_id=None, timestamp=None, skip_db_save=False, external_message_id=None):
         """
         Handle incoming WhatsApp message.
         Learning Only: Does not send reply, but logs and updates system state.
@@ -12731,6 +12736,23 @@ Conversation:
         except Exception:
             chat_conv = None
 
+        inbound_external_id = str(external_message_id or "").strip() or None
+
+        def _save_inbound_without_ai(chat_id):
+            if skip_db_save or not chat_id or not str(message_body or "").strip():
+                return
+            try:
+                chat_db.add_message(
+                    chat_id=chat_id,
+                    sender_type="customer",
+                    text=message_body,
+                    status="received",
+                    source="WhatsApp",
+                    external_message_id=inbound_external_id,
+                )
+            except Exception as save_err:
+                logging.error("Failed to save WhatsApp message while skipping AI: %s", save_err)
+
         # If a workflow/human/echo already replied to this customer turn during debounce,
         # do not spend AI tokens or insert a late PROPOSED_DRAFT.
         try:
@@ -12740,6 +12762,7 @@ Conversation:
                     "Skipping WhatsApp AI processing for chat %s because system/workflow already replied after last customer message.",
                     early_chat_id,
                 )
+                _save_inbound_without_ai(early_chat_id)
                 try:
                     self._reconcile_stale_proposed_draft(early_chat_id)
                 except Exception:
@@ -12848,6 +12871,7 @@ Conversation:
         needs_help_paused = bool((is_auto_location and not is_draft_location) and chat_conv and int(chat_conv.get("needs_help") or 0) == 1)
         if needs_help_paused:
             logging.info(f"WhatsApp auto-reply paused (needs_help=1) for chat {chat_conv.get('chat_id')}")
+            _save_inbound_without_ai(chat_conv.get("chat_id") if chat_conv else None)
             return
 
         if is_auto_location:
@@ -12855,6 +12879,7 @@ Conversation:
             if lower_body.startswith("[customer sent an audio message.") or lower_body.startswith("[customer sent a video.") or lower_body.startswith("[customer sent a sticker.") or lower_body.startswith("[customer sent a document.") or lower_body.startswith("[customer sent a message of type:"):
                 try:
                     if chat_conv and chat_conv.get("chat_id"):
+                        _save_inbound_without_ai(chat_conv.get("chat_id"))
                         chat_db.update_conversation_info(chat_conv["chat_id"], needs_help=True)
                 except Exception:
                     pass
@@ -12868,7 +12893,8 @@ Conversation:
             subject=f"WhatsApp Message ({location})",
             location=location,
             receiving_phone_id=phone_id,
-            skip_db_save=skip_db_save
+            skip_db_save=skip_db_save,
+            incoming_external_message_id=inbound_external_id,
         )
         
         sent_auto_reply = False
@@ -13943,23 +13969,34 @@ Conversation:
         instance_name = str(acc.get("instanceName") or "").strip()
         if not base or not api_key or not instance_name or not isinstance(blob, dict):
             return None
-        try:
-            resp = requests.post(
-                f"{base}/chat/getBase64FromMediaMessage/{quote(instance_name)}",
-                headers={"Content-Type": "application/json", "apikey": api_key},
-                json={"message": blob, "convertToMp4": False},
-                timeout=45,
-            )
-            if int(resp.status_code or 0) >= 400:
-                logging.warning("Evolution getBase64 failed %s: %s", resp.status_code, (resp.text or "")[:300])
-                return None
-            payload = resp.json() if resp.content else {}
-            if not isinstance(payload, dict):
-                return None
-            return self._decode_media_base64(payload.get("base64"))
-        except Exception as exc:
-            logging.warning("Evolution media download failed: %s", exc)
-            return None
+        headers = {"Content-Type": "application/json", "apikey": api_key}
+        bodies = [{"message": blob, "convertToMp4": False}]
+        key = blob.get("key") if isinstance(blob.get("key"), dict) else None
+        if key:
+            bodies.append({"message": {"key": key}, "convertToMp4": False})
+        last_error = ""
+        for body in bodies:
+            try:
+                resp = requests.post(
+                    f"{base}/chat/getBase64FromMediaMessage/{quote(instance_name)}",
+                    headers=headers,
+                    json=body,
+                    timeout=45,
+                )
+                if int(resp.status_code or 0) >= 400:
+                    last_error = f"{resp.status_code} {(resp.text or '')[:240]}"
+                    continue
+                payload = resp.json() if resp.content else {}
+                if not isinstance(payload, dict):
+                    continue
+                data = self._decode_media_base64(payload.get("base64"))
+                if data:
+                    return data
+            except Exception as exc:
+                last_error = str(exc)
+        if last_error:
+            logging.warning("Evolution media download failed: %s", last_error)
+        return None
 
     def evolution_customer_message_body(self, account, blob):
         """Turn an Evolution customer webhook into the same inbox text Meta uses."""
@@ -14007,22 +14044,148 @@ Conversation:
             if transcript:
                 parts.append(f"[رسالة صوتية مفرغة]: {transcript}")
             elif not media_id:
-                parts.append("[Customer sent an audio message. Audio ID: ] تعذر حفظ الرسالة الصوتية")
+                parts.append("[تعذر تحميل الرسالة الصوتية من واتساب]")
             return "\n".join(part for part in parts if part).strip()
         if kind in ("image", "sticker"):
             if media_id:
                 body = f"[Customer sent an image. Image ID: {media_id}]"
                 return f"{body}\n{caption}".strip() if caption else body
-            return caption or "[Customer sent an image. Image ID: ]"
+            return caption or "[تعذر تحميل الصورة من واتساب]"
         if kind == "video":
+            video_name = filename if filename and filename != "file" else "video.mp4"
             if media_id:
-                body = f"[Customer sent a video. Video ID: {media_id}]"
-                return f"{body} {caption}".strip()
-            return f"[Customer sent a video. Video ID: ] {caption}".strip()
+                body = f"[Customer sent a document. Document ID: {media_id} | Filename: {video_name}]"
+                return f"{body}\n{caption}".strip() if caption else body
+            return caption or "[تعذر تحميل الفيديو من واتساب]"
         if media_id:
             body = f"[Customer sent a document. Document ID: {media_id} | Filename: {filename}]"
             return f"{body}\n{caption}".strip() if caption else body
-        return caption or f"[Customer sent a document. Document ID:  | Filename: {filename}]"
+        return caption or "[تعذر تحميل الملف من واتساب]"
+
+    def _poll_company_evolution_media(self):
+        """Pull customer image/file/audio that Evolution stored but never posted to the inbox webhook."""
+        import sqlite3
+        db_path = os.path.join(SCRIPT_DIR, "make.com", "evolution-api-main", "prisma", "dev.db")
+        if not os.path.isfile(db_path):
+            return 0
+        cursor_key = "company_evolution_media_cursor"
+        try:
+            cursor_ts = int(chat_db.get_setting(cursor_key, 0) or 0)
+        except Exception:
+            cursor_ts = 0
+        if cursor_ts <= 0:
+            cursor_ts = int(time.time()) - 12 * 3600
+        instance_names = []
+        try:
+            for _cid, acc in company_tenancy.iter_customer_whatsapp_accounts():
+                if str(acc.get("provider") or "").strip().lower() != "evolution":
+                    continue
+                name = str(acc.get("instanceName") or "").strip()
+                if name:
+                    instance_names.append(name)
+        except Exception as acc_err:
+            logging.warning("Could not list company Evolution instances: %s", acc_err)
+            return 0
+        if not instance_names:
+            return 0
+        media_types = (
+            "imageMessage",
+            "stickerMessage",
+            "audioMessage",
+            "videoMessage",
+            "documentMessage",
+            "documentWithCaptionMessage",
+            "ptvMessage",
+        )
+        type_placeholders = ",".join("?" * len(media_types))
+        instance_placeholders = ",".join("?" * len(instance_names))
+        sql = f"""
+            SELECT i.name AS instance_name, m.messageType, m.key, m.message, m.pushName, m.messageTimestamp, m.remoteJid
+            FROM Message m
+            JOIN Instance i ON i.id = m.instanceId
+            WHERE m.messageTimestamp > ?
+              AND m.fromMe = 0
+              AND i.name IN ({instance_placeholders})
+              AND IFNULL(m.remoteJid, '') NOT LIKE '%@g.us'
+              AND IFNULL(m.remoteJid, '') NOT LIKE '%@broadcast'
+              AND m.messageType IN ({type_placeholders})
+            ORDER BY m.messageTimestamp ASC
+            LIMIT 8
+        """
+        con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=8)
+        con.row_factory = sqlite3.Row
+        try:
+            rows = con.execute(sql, (cursor_ts, *instance_names, *media_types)).fetchall()
+        finally:
+            con.close()
+        ingested = 0
+        last_ok = cursor_ts
+        for row in rows:
+            try:
+                ts = int(row["messageTimestamp"] or 0)
+            except Exception:
+                ts = last_ok
+            instance_name = str(row["instance_name"] or "").strip()
+            try:
+                key = json.loads(row["key"] or "{}")
+            except Exception:
+                key = {}
+            try:
+                message = json.loads(row["message"] or "{}")
+            except Exception:
+                message = {}
+            if not isinstance(key, dict):
+                key = {}
+            if not isinstance(message, dict):
+                message = {}
+            ext = str(key.get("id") or "").strip()
+            alt = str(key.get("remoteJidAlt") or key.get("senderPn") or "").strip()
+            primary = str(key.get("remoteJid") or row["remoteJid"] or "").strip()
+            jid = alt if alt.endswith(("@s.whatsapp.net", "@c.us")) else primary
+            if "@g.us" in jid or jid.endswith("@broadcast") or jid.endswith("@lid"):
+                last_ok = max(last_ok, ts)
+                continue
+            phone = re.sub(r"\D", "", jid.split("@", 1)[0])
+            acc = company_tenancy.find_customer_whatsapp_account(instance_name=instance_name) if instance_name else None
+            usage = str((acc or {}).get("usage") or "").strip().lower()
+            if not acc or usage == "internal_notifications" or not phone or len(phone) < 8:
+                last_ok = max(last_ok, ts)
+                continue
+            blob = {
+                "key": key,
+                "message": message,
+                "messageType": row["messageType"],
+                "pushName": row["pushName"] or "Guest",
+            }
+            try:
+                inbox_text = self.evolution_customer_message_body(acc, blob)
+                if not str(inbox_text or "").strip():
+                    last_ok = max(last_ok, ts)
+                    continue
+                sender_name = str(row["pushName"] or "Guest").strip() or "Guest"
+                self.process_whatsapp_message(
+                    phone,
+                    inbox_text,
+                    sender_name,
+                    phone_id=f"evo:{instance_name}",
+                    external_message_id=ext or None,
+                )
+                ingested += 1
+                logging.info(
+                    "Company Evolution media poll saved %s from %s on %s",
+                    row["messageType"],
+                    phone,
+                    instance_name,
+                )
+            except Exception as poll_err:
+                logging.error("Company Evolution media poll failed for %s: %s", ext or instance_name, poll_err)
+            last_ok = max(last_ok, ts)
+        if last_ok > cursor_ts:
+            try:
+                chat_db.set_setting(cursor_key, str(last_ok))
+            except Exception as cursor_err:
+                logging.warning("Could not store Evolution media cursor: %s", cursor_err)
+        return ingested
 
     def send_company_evolution_whatsapp(
         self,
@@ -14125,6 +14288,18 @@ Conversation:
                             "mimetype": mime or "audio/ogg",
                             "media": media_value,
                             "fileName": str(media_filename or "voice.ogg"),
+                        },
+                    )
+                if not ok:
+                    ok, meta = _post(
+                        f"/message/sendMedia/{quote(instance_name)}",
+                        {
+                            "number": to_phone,
+                            "mediatype": "document",
+                            "mimetype": mime or "application/octet-stream",
+                            "media": media_value,
+                            "fileName": str(media_filename or "voice.ogg"),
+                            "caption": message_text or "Voice message",
                         },
                     )
                 if ok and message_text:
@@ -29639,7 +29814,7 @@ Rules:
                 "SEND_MESSAGE",
             ]
 
-        def _ensure_internal_whatsapp_webhook(cfg):
+        def _ensure_internal_whatsapp_webhook(cfg, include_media_base64=True):
             cfg = dict(cfg or {})
             instance_name = str((cfg or {}).get("instanceName") or "").strip()
             webhook_url = _sanitize_url_field((cfg or {}).get("webhookUrl"))
@@ -29651,7 +29826,7 @@ Rules:
                     "url": webhook_url,
                     "events": _internal_whatsapp_webhook_events(),
                     "byEvents": False,
-                    "base64": True,
+                    "base64": bool(include_media_base64),
                     "headers": {},
                 }
             }
@@ -38343,14 +38518,19 @@ Write ONE short message only. No JSON. No explanations."""
                                     format='pdf' if mime_type == 'application/pdf' else None
                                 )
                                 media_url = res.get('secure_url') or res.get('url')
-                                if media_type == 'audio' and media_url and media_url.endswith('.webm'):
-                                    media_url = media_url.rsplit('.webm', 1)[0] + '.m4a'
                                 logging.info(f"Uploaded file to Cloudinary: {media_url}")
                             else:
                                 logging.warning("Cloudinary not configured. Sending media via Meta upload instead.")
                         except Exception as e:
                             logging.warning(f"Cloudinary upload failed, sending media via Meta upload instead: {e}")
                             media_url = None
+                    if file_content and not str(media_url or "").strip():
+                        try:
+                            local_id = self.save_evolution_customer_media(file_content, mime_type or "application/octet-stream")
+                            if local_id:
+                                media_url = self._get_dashboard_oauth_public_base_url().rstrip("/") + "/api/media/" + local_id
+                        except Exception as local_media_err:
+                            logging.warning("Could not store outbound media for the inbox: %s", local_media_err)
                 
                 # Logic to actually send the message based on desired channel
                 texts_to_save = []
@@ -38887,7 +39067,9 @@ Write ONE short message only. No JSON. No explanations."""
                             except Exception:
                                 pass
                         elif media_url:
-                            text = f"[Sent {media_type.capitalize()}] {media_url}\n{text}"
+                            raw_kind = str(media_type or "document").split("/")[0].strip().lower()
+                            sent_label = {"image": "Image", "audio": "Audio"}.get(raw_kind, "Document")
+                            text = f"[Sent {sent_label}] {media_url}\n{text}"
                             texts_to_save.append(text)
                         else:
                             texts_to_save.append(text)
@@ -38991,12 +39173,18 @@ Write ONE short message only. No JSON. No explanations."""
                     if file_content and filename:
                         attachments = [{'filename': filename, 'content': file_content, 'mime_type': mime_type}]
                         
-                    gmail_svc.send_email(
+                    sent_ok = gmail_svc.send_email(
                         to_email=email_address, 
                         subject=f"Reply from {reply_brand}", 
                         html_content=html_content,
                         attachments=attachments
                     )
+                    if sent_ok is False:
+                        return jsonify({
+                            "status": "error",
+                            "message": "The email was not sent. Check the company mailbox connection and try again.",
+                            "code": "EMAIL_SEND_FAILED",
+                        }), 502
                     try:
                         if selected_mailbox and selected_mailbox not in ("booking", "sales"):
                             chat_db.update_conversation_info(chat_id, email_account_id=selected_mailbox)
@@ -39027,7 +39215,11 @@ Write ONE short message only. No JSON. No explanations."""
                         except Exception:
                             pass
                     
-                    if file_content:
+                    if file_content and media_url:
+                        raw_kind = str(media_type or "document").split("/")[0].strip().lower()
+                        sent_label = {"image": "Image", "audio": "Audio"}.get(raw_kind, "Document")
+                        text = f"[Sent {sent_label}] {media_url}\n{text}".strip()
+                    elif file_content:
                         text = f"[Attached: {filename}]\n{text}"
                     texts_to_save.append(text)
                 elif desired_channel == 'facebook':
@@ -43010,7 +43202,7 @@ Write ONE short message only. No JSON. No explanations."""
                                             "instanceName": acc.get("instanceName") or "",
                                             "webhookUrl": webhook_url,
                                         }
-                                        _ensure_internal_whatsapp_webhook(evo_cfg)
+                                        _ensure_internal_whatsapp_webhook(evo_cfg, include_media_base64=False)
                             except Exception as evo_hook_err:
                                 logging.warning("Company Evolution webhook setup skipped: %s", evo_hook_err)
                     if str(key) == "dashboard_channel_settings" and company_tenancy.is_default_company(
@@ -43822,7 +44014,7 @@ Write ONE short message only. No JSON. No explanations."""
                         "webhookUrl": account.get("webhookUrl") or "",
                     }
                     if evo_cfg["instanceName"] and evo_cfg["providerBaseUrl"] and evo_cfg["apiKey"] and evo_cfg["webhookUrl"]:
-                        _ensure_internal_whatsapp_webhook(evo_cfg)
+                        _ensure_internal_whatsapp_webhook(evo_cfg, include_media_base64=False)
                 except Exception as hook_err:
                     logging.warning("Company Evolution QR webhook setup skipped: %s", hook_err)
             return dict(account)
@@ -43932,7 +44124,7 @@ Write ONE short message only. No JSON. No explanations."""
                             "apiKey": saved_account.get("apiKey") or "",
                             "instanceName": saved_account.get("instanceName") or "",
                             "webhookUrl": saved_account.get("webhookUrl") or _company_evolution_webhook_url(cid),
-                        })
+                        }, include_media_base64=False)
                     except Exception as hook_err:
                         logging.warning("Company Evolution webhook rebind on refresh failed: %s", hook_err)
                 return jsonify({"status": "success", "data": {"account": saved_account}}), 200
@@ -44175,11 +44367,17 @@ Write ONE short message only. No JSON. No explanations."""
                                 sender_phone_early,
                                 str(inbox_text)[:80],
                             )
+                            inbound_key = ""
+                            try:
+                                inbound_key = str(_extract_evolution_message_id(incoming_blob_early) or "").strip()
+                            except Exception:
+                                inbound_key = ""
                             self.process_whatsapp_message(
                                 sender_phone_early,
                                 inbox_text,
                                 sender_name_early,
                                 phone_id=f"evo:{payload_instance}",
+                                external_message_id=inbound_key or None,
                             )
                             ingested += 1
                         if ingested:
@@ -47769,7 +47967,7 @@ Draft to optimize:
                         if not str((acc or {}).get("instanceName") or "").strip():
                             continue
                         cfg = _prepare_company_evolution_cfg(acc, cid)
-                        _ensure_internal_whatsapp_webhook(cfg)
+                        _ensure_internal_whatsapp_webhook(cfg, include_media_base64=False)
                         logging.info("Rebound customer Evolution webhook for %s", cfg.get("instanceName"))
                 except Exception as rebind_err:
                     logging.warning("Company Evolution webhook rebind skipped: %s", rebind_err)
@@ -49057,6 +49255,18 @@ Draft to optimize:
 
         threading.Thread(target=_company_email_loop, daemon=True, name="company-email-poll").start()
         logging.info("Company mailbox poll started.")
+
+        def _company_evolution_media_loop():
+            time.sleep(8)
+            while True:
+                try:
+                    self._poll_company_evolution_media()
+                except Exception as media_loop_err:
+                    logging.error("Company Evolution media poll failed: %s", media_loop_err)
+                time.sleep(15)
+
+        threading.Thread(target=_company_evolution_media_loop, daemon=True, name="company-evolution-media-poll").start()
+        logging.info("Company Evolution media poll started.")
         schedule.every(10).minutes.do(self.learn_from_human_edits)
         schedule.every(15).minutes.do(self.sync_orphan_chats)
         schedule.every(30).seconds.do(self.automation_engine.tick)

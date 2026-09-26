@@ -879,7 +879,21 @@ class GmailService:
                 })
             
             return history
+        except HttpError as e:
+            status = 0
+            try:
+                status = int(getattr(getattr(e, "resp", None), "status", 0) or 0)
+            except Exception:
+                status = 0
+            if status == 404 or "not found" in str(e).lower():
+                logging.info("Gmail thread %s is not in this mailbox.", thread_id)
+                return []
+            logging.error(f"Error retrieving thread history: {e}")
+            return []
         except Exception as e:
+            if "not found" in str(e).lower():
+                logging.info("Gmail thread %s is not in this mailbox.", thread_id)
+                return []
             logging.error(f"Error retrieving thread history: {e}")
             return []
 

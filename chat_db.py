@@ -2205,6 +2205,24 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                     WHERE chat_id = ?
                 """, (contact_name, airtable_record_id, location, thread_id, clean_identifier, receiving_phone_id, 1 if sales_inbox else 0, email_account_id, row['chat_id']))
                 conn.commit()
+            if (
+                str(receiving_phone_id or "").startswith("evo:")
+                and str(location or "").strip()
+                and str(location).strip().lower() not in ("unknown", "needhelp", "all")
+            ):
+                c.execute(
+                    """
+                    UPDATE conversations
+                    SET location = ?,
+                        company_id = ?,
+                        receiving_phone_id = COALESCE(NULLIF(?, ''), receiving_phone_id)
+                    WHERE chat_id = ?
+                    """,
+                    (str(location).strip(), resolved_company_id, receiving_phone_id, row["chat_id"]),
+                )
+                conn.commit()
+            c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
+            row = c.fetchone()
             return dict(row)
         else:
             chat_id = str(uuid.uuid4())
@@ -2220,6 +2238,60 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 return dict(c.fetchone())
             except sqlite3.IntegrityError:
                 row = None
+                normalized_sender_expr = "REPLACE(REPLACE(REPLACE(sender_identifier, '+', ''), ' ', ''), '-', '')"
+                c.execute(
+                    f"""
+                    SELECT *
+                    FROM conversations
+                    WHERE lower(source) = lower(?)
+                      AND {normalized_sender_expr} = ?
+                    ORDER BY
+                      CASE WHEN COALESCE(thread_id, '') = ? THEN 0 ELSE 1 END,
+                      last_message_time DESC
+                    LIMIT 1
+                    """,
+                    (source, clean_identifier, str(thread_id or "")),
+                )
+                row = c.fetchone()
+                if row:
+                    existing_company = str(row["company_id"] or "").strip() or DEFAULT_COMPANY_ID
+                    try:
+                        import company_tenancy
+                        incoming_company = str(resolved_company_id or "").strip()
+                        if (
+                            str(receiving_phone_id or "").startswith("evo:")
+                            and incoming_company
+                            and not company_tenancy.is_default_company(incoming_company)
+                            and company_tenancy.is_default_company(existing_company)
+                        ):
+                            c.execute(
+                                """
+                                UPDATE conversations
+                                SET company_id = ?,
+                                    receiving_phone_id = COALESCE(NULLIF(?, ''), receiving_phone_id),
+                                    contact_name = COALESCE(NULLIF(?, ''), contact_name),
+                                    location = CASE
+                                        WHEN ? NOT IN ('', 'Unknown', 'NeedHelp', 'All') THEN ?
+                                        ELSE COALESCE(NULLIF(location, 'Unknown'), NULLIF(?, 'Unknown'), 'Unknown')
+                                    END
+                                WHERE chat_id = ?
+                                """,
+                                (
+                                    incoming_company,
+                                    receiving_phone_id,
+                                    contact_name,
+                                    str(location or "").strip(),
+                                    str(location or "").strip(),
+                                    location,
+                                    row["chat_id"],
+                                ),
+                            )
+                            conn.commit()
+                            c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
+                            row = c.fetchone()
+                    except Exception:
+                        pass
+                    return dict(row)
                 if source == "Email" and thread_id:
                     c.execute(
                         f"SELECT * FROM conversations WHERE source = ? AND thread_id = ? AND {_COMPANY_ID_SQL} = ? ORDER BY last_message_time DESC LIMIT 1",

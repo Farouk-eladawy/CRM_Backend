@@ -10054,6 +10054,17 @@ Conversation:
                     location = pinned_location
             except Exception as pin_err:
                 logging.warning(f"Failed pinning WhatsApp location from phone_id: {pin_err}")
+        if str(receiving_phone_id or "").startswith("evo:"):
+            try:
+                evo_acc = company_tenancy.find_customer_whatsapp_account(
+                    instance_name=str(receiving_phone_id)[4:]
+                )
+                location = company_tenancy.company_customer_inbox_location(
+                    (evo_acc or {}).get("companyId") or company_id,
+                    (evo_acc or {}).get("routingLocation") or "",
+                )
+            except Exception as evo_loc_err:
+                logging.warning("Evolution inbox location fallback failed: %s", evo_loc_err)
         
         # --- IGNORE INTERNAL EMAILS & SPECIFIC DOMAINS (Only for Email source or if email detected) ---
         if customer_email and "@" in customer_email:
@@ -10102,6 +10113,7 @@ Conversation:
         temp_contact_name = customer_email if source == "Email" else contact_phone
         
         # --- RECORD INCOMING CHAT MESSAGE IN DB ---
+        chat_conv = None
         if not skip_db_save:
             try:
                 import chat_db
@@ -12376,9 +12388,10 @@ Conversation:
             location = f"Phone-{str(phone_id)[-4:]}"
         if str(phone_id or "").startswith("evo:"):
             evo_acc = company_tenancy.find_customer_whatsapp_account(instance_name=str(phone_id)[4:])
-            routed = str((evo_acc or {}).get("routingLocation") or "").strip()
-            if routed:
-                location = routed
+            location = company_tenancy.company_customer_inbox_location(
+                (evo_acc or {}).get("companyId"),
+                (evo_acc or {}).get("routingLocation") or "",
+            )
 
         logging.info(f"Processing WhatsApp message from {sender_name} ({sender_phone}) for {location}")
         
@@ -13684,9 +13697,16 @@ Conversation:
             if isinstance(msg.get("conversation"), str) and msg.get("conversation").strip():
                 return msg.get("conversation").strip()
             if isinstance(payload, dict):
-                text = str(payload.get("text") or "").strip()
+                text = str(payload.get("text") or payload.get("conversation") or "").strip()
                 if text:
                     return text
+            elif isinstance(payload, str) and payload.strip():
+                return payload.strip()
+            nested = msg.get("message") if isinstance(msg, dict) else None
+            if isinstance(nested, dict):
+                nested_text = str(nested.get("conversation") or "").strip()
+                if nested_text:
+                    return nested_text
             return caption
         if kind == "location":
             lat = payload.get("degreesLatitude") if isinstance(payload, dict) else None
@@ -20816,9 +20836,14 @@ Conversation:
                 if isinstance(data, dict):
                     key_obj = data.get("key")
                     if isinstance(key_obj, dict):
-                        remote_jid = key_obj.get("remoteJid") or key_obj.get("participant")
-                        if isinstance(remote_jid, str) and remote_jid.strip():
-                            return remote_jid.strip()
+                        primary = key_obj.get("remoteJid") or key_obj.get("participant")
+                        alt = key_obj.get("remoteJidAlt") or key_obj.get("senderPn")
+                        for candidate in (alt, primary, key_obj.get("remoteJid"), key_obj.get("participant")):
+                            if isinstance(candidate, str) and candidate.strip().endswith(("@s.whatsapp.net", "@c.us")):
+                                return candidate.strip()
+                        for candidate in (primary, alt):
+                            if isinstance(candidate, str) and candidate.strip():
+                                return candidate.strip()
                     for key in ("remoteJid", "jid", "participant", "sender"):
                         value = data.get(key)
                         if isinstance(value, str) and value.strip():
@@ -43423,6 +43448,16 @@ Write ONE short message only. No JSON. No explanations."""
                 )
                 if changed:
                     saved_account = _merge_company_evolution_account(cid, saved_account)
+                if str(saved_account.get("connectionStatus") or "") == "connected":
+                    try:
+                        _ensure_internal_whatsapp_webhook({
+                            "providerBaseUrl": saved_account.get("providerBaseUrl") or "",
+                            "apiKey": saved_account.get("apiKey") or "",
+                            "instanceName": saved_account.get("instanceName") or "",
+                            "webhookUrl": saved_account.get("webhookUrl") or _company_evolution_webhook_url(cid),
+                        })
+                    except Exception as hook_err:
+                        logging.warning("Company Evolution webhook rebind on refresh failed: %s", hook_err)
                 return jsonify({"status": "success", "data": {"account": saved_account}}), 200
             except Exception as e:
                 logging.error(f"Error in /api/channels/evolution/refresh: {e}", exc_info=True)
@@ -43566,59 +43601,90 @@ Write ONE short message only. No JSON. No explanations."""
                         return
 #endregion debug-point pi-workflow-e2e-tests.internal_webhook_dbg_emit
                 
-                # Safely extract instance name avoiding AttributeError if 'instance' or 'data' is a string
-                instance_obj = payload.get("instance")
-                instance_name_1 = instance_obj.get("instanceName") if isinstance(instance_obj, dict) else ""
-                
-                instance_name_2 = payload.get("instanceName") if isinstance(payload, dict) else ""
-                
-                data_obj = payload.get("data")
-                data_instance_obj = data_obj.get("instance") if isinstance(data_obj, dict) else None
-                instance_name_3 = data_instance_obj.get("instanceName") if isinstance(data_instance_obj, dict) else ""
-                
-                payload_instance = (
-                    str(instance_name_1 or "")
-                    or str(instance_name_2 or "")
-                    or str(instance_name_3 or "")
-                ).strip()
+                # Evolution v2 sends instance as a plain string. Older payloads use {instanceName}.
+                def _payload_instance_name(body):
+                    if not isinstance(body, dict):
+                        return ""
+                    instance_obj = body.get("instance")
+                    if isinstance(instance_obj, str) and instance_obj.strip():
+                        return instance_obj.strip()
+                    if isinstance(instance_obj, dict):
+                        named = str(instance_obj.get("instanceName") or instance_obj.get("name") or "").strip()
+                        if named:
+                            return named
+                    named = str(body.get("instanceName") or "").strip()
+                    if named:
+                        return named
+                    data_obj_local = body.get("data")
+                    if isinstance(data_obj_local, dict):
+                        return _payload_instance_name(data_obj_local)
+                    return ""
 
-                if instance_name and payload_instance and payload_instance != instance_name:
+                def _payload_message_blobs(body):
+                    data_obj_local = body.get("data") if isinstance(body, dict) else None
+                    if isinstance(data_obj_local, list):
+                        blobs = [item for item in data_obj_local if isinstance(item, dict)]
+                        return blobs or ([body] if isinstance(body, dict) else [])
+                    if isinstance(data_obj_local, dict):
+                        messages = data_obj_local.get("messages")
+                        if isinstance(messages, list):
+                            blobs = [item for item in messages if isinstance(item, dict)]
+                            if blobs:
+                                return blobs
+                        return [data_obj_local]
+                    return [body] if isinstance(body, dict) else []
+
+                payload_instance = _payload_instance_name(payload)
+
+                if payload_instance and payload_instance.lower() != str(instance_name or "").strip().lower():
                     try:
-                        data_obj_early = payload.get("data") if isinstance(payload, dict) else None
-                        incoming_blob_early = data_obj_early if isinstance(data_obj_early, dict) else payload
-                        from_me_early = _extract_evolution_from_me(incoming_blob_early)
-                        remote_jid_early = _extract_evolution_remote_jid(incoming_blob_early)
-                        sender_phone_early = re.sub(r"\D", "", str(remote_jid_early or ""))
-                        incoming_text_early = _extract_evolution_message_text(incoming_blob_early)
+                        event_name_early = str(payload.get("event") or payload.get("eventName") or payload.get("type") or "").strip().lower()
                         state_early = _extract_connection_state(payload)
                         qr_early = _extract_qr_data(payload)
-                        next_status_early = _map_evolution_state_to_ui(state_early, qr_early)
-                        detected_phone_early = _extract_connected_whatsapp_number(payload) or ""
-                        if next_status_early == "connected" and not detected_phone_early:
-                            try:
-                                acc_for_phone = company_tenancy.find_customer_whatsapp_account(instance_name=payload_instance)
-                                if isinstance(acc_for_phone, dict):
-                                    phone_cfg = {
-                                        "providerBaseUrl": acc_for_phone.get("providerBaseUrl") or "",
-                                        "apiKey": acc_for_phone.get("apiKey") or "",
-                                        "instanceName": payload_instance,
-                                    }
-                                    phone_meta = _fetch_evolution_instance_metadata(phone_cfg, payload_instance)
-                                    detected_phone_early = _extract_connected_whatsapp_number(phone_meta) or ""
-                            except Exception:
-                                detected_phone_early = ""
-                        company_tenancy.update_evolution_account_connection(
-                            payload_instance,
-                            connection_status=next_status_early or "",
-                            qr_data=qr_early or "",
-                            whatsapp_number=detected_phone_early,
+                        is_connection_event = (
+                            "connection" in event_name_early
+                            or "qrcode" in event_name_early
+                            or bool(qr_early)
+                            or bool(state_early)
                         )
+                        if is_connection_event:
+                            next_status_early = _map_evolution_state_to_ui(state_early, qr_early)
+                            detected_phone_early = _extract_connected_whatsapp_number(payload) or ""
+                            if next_status_early == "connected" and not detected_phone_early:
+                                try:
+                                    acc_for_phone = company_tenancy.find_customer_whatsapp_account(instance_name=payload_instance)
+                                    if isinstance(acc_for_phone, dict):
+                                        phone_cfg = {
+                                            "providerBaseUrl": acc_for_phone.get("providerBaseUrl") or "",
+                                            "apiKey": acc_for_phone.get("apiKey") or "",
+                                            "instanceName": payload_instance,
+                                        }
+                                        phone_meta = _fetch_evolution_instance_metadata(phone_cfg, payload_instance)
+                                        detected_phone_early = _extract_connected_whatsapp_number(phone_meta) or ""
+                                except Exception:
+                                    detected_phone_early = ""
+                            company_tenancy.update_evolution_account_connection(
+                                payload_instance,
+                                connection_status=next_status_early or "",
+                                qr_data=qr_early or "",
+                                whatsapp_number=detected_phone_early,
+                            )
                         acc_early = company_tenancy.find_customer_whatsapp_account(instance_name=payload_instance)
-                        remote_is_group = "@g.us" in str(remote_jid_early or "") or str(remote_jid_early or "").endswith("@broadcast")
-                        inbox_text = ""
-                        if acc_early and not from_me_early and sender_phone_early and not remote_is_group:
+                        ingested = 0
+                        for incoming_blob_early in _payload_message_blobs(payload):
+                            from_me_early = _extract_evolution_from_me(incoming_blob_early)
+                            remote_jid_early = _extract_evolution_remote_jid(incoming_blob_early)
+                            sender_phone_early = re.sub(r"\D", "", str(remote_jid_early or "").split("@", 1)[0])
+                            remote_is_group = "@g.us" in str(remote_jid_early or "") or str(remote_jid_early or "").endswith("@broadcast")
+                            if not acc_early or from_me_early or not sender_phone_early or remote_is_group:
+                                continue
                             inbox_text = self.evolution_customer_message_body(acc_early, incoming_blob_early)
-                        if inbox_text:
+                            if not str(inbox_text or "").strip():
+                                fallback_text = _extract_evolution_message_text(incoming_blob_early)
+                                if fallback_text and not str(fallback_text).startswith("__AUDIO_EVOLUTION_MSG__"):
+                                    inbox_text = fallback_text
+                            if not str(inbox_text or "").strip():
+                                continue
                             sender_name_early = "Guest"
                             if isinstance(incoming_blob_early, dict):
                                 sender_name_early = str(
@@ -43626,13 +43692,23 @@ Write ONE short message only. No JSON. No explanations."""
                                     or incoming_blob_early.get("pushname")
                                     or "Guest"
                                 ).strip() or "Guest"
+                            logging.info(
+                                "Company Evolution inbound %s from %s on %s",
+                                payload_instance,
+                                sender_phone_early,
+                                str(inbox_text)[:80],
+                            )
                             self.process_whatsapp_message(
                                 sender_phone_early,
                                 inbox_text,
                                 sender_name_early,
                                 phone_id=f"evo:{payload_instance}",
                             )
-                            return jsonify({"status": "success", "message": "company_customer_ingested"}), 200
+                            ingested += 1
+                        if ingested:
+                            return jsonify({"status": "success", "message": "company_customer_ingested", "count": ingested}), 200
+                        if not acc_early:
+                            logging.warning("Evolution webhook for unknown customer instance: %s", payload_instance)
                         if acc_early:
                             return jsonify({"status": "success", "message": "company_evolution_status"}), 200
                     except Exception as company_wa_err:
@@ -47189,6 +47265,22 @@ Draft to optimize:
                         logging.warning(f"Embedded Evolution auto-start skipped/failed: {auto_start_err}")
 
                 threading.Thread(target=_start_embedded_evolution_background, daemon=True).start()
+
+            def _rebind_company_evolution_webhooks():
+                try:
+                    time.sleep(4)
+                    for cid, acc in company_tenancy.iter_customer_whatsapp_accounts():
+                        if str((acc or {}).get("provider") or "").strip().lower() != "evolution":
+                            continue
+                        if not str((acc or {}).get("instanceName") or "").strip():
+                            continue
+                        cfg = _prepare_company_evolution_cfg(acc, cid)
+                        _ensure_internal_whatsapp_webhook(cfg)
+                        logging.info("Rebound customer Evolution webhook for %s", cfg.get("instanceName"))
+                except Exception as rebind_err:
+                    logging.warning("Company Evolution webhook rebind skipped: %s", rebind_err)
+
+            threading.Thread(target=_rebind_company_evolution_webhooks, daemon=True).start()
                 
             def _start_tiqets_service():
                 """Auto-start the Tiqets API background service."""

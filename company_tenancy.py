@@ -617,6 +617,45 @@ def _looks_like_nile_crystal(*parts) -> bool:
     return "nilecrystal" in _compact_token(blob)
 
 
+def company_customer_inbox_location(company_id, preferred=""):
+    """Inbox location for a company customer WhatsApp chat.
+
+    Generic defaults such as NeedHelp hide the chat when the company inbox
+    is filtered by its own location, for example Nile_Crystal.
+    """
+    generic = {"", "all", "unknown", "needhelp", "operations"}
+    preferred_s = re.sub(r"\s+", "_", str(preferred or "").strip())
+    cid = normalize_company_id(company_id)
+    if preferred_s and preferred_s.lower() not in generic and not is_default_company(cid):
+        return preferred_s
+    if is_default_company(cid):
+        return preferred_s or "NeedHelp"
+    try:
+        import chat_db
+
+        raw = chat_db.get_setting(scoped_setting_key("dashboard_company_filters", cid))
+        parsed = _parse_json(raw, {})
+        filters = parsed.get("filters") if isinstance(parsed, dict) else None
+        if isinstance(filters, list):
+            for item in filters:
+                fid = ""
+                if isinstance(item, dict):
+                    fid = str(item.get("id") or item.get("label") or "").strip()
+                else:
+                    fid = str(item or "").strip()
+                fid = re.sub(r"\s+", "_", fid)
+                if fid and fid.lower() not in generic:
+                    return fid
+    except Exception:
+        pass
+    company = get_company(cid) or {}
+    for key in ("name", "publicSlug", "createdByUsername"):
+        val = re.sub(r"\s+", "_", str(company.get(key) or "").strip())
+        if val and val.lower() not in generic:
+            return val
+    return preferred_s or "NeedHelp"
+
+
 def company_is_nile_crystal(company) -> bool:
     if not isinstance(company, dict):
         return False
@@ -758,7 +797,7 @@ def find_customer_whatsapp_account(phone_number_id="", instance_name="", company
         row["companyId"] = cid
         if pid and provider == "meta" and str(acc.get("phoneNumberId") or "").strip() == pid:
             return row
-        if inst and provider == "evolution" and str(acc.get("instanceName") or "").strip() == inst:
+        if inst and provider == "evolution" and str(acc.get("instanceName") or "").strip().lower() == inst.lower():
             return row
         if wanted_company:
             if bool(acc.get("isDefault")):
@@ -789,7 +828,7 @@ def update_evolution_account_connection(instance_name, connection_status="", qr_
                 continue
             row = dict(acc)
             provider = str(row.get("provider") or "").strip().lower()
-            if provider == "evolution" and str(row.get("instanceName") or "").strip() == inst:
+            if provider == "evolution" and str(row.get("instanceName") or "").strip().lower() == inst.lower():
                 if connection_status:
                     row["connectionStatus"] = connection_status
                 if qr_data:

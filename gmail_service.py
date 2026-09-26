@@ -888,6 +888,8 @@ class GmailService:
         try:
             add_labels = add_labels or []
             remove_labels = remove_labels or []
+            if not add_labels and not remove_labels:
+                return True
             body = {
                 'addLabelIds': add_labels,
                 'removeLabelIds': remove_labels

@@ -362,3 +362,26 @@ def generate_missing_info_email(customer_name, trip_name, booking_nr, date_trip,
     </html>
     """
     return html_content
+
+
+def generate_company_plain_email(content, company_name="Support", customer_name="Guest", signature=None):
+    """Outbound email for a non-FTS company. No FTS logo, address, or Farah disclaimer."""
+    name = str(company_name or "Support").strip() or "Support"
+    guest = str(customer_name or "Guest").strip() or "Guest"
+    body = str(content or "")
+    signature_html = ""
+    if signature:
+        signature_html = (
+            "<div style=\"margin-top: 20px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-weight: bold;\">"
+            + str(signature).replace("\n", "<br>")
+            + "</div>"
+        )
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 24px;">
+<div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 24px;">
+<p style="margin-top: 0;">Dear <b>{guest}</b>,</p>
+<div style="line-height: 1.6; color: #111827;">{body}</div>
+{signature_html}
+<p style="font-size: 12px; color: #6b7280; margin-top: 28px;">{name}</p>
+</div>
+</body></html>"""

@@ -2596,6 +2596,26 @@ class AIAgent:
         self._refresh_dynamic_email_services()
         return self.dynamic_email_accounts.get(str(account_id or "").strip())
 
+    def _company_default_email_account_id(self, company_id, direction="outbound"):
+        self._refresh_dynamic_email_services()
+        cid = company_tenancy.normalize_company_id(company_id)
+        fallback = None
+        for account_id, account in (self.dynamic_email_accounts or {}).items():
+            if account_id not in self.dynamic_gmail_services:
+                continue
+            if not bool(account.get("enabled", True)):
+                continue
+            owner = company_tenancy.lookup_company_id_for_email_account(account_id)
+            if company_tenancy.normalize_company_id(owner) != cid:
+                continue
+            if direction == "inbound" and bool(account.get("isDefaultInbound")):
+                return account_id
+            if direction == "outbound" and bool(account.get("isDefaultOutbound")):
+                return account_id
+            if fallback is None:
+                fallback = account_id
+        return fallback
+
     def _get_default_dynamic_email_account_id(self, direction="outbound"):
         self._refresh_dynamic_email_services()
         for account_id, account in (self.dynamic_email_accounts or {}).items():
@@ -2610,11 +2630,26 @@ class AIAgent:
                 return account_id
         return None
 
-    def _select_gmail_service(self, mailbox=None, direction="outbound", sales_fallback=False):
+    def _select_gmail_service(self, mailbox=None, direction="outbound", sales_fallback=False, company_id=None):
         self._refresh_dynamic_email_services()
         mailbox_key = str(mailbox or "").strip()
+        cid = str(company_id or "").strip()
+        company_locked = bool(cid) and not company_tenancy.is_default_company(cid)
         if mailbox_key and mailbox_key in self.dynamic_gmail_services:
-            return self.dynamic_gmail_services[mailbox_key], mailbox_key
+            if company_locked:
+                owner = company_tenancy.lookup_company_id_for_email_account(mailbox_key)
+                if company_tenancy.normalize_company_id(owner) != company_tenancy.normalize_company_id(cid):
+                    mailbox_key = ""
+                else:
+                    return self.dynamic_gmail_services[mailbox_key], mailbox_key
+            else:
+                return self.dynamic_gmail_services[mailbox_key], mailbox_key
+
+        if company_locked:
+            chosen = self._company_default_email_account_id(cid, direction=direction)
+            if chosen and chosen in self.dynamic_gmail_services:
+                return self.dynamic_gmail_services[chosen], chosen
+            return None, None
 
         normalized_mailbox_key = mailbox_key.lower()
         if normalized_mailbox_key == "sales":
@@ -4570,15 +4605,24 @@ class AIAgent:
         customer_email = self.get_field_value(fields, FieldIds.CUSTOMER_EMAIL)
         if customer_email:
             subject = f"Re: Your inquiry about {self.get_field_value(fields, FieldIds.TRIP_NAME)}"
-            html_content = email_templates.generate_standard_email_template(
+            reply_company = self._resolve_reply_company_id()
+            html_content = self._render_outbound_email_html(
                 content=response.replace('\n', '<br>'),
                 title=subject,
-                customer_name=self.get_field_value(fields, FieldIds.CUSTOMER_NAME) or 'Guest'
+                customer_name=self.get_field_value(fields, FieldIds.CUSTOMER_NAME) or 'Guest',
+                company_id=reply_company,
+                include_disclaimer=company_tenancy.is_default_company(reply_company),
             )
             
             # Only send attachments if logic decided to
             final_attachments = processed_attachments if should_attach else []
-            self.send_email(customer_email, subject, html_content, attachments=final_attachments, record_id=record_id)
+            mailbox = None
+            if not company_tenancy.is_default_company(reply_company):
+                mailbox = self._company_default_email_account_id(reply_company, direction="outbound")
+                if not mailbox:
+                    logging.error("Skipped company email reply. No mailbox for company=%s", reply_company)
+                    return True
+            self.send_email(customer_email, subject, html_content, attachments=final_attachments, record_id=record_id, mailbox=mailbox)
             
             # 4. Log to Airtable
             try:
@@ -4893,6 +4937,44 @@ class AIAgent:
                 # We might not have record_id easily accessible here.
                 pass
 
+    def _resolve_reply_company_id(self, company_id=None, chat_id=None):
+        cid = str(company_id or "").strip()
+        if not cid:
+            cid = str(company_tenancy.active_booking_company_id() or "").strip()
+        if not cid and chat_id:
+            try:
+                import chat_db
+                conv = chat_db.get_conversation_info(chat_id) or {}
+                cid = str(conv.get("company_id") or "").strip()
+            except Exception:
+                cid = ""
+        return company_tenancy.normalize_company_id(cid or company_tenancy.DEFAULT_COMPANY_ID)
+
+    def _company_public_name(self, company_id=None):
+        cid = company_tenancy.normalize_company_id(company_id)
+        if company_tenancy.is_default_company(cid):
+            info = (self.config.get("company_info") or {}) if isinstance(self.config, dict) else {}
+            return str(info.get("name") or "FTS Travels").strip() or "FTS Travels"
+        company = company_tenancy.get_company(cid) or {}
+        return str(company.get("name") or "Support").replace("_", " ").strip() or "Support"
+
+    def _render_outbound_email_html(self, content, customer_name, title, company_id=None, signature=None, include_disclaimer=True):
+        cid = self._resolve_reply_company_id(company_id=company_id)
+        if not company_tenancy.is_default_company(cid):
+            return email_templates.generate_company_plain_email(
+                content=content,
+                company_name=self._company_public_name(cid),
+                customer_name=customer_name,
+                signature=signature,
+            )
+        return email_templates.generate_standard_email_template(
+            content=content,
+            title=title,
+            customer_name=customer_name,
+            signature=signature,
+            include_disclaimer=include_disclaimer,
+        )
+
     def _is_arabic_text(self, text):
         try:
             import re
@@ -4900,7 +4982,13 @@ class AIAgent:
         except Exception:
             return False
 
-    def _assistant_identity_for_text(self, text):
+    def _assistant_identity_for_text(self, text, company_id=None, chat_id=None):
+        cid = self._resolve_reply_company_id(company_id=company_id, chat_id=chat_id)
+        if not company_tenancy.is_default_company(cid):
+            name = self._company_public_name(cid)
+            if self._is_arabic_text(text):
+                return name, f"مع خالص التحية،\n{name}"
+            return name, f"Best regards,\n{name}"
         cfg = self.config.get('assistant', {}) or {}
         if self._is_arabic_text(text):
             name = str(cfg.get('name_ar') or cfg.get('name') or "فرح").strip() or "فرح"
@@ -5199,8 +5287,9 @@ class AIAgent:
                 "Authorization": f"Bearer {api_key}"
             }
             
-            assistant_name, _assistant_sig = self._assistant_identity_for_text(prompt)
-            if location and str(location).lower() == 'religious':
+            assistant_name, _assistant_sig = self._assistant_identity_for_text(prompt, chat_id=chat_id)
+            reply_company = self._resolve_reply_company_id(chat_id=chat_id)
+            if company_tenancy.is_default_company(reply_company) and location and str(location).lower() == 'religious':
                 # Religious Meta WhatsApp: do not identify as Farah / sales rep
                 if self._is_religious_meta_whatsapp(
                     chat_id=chat_id,
@@ -5222,7 +5311,8 @@ class AIAgent:
                     else:
                         assistant_name = "مسؤول المبيعات"
 
-            system_content = f"You are a helpful travel assistant for {self.config['company_info']['name']}."
+            brand_name = self._company_public_name(self._resolve_reply_company_id(chat_id=chat_id))
+            system_content = f"You are a helpful travel assistant for {brand_name}."
             if system_role == "assistant":
                  system_content += " CRITICAL RULE: You MUST reply in the SAME LANGUAGE as the user's last message. If they speak English, reply in English. If Arabic, reply in Arabic."
                  system_content += f" Your name is '{assistant_name}'. Always refer to yourself using this name."
@@ -8265,13 +8355,21 @@ User request:
         classification_instruction = ""
 
         # First, try to determine identity normally based on the language of the message
-        assistant_name, assistant_signature = self._assistant_identity_for_text(latest_message_body)
+        assistant_name, assistant_signature = self._assistant_identity_for_text(
+            latest_message_body,
+            company_id=company_id,
+            chat_id=getattr(self, "_current_chat_id", None),
+        )
         source = source or getattr(self, "_current_source", None)
-        
-        # Override for Religious location
+        reply_company = self._resolve_reply_company_id(
+            company_id=company_id,
+            chat_id=getattr(self, "_current_chat_id", None),
+        )
+
+        # Override for Religious location on the FTS account only.
         # WhatsApp Meta Religious: no Farah / no sales-title signature (plain reply)
         # Facebook Religious: keep sales-owner Arabic signature
-        if location and str(location).lower() == 'religious':
+        if company_tenancy.is_default_company(reply_company) and location and str(location).lower() == 'religious':
             if self._is_religious_meta_whatsapp(chat_id=chat_id, location=location, source=source):
                 assistant_signature = ""
                 # Avoid instructing the model to introduce itself as Farah / add a closing signature
@@ -10027,6 +10125,12 @@ Conversation:
                         fallback_location=location or (conv or {}).get("location") or "Unknown",
                         receiving_phone_id=receiving_phone_id,
                     )
+                    linked_company_id = str((conv or {}).get("company_id") or "").strip()
+                    if linked_company_id and not company_tenancy.is_default_company(linked_company_id):
+                        db_location = company_tenancy.company_customer_inbox_location(
+                            linked_company_id,
+                            location or (conv or {}).get("location") or "",
+                        )
                     if db_location and db_location != (conv or {}).get("location"):
                         chat_db.update_conversation_info(chat_id=chat_id, location=db_location)
             except Exception as sync_err:
@@ -10052,6 +10156,12 @@ Conversation:
             receiving_phone_id=receiving_phone_id,
             is_leads_table=is_leads_table,
         )
+        linked_company_id = str((conv or {}).get("company_id") or "").strip()
+        if linked_company_id and not company_tenancy.is_default_company(linked_company_id):
+            db_location = company_tenancy.company_customer_inbox_location(
+                linked_company_id,
+                location or (conv or {}).get("location") or "",
+            )
         booking_nr_val = self.get_field_value(rec.get("fields", {}) or {}, FieldIds.BOOKING_NR) or booking_nr
         contact_name = self.get_field_value(rec.get("fields", {}) or {}, FieldIds.CUSTOMER_NAME) or None
         chat_db.update_conversation_info(
@@ -11569,7 +11679,11 @@ Conversation:
                 )
                 if "quality" not in response_text.lower() and "فريق الجودة" not in response_text and "الكواليتي" not in response_text:
                     if location and location.lower() != "religious":
-                        _an, _sig = self._assistant_identity_for_text(str(message_body or ""))
+                        _an, _sig = self._assistant_identity_for_text(
+                            str(message_body or ""),
+                            company_id=company_id,
+                            chat_id=getattr(self, "_current_chat_id", None),
+                        )
                         response_text = self._append_offer_before_signature(response_text, offer, _sig, chat_id=getattr(self, '_current_chat_id', None), location=location)
         except Exception:
             pass
@@ -12763,7 +12877,10 @@ Conversation:
             lower_body = str(message_body or "").lower()
             if lower_body.startswith("[customer shared a location]") or lower_body.startswith("[customer shared contacts."):
                 reply_text = "Thanks! We received your details. If you haven’t already, please type your hotel name and room number. We’ll confirm your pickup time shortly."
-                assistant_name, assistant_signature = self._assistant_identity_for_text(message_body)
+                assistant_name, assistant_signature = self._assistant_identity_for_text(
+                    message_body,
+                    chat_id=chat_conv.get("chat_id") if chat_conv else None,
+                )
                 reply_text = self._ensure_signature_once(
                     reply_text,
                     assistant_signature,
@@ -12823,7 +12940,10 @@ Conversation:
 
                 if not needs_help_paused:
                     reply_text = str(result.get("response_text") or "").strip()
-                    assistant_name, assistant_signature = self._assistant_identity_for_text(message_body)
+                    assistant_name, assistant_signature = self._assistant_identity_for_text(
+                    message_body,
+                    chat_id=chat_conv.get("chat_id") if chat_conv else None,
+                )
                     reply_text = self._ensure_signature_once(
                         reply_text,
                         assistant_signature,
@@ -13001,7 +13121,10 @@ Conversation:
             )
             if looks_like_ops_details:
                 reply_text = "Thanks! We received your details and forwarded them to our operations team. We’ll confirm your pickup time shortly."
-                assistant_name, assistant_signature = self._assistant_identity_for_text(message_body)
+                assistant_name, assistant_signature = self._assistant_identity_for_text(
+                    message_body,
+                    chat_id=chat_conv.get("chat_id") if chat_conv else None,
+                )
                 reply_text = self._ensure_signature_once(
                     reply_text,
                     assistant_signature,
@@ -14077,9 +14200,6 @@ Conversation:
                 media_mime=media_mime,
                 media_filename=media_filename,
             )
-        if template_name:
-            company_tenancy.clear_wa_override()
-            return None
         if provider == "meta" and str(acc.get("accessToken") or "").strip() and str(acc.get("phoneNumberId") or "").strip():
             company_tenancy.set_wa_override(acc.get("accessToken"), acc.get("phoneNumberId"))
             return None
@@ -14116,60 +14236,68 @@ Conversation:
             # If the requested template is missing on the primary number/WABA, switch
             # early to another configured number that already has the same template.
             if template_name and _template_phone_fallback and phone_number_id:
-                try:
-                    access_token_pre = self._get_whatsapp_access_token()
-                    has_tmpl, _, _ = self._phone_id_has_whatsapp_template(
+                _override_token, forced_phone_id = company_tenancy.wa_override()
+                company_phone_locked = bool(forced_phone_id) and str(forced_phone_id).strip() == str(phone_number_id).strip()
+                if company_phone_locked:
+                    logging.info(
+                        "Company WhatsApp template stays on phone_number_id %s. No fallback to another number.",
                         phone_number_id,
-                        template_name,
-                        template_language,
-                        access_token_pre,
-                        location_hint=location,
                     )
-                    if has_tmpl is False:
-                        selected = self._select_whatsapp_phone_for_template(
-                            template_name=template_name,
-                            template_language=template_language,
-                            location=location,
-                            receiving_phone_id=receiving_phone_id,
-                            access_token=access_token_pre,
-                            exclude_phone_ids=[phone_number_id],
+                if not company_phone_locked:
+                    try:
+                        access_token_pre = self._get_whatsapp_access_token()
+                        has_tmpl, _, _ = self._phone_id_has_whatsapp_template(
+                            phone_number_id,
+                            template_name,
+                            template_language,
+                            access_token_pre,
+                            location_hint=location,
                         )
-                        if selected:
-                            alt_pid, alt_loc, alt_lang, _alt_tmpl = selected
-                            logging.warning(
-                                "Template '%s' (%s) not found on phone_number_id %s (%s). "
-                                "Falling back to phone_number_id %s (%s) before send.",
-                                template_name,
-                                template_language,
-                                phone_number_id,
-                                location,
-                                alt_pid,
-                                alt_loc,
-                            )
-                            return self.send_whatsapp_message(
-                                recipient_phone,
-                                text=text,
-                                location=alt_loc or location,
-                                media_url=media_url,
-                                media_type=media_type,
+                        if has_tmpl is False:
+                            selected = self._select_whatsapp_phone_for_template(
                                 template_name=template_name,
-                                template_language=alt_lang or template_language,
-                                booking_data=booking_data,
-                                template_variables=template_variables,
-                                receiving_phone_id=alt_pid,
-                                template_header_media_url=template_header_media_url,
-                                template_header_media_type=template_header_media_type,
-                                media_bytes=media_bytes,
-                                media_mime=media_mime,
-                                media_filename=media_filename,
-                                _template_phone_fallback=True,
-                                _tried_phone_number_ids=list(tried_phone_ids | {str(alt_pid)}),
-                                _fallback_from_phone_number_id=str(
-                                    _fallback_from_phone_number_id or phone_number_id
-                                ),
+                                template_language=template_language,
+                                location=location,
+                                receiving_phone_id=receiving_phone_id,
+                                access_token=access_token_pre,
+                                exclude_phone_ids=[phone_number_id],
                             )
-                except Exception as pre_fb_err:
-                    logging.warning(f"Template phone pre-fallback check failed: {pre_fb_err}")
+                            if selected:
+                                alt_pid, alt_loc, alt_lang, _alt_tmpl = selected
+                                logging.warning(
+                                    "Template '%s' (%s) not found on phone_number_id %s (%s). "
+                                    "Falling back to phone_number_id %s (%s) before send.",
+                                    template_name,
+                                    template_language,
+                                    phone_number_id,
+                                    location,
+                                    alt_pid,
+                                    alt_loc,
+                                )
+                                return self.send_whatsapp_message(
+                                    recipient_phone,
+                                    text=text,
+                                    location=alt_loc or location,
+                                    media_url=media_url,
+                                    media_type=media_type,
+                                    template_name=template_name,
+                                    template_language=alt_lang or template_language,
+                                    booking_data=booking_data,
+                                    template_variables=template_variables,
+                                    receiving_phone_id=alt_pid,
+                                    template_header_media_url=template_header_media_url,
+                                    template_header_media_type=template_header_media_type,
+                                    media_bytes=media_bytes,
+                                    media_mime=media_mime,
+                                    media_filename=media_filename,
+                                    _template_phone_fallback=True,
+                                    _tried_phone_number_ids=list(tried_phone_ids | {str(alt_pid)}),
+                                    _fallback_from_phone_number_id=str(
+                                        _fallback_from_phone_number_id or phone_number_id
+                                    ),
+                                )
+                    except Exception as pre_fb_err:
+                        logging.warning(f"Template phone pre-fallback check failed: {pre_fb_err}")
 
             if not phone_number_id:
                 logging.error(f"Could not resolve phone_number_id for location='{location}', receiving_phone_id='{receiving_phone_id}'")
@@ -15591,7 +15719,10 @@ Conversation:
                 if not reply_text:
                     return
                     
-                assistant_name, assistant_signature = self._assistant_identity_for_text(message_body)
+                assistant_name, assistant_signature = self._assistant_identity_for_text(
+                    message_body,
+                    chat_id=chat_conv.get("chat_id") if chat_conv else None,
+                )
                 reply_text = self._ensure_signature_once(reply_text, assistant_signature, chat_id=chat_conv.get("chat_id") if chat_conv else None, location=location)
                 
                 if is_draft_location:
@@ -16740,11 +16871,12 @@ Conversation:
                 matched.append(item)
         return matched[:5]
 
-    def _get_payment_record_context(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None):
+    def _get_payment_record_context(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None, company_id=None):
         record_id = str(record_id or "").strip()
         if not record_id:
             raise ValueError("Missing record_id")
-        rec = self.table.get(record_id)
+        bookings_table, _pay_company = self._payment_bookings_table(company_id)
+        rec = bookings_table.get(record_id)
         if not isinstance(rec, dict):
             raise ValueError("Booking record not found")
         fields = (rec.get("fields") or {}) if isinstance(rec.get("fields"), dict) else {}
@@ -17173,6 +17305,38 @@ Conversation:
             "dry_run_supported": True,
         }
 
+    def _company_payment_runtime(self, company_id=None):
+        """Resolve Stripe/WeTravel keys for a company. FTS path uses the global account."""
+        cid = company_tenancy.normalize_company_id(company_id or company_tenancy.active_booking_company_id())
+        settings = company_tenancy.payment_settings(cid)
+        use_fts = company_tenancy.is_default_company(cid) or bool(settings.get("useFtsPayment", True))
+        if use_fts:
+            stripe_key = os.environ.get("STRIPE_SECRET_KEY") or ((self.config.get("stripe") or {}).get("secret_key"))
+            wetravel = os.environ.get("WETRAVEL_REFRESH_TOKEN") or ((self.config.get("wetravel") or {}).get("refresh_token"))
+            return {
+                "companyId": cid,
+                "useFtsPayment": True,
+                "stripeEnabled": True,
+                "wetravelEnabled": True,
+                "stripeSecretKey": str(stripe_key or "").strip(),
+                "wetravelRefreshToken": str(wetravel or "").strip(),
+            }
+        stripe_on = bool(settings.get("stripeEnabled"))
+        wetravel_on = bool(settings.get("wetravelEnabled"))
+        return {
+            "companyId": cid,
+            "useFtsPayment": False,
+            "stripeEnabled": stripe_on,
+            "wetravelEnabled": wetravel_on,
+            "stripeSecretKey": str(settings.get("stripeSecretKey") or "").strip() if stripe_on else "",
+            "wetravelRefreshToken": str(settings.get("wetravelRefreshToken") or "").strip() if wetravel_on else "",
+        }
+
+    def _payment_bookings_table(self, company_id=None):
+        cid = company_tenancy.normalize_company_id(company_id or company_tenancy.active_booking_company_id())
+        table, _name = self._open_company_bookings_table(cid)
+        return (table or self.table), cid
+
     def _execute_invoice_capability(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None, allow_existing=False):
         preview = self._preview_invoice_capability(
             record_id,
@@ -17184,7 +17348,15 @@ Conversation:
         blocked_reasons = list(preview.get("blocked_reasons") or [])
         if blocked_reasons and not (allow_existing and blocked_reasons == ["invoice_already_exists"]):
             raise ValueError("Invoice execution blocked: " + ", ".join(blocked_reasons))
-        ctx = self._get_payment_record_context(record_id, amount_in=amount_in, currency_in=currency_in, selected_add_ons=selected_add_ons)
+        bookings_table, pay_company = self._payment_bookings_table(company_tenancy.active_booking_company_id())
+        payment_runtime = self._company_payment_runtime(pay_company)
+        ctx = self._get_payment_record_context(
+            record_id,
+            amount_in=amount_in,
+            currency_in=currency_in,
+            selected_add_ons=selected_add_ons,
+            company_id=pay_company,
+        )
         amount_val = float(ctx.get("amount"))
         currency_val = str(ctx.get("currency") or "").strip()
         customer_name = str(ctx.get("customer_name") or "").strip() or None
@@ -17196,20 +17368,10 @@ Conversation:
         add_ons_text = str(ctx.get("add_ons_text") or "").strip()
 
         def _stripe_secret_key():
-            k = os.environ.get("STRIPE_SECRET_KEY")
-            if k:
-                return k.strip()
-            cfg = (self.config.get("stripe", {}) or {})
-            k = cfg.get("secret_key")
-            return str(k).strip() if k else None
+            return str((payment_runtime or {}).get("stripeSecretKey") or "").strip() or None
 
         def _wetravel_refresh_token():
-            k = os.environ.get("WETRAVEL_REFRESH_TOKEN")
-            if k:
-                return k.strip()
-            cfg = (self.config.get("wetravel", {}) or {})
-            k = cfg.get("refresh_token")
-            return str(k).strip() if k else None
+            return str((payment_runtime or {}).get("wetravelRefreshToken") or "").strip() or None
 
         def _stripe_request(method, path, data=None):
             import requests
@@ -17360,9 +17522,19 @@ Conversation:
                 "payment_url": w_url,
             }
 
+        logging.info(
+            "Invoice payment company=%s use_fts=%s currency=%s",
+            pay_company,
+            bool((payment_runtime or {}).get("useFtsPayment")),
+            currency_val,
+        )
         if "USD" in currency_val.upper():
+            if not (payment_runtime or {}).get("stripeEnabled"):
+                raise ValueError("Stripe is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
             created = _create_stripe_invoice()
         else:
+            if not (payment_runtime or {}).get("wetravelEnabled"):
+                raise ValueError("WeTravel is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
             created = _create_wetravel_link()
         updates = {
             "Trip UUID": created.get("payment_id"),
@@ -17374,14 +17546,14 @@ Conversation:
         if str(currency_in or "").strip():
             updates["Currency"] = currency_val
         try:
-            self._update_airtable_table_record(self.table, str(record_id), updates, typecast=True)
+            self._update_airtable_table_record(bookings_table, str(record_id), updates, typecast=True)
         except Exception:
             fallback_updates = {
                 "Trip UUID": created.get("payment_id"),
                 "Stripe invoice": created.get("payment_url"),
                 "Invoice Status": "pending",
             }
-            self._update_airtable_table_record(self.table, str(record_id), fallback_updates, typecast=True)
+            self._update_airtable_table_record(bookings_table, str(record_id), fallback_updates, typecast=True)
         return {
             "record_id": str(record_id),
             **created,
@@ -34901,7 +35073,7 @@ Write ONE short message only. No JSON. No explanations."""
                 out = self.query_ai(prompt, system_role="assistant", chat_id=chat_id, location=conv_dict.get('location') if conv_dict else None)
                 
                 # Also ensure signature is added
-                assistant_name, assistant_signature = self._assistant_identity_for_text("")
+                assistant_name, assistant_signature = self._assistant_identity_for_text("", chat_id=chat_id)
                 out = self._ensure_signature_once(out, assistant_signature, chat_id=chat_id, location=conv_dict.get('location') if conv_dict else None)
 
                 return jsonify({"status": "success", "data": {"message_text": out}}), 200
@@ -35354,8 +35526,10 @@ Write ONE short message only. No JSON. No explanations."""
                 logging.error(f"Error in /api/customer_bookings/<chat_id>: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
-        def _create_payment_link_for_record(record_id, amount_in=None, currency_in=None, selected_add_ons=None):
-            rec = self.table.get(str(record_id))
+        def _create_payment_link_for_record(record_id, amount_in=None, currency_in=None, selected_add_ons=None, company_id=None):
+            bookings_table, resolved_company = self._payment_bookings_table(company_id)
+            payment_runtime = self._company_payment_runtime(resolved_company)
+            rec = bookings_table.get(str(record_id))
             fields = (rec or {}).get('fields', {}) or {}
 
             amount = amount_in if amount_in is not None else fields.get('Amount')
@@ -35407,20 +35581,10 @@ Write ONE short message only. No JSON. No explanations."""
                 add_ons_text = str(fields.get('Add - Ons') or '').strip()
 
             def _stripe_secret_key():
-                k = os.environ.get('STRIPE_SECRET_KEY')
-                if k:
-                    return k.strip()
-                cfg = (self.config.get('stripe', {}) or {})
-                k = cfg.get('secret_key')
-                return str(k).strip() if k else None
+                return str((payment_runtime or {}).get('stripeSecretKey') or '').strip() or None
 
             def _wetravel_refresh_token():
-                k = os.environ.get('WETRAVEL_REFRESH_TOKEN')
-                if k:
-                    return k.strip()
-                cfg = (self.config.get('wetravel', {}) or {})
-                k = cfg.get('refresh_token')
-                return str(k).strip() if k else None
+                return str((payment_runtime or {}).get('wetravelRefreshToken') or '').strip() or None
 
             def _stripe_request(method, path, data=None):
                 import requests
@@ -35613,9 +35777,19 @@ Write ONE short message only. No JSON. No explanations."""
                     "payment_url": w_url,
                 }
 
+            logging.info(
+                "Invoice payment company=%s use_fts=%s currency=%s",
+                resolved_company,
+                bool((payment_runtime or {}).get("useFtsPayment")),
+                currency_val,
+            )
             if "USD" in currency_val.upper():
+                if not (payment_runtime or {}).get("stripeEnabled"):
+                    raise ValueError("Stripe is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
                 created = _create_stripe_invoice()
             else:
+                if not (payment_runtime or {}).get("wetravelEnabled"):
+                    raise ValueError("WeTravel is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
                 created = _create_wetravel_link()
 
             updates = {
@@ -35628,14 +35802,14 @@ Write ONE short message only. No JSON. No explanations."""
             if str(currency_in or '').strip():
                 updates["Currency"] = currency_val
             try:
-                self._update_airtable_table_record(self.table, str(record_id), updates, typecast=True)
+                self._update_airtable_table_record(bookings_table, str(record_id), updates, typecast=True)
             except Exception:
                 fallback_updates = {
                     "Trip UUID": created.get("payment_id"),
                     "Stripe invoice": created.get("payment_url"),
                     "Invoice Status": "pending",
                 }
-                self._update_airtable_table_record(self.table, str(record_id), fallback_updates, typecast=True)
+                self._update_airtable_table_record(bookings_table, str(record_id), fallback_updates, typecast=True)
 
             return {
                 "record_id": str(record_id),
@@ -35658,21 +35832,35 @@ Write ONE short message only. No JSON. No explanations."""
                 except Exception: pass
                 # #endregion
 
-                if (not record_id) and chat_id:
+                pay_company_id = None
+                if chat_id:
                     with sqlite3.connect(get_data_path(get_data_path('chat_history.db')), timeout=15.0) as conn:
                         conn.row_factory = sqlite3.Row
                         c = conn.cursor()
                         c.execute("SELECT * FROM conversations WHERE chat_id = ?", (str(chat_id),))
                         conv = c.fetchone()
                     if conv:
-                        rid = conv.get('airtable_record_id') if hasattr(conv, 'get') else conv['airtable_record_id']
-                        if rid:
-                            record_id = str(rid)
+                        pay_company_id = conv.get('company_id') if hasattr(conv, 'get') else conv['company_id']
+                        if not record_id:
+                            rid = conv.get('airtable_record_id') if hasattr(conv, 'get') else conv['airtable_record_id']
+                            if rid:
+                                record_id = str(rid)
+                if not pay_company_id:
+                    try:
+                        pay_company_id = _actor_company_id_from_request()
+                    except Exception:
+                        pay_company_id = None
 
                 if not record_id:
                     return jsonify({"status": "error", "message": "Missing record_id"}), 400
 
-                created = _create_payment_link_for_record(record_id, amount_in=amount_in, currency_in=currency_in, selected_add_ons=selected_add_ons)
+                created = _create_payment_link_for_record(
+                    record_id,
+                    amount_in=amount_in,
+                    currency_in=currency_in,
+                    selected_add_ons=selected_add_ons,
+                    company_id=pay_company_id,
+                )
                 return jsonify({
                     "status": "success",
                     **created,
@@ -36071,7 +36259,12 @@ Write ONE short message only. No JSON. No explanations."""
                         continue
 
                     try:
-                        created = _create_payment_link_for_record(rid, amount_in=amount_raw, currency_in=currency_raw)
+                        created = _create_payment_link_for_record(
+                            rid,
+                            amount_in=amount_raw,
+                            currency_in=currency_raw,
+                            company_id=_actor_company_id_from_request(),
+                        )
                         success_count += 1
                         notify_meta = {}
 
@@ -38040,6 +38233,37 @@ Write ONE short message only. No JSON. No explanations."""
                 else:
                     desired_channel = rc
 
+                conv_company_id = company_tenancy.normalize_company_id(conv_dict.get("company_id"))
+                company_send = not company_tenancy.is_default_company(conv_company_id)
+                if company_send and str(template_name or "").strip() == "ftstravels_confirm_payment":
+                    vars_ = template_variables if isinstance(template_variables, list) else []
+                    guest = str(vars_[0] if len(vars_) > 0 else conv_dict.get("contact_name") or "Guest").strip() or "Guest"
+                    booking_ref = str(vars_[1] if len(vars_) > 1 else "").strip()
+                    trip_label = str(vars_[2] if len(vars_) > 2 else "").strip()
+                    pay_link = str(vars_[3] if len(vars_) > 3 else "").strip()
+                    text = f"Hello {guest},\n\nYour payment link"
+                    if booking_ref:
+                        text += f" for booking {booking_ref}"
+                    if trip_label:
+                        text += f" ({trip_label})"
+                    text += " is ready"
+                    text += f":\n{pay_link}" if pay_link else "."
+                    template_name = None
+                    template_variables = None
+                    source_l = str(source or "").strip().lower()
+                    if source_l == "email":
+                        desired_channel = "email"
+                    elif source_l == "facebook":
+                        desired_channel = "facebook"
+                    else:
+                        desired_channel = "whatsapp"
+                    logging.info(
+                        "Company invoice stays on the company channel. company=%s chat=%s channel=%s",
+                        conv_company_id,
+                        chat_id,
+                        desired_channel,
+                    )
+
                 if template_name:
                     # Meta templates are Cloud API only
                     if desired_channel == 'whatsapp_internal':
@@ -38291,6 +38515,13 @@ Write ONE short message only. No JSON. No explanations."""
                     logging.info(f"UI Agent sending WhatsApp to {recipient_phone}: {text} (Template: {template_name})")
                     location = str(location_override).strip() if location_override not in (None, "", "undefined", "null") else conv_dict.get('location', 'Unknown')
                     receiving_phone_id = receiving_phone_id_override if receiving_phone_id_override not in (None, "", "undefined", "null") else conv_dict.get('receiving_phone_id')
+                    if company_send and not str(receiving_phone_id or "").strip():
+                        company_acc = company_tenancy.find_customer_whatsapp_account(company_id=conv_company_id)
+                        if company_acc:
+                            if str(company_acc.get("provider") or "").strip().lower() == "evolution":
+                                receiving_phone_id = "evo:" + str(company_acc.get("instanceName") or "").strip()
+                            else:
+                                receiving_phone_id = str(company_acc.get("phoneNumberId") or "").strip()
 
                     try:
                         allowed_locations = actor.get('allowedLocations') or []
@@ -38322,7 +38553,7 @@ Write ONE short message only. No JSON. No explanations."""
 
                     if text and not template_name:
                         # Apply signature rules for manual messages too
-                        assistant_name, assistant_signature = self._assistant_identity_for_text(text)
+                        assistant_name, assistant_signature = self._assistant_identity_for_text(text, chat_id=chat_id)
                         if location and str(location).lower() == 'religious':
                             text = self._ensure_signature_once(
                                 text,
@@ -38691,9 +38922,16 @@ Write ONE short message only. No JSON. No explanations."""
                     gmail_svc, selected_mailbox = self._select_gmail_service(
                         mailbox=email_account_id,
                         direction="outbound",
-                        sales_fallback=is_sales_inbox
+                        sales_fallback=is_sales_inbox and not company_send,
+                        company_id=conv_company_id if company_send else None,
                     )
                     if not gmail_svc or not getattr(gmail_svc, "service", None):
+                        if company_send:
+                            return jsonify({
+                                "status": "error",
+                                "message": "No mailbox is connected for this company. Connect the company email in Settings, then send again.",
+                                "code": "COMPANY_MAILBOX_MISSING",
+                            }), 400
                         return jsonify({"status": "error", "message": "No connected Gmail account is available for this conversation."}), 400
                         
                     # --- NEW: Check if replying to OTA and route to Customer Email instead ---
@@ -38739,12 +38977,14 @@ Write ONE short message only. No JSON. No explanations."""
                     if not customer_name or customer_name.strip() == "":
                         customer_name = "Guest"
                         
-                    html_content = email_templates.generate_standard_email_template(
+                    reply_brand = self._company_public_name(conv_company_id if company_send else None)
+                    html_content = self._render_outbound_email_html(
                         content=formatted_text,
-                        title="Response from FTS Travels Support",
+                        title=f"Response from {reply_brand}",
                         customer_name=customer_name,
                         signature=signature,
-                        include_disclaimer=False  # Human reply
+                        company_id=conv_company_id if company_send else None,
+                        include_disclaimer=False,
                     )
                     
                     attachments = None
@@ -38753,7 +38993,7 @@ Write ONE short message only. No JSON. No explanations."""
                         
                     gmail_svc.send_email(
                         to_email=email_address, 
-                        subject="Reply from FTS Travels Support", 
+                        subject=f"Reply from {reply_brand}", 
                         html_content=html_content,
                         attachments=attachments
                     )
@@ -42222,6 +42462,13 @@ Write ONE short message only. No JSON. No explanations."""
                 )
             if data.get("createWithPiEnabled") is not None:
                 company["createWithPiEnabled"] = company_tenancy.coerce_bool(data.get("createWithPiEnabled"), default=False)
+            if isinstance(data.get("payment"), dict):
+                company["payment"] = company_tenancy.sanitize_payment_settings(
+                    data.get("payment"),
+                    company.get("payment"),
+                )
+                if company_tenancy.is_default_company(company_id):
+                    company["payment"]["useFtsPayment"] = True
             saved = company_tenancy.upsert_company(company)
             if data.get("webhookPublicBase") is not None:
                 conns = company_tenancy.get_connections(company_id)
@@ -45691,7 +45938,7 @@ Draft to optimize:
                 response_text = re.sub(r'\[INTENT:.*?\]', '', response_text, flags=re.IGNORECASE).strip()
                 response_text = re.sub(r'^\[PROPOSED_DRAFT\]\s*', '', response_text, flags=re.IGNORECASE).strip()
                 
-                assistant_name, assistant_signature = self._assistant_identity_for_text(latest_user_msg)
+                assistant_name, assistant_signature = self._assistant_identity_for_text(latest_user_msg, chat_id=chat_id)
                 response_text = self._ensure_signature_once(response_text, assistant_signature, chat_id=chat_id, location=location)
                 
                 return jsonify({"status": "success", "data": {"reply": response_text, "source": actual_source}}), 200
@@ -47849,6 +48096,40 @@ Draft to optimize:
         finally:
             _dbg_report("flask.run.exit")
 
+    def _poll_company_email_accounts(self):
+        """Poll company mailboxes without waiting for the FTS inbox batch."""
+        lock = getattr(self, "_company_email_lock", None)
+        if lock is None:
+            lock = threading.Lock()
+            self._company_email_lock = lock
+        if not lock.acquire(blocking=False):
+            return
+        try:
+            primary_cfg = self.config.get('email', {}) or {}
+            self._refresh_dynamic_email_services(force=True)
+            for account_id, account in list((self.dynamic_email_accounts or {}).items()):
+                if account_id not in self.dynamic_gmail_services:
+                    continue
+                account_company_id = company_tenancy.lookup_company_id_for_email_account(account_id)
+                if company_tenancy.is_default_company(account_company_id):
+                    continue
+                merged_cfg = dict(primary_cfg)
+                merged_cfg['labels'] = {}
+                merged_cfg['settings'] = dict((merged_cfg.get('settings', {}) or {}))
+                merged_cfg['settings']['search_in_inbox'] = True
+                email_address = str(account.get('emailAddress') or "").strip()
+                if email_address:
+                    merged_cfg['email_address'] = email_address
+                self.process_incoming_emails(
+                    gmail_service=self.dynamic_gmail_services[account_id],
+                    email_config=merged_cfg,
+                    account_name=account_id
+                )
+        except Exception as company_mail_err:
+            logging.error("Company email poll failed: %s", company_mail_err, exc_info=True)
+        finally:
+            lock.release()
+
     def process_incoming_emails(self, gmail_service=None, email_config=None, account_name="booking"):
         """
         Check for new emails (Channel: Email)
@@ -47858,6 +48139,9 @@ Draft to optimize:
             self._refresh_dynamic_email_services(force=True)
             for account_id, account in (self.dynamic_email_accounts or {}).items():
                 if account_id not in self.dynamic_gmail_services:
+                    continue
+                account_company_id = company_tenancy.lookup_company_id_for_email_account(account_id)
+                if not company_tenancy.is_default_company(account_company_id):
                     continue
                 merged_cfg = dict(primary_cfg)
                 merged_cfg['labels'] = dict((merged_cfg.get('labels', {}) or {}))
@@ -48123,15 +48407,15 @@ Draft to optimize:
                     # ---------------------------------------------
 
                     if classification in ['BOOKING_CONFIRMATION', 'CANCELLATION']:
-                        logging.info(f"Skipping Supplier Booking Notification from {supplier_agency} (handled by legacy system).")
-                        # --- MARK AS PROCESSED TO AVOID LOOP ---
-                        # Remove both search labels to be safe
-                        remove_labels_list = []
-                        if search_label_id: remove_labels_list.append(search_label_id)
-                        if sharm_label_id: remove_labels_list.append(sharm_label_id)
-                        
-                        gmail_service.modify_thread_labels(thread_id, add_labels=[processed_label_id] if processed_label_id else [], remove_labels=remove_labels_list)
-                        continue
+                        mailbox_company_id = company_tenancy.lookup_company_id_for_email_account(account_name)
+                        if company_tenancy.is_default_company(mailbox_company_id):
+                            logging.info(f"Skipping Supplier Booking Notification from {supplier_agency} (handled by legacy system).")
+                            remove_labels_list = ["UNREAD"]
+                            if search_label_id: remove_labels_list.append(search_label_id)
+                            if sharm_label_id: remove_labels_list.append(sharm_label_id)
+                            gmail_service.modify_thread_labels(thread_id, add_labels=[processed_label_id] if processed_label_id else [], remove_labels=remove_labels_list)
+                            continue
+                        logging.info(f"Company mailbox {account_name} will save {classification} from {supplier_agency} as a chat.")
                     elif classification in ['CUSTOMER_INQUIRY', 'ADDITIONAL_INFO', 'OTHER']:
                         logging.info(f"Supplier email from {supplier_agency} contains {classification}. Processing as User Message.")
                         # Treat as normal user message, proceed.
@@ -48402,10 +48686,13 @@ Draft to optimize:
                             logging.info(f"Draft Mode ON: Creating draft for {customer_email} instead of sending.")
                     
                     # Create Draft
-                    html_content = email_templates.generate_standard_email_template(
+                    mailbox_company_id = company_tenancy.lookup_company_id_for_email_account(account_name)
+                    html_content = self._render_outbound_email_html(
                         content=response_text.replace('\n', '<br>'),
                         title=reply_subject,
-                        customer_name=customer_name
+                        customer_name=customer_name,
+                        company_id=mailbox_company_id,
+                        include_disclaimer=company_tenancy.is_default_company(mailbox_company_id),
                     )
                     
                     draft = gmail_service.create_draft(
@@ -48436,12 +48723,19 @@ Draft to optimize:
                         email_sent_success = False
                 else:
                     # LIVE MODE - SEND EMAIL
-                    assistant_name, assistant_signature = self._assistant_identity_for_text(f"{subject or ''}\n{body or ''}")
+                    assistant_name, assistant_signature = self._assistant_identity_for_text(
+                        f"{subject or ''}\n{body or ''}",
+                        chat_id=getattr(self, "_current_chat_id", None),
+                        company_id=company_tenancy.lookup_company_id_for_email_account(account_name),
+                    )
                     response_text = self._ensure_signature_once(response_text, assistant_signature, chat_id=getattr(self, '_current_chat_id', None), location=inferred_location)
-                    html_content = email_templates.generate_standard_email_template(
+                    mailbox_company_id = company_tenancy.lookup_company_id_for_email_account(account_name)
+                    html_content = self._render_outbound_email_html(
                         content=response_text.replace('\n', '<br>'),
                         title=reply_subject,
-                        customer_name=customer_name
+                        customer_name=customer_name,
+                        company_id=mailbox_company_id,
+                        include_disclaimer=company_tenancy.is_default_company(mailbox_company_id),
                     )
                     
                     email_sent_success = gmail_service.send_email(
@@ -48752,6 +49046,17 @@ Draft to optimize:
         if legacy_booking_scheduler_enabled:
             schedule.every(2).minutes.do(self.process_new_bookings)
         schedule.every(2).minutes.do(self.process_incoming_emails)
+
+        def _company_email_loop():
+            while True:
+                try:
+                    self._poll_company_email_accounts()
+                except Exception as company_loop_err:
+                    logging.error("Company email loop failed: %s", company_loop_err)
+                time.sleep(45)
+
+        threading.Thread(target=_company_email_loop, daemon=True, name="company-email-poll").start()
+        logging.info("Company mailbox poll started.")
         schedule.every(10).minutes.do(self.learn_from_human_edits)
         schedule.every(15).minutes.do(self.sync_orphan_chats)
         schedule.every(30).seconds.do(self.automation_engine.tick)

@@ -26,6 +26,70 @@ NEW_COMPANY_ALLOWED_TABS = [
 ]
 
 
+def empty_payment_settings():
+    return {
+        "useFtsPayment": True,
+        "stripeEnabled": True,
+        "wetravelEnabled": True,
+        "stripeSecretKey": "",
+        "wetravelRefreshToken": "",
+    }
+
+
+def sanitize_payment_settings(raw, previous=None):
+    base = empty_payment_settings()
+    prev = previous if isinstance(previous, dict) else {}
+    src = raw if isinstance(raw, dict) else {}
+    merged = dict(base)
+    for key in base:
+        if key in prev:
+            merged[key] = prev.get(key)
+    if "useFtsPayment" in src:
+        merged["useFtsPayment"] = coerce_bool(src.get("useFtsPayment"), default=True)
+    if "stripeEnabled" in src:
+        merged["stripeEnabled"] = coerce_bool(src.get("stripeEnabled"), default=True)
+    if "wetravelEnabled" in src:
+        merged["wetravelEnabled"] = coerce_bool(src.get("wetravelEnabled"), default=True)
+
+    def _secret(field):
+        if field not in src or src.get(field) is None:
+            return str(prev.get(field) or "")
+        text = str(src.get(field) or "").strip()
+        if text == "__clear__":
+            return ""
+        if not text:
+            return str(prev.get(field) or "")
+        return text
+
+    merged["stripeSecretKey"] = _secret("stripeSecretKey")
+    merged["wetravelRefreshToken"] = _secret("wetravelRefreshToken")
+    merged["useFtsPayment"] = bool(merged.get("useFtsPayment", True))
+    merged["stripeEnabled"] = bool(merged.get("stripeEnabled", True))
+    merged["wetravelEnabled"] = bool(merged.get("wetravelEnabled", True))
+    return merged
+
+
+def payment_public_view(settings):
+    item = sanitize_payment_settings(settings if isinstance(settings, dict) else None)
+    return {
+        "useFtsPayment": bool(item.get("useFtsPayment")),
+        "stripeEnabled": bool(item.get("stripeEnabled")),
+        "wetravelEnabled": bool(item.get("wetravelEnabled")),
+        "stripeConfigured": bool(str(item.get("stripeSecretKey") or "").strip()),
+        "wetravelConfigured": bool(str(item.get("wetravelRefreshToken") or "").strip()),
+    }
+
+
+def payment_settings(company_id=None):
+    if is_default_company(company_id):
+        settings = empty_payment_settings()
+        settings["useFtsPayment"] = True
+        return settings
+    company = get_company(company_id) or {}
+    settings = sanitize_payment_settings(company.get("payment"))
+    return settings
+
+
 def empty_connections():
     return {
         "baserowMainUrl": "",
@@ -412,6 +476,7 @@ def _normalize_company_record(item, previous=None) -> dict:
         "createdByUsername": str(src.get("createdByUsername") or prev.get("createdByUsername") or "").strip(),
         "createdAt": created_at,
         "createWithPiEnabled": flag,
+        "payment": sanitize_payment_settings(src.get("payment") if "payment" in src else None, prev.get("payment")),
         "connections": sanitize_connections(connections_src),
     }
 
@@ -424,6 +489,7 @@ def default_fts_company():
         "createdByUsername": "admin",
         "createdAt": _now_iso(),
         "createWithPiEnabled": False,
+        "payment": empty_payment_settings(),
         "connections": empty_connections(),
     }
 
@@ -439,6 +505,7 @@ def public_company(company) -> dict:
         "createdAt": str(item.get("createdAt") or ""),
         "createWithPiEnabled": bool(item.get("createWithPiEnabled")),
         "isDefaultCompany": is_default_company(cid),
+        "payment": payment_public_view(item.get("payment")),
         "connections": sanitize_connections(item.get("connections")),
         "webhookPublicBase": str(sanitize_connections(item.get("connections")).get("webhookPublicBase") or ""),
     }
@@ -540,6 +607,7 @@ def create_company(name, created_by_username=""):
         "createdByUsername": str(created_by_username or "").strip(),
         "createdAt": _now_iso(),
         "createWithPiEnabled": False,
+        "payment": empty_payment_settings(),
         "connections": empty_connections(),
     }
     return upsert_company(item)

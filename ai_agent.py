@@ -10119,6 +10119,24 @@ Conversation:
                     return tail
         return None
 
+    def _platform_thread_booking_number(self, sender_identifier="", thread_id="", subject="", message_body=""):
+        """Booking number printed on a platform notification, such as a GYG supplier email."""
+        blob = "\n".join([str(sender_identifier or ""), str(thread_id or "")]).lower()
+        is_platform = (
+            "::gyg" in blob
+            or "::br-" in blob
+            or "system-notification-" in blob
+            or "reply.getyourguide.com" in blob
+            or "getyourguide.com" in blob
+            or "viator.com" in blob
+            or "headout.com" in blob
+        )
+        if not is_platform:
+            return ""
+        return str(self._extract_explicit_ota_booking_number(
+            sender_identifier, thread_id, subject, message_body
+        ) or "").strip()
+
     def _try_immediate_ota_booking_link(
         self,
         chat_id,
@@ -10142,6 +10160,33 @@ Conversation:
         except Exception:
             conv = {}
         existing_record_id = str((conv or {}).get("airtable_record_id") or "").strip()
+        booking_nr = self._extract_explicit_ota_booking_number(
+            thread_id, sender_identifier, subject, message_body
+        )
+        if existing_record_id and booking_nr:
+            stored_nr = ""
+            try:
+                linked = self._get_record_from_any_table(existing_record_id) or {}
+                stored_nr = str(self.get_field_value((linked or {}).get("fields") or {}, FieldIds.BOOKING_NR) or "").strip()
+            except Exception:
+                stored_nr = ""
+            if stored_nr.lower() != str(booking_nr).strip().lower():
+                logging.info(
+                    "OTA chat %s number %s does not match linked record %s (%s). Leaving it unlinked.",
+                    chat_id,
+                    booking_nr,
+                    existing_record_id,
+                    stored_nr or "no booking number",
+                )
+                try:
+                    chat_db.update_conversation_info(
+                        chat_id=chat_id,
+                        airtable_record_id="",
+                        booking_number=booking_nr,
+                    )
+                except Exception as unlink_err:
+                    logging.warning("Failed to unlink mismatched OTA chat %s: %s", chat_id, unlink_err)
+                existing_record_id = ""
         if existing_record_id:
             try:
                 rec = self._get_record_from_any_table(existing_record_id) or {}
@@ -10168,9 +10213,6 @@ Conversation:
                     sync_err,
                 )
             return True
-        booking_nr = self._extract_explicit_ota_booking_number(
-            thread_id, sender_identifier, subject, message_body
-        )
         if not booking_nr:
             return False
         rec = self.find_booking_by_number(booking_nr)
@@ -10789,6 +10831,36 @@ Conversation:
                 )
                 booking_record = None
 
+        platform_booking_nr = ""
+        platform_booking_unconfirmed = False
+        try:
+            platform_booking_nr = self._platform_thread_booking_number(
+                sender_identifier=sender_identifier,
+                thread_id=thread_id,
+                subject=subject,
+                message_body=message_body,
+            )
+        except Exception:
+            platform_booking_nr = ""
+        if platform_booking_nr:
+            exact_platform_record = None
+            try:
+                exact_platform_record = self.find_booking_by_number(platform_booking_nr)
+            except Exception:
+                exact_platform_record = None
+            if exact_platform_record:
+                booking_record = exact_platform_record
+            else:
+                # A supplier notice for a booking that is not in Airtable yet must stay
+                # its own conversation. Do not attach it to another customer's record.
+                platform_booking_unconfirmed = True
+                booking_record = None
+                logging.info(
+                    "Platform booking %s is not in Airtable yet. Chat %s stays separate and is not linked to another booking.",
+                    platform_booking_nr,
+                    getattr(self, "_current_chat_id", ""),
+                )
+
         # --- MULTIPLE BOOKING DISAMBIGUATION LOGIC ---
         if booking_record and booking_record.get('other_related_bookings'):
             try:
@@ -11051,6 +11123,16 @@ Conversation:
                 booking_nr_val = None
                 if booking_record:
                     booking_nr_val = self.get_field_value(booking_record.get('fields', {}), FieldIds.BOOKING_NR)
+                if platform_booking_unconfirmed:
+                    record_id_to_save = ""
+                    booking_nr_val = platform_booking_nr
+                    booking_record = None
+                    try:
+                        cid = company_tenancy.active_booking_company_id()
+                        if cid and not company_tenancy.is_default_company(cid):
+                            db_location = company_tenancy.company_customer_inbox_location(cid, "")
+                    except Exception:
+                        pass
                 
                 chat_db.update_conversation_info(
                     chat_id=self._current_chat_id,

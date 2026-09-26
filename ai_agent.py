@@ -1087,6 +1087,29 @@ def _save_dashboard_email_oauth_states(states_map):
     _write_setting_value("dashboard_email_oauth_states", normalized)
     return normalized
 
+def _get_dashboard_email_oauth_results():
+    raw = _read_setting_value("dashboard_email_oauth_results")
+    return raw if isinstance(raw, dict) else {}
+
+def _save_dashboard_email_oauth_result(state, result):
+    token = str(state or "").strip()
+    if not token:
+        return
+    results = _get_dashboard_email_oauth_results()
+    now_ts = int(time.time())
+    pruned = {}
+    for key, item in results.items():
+        if not isinstance(item, dict):
+            continue
+        finished_at = int(item.get("finished_at") or 0)
+        if finished_at and now_ts - finished_at > 1800:
+            continue
+        pruned[str(key)] = item
+    payload = dict(result) if isinstance(result, dict) else {}
+    payload["finished_at"] = now_ts
+    pruned[token] = payload
+    _write_setting_value("dashboard_email_oauth_results", pruned)
+
 def _get_dashboard_email_accounts():
     settings = _get_channel_settings()
     accounts = settings.get("emailAccounts") if isinstance(settings, dict) else None
@@ -2466,14 +2489,39 @@ class AIAgent:
             pass
         return credentials_file
 
+    def _find_web_oauth_credentials_file(self):
+        try:
+            names = os.listdir(SCRIPT_DIR)
+        except Exception:
+            return ""
+        for name in names:
+            if not str(name).startswith("client_secret_") or not str(name).endswith(".json"):
+                continue
+            path = os.path.join(SCRIPT_DIR, name)
+            try:
+                with open(path, "r", encoding="utf-8") as handle:
+                    data = json.load(handle)
+            except Exception:
+                continue
+            web = data.get("web") if isinstance(data, dict) else None
+            if not isinstance(web, dict):
+                continue
+            uris = [str(item or "").rstrip("/") for item in (web.get("redirect_uris") or [])]
+            if any(item.endswith("/api/gmail_accounts/oauth/callback") for item in uris):
+                return path
+        return ""
+
     def _get_dashboard_oauth_email_credentials_path(self):
         email_cfg = self.config.get('email', {}) or {}
         email_settings = email_cfg.get('settings', {}) or {}
-        credentials_file = str(
-            email_settings.get('dashboard_oauth_credentials_file')
-            or email_settings.get('credentials_file')
-            or get_data_path(get_data_path('credentials.json'))
-        ).strip() or get_data_path(get_data_path('credentials.json'))
+        credentials_file = str(email_settings.get('dashboard_oauth_credentials_file') or "").strip()
+        if not credentials_file:
+            credentials_file = self._find_web_oauth_credentials_file()
+        if not credentials_file:
+            credentials_file = str(
+                email_settings.get('credentials_file')
+                or get_data_path(get_data_path('credentials.json'))
+            ).strip() or get_data_path(get_data_path('credentials.json'))
         try:
             if not os.path.isabs(credentials_file):
                 credentials_file = os.path.join(SCRIPT_DIR, credentials_file)
@@ -5078,7 +5126,7 @@ class AIAgent:
             return before + "\n\n" + o + "\n\n" + s
         return self._ensure_signature_once(t + "\n\n" + o, s, chat_id=chat_id, location=location)
 
-    def query_ai(self, prompt, system_role="assistant", image_url=None, location=None, chat_id=None, usage_department=None, usage_source=None):
+    def query_ai(self, prompt, system_role="assistant", image_url=None, location=None, chat_id=None, usage_department=None, usage_source=None, interactive=False):
         ai_section = self.config.get('ai', {})
         
         # Determine providers and order based on config structure
@@ -5238,12 +5286,20 @@ class AIAgent:
                         payload["max_completion_tokens"] = payload.pop("max_tokens")
 
             try:
-                # Local CPU models may need longer; default 60s for cloud providers
+                # Local CPU models may need longer; default 60s for cloud providers.
+                # Dashboard buttons sit behind a ~60s proxy. A 300s local wait becomes
+                # a Cloudflare 502 with no CORS header, so interactive calls fail fast
+                # and fall through to the next provider.
                 req_timeout = provider_config.get("timeout", 60)
                 try:
                     req_timeout = int(req_timeout)
                 except (TypeError, ValueError):
                     req_timeout = 60
+                if interactive:
+                    if str(provider_name or "").strip().lower().startswith("ollama"):
+                        req_timeout = min(req_timeout, 8)
+                    else:
+                        req_timeout = min(req_timeout, 40)
                 response = requests.post(
                     provider_config['api_url'], headers=headers, json=payload, timeout=req_timeout
                 )
@@ -8182,7 +8238,7 @@ User request:
 
         return context
 
-    def generate_smart_reply(self, history_text, kb_context, latest_message_body, fallback_email=None, booking_record=None, has_attachments=False, kind=None, override_instruction=None, image_url=None, chat_id=None, location=None, source=None):
+    def generate_smart_reply(self, history_text, kb_context, latest_message_body, fallback_email=None, booking_record=None, has_attachments=False, kind=None, override_instruction=None, image_url=None, chat_id=None, location=None, source=None, interactive=False):
         """
         Generate AI response with strict adherence to data.
         """
@@ -9247,7 +9303,7 @@ INSTRUCTIONS:
 
 **FINAL CHECK**: Ensure your reply language matches the User Question language EXACTLY.
 """
-        response = self.query_ai(final_prompt, image_url=image_url, location=location, chat_id=chat_id)
+        response = self.query_ai(final_prompt, image_url=image_url, location=location, chat_id=chat_id, interactive=interactive)
         
         # --- NEW: Handle AI Provider Failure Gracefully ---
         response_s = str(response or "").strip()
@@ -10133,6 +10189,18 @@ Conversation:
                 )
             except Exception as evo_loc_err:
                 logging.warning("Evolution inbox location fallback failed: %s", evo_loc_err)
+        if str(source or "").strip().lower() == "email" and company_id and not company_tenancy.is_default_company(company_id):
+            try:
+                email_acc, _acc_company, _key, _settings = _find_company_email_account(
+                    email_account_id or mailbox,
+                    company_id,
+                )
+                preferred_location = ""
+                if isinstance(email_acc, dict):
+                    preferred_location = str(email_acc.get("routingLocation") or "").strip()
+                location = company_tenancy.company_customer_inbox_location(company_id, preferred_location)
+            except Exception as email_loc_err:
+                logging.warning("Company email inbox location fallback failed: %s", email_loc_err)
         
         # --- IGNORE INTERNAL EMAILS & SPECIFIC DOMAINS (Only for Email source or if email detected) ---
         if customer_email and "@" in customer_email:
@@ -41707,6 +41775,7 @@ Write ONE short message only. No JSON. No explanations."""
                 }
                 _save_dashboard_email_oauth_states(oauth_states)
 
+                # scopes must be passed by name; SCOPES= is rejected by google-auth-oauthlib.
                 auth_url, returned_state = GmailService.build_web_auth_url(
                     credentials_file=self._get_dashboard_oauth_email_credentials_path(),
                     redirect_uri=redirect_uri,
@@ -41718,7 +41787,7 @@ Write ONE short message only. No JSON. No explanations."""
                         oauth_states[returned_state] = payload
                         _save_dashboard_email_oauth_states(oauth_states)
 
-                return jsonify({"status": "success", "auth_url": auth_url}), 200
+                return jsonify({"status": "success", "auth_url": auth_url, "state": returned_state or state}), 200
             except Exception as e:
                 logging.error(f"Error in api_gmail_accounts_oauth_start: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
@@ -41778,6 +41847,13 @@ Write ONE short message only. No JSON. No explanations."""
                 logging.error(f"Error in api_gmail_accounts_oauth_callback: {e}", exc_info=True)
                 payload["error"] = str(e)
 
+            _save_dashboard_email_oauth_result(state, {
+                "success": bool(success),
+                "error": str(payload.get("error") or ""),
+                "account_id": payload.get("accountId"),
+                "email": payload.get("emailAddress") or "",
+            })
+
             html = f"""<!doctype html>
 <html>
   <body>
@@ -41799,6 +41875,24 @@ Write ONE short message only. No JSON. No explanations."""
   </body>
 </html>"""
             return Response(html, mimetype="text/html")
+
+        @app.route('/api/gmail_accounts/oauth/result', methods=['GET', 'OPTIONS'])
+        def api_gmail_accounts_oauth_result():
+            if request.method == 'OPTIONS':
+                return _apply_api_cors_headers(app.make_default_options_response())
+            state = str(request.args.get('state') or "").strip()
+            if not state:
+                return jsonify({"status": "error", "message": "state is required"}), 400
+            item = _get_dashboard_email_oauth_results().get(state)
+            if not isinstance(item, dict):
+                return jsonify({"status": "pending"}), 200
+            return jsonify({
+                "status": "done",
+                "success": bool(item.get("success")),
+                "error": str(item.get("error") or ""),
+                "account_id": item.get("account_id"),
+                "email": str(item.get("email") or ""),
+            }), 200
 
         @app.route('/api/gmail_accounts/manual_connect', methods=['POST', 'OPTIONS'])
         def api_gmail_accounts_manual_connect():
@@ -45449,7 +45543,7 @@ DO NOT add any conversational filler or quotes, just return the translated text 
 Text to translate:
 {text}
 """
-                translated = self.query_ai(prompt, system_role="translator")
+                translated = self.query_ai(prompt, system_role="translator", interactive=True)
                 return jsonify({"status": "success", "translated_text": translated})
             except Exception as e:
                 logging.error(f"Error in api_translate_text: {e}")
@@ -45478,7 +45572,7 @@ Draft to optimize:
                 if booking_data:
                     prompt += f"\nContext/Booking Data:\n{booking_data}"
 
-                optimized_text = self.query_ai(prompt, system_role="optimizer")
+                optimized_text = self.query_ai(prompt, system_role="optimizer", interactive=True)
                 optimized_s = str(optimized_text or "").strip()
                 if (
                     not optimized_s
@@ -45573,7 +45667,8 @@ Draft to optimize:
                     booking_record=booking_record,
                     image_url=image_url_for_vision,
                     chat_id=chat_id,
-                    location=location
+                    location=location,
+                    interactive=True,
                 )
 
                 response_s = str(response_text or "").strip()

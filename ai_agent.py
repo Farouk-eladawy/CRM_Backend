@@ -380,6 +380,8 @@ def _send_internal_error_alert_text(text):
             users = json.loads(users_raw)
             for u in users:
                 if u.get('role') == 'Admin' and u.get('toolPhone'):
+                    if not company_tenancy.is_default_company(company_tenancy.user_company_id(u)):
+                        continue
                     phone = re.sub(r"\D", "", str(u.get('toolPhone')))
                     if phone:
                         admin_phones.append(phone)
@@ -4892,6 +4894,10 @@ class AIAgent:
         return report
 
     def notify_operations(self, fields, customer_message, ai_reply, sender_email=None, other_contacts=None, department="SUPPORT"):
+        reply_company = self._resolve_reply_company_id(chat_id=getattr(self, "_current_chat_id", None))
+        if not company_tenancy.is_default_company(reply_company):
+            logging.info("Skipping FTS operations alert for company %s", reply_company)
+            return False
         ops_email = "quality.fts@ftstravels.com"
         if str(department or "").strip().upper() == "SALES" and getattr(self, "sales_inbox_email", None):
             ops_email = self.sales_inbox_email
@@ -5518,6 +5524,21 @@ class AIAgent:
         auto_locations = {str(x).strip() for x in (raw.get("auto_reply_locations") or []) if str(x).strip()}
         draft_locations = {str(x).strip() for x in (raw.get("auto_reply_draft_locations") or []) if str(x).strip()}
         return auto_locations, draft_locations
+
+    def _normalize_auto_reply_location(self, value):
+        return re.sub(r"[\s_]+", "", str(value or "").strip().lower())
+
+    def _location_auto_reply_mode(self, location, company_id=None):
+        """Return auto, draft, or disabled from Settings → Auto Reply (AI)."""
+        auto_locations, draft_locations = self._auto_reply_sets_for_company(company_id)
+        key = self._normalize_auto_reply_location(location)
+        if not key:
+            return "disabled"
+        if key in {self._normalize_auto_reply_location(item) for item in auto_locations}:
+            return "auto"
+        if key in {self._normalize_auto_reply_location(item) for item in draft_locations}:
+            return "draft"
+        return "disabled"
 
     def _record_ai_usage_from_result(
         self,
@@ -11711,7 +11732,7 @@ Conversation:
         # --------------------------------
 
         # --- CANCELLATION NOTIFICATION WORKFLOW ---
-        if inquiry_intent == "CANCELLATION" and booking_record:
+        if inquiry_intent == "CANCELLATION" and booking_record and company_tenancy.is_default_company(self._resolve_reply_company_id(chat_id=getattr(self, "_current_chat_id", None))):
             try:
                 b_fields = booking_record.get('fields', {})
                 b_status = str(self.get_field_value(b_fields, FieldIds.BOOKING_STATUS) or "").strip().lower()
@@ -14186,6 +14207,70 @@ Conversation:
             except Exception as cursor_err:
                 logging.warning("Could not store Evolution media cursor: %s", cursor_err)
         return ingested
+
+    def _evolution_reaction_key(self, external_id, fallback_phone, from_me=False):
+        phone = re.sub(r"\D", "", str(fallback_phone or ""))
+        key = {
+            "id": str(external_id or "").strip(),
+            "remoteJid": f"{phone}@s.whatsapp.net" if phone else "",
+            "fromMe": bool(from_me),
+        }
+        db_path = os.path.join(SCRIPT_DIR, "make.com", "evolution-api-main", "prisma", "dev.db")
+        if not key["id"] or not os.path.isfile(db_path):
+            return key
+        try:
+            import sqlite3
+            con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=5)
+            try:
+                row = con.execute("SELECT key FROM Message WHERE keyId = ? LIMIT 1", (key["id"],)).fetchone()
+            finally:
+                con.close()
+            stored = json.loads(row[0]) if row and row[0] else {}
+            if not isinstance(stored, dict) or not str(stored.get("id") or "").strip():
+                return key
+            remote = str(stored.get("remoteJid") or "").strip()
+            alt = str(stored.get("remoteJidAlt") or stored.get("senderPn") or "").strip()
+            if remote.endswith("@lid") and alt.endswith(("@s.whatsapp.net", "@c.us")):
+                remote = alt
+            if remote:
+                key["remoteJid"] = remote
+            key["id"] = str(stored.get("id")).strip()
+            key["fromMe"] = bool(stored.get("fromMe"))
+        except Exception as key_err:
+            logging.warning("Could not load Evolution message key for reaction: %s", key_err)
+        return key
+
+    def send_company_evolution_reaction(self, account, message_key, emoji):
+        """Send a reaction emoji through a company regular-WhatsApp (Evolution) number."""
+        acc = account if isinstance(account, dict) else {}
+        instance_name = str(acc.get("instanceName") or "").strip()
+        provider_base_url = str(acc.get("providerBaseUrl") or "").strip().rstrip("/")
+        api_key = str(acc.get("apiKey") or "").strip()
+        if not provider_base_url or not api_key:
+            base_cfg = self._internal_evolution_cfg_for_notifications() or {}
+            provider_base_url = provider_base_url or str(base_cfg.get("providerBaseUrl") or "http://127.0.0.1:8080").rstrip("/")
+            api_key = api_key or str(base_cfg.get("apiKey") or "").strip()
+        if not api_key or not instance_name:
+            return False, {"error": "missing_evolution_config", "message": "Evolution API config missing for this company."}
+        if not isinstance(message_key, dict) or not str(message_key.get("id") or "").strip() or not str(message_key.get("remoteJid") or "").strip():
+            return False, {"error": "missing_message_key", "message": "The WhatsApp message id is missing."}
+        try:
+            resp = requests.post(
+                f"{provider_base_url}/message/sendReaction/{quote(instance_name)}",
+                headers={"Content-Type": "application/json", "apikey": api_key},
+                json={"key": message_key, "reaction": str(emoji or "")},
+                timeout=30,
+            )
+            payload = {}
+            try:
+                payload = resp.json() if resp.content else {}
+            except Exception:
+                payload = {"body": (resp.text or "")[:400]}
+            if int(resp.status_code or 0) >= 400:
+                return False, {"status_code": resp.status_code, "body": payload}
+            return True, payload if isinstance(payload, dict) else {"body": payload}
+        except Exception as exc:
+            return False, {"status_code": 500, "body": str(exc)}
 
     def send_company_evolution_whatsapp(
         self,
@@ -19596,7 +19681,35 @@ Conversation:
             "apiKey": api_key,
         }
 
-    def send_internal_notifications_whatsapp_text(self, recipient_phone, text):
+    def _company_internal_notification_cfg(self, company_id=None):
+        """Internal alert WhatsApp for one company. Other companies never use the FTS number."""
+        if not company_id or company_tenancy.is_default_company(company_id):
+            return self._internal_evolution_cfg_for_notifications()
+        settings = _get_channel_settings_for_company(company_id)
+        accounts = settings.get("whatsappAccounts") if isinstance(settings, dict) else None
+        if not isinstance(accounts, list):
+            return None
+        for acc in accounts:
+            if not isinstance(acc, dict):
+                continue
+            if str(acc.get("usage") or "").strip().lower() != "internal_notifications":
+                continue
+            if acc.get("enabled") is False:
+                continue
+            if str(acc.get("provider") or "").strip().lower() != "evolution":
+                continue
+            instance_name = str(acc.get("instanceName") or "").strip()
+            api_key = str(acc.get("apiKey") or "").strip()
+            if not instance_name or not api_key:
+                continue
+            return {
+                "instanceName": instance_name,
+                "providerBaseUrl": str(acc.get("providerBaseUrl") or "http://127.0.0.1:8080").strip().rstrip("/"),
+                "apiKey": api_key,
+            }
+        return None
+
+    def send_internal_notifications_whatsapp_text(self, recipient_phone, text, company_id=None):
         """
         Staff/ops alerts MUST send only via the dedicated Internal Notifications
         Evolution instance. No load-balancing / fallback to other user numbers.
@@ -19604,15 +19717,19 @@ Conversation:
         Returns True/False for backward compatibility.
         Detailed result is also stored on self._last_internal_notify_send_meta.
         """
-        ok, meta = self.send_internal_notifications_whatsapp_text_detailed(recipient_phone, text)
+        ok, meta = self.send_internal_notifications_whatsapp_text_detailed(recipient_phone, text, company_id=company_id)
         self._last_internal_notify_send_meta = meta
         return ok
 
-    def send_internal_notifications_whatsapp_text_detailed(self, recipient_phone, text):
+    def send_internal_notifications_whatsapp_text_detailed(self, recipient_phone, text, company_id=None):
         """
         Same as send_internal_notifications_whatsapp_text but returns (ok, meta_dict).
+        A non-FTS company uses only its own internal-notifications number.
         """
-        cfg = self._internal_evolution_cfg_for_notifications()
+        if company_id and not company_tenancy.is_default_company(company_id):
+            cfg = self._company_internal_notification_cfg(company_id)
+        else:
+            cfg = self._internal_evolution_cfg_for_notifications()
         raw_recipient = str(recipient_phone or "").strip()
         is_group = "@g.us" in raw_recipient.lower()
         if is_group:
@@ -39437,7 +39554,7 @@ Write ONE short message only. No JSON. No explanations."""
                     if not recipient_phone:
                         return jsonify({"status": "error", "message": "Missing recipient phone"}), 400
 
-                    c.execute("SELECT external_message_id, source FROM messages WHERE msg_id = ? AND chat_id = ?", (target_msg_id, chat_id))
+                    c.execute("SELECT external_message_id, source, sender_type FROM messages WHERE msg_id = ? AND chat_id = ?", (target_msg_id, chat_id))
                     m = c.fetchone()
                     if not m:
                         return jsonify({"status": "error", "message": "Target message not found"}), 404
@@ -39445,16 +39562,34 @@ Write ONE short message only. No JSON. No explanations."""
                     reacted_external_id = str(m_dict.get('external_message_id') or '').strip()
                     if not reacted_external_id:
                         return jsonify({"status": "error", "message": "Target message has no WhatsApp message id"}), 400
+                    target_from_me = str(m_dict.get('sender_type') or '').strip().lower() in ('agent', 'ai', 'system')
 
-                ok, meta = self.send_whatsapp_reaction(
-                    recipient_phone=recipient_phone,
-                    reacted_message_id=reacted_external_id,
-                    emoji=emoji,
-                    location=str(conv_dict.get('location') or 'Unknown'),
-                    receiving_phone_id=str(conv_dict.get('receiving_phone_id') or '').strip() or None
-                )
+                receiving_phone_id = str(conv_dict.get('receiving_phone_id') or '').strip()
+                if receiving_phone_id.startswith("evo:"):
+                    instance_name = receiving_phone_id[4:].strip()
+                    evo_account = company_tenancy.find_customer_whatsapp_account(instance_name=instance_name)
+                    reaction_key = self._evolution_reaction_key(reacted_external_id, recipient_phone, from_me=target_from_me)
+                    ok, meta = self.send_company_evolution_reaction(evo_account, reaction_key, emoji)
+                else:
+                    ok, meta = self.send_whatsapp_reaction(
+                        recipient_phone=recipient_phone,
+                        reacted_message_id=reacted_external_id,
+                        emoji=emoji,
+                        location=str(conv_dict.get('location') or 'Unknown'),
+                        receiving_phone_id=receiving_phone_id or None
+                    )
                 if not ok:
-                    return jsonify({"status": "error", "message": meta}), 500
+                    detail = ""
+                    if isinstance(meta, dict):
+                        body = meta.get("body")
+                        if isinstance(body, dict):
+                            detail = str(body.get("message") or body.get("error") or "")[:240]
+                        else:
+                            detail = str(body or meta.get("message") or meta.get("error") or "")[:240]
+                    return jsonify({
+                        "status": "error",
+                        "message": detail or "Could not send the WhatsApp reaction.",
+                    }), 500
 
                 try:
                     import chat_db
@@ -39464,6 +39599,9 @@ Write ONE short message only. No JSON. No explanations."""
                             msgs = meta.get('messages') or []
                             if isinstance(msgs, list) and msgs:
                                 out_external_id = msgs[0].get('id')
+                            key_obj = meta.get('key') if isinstance(meta.get('key'), dict) else None
+                            if not out_external_id and key_obj:
+                                out_external_id = key_obj.get('id')
                     except Exception:
                         out_external_id = None
                     chat_db.add_message(
@@ -48858,6 +48996,45 @@ Draft to optimize:
                 reply_subject = f"Re: {subject}" if not subject.startswith("Re:") else subject
                 last_msg_id = latest_msg['id']
                 
+                # --- AUTO REPLY TAB (Email follows the same location mode as WhatsApp) ---
+                reply_company_id = company_tenancy.lookup_company_id_for_email_account(account_name)
+                reply_location = str(inferred_location or "").strip()
+                try:
+                    import chat_db as _chat_db_reply
+                    active_chat_id = getattr(self, "_current_chat_id", None)
+                    conv = _chat_db_reply.get_conversation(active_chat_id) if active_chat_id else None
+                    if isinstance(conv, dict):
+                        if str(conv.get("company_id") or "").strip():
+                            reply_company_id = str(conv.get("company_id") or "").strip()
+                        if str(conv.get("location") or "").strip():
+                            reply_location = str(conv.get("location") or "").strip()
+                except Exception:
+                    active_chat_id = getattr(self, "_current_chat_id", None)
+                generic_locations = {"", "all", "unknown", "needhelp", "operations"}
+                if (
+                    self._normalize_auto_reply_location(reply_location) in generic_locations
+                    and reply_company_id
+                    and not company_tenancy.is_default_company(reply_company_id)
+                ):
+                    try:
+                        email_acc, _acc_company, _key, _settings = _find_company_email_account(account_name, reply_company_id)
+                        preferred = ""
+                        if isinstance(email_acc, dict):
+                            preferred = str(email_acc.get("routingLocation") or "").strip()
+                        pinned = company_tenancy.company_customer_inbox_location(reply_company_id, preferred or reply_location)
+                        if pinned:
+                            reply_location = pinned
+                    except Exception:
+                        pass
+                location_reply_mode = self._location_auto_reply_mode(reply_location, reply_company_id)
+                if location_reply_mode == "disabled":
+                    logging.info(
+                        "Email auto-reply disabled by Auto Reply settings for location=%s company=%s",
+                        reply_location,
+                        reply_company_id,
+                    )
+                    continue
+
                 # --- DRAFT MODE CHECK (EMAIL) ---
                 is_draft_mode = email_config.get('settings', {}).get('draft_mode', False)
                 sales_reply_mode = None
@@ -48865,7 +49042,7 @@ Draft to optimize:
                     sales_reply_mode = str((email_config.get('sales_inbox', {}) or {}).get('reply_mode') or "").strip().lower() or None
                 except Exception:
                     sales_reply_mode = None
-                if account_name == "sales" and sales_reply_mode == "draft":
+                if location_reply_mode == "draft" or (account_name == "sales" and sales_reply_mode == "draft"):
                     effective_draft_mode = True
                 else:
                     effective_draft_mode = bool(is_draft_mode or force_draft)
@@ -48880,6 +49057,12 @@ Draft to optimize:
                     else:
                         if account_name == "sales" and sales_reply_mode == "draft":
                             logging.info(f"Sales Inbox Draft Mode: Creating draft for {customer_email} instead of sending.")
+                        elif location_reply_mode == "draft":
+                            logging.info(
+                                "Auto Reply draft mode: creating email draft for %s location=%s",
+                                customer_email,
+                                reply_location,
+                            )
                         else:
                             logging.info(f"Draft Mode ON: Creating draft for {customer_email} instead of sending.")
                     
@@ -48917,6 +49100,23 @@ Draft to optimize:
                             response_text, 
                             table_name=booking_record.get('table_name') if booking_record else None
                         )
+                        try:
+                            import chat_db as _chat_db_draft
+                            draft_chat_id = getattr(self, "_current_chat_id", None)
+                            if draft_chat_id and str(response_text or "").strip():
+                                _chat_db_draft.delete_proposed_drafts(draft_chat_id)
+                                _chat_db_draft.add_message(
+                                    chat_id=draft_chat_id,
+                                    sender_type="agent",
+                                    text="[PROPOSED_DRAFT]\n" + str(response_text or "").strip(),
+                                    status="sent",
+                                    increment_unread=False,
+                                    source="Email",
+                                )
+                                if hasattr(_chat_db_draft, "ensure_unread_for_pending_draft"):
+                                    _chat_db_draft.ensure_unread_for_pending_draft(draft_chat_id)
+                        except Exception as draft_chat_err:
+                            logging.warning("Could not save email review draft in the chat: %s", draft_chat_err)
                     else:
                         email_sent_success = False
                 else:

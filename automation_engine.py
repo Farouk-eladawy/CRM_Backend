@@ -607,6 +607,13 @@ class AutomationEngine:
                             continue
                     except Exception:
                         pass
+                else:
+                    try:
+                        import company_tenancy
+                        if not company_tenancy.is_default_company(automation_db.workflow_company_id(wf)):
+                            continue
+                    except Exception:
+                        pass
 
                 trigger_cfg = {}
                 try:
@@ -1575,7 +1582,8 @@ class AutomationEngine:
             return
         if not self.agent or not hasattr(self.agent, "send_internal_notifications_whatsapp_text"):
             raise Exception("send_internal_notification_unavailable")
-        ok = bool(self.agent.send_internal_notifications_whatsapp_text(to_phone, text))
+        company_id = str((ctx or {}).get("company_id") or "").strip()
+        ok = bool(self.agent.send_internal_notifications_whatsapp_text(to_phone, text, company_id=company_id))
         if not ok:
             raise Exception("send_internal_notification_failed")
         ctx.setdefault("vars", {})["_workflow_sent"] = True

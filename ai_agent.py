@@ -10153,9 +10153,10 @@ Conversation:
                     )
                     linked_company_id = str((conv or {}).get("company_id") or "").strip()
                     if linked_company_id and not company_tenancy.is_default_company(linked_company_id):
+                        # Keep the company inbox filter. A trip city would hide the chat.
                         db_location = company_tenancy.company_customer_inbox_location(
                             linked_company_id,
-                            location or (conv or {}).get("location") or "",
+                            "",
                         )
                     if db_location and db_location != (conv or {}).get("location"):
                         chat_db.update_conversation_info(chat_id=chat_id, location=db_location)

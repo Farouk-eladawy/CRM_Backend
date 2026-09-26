@@ -685,19 +685,11 @@ def _looks_like_nile_crystal(*parts) -> bool:
     return "nilecrystal" in _compact_token(blob)
 
 
-def company_customer_inbox_location(company_id, preferred=""):
-    """Inbox location for a company customer WhatsApp chat.
-
-    Generic defaults such as NeedHelp hide the chat when the company inbox
-    is filtered by its own location, for example Nile_Crystal.
-    """
-    generic = {"", "all", "unknown", "needhelp", "operations"}
-    preferred_s = re.sub(r"\s+", "_", str(preferred or "").strip())
+def _company_inbox_filter_ids(company_id):
+    """Location filters that belong to this company, such as Nile_Crystal."""
+    generic = {"", "all", "unknown", "needhelp", "operations", "trash", "transport"}
     cid = normalize_company_id(company_id)
-    if preferred_s and preferred_s.lower() not in generic and not is_default_company(cid):
-        return preferred_s
-    if is_default_company(cid):
-        return preferred_s or "NeedHelp"
+    found = []
     try:
         import chat_db
 
@@ -712,16 +704,38 @@ def company_customer_inbox_location(company_id, preferred=""):
                 else:
                     fid = str(item or "").strip()
                 fid = re.sub(r"\s+", "_", fid)
-                if fid and fid.lower() not in generic:
-                    return fid
+                if fid and fid.lower() not in generic and fid not in found:
+                    found.append(fid)
     except Exception:
         pass
+    return found
+
+
+def company_customer_inbox_location(company_id, preferred=""):
+    """Inbox location for a company customer chat.
+
+    A trip city such as Hurghada/Cairo is not this company's filter.
+    Using it hides the chat from the company inbox, for example Nile_Crystal.
+    """
+    generic = {"", "all", "unknown", "needhelp", "operations"}
+    preferred_s = re.sub(r"\s+", "_", str(preferred or "").strip())
+    cid = normalize_company_id(company_id)
+    if is_default_company(cid):
+        return preferred_s or "NeedHelp"
+    company_filters = _company_inbox_filter_ids(cid)
+    preferred_key = preferred_s.lower()
+    if preferred_s and preferred_key not in generic:
+        for fid in company_filters:
+            if fid.lower() == preferred_key:
+                return fid
+    if company_filters:
+        return company_filters[0]
     company = get_company(cid) or {}
     for key in ("name", "publicSlug", "createdByUsername"):
         val = re.sub(r"\s+", "_", str(company.get(key) or "").strip())
         if val and val.lower() not in generic:
             return val
-    return preferred_s or "NeedHelp"
+    return "NeedHelp"
 
 
 def company_is_nile_crystal(company) -> bool:

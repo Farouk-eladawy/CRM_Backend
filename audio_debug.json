@@ -209005,3 +209005,91 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB03E64275ADF863764E2",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB03E64275ADF863764E2",
+    "fromMe": true,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Nile crystal",
+    "status": "SERVER_ACK",
+    "message": {
+      "conversation": "GYG83W783H7V"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790252962,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1,
+        "initiatedByMe": true
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790504048,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-27T03:14:08.920Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0440074A2D0ED82A9E0"
+    },
+    "keyId": "3EB0440074A2D0ED82A9E0",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "login_code: *987625*\n⏳ صالح لمدة 10 دقائق. الرجاء عدم مشاركته."
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790331300,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790504100,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-27T03:15:01.443Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

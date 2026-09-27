@@ -78,8 +78,13 @@
       border-color: var(--amber-line);
       background: var(--amber-soft);
     }
+    .callout.ok {
+      border-color: #a7f3d0;
+      background: var(--green-soft);
+    }
     .callout strong { display: block; margin-bottom: 4px; color: var(--blue); }
     .callout.warn strong { color: var(--amber); }
+    .callout.ok strong { color: var(--green); }
     .callout p { margin: 0; color: var(--ink); font-size: 14px; }
     .pills {
       display: flex;
@@ -264,24 +269,30 @@
     <p class="brand">TourCare.ai</p>
     <h1>تسعير TourCare.ai</h1>
     <p class="lead">
-      نظام تشغيل بالذكاء الاصطناعي لشركات الرحلات على GetYourGuide وViator وHeadout وTiqets.
-      التأسيس والربط مجانيان. السعر هو اشتراك شهري للمنصة والدعم فقط.
+      نظام تشغيل بالذكاء الاصطناعي لشركات الرحلات.
+      تأسيس مجاني، واشتراك شهري منخفض جداً لدخول سهل بدون خسارة العميل.
     </p>
 
-    <div class="callout">
-      <strong>العرض المقترح لشركة جديدة قبل معرفة حجمها</strong>
+    <div class="callout ok">
+      <strong>عرض إطلاق جذاب</strong>
       <p>
-        ابدأ بباقة Operations باشتراك <span dir="ltr">$295</span> شهرياً — بدون رسوم تأسيس.
-        أضف التتبع أو فريق الجودة فقط إذا طُلبا. الاستشارة والعرض الحي مجانيان.
+        صفر تأسيس · البداية من <span dir="ltr">$39</span> · Operations بـ
+        <span dir="ltr">$79</span> شهرياً · استشارة وعرض حي مجانيان · الاستهلاك الفعلي للموديلات والأدوات على العميل بشفافية.
+      </p>
+    </div>
+
+    <div class="callout">
+      <strong>العرض المقترح لشركة جديدة</strong>
+      <p>
+        ابدأ بـ Operations بـ <span dir="ltr">$79</span> شهرياً فقط — بدون تأسيس.
+        التتبع والجودة يمكن إضافتهما لاحقاً بنفس سهولة الترقية.
       </p>
     </div>
 
     <div class="callout warn" style="margin-top:12px">
       <strong>استهلاك الأدوات والموديلات والفلو على العميل</strong>
       <p>
-        الاشتراك الشهري يغطي المنصة والدعم والتشغيل. أما تكلفة استهلاك نماذج الذكاء الاصطناعي،
-        والأدوات المتصلة، وتشغيل الـ Flows / الأتمتة، وواجهات المزودين (مثل OpenAI أو DeepSeek أو غيرها)
-        فهي على حساب العميل حسب استخدامه الفعلي، وليست ضمن الاشتراك.
+        الاشتراك يغطي المنصة والدعم. تكلفة نماذج الذكاء الاصطناعي، والأدوات، والـ Flows، وواجهات المزودين — على حساب العميل حسب الاستخدام الفعلي.
       </p>
     </div>
 
@@ -291,7 +302,7 @@
     <h2>الاشتراك الشهري لكل باقة</h2>
     <div class="chart">
       <div class="bars" id="bars"></div>
-      <p class="caption">المحور: الباقة مقابل دولار أمريكي / شهر. التأسيس مجاني لكل الباقات.</p>
+      <p class="caption">المحور: الباقة مقابل دولار أمريكي / شهر. التأسيس مجاني.</p>
     </div>
 
     <h2>الباقات الجاهزة للعرض</h2>
@@ -309,7 +320,7 @@
         <tbody></tbody>
       </table>
     </div>
-    <p class="caption">شراء الميزات منفردة أغلى من الباقة. الدفع السنوي = 10 أشهر بسعر 12. استهلاك الموديلات والأدوات والفلو خارج هذا السعر.</p>
+    <p class="caption">الدفع السنوي = 10 أشهر بسعر 12. استهلاك الموديلات والأدوات والفلو خارج الاشتراك.</p>
 
     <h2>المنتجات الثلاثة إذا بيعت وحدها</h2>
     <div class="table-wrap">
@@ -323,16 +334,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="stripe"><td>AI Operations System</td><td class="num free">مجاناً</td><td class="num">$295</td><td>من الحجز حتى نهاية الرحلة: تأكيد، بيانات الضيف، تقارير، تحليلات</td></tr>
-          <tr><td>Smart Pickup &amp; Tracking</td><td class="num free">مجاناً</td><td class="num">$220</td><td>وقت التجمع والرسائل + GPS ولوحة التتبع، حتى 200 حجز و10 سائقين</td></tr>
-          <tr class="stripe"><td>Live Quality — برنامج فقط</td><td class="num free">مجاناً</td><td class="num">$195</td><td>طلب تقييم، تحليل مشاعر، شكاوى، واسترداد داخل النظام</td></tr>
-          <tr><td>Live Quality — فريق بشري</td><td class="num free">مجاناً</td><td class="num">$520</td><td>الفريق يدير الجودة حتى 200 حجز، ثم $1.75 لكل حجز إضافي</td></tr>
+          <tr class="stripe"><td>AI Operations System</td><td class="num free">مجاناً</td><td class="num">$79</td><td>من الحجز حتى نهاية الرحلة: تأكيد، بيانات الضيف، تقارير، تحليلات</td></tr>
+          <tr><td>Smart Pickup &amp; Tracking</td><td class="num free">مجاناً</td><td class="num">$49</td><td>وقت التجمع والرسائل + GPS ولوحة التتبع، حتى 200 حجز و10 سائقين</td></tr>
+          <tr class="stripe"><td>Live Quality — برنامج فقط</td><td class="num free">مجاناً</td><td class="num">$39</td><td>طلب تقييم، تحليل مشاعر، شكاوى، واسترداد داخل النظام</td></tr>
+          <tr><td>Live Quality — فريق بشري</td><td class="num free">مجاناً</td><td class="num">$149</td><td>الفريق يدير الجودة حتى 200 حجز، ثم $0.90 لكل حجز إضافي</td></tr>
         </tbody>
       </table>
     </div>
 
     <h2>سعر كل ميزة عند إضافتها خارج باقتها</h2>
-    <p class="lead" style="margin-bottom:8px">إذا كانت الميزة داخل الباقة المختارة فلا تُحسب مرة ثانية. الأسعار هنا اشتراك شهري فقط — بدون تأسيس.</p>
+    <p class="lead" style="margin-bottom:8px">إضافات شهرية خفيفة — بدون تأسيس.</p>
 
     <details class="card" open>
       <summary>
@@ -344,18 +355,18 @@
           <table>
             <thead><tr><th>الميزة</th><th class="num">شهري</th><th>داخل</th></tr></thead>
             <tbody>
-              <tr class="stripe"><td>تجميع الحجوزات من المنصات</td><td class="num">$28</td><td>Operations وما فوقها، حتى منصتين</td></tr>
-              <tr><td>رد تأكيد فوري بعد الحجز</td><td class="num">$32</td><td>Operations وما فوقها</td></tr>
-              <tr class="stripe"><td>إرسال وقت التجمع واتساب وإيميل</td><td class="num">$65</td><td>كل الباقات</td></tr>
-              <tr><td>تذكير قبل الرحلة</td><td class="num">$28</td><td>كل الباقات</td></tr>
-              <tr class="stripe"><td>جمع الفندق والغرفة والموقع بالذكاء</td><td class="num">$85</td><td>Operations وما فوقها</td></tr>
-              <tr><td>قوالب المراحل بعدة لغات</td><td class="num">$22</td><td>Operations: إنجليزي + لغة. كل لغة زائدة بهذا السعر</td></tr>
-              <tr class="stripe"><td>فاتورة ومبلغ إضافي وبوابة دفع</td><td class="num">$28</td><td>إضافة على كل الباقات. نسبة البوابة على العميل</td></tr>
-              <tr><td>إشعار الحجز اللحظي لمدير التشغيل</td><td class="num">$28</td><td>Operations وما فوقها</td></tr>
-              <tr class="stripe"><td>حساب فرعي لسائق أو مرشد أو مورد</td><td class="num">$7</td><td>Operations تشمل 5، ثم هذا السعر للمقعد</td></tr>
-              <tr><td>تقرير يومي بعدد الحجوزات لكل منصة</td><td class="num">$38</td><td>Operations وما فوقها</td></tr>
-              <tr class="stripe"><td>لوحة التحليلات</td><td class="num">$60</td><td>Operations وما فوقها</td></tr>
-              <tr><td>مستخدم إضافي في لوحة الشركة</td><td class="num">$10</td><td>Operations تشمل 3</td></tr>
+              <tr class="stripe"><td>تجميع الحجوزات من المنصات</td><td class="num">$7</td><td>Operations وما فوقها، حتى منصتين</td></tr>
+              <tr><td>رد تأكيد فوري بعد الحجز</td><td class="num">$9</td><td>Operations وما فوقها</td></tr>
+              <tr class="stripe"><td>إرسال وقت التجمع واتساب وإيميل</td><td class="num">$15</td><td>كل الباقات</td></tr>
+              <tr><td>تذكير قبل الرحلة</td><td class="num">$7</td><td>كل الباقات</td></tr>
+              <tr class="stripe"><td>جمع الفندق والغرفة والموقع بالذكاء</td><td class="num">$19</td><td>Operations وما فوقها</td></tr>
+              <tr><td>قوالب المراحل بعدة لغات</td><td class="num">$5</td><td>Operations: إنجليزي + لغة. كل لغة زائدة بهذا السعر</td></tr>
+              <tr class="stripe"><td>فاتورة ومبلغ إضافي وبوابة دفع</td><td class="num">$7</td><td>إضافة على كل الباقات. نسبة البوابة على العميل</td></tr>
+              <tr><td>إشعار الحجز اللحظي لمدير التشغيل</td><td class="num">$7</td><td>Operations وما فوقها</td></tr>
+              <tr class="stripe"><td>حساب فرعي لسائق أو مرشد أو مورد</td><td class="num">$2</td><td>Operations تشمل 5، ثم هذا السعر للمقعد</td></tr>
+              <tr><td>تقرير يومي بعدد الحجوزات لكل منصة</td><td class="num">$9</td><td>Operations وما فوقها</td></tr>
+              <tr class="stripe"><td>لوحة التحليلات</td><td class="num">$12</td><td>Operations وما فوقها</td></tr>
+              <tr><td>مستخدم إضافي في لوحة الشركة</td><td class="num">$3</td><td>Operations تشمل 3</td></tr>
             </tbody>
           </table>
         </div>
@@ -372,14 +383,14 @@
           <table>
             <thead><tr><th>الميزة</th><th class="num">شهري</th><th>داخل</th></tr></thead>
             <tbody>
-              <tr class="stripe"><td>تتبع GPS للسائق والعميل</td><td class="num">$105</td><td>Ops + Tracking و Full Care</td></tr>
-              <tr><td>تنبيه تأخير أو تغيّر موقع</td><td class="num">$28</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr class="stripe"><td>تتبع GPS للسائق والعميل</td><td class="num">$25</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>تنبيه تأخير أو تغيّر موقع</td><td class="num">$7</td><td>Ops + Tracking و Full Care</td></tr>
               <tr class="stripe"><td>لوحة عمليات حية</td><td class="num">داخل GPS</td><td>Ops + Tracking و Full Care</td></tr>
-              <tr><td>تواصل السائق دون إظهار الرقم</td><td class="num">$45</td><td>Ops + Tracking و Full Care</td></tr>
-              <tr class="stripe"><td>صورة من موقع السائق للعميل</td><td class="num">$25</td><td>Ops + Tracking و Full Care</td></tr>
-              <tr><td>موقع حي عند عدم الحضور</td><td class="num">$32</td><td>Ops + Tracking و Full Care</td></tr>
-              <tr class="stripe"><td>تقارير أداء السائقين والإلغاء</td><td class="num">$32</td><td>Ops + Tracking و Full Care</td></tr>
-              <tr><td>سائق إضافي بعد العاشر</td><td class="num">$8</td><td>إضافة على باقات التتبع</td></tr>
+              <tr><td>تواصل السائق دون إظهار الرقم</td><td class="num">$9</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr class="stripe"><td>صورة من موقع السائق للعميل</td><td class="num">$5</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>موقع حي عند عدم الحضور</td><td class="num">$7</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr class="stripe"><td>تقارير أداء السائقين والإلغاء</td><td class="num">$7</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>سائق إضافي بعد العاشر</td><td class="num">$2</td><td>إضافة على باقات التتبع</td></tr>
             </tbody>
           </table>
         </div>
@@ -396,50 +407,44 @@
           <table>
             <thead><tr><th>الميزة</th><th class="num">شهري أو للحالة</th><th>داخل</th></tr></thead>
             <tbody>
-              <tr class="stripe"><td>طلب تقييم بعد الرحلة</td><td class="num">$49</td><td>Full Care، أو برنامج الجودة</td></tr>
-              <tr><td>اكتشاف العميل غير الراضي مبكراً</td><td class="num">$65</td><td>Full Care، أو برنامج الجودة</td></tr>
-              <tr class="stripe"><td>تحقيق الشكوى وتوثيق السبب</td><td class="num">$60</td><td>Full Care، أو برنامج الجودة</td></tr>
-              <tr><td>تفاوض لتجنب الاسترداد أو تقييم سلبي</td><td class="num">$49</td><td>Full Care</td></tr>
-              <tr class="stripe"><td>إدارة طلب الاسترداد حتى الإغلاق</td><td class="num">$63</td><td>Full Care، أو برنامج الجودة</td></tr>
-              <tr><td>تقرير شهري بأسباب الرضا وعدم الرضا</td><td class="num">$38</td><td>Full Care</td></tr>
-              <tr class="stripe"><td>متابعة حذف تقييم مخالف لشروط المنصة</td><td class="num">$32 للحالة</td><td>Full Care تشمل 4 حالات شهرياً</td></tr>
-              <tr><td>فريق جودة بشري</td><td class="num">$520</td><td>Full Care حتى 200 حجز، ثم $1.75 للحجز</td></tr>
+              <tr class="stripe"><td>طلب تقييم بعد الرحلة</td><td class="num">$9</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr><td>اكتشاف العميل غير الراضي مبكراً</td><td class="num">$12</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr class="stripe"><td>تحقيق الشكوى وتوثيق السبب</td><td class="num">$12</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr><td>تفاوض لتجنب الاسترداد أو تقييم سلبي</td><td class="num">$9</td><td>Full Care</td></tr>
+              <tr class="stripe"><td>إدارة طلب الاسترداد حتى الإغلاق</td><td class="num">$12</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr><td>تقرير شهري بأسباب الرضا وعدم الرضا</td><td class="num">$7</td><td>Full Care</td></tr>
+              <tr class="stripe"><td>متابعة حذف تقييم مخالف لشروط المنصة</td><td class="num">$9 للحالة</td><td>Full Care تشمل 4 حالات شهرياً</td></tr>
+              <tr><td>فريق جودة بشري</td><td class="num">$149</td><td>Full Care حتى 200 حجز، ثم $0.90 للحجز</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </details>
 
-    <h2>إضافات اختيارية على الاشتراك</h2>
+    <h2>إضافات اختيارية</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>البند</th><th class="num">السعر</th></tr></thead>
         <tbody>
-          <tr class="stripe"><td>ربط منصة حجز إضافية</td><td class="num">$28 شهرياً</td></tr>
-          <tr><td>ربط رقم واتساب إضافي</td><td class="num free">مجاناً عند الإعداد</td></tr>
-          <tr class="stripe"><td>ربط صندوق بريد إضافي</td><td class="num free">مجاناً عند الإعداد</td></tr>
-          <tr><td>ربط بوابة دفع</td><td class="num free">مجاناً عند الإعداد</td></tr>
-          <tr class="stripe"><td>كتابة قوالب لغة إضافية</td><td class="num">$22 شهرياً</td></tr>
+          <tr class="stripe"><td>ربط منصة حجز إضافية</td><td class="num">$7 شهرياً</td></tr>
+          <tr><td>ربط رقم واتساب / بريد / بوابة دفع</td><td class="num free">مجاناً</td></tr>
+          <tr class="stripe"><td>كتابة قوالب لغة إضافية</td><td class="num">$5 شهرياً</td></tr>
           <tr><td>جلسة تدريب للفريق</td><td class="num free">مجاناً</td></tr>
-          <tr class="stripe"><td>مسار أتمتة مخصص خارج المنتجات</td><td class="num">$55 شهرياً</td></tr>
-          <tr><td>مدينة أو وجهة إضافية على الاشتراك</td><td class="num">$32 شهرياً</td></tr>
+          <tr class="stripe"><td>مسار أتمتة مخصص</td><td class="num">$15 شهرياً</td></tr>
+          <tr><td>مدينة أو وجهة إضافية</td><td class="num">$9 شهرياً</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="foot">
-      <h3 style="margin-bottom:8px">ما لا يدخل في الاشتراك الشهري</h3>
+      <h3 style="margin-bottom:8px">ما لا يدخل في الاشتراك</h3>
       <p>
-        <strong>استهلاك الموديلات والأدوات والفلو على العميل</strong> حسب الاستخدام الفعلي.
-        كذلك: رسوم محادثات واتساب من ميتا، ورسائل SMS، ونسبة بوابة الدفع، وأي حجز فوق حد الباقة.
-        الحجز الزائد: <span dir="ltr">$0.18</span> في Pickup Start، و<span dir="ltr">$0.32</span> في Operations وOps + Tracking.
-        حجز الجودة البشري الزائد عن 200: <span dir="ltr">$1.75</span>.
+        <strong>استهلاك الموديلات والأدوات والفلو على العميل</strong> حسب الاستخدام.
+        كذلك رسوم واتساب ميتا وSMS ونسبة بوابة الدفع.
+        الحجز الزائد: <span dir="ltr">$0.08</span> في Pickup Start، و<span dir="ltr">$0.12</span> في Operations وOps + Tracking.
+        حجز الجودة البشري فوق 200: <span dir="ltr">$0.90</span>.
       </p>
-      <p>
-        مسار الخدمة: ربط المنصات، ثم ضبط القواعد والقوالب، ثم الأتمتة، ثم النمو.
-        مسار العرض الحي: حجز، جمع بيانات، وقت تجمع، طلب تقييم، ثم حجز استشارة.
-      </p>
-      <p dir="ltr" style="margin-top:16px">TourCare.ai · Internal pricing card · Updated Sep 2026</p>
+      <p dir="ltr" style="margin-top:16px">TourCare.ai · Launch pricing · Updated Sep 2026</p>
     </div>
   </main>
 
@@ -448,37 +453,37 @@
       {
         id: "start",
         name: "Pickup Start",
-        monthly: 135,
+        monthly: 39,
         cap: "150 حجز / شهر",
-        fit: "شركة تريد إرسال وقت التجمع فقط",
+        fit: "دخول سهل جداً",
         limit: "150 حجز، منصة واحدة، مدينة واحدة",
         include: "وقت التجمع + تذكير عبر واتساب وإيميل",
       },
       {
         id: "ops",
         name: "Operations",
-        monthly: 295,
+        monthly: 79,
         cap: "300 حجز / شهر",
-        fit: "العرض الافتراضي لشركة جديدة",
+        fit: "العرض الرئيسي لشركة جديدة",
         limit: "300 حجز، منصتان، 3 مستخدمين، 5 حسابات فرعية",
         include: "كل مسار التشغيل بدون GPS وبدون فريق جودة بشري",
       },
       {
         id: "track",
         name: "Ops + Tracking",
-        monthly: 450,
+        monthly: 119,
         cap: "300 حجز و 10 سائقين",
-        fit: "تشغيل مع تتبع السائقين",
+        fit: "تشغيل مع تتبع",
         limit: "300 حجز و10 سائقين",
         include: "Operations + تتبع حي وتواصل مخفي وصورة السائق",
       },
       {
         id: "full",
         name: "Full Care",
-        monthly: 690,
+        monthly: 189,
         cap: "جودة بشرية حتى 200 حجز",
-        fit: "التشغيل والتتبع وفريق الجودة",
-        limit: "جودة بشرية حتى 200 حجز ثم $1.75 للحجز",
+        fit: "تشغيل + تتبع + جودة",
+        limit: "جودة بشرية حتى 200 حجز ثم $0.90 للحجز",
         include: "التتبع + التقييمات والشكاوى والاسترداد ومتابعة حذف التقييم المخالف",
       },
     ];
@@ -495,9 +500,9 @@
       ).join("");
 
       document.getElementById("stats").innerHTML = `
-        <div class="stat success"><div class="value" style="direction:rtl;text-align:right">مجاناً</div><div class="label">تأسيس وربط المنصات</div></div>
-        <div class="stat info"><div class="value">${usd(pack.monthly)}</div><div class="label">اشتراك شهري</div></div>
-        <div class="stat"><div class="value">${usd(pack.monthly * 10)}</div><div class="label">سنوي (شهرين مجاناً)</div></div>
+        <div class="stat success"><div class="value" style="direction:rtl;text-align:right">مجاناً</div><div class="label">تأسيس وربط</div></div>
+        <div class="stat info"><div class="value">${usd(pack.monthly)}</div><div class="label">اشتراك شهري فقط</div></div>
+        <div class="stat"><div class="value">${usd(pack.monthly * 10)}</div><div class="label">سنوي (شهرين هدية)</div></div>
       `;
 
       document.getElementById("bars").innerHTML = PACKS.map((p) => {

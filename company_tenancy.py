@@ -105,6 +105,8 @@ def empty_connections():
         "airtableBookingsTable": "",
         # Per-company Airtable personal access token. Empty = not connected for that company.
         "airtableApiKey": "",
+        # Secret for Make/n8n sends on this company's hook URL. Never shared across companies.
+        "outboundApiKey": "",
     }
 
 
@@ -237,7 +239,7 @@ def sanitize_connections(raw, existing=None) -> dict:
             continue
         val = str(src.get(key) or "").strip()
         # Never wipe a stored Airtable token with an empty or masked UI value.
-        if key == "airtableApiKey" and _is_secret_placeholder(val):
+        if key in ("airtableApiKey", "outboundApiKey") and _is_secret_placeholder(val):
             continue
         out[key] = val
     out["baserowMainUrl"] = sanitize_public_url(out.get("baserowMainUrl"))
@@ -254,6 +256,9 @@ def connections_public_view(connections) -> dict:
     key = str(out.get("airtableApiKey") or "").strip()
     out["airtableApiKeyConfigured"] = bool(key)
     out["airtableApiKey"] = mask_secret(key) if key else ""
+    send_key = str(out.get("outboundApiKey") or "").strip()
+    out["outboundApiKeyConfigured"] = bool(send_key)
+    out["outboundApiKey"] = mask_secret(send_key) if send_key else ""
     return out
 
 
@@ -757,6 +762,30 @@ def _company_inbox_filter_ids(company_id):
     return found
 
 
+def company_id_for_inbox_location(location):
+    """Return a non-default company when a location filter belongs only to that company."""
+    wanted = re.sub(r"\s+", "_", str(location or "").strip()).lower()
+    generic = {
+        "", "all", "unknown", "needhelp", "operations", "trash", "transport",
+        "hurghada/cairo", "hurghada", "cairo", "sharm", "sales", "religious",
+        "quality", "guides", "drivers",
+    }
+    if wanted in generic:
+        return ""
+    match = ""
+    for company in load_companies():
+        cid = company.get("id")
+        if is_default_company(cid):
+            continue
+        owned = {re.sub(r"\s+", "_", str(item or "").strip()).lower() for item in _company_inbox_filter_ids(cid)}
+        if wanted not in owned:
+            continue
+        if match and normalize_company_id(match) != normalize_company_id(cid):
+            return ""
+        match = cid
+    return match or ""
+
+
 def company_customer_inbox_location(company_id, preferred=""):
     """Inbox location for a company customer chat.
 
@@ -978,6 +1007,111 @@ def update_evolution_account_connection(instance_name, connection_status="", qr_
             )
             changed = True
     return changed
+
+
+def company_send_api_url(company_or_id) -> str:
+    """Public Make/n8n URL. Uses the company host when set, otherwise hooks.tourcare.ai."""
+    if isinstance(company_or_id, dict):
+        company = company_or_id
+    else:
+        company = get_company(company_or_id) or default_fts_company()
+    base = company_webhook_public_base(company) or "https://hooks.tourcare.ai"
+    slug = company_public_slug(company)
+    return f"{base.rstrip('/')}/c/{slug}/send"
+
+
+def ensure_outbound_api_key(company_id) -> str:
+    conn = get_connections(company_id)
+    key = str(conn.get("outboundApiKey") or "").strip()
+    if len(key) >= 24:
+        return key
+    key = secrets.token_urlsafe(32)
+    conn = dict(conn)
+    conn["outboundApiKey"] = key
+    save_connections(company_id, conn)
+    return key
+
+
+def rotate_outbound_api_key(company_id) -> str:
+    key = secrets.token_urlsafe(32)
+    conn = dict(get_connections(company_id))
+    conn["outboundApiKey"] = key
+    save_connections(company_id, conn)
+    return key
+
+
+def outbound_api_key_matches(company_id, presented) -> bool:
+    expected = str(get_connections(company_id).get("outboundApiKey") or "").strip()
+    given = str(presented or "").strip()
+    if not expected or not given:
+        return False
+    return secrets.compare_digest(expected, given)
+
+
+def describe_company_outbound_channels(company_id):
+    """Labels only. No tokens. Used by Company Connections and the send API."""
+    import chat_db
+
+    cid = normalize_company_id(company_id)
+    raw = chat_db.get_setting(channel_settings_key(cid))
+    settings = _parse_json(raw, {})
+    if not isinstance(settings, dict):
+        settings = {}
+    emails = []
+    for item in settings.get("emailAccounts") or []:
+        if not isinstance(item, dict) or item.get("enabled") is False:
+            continue
+        emails.append({
+            "id": str(item.get("id") or "").strip(),
+            "email": str(item.get("emailAddress") or item.get("email") or "").strip(),
+            "label": str(item.get("label") or item.get("emailAddress") or item.get("id") or "").strip(),
+        })
+    whatsapp = []
+    for item in settings.get("whatsappAccounts") or []:
+        if not isinstance(item, dict) or item.get("enabled") is False:
+            continue
+        if str(item.get("usage") or "customers").strip().lower() == "internal_notifications":
+            continue
+        provider = str(item.get("provider") or "").strip().lower()
+        phone_id = str(item.get("phoneNumberId") or "").strip()
+        if provider == "evolution" and not phone_id:
+            inst = str(item.get("instanceName") or "").strip()
+            phone_id = f"evo:{inst}" if inst else ""
+        whatsapp.append({
+            "id": str(item.get("id") or phone_id).strip(),
+            "label": str(item.get("label") or item.get("displayPhone") or phone_id).strip(),
+            "provider": provider,
+            "phoneNumberId": phone_id,
+        })
+    facebook = []
+    for page_id in _iter_facebook_page_ids(settings):
+        if normalize_company_id(lookup_company_id_for_facebook_page(page_id)) == cid:
+            facebook.append({"pageId": page_id})
+    internal = []
+    for item in settings.get("whatsappAccounts") or []:
+        if not isinstance(item, dict) or item.get("enabled") is False:
+            continue
+        if str(item.get("usage") or "").strip().lower() != "internal_notifications":
+            continue
+        label = str(item.get("label") or item.get("displayPhone") or item.get("instanceName") or "").strip()
+        phone = str(item.get("displayPhone") or item.get("phone") or "").strip()
+        internal.append({
+            "id": str(item.get("id") or item.get("instanceName") or "").strip(),
+            "label": label or phone or "Internal",
+            "phone": phone,
+            "connected": bool(str(item.get("instanceName") or "").strip() and str(item.get("apiKey") or "").strip()),
+        })
+    if is_default_company(cid) and not internal:
+        raw_cfg = chat_db.get_setting("internal_whatsapp_notifications_config")
+        cfg = _parse_json(raw_cfg, {})
+        if isinstance(cfg, dict) and str(cfg.get("instanceName") or "").strip() and str(cfg.get("apiKey") or "").strip():
+            internal.append({
+                "id": "fts_internal",
+                "label": "Internal alerts",
+                "phone": str(cfg.get("whatsappNumber") or "").strip(),
+                "connected": True,
+            })
+    return {"email": emails, "whatsapp": whatsapp, "facebook": facebook, "internal": internal}
 
 
 def save_connections(company_id, connections):

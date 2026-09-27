@@ -150,9 +150,13 @@ DEFAULT_CREDENTIALS_FILE = os.path.join(SCRIPT_DIR, 'credentials.json')
 DEFAULT_TOKEN_FILE = os.path.join(SCRIPT_DIR, 'token.json')
 
 class GmailService:
-    def __init__(self, token_file=None, credentials_file=None, token_json=None, auto_auth=True):
+    def __init__(self, token_file=None, credentials_file=None, token_json=None, auto_auth=True, persist_token_file=True):
         self.service = None
-        self.token_file = token_file or DEFAULT_TOKEN_FILE
+        # A company mailbox passed as token_json must not overwrite the primary token file.
+        if persist_token_file:
+            self.token_file = token_file or DEFAULT_TOKEN_FILE
+        else:
+            self.token_file = None
         self.credentials_file = credentials_file or DEFAULT_CREDENTIALS_FILE
         self.token_json = token_json
         self._credentials_lock = threading.Lock()

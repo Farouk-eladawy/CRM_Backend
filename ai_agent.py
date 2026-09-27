@@ -2581,7 +2581,7 @@ class AIAgent:
             if not token_payload:
                 continue
             try:
-                gmail_svc = GmailService(credentials_file=credentials_path, token_json=token_payload)
+                gmail_svc = GmailService(credentials_file=credentials_path, token_json=token_payload, persist_token_file=False)
                 if not gmail_svc.service:
                     continue
                 if not str(account.get('emailAddress') or "").strip():
@@ -2667,19 +2667,60 @@ class AIAgent:
 
         normalized_mailbox_key = mailbox_key.lower()
         if normalized_mailbox_key == "sales":
-            if getattr(self, "sales_gmail_service", None):
+            if self._legacy_gmail_matches(getattr(self, "sales_gmail_service", None), getattr(self, "sales_inbox_email", "")):
                 return self.sales_gmail_service, "sales"
-            return self.gmail_service, "booking"
+            return None, None
         if normalized_mailbox_key == "booking":
-            return self.gmail_service, "booking"
+            booking_svc = self._connected_booking_gmail_service()
+            if booking_svc:
+                return booking_svc, "booking"
+            logging.error("Primary mailbox login does not match the FTS booking address. Send blocked.")
+            return None, None
 
         default_dynamic_id = self._get_default_dynamic_email_account_id(direction=direction)
         if default_dynamic_id and default_dynamic_id in self.dynamic_gmail_services:
             return self.dynamic_gmail_services[default_dynamic_id], default_dynamic_id
 
-        if sales_fallback and getattr(self, "sales_gmail_service", None):
+        if sales_fallback and self._legacy_gmail_matches(getattr(self, "sales_gmail_service", None), getattr(self, "sales_inbox_email", "")):
             return self.sales_gmail_service, "sales"
-        return self.gmail_service, "booking"
+        booking_svc = self._connected_booking_gmail_service()
+        if booking_svc:
+            return booking_svc, "booking"
+        logging.error("Primary mailbox login does not match the FTS booking address. Send blocked.")
+        return None, None
+
+    def _connected_booking_gmail_service(self):
+        """FTS booking mailbox from the UI connection. Ignore a login that opens another company."""
+        self._refresh_dynamic_email_services()
+        expected = self._primary_mailbox_email().strip().lower()
+        if not expected:
+            return None
+        for account_id, account in (self.dynamic_email_accounts or {}).items():
+            svc = (self.dynamic_gmail_services or {}).get(account_id)
+            if not svc or not isinstance(account, dict):
+                continue
+            owner = company_tenancy.lookup_company_id_for_email_account(account_id)
+            if not company_tenancy.is_default_company(owner):
+                continue
+            email = str(account.get("emailAddress") or "").strip().lower()
+            if email == expected:
+                return svc
+        if self._legacy_gmail_matches(getattr(self, "gmail_service", None), expected):
+            return self.gmail_service
+        return None
+
+    def _primary_mailbox_email(self):
+        return str(((self.config.get("email") or {}).get("email_address") or "")).strip()
+
+    def _legacy_gmail_matches(self, gmail_svc, expected_email):
+        expected = str(expected_email or "").strip().lower()
+        if not gmail_svc or not getattr(gmail_svc, "service", None) or not expected:
+            return False
+        cached = getattr(gmail_svc, "_profile_email_cache", None)
+        if not cached:
+            cached = str(gmail_svc.get_profile_email() or "").strip().lower()
+            gmail_svc._profile_email_cache = cached
+        return cached == expected
 
     def setup_connections(self):
         try:
@@ -3688,6 +3729,10 @@ class AIAgent:
         Send HTML email using Gmail OAuth Service
         Respects 'draft_mode' setting in config.
         """
+        if not company_id:
+            active_company = company_tenancy.active_booking_company_id()
+            if active_company and not company_tenancy.is_default_company(active_company):
+                company_id = active_company
         gmail_svc, selected_mailbox = self._select_gmail_service(
             mailbox=mailbox,
             direction="outbound",
@@ -3739,6 +3784,134 @@ class AIAgent:
             in_reply_to_message_id=in_reply_to_message_id,
             attachments=attachments
         )
+
+    def _company_outbound_settings(self, company):
+        cid = company_tenancy.normalize_company_id((company or {}).get("id"))
+        api_key = company_tenancy.ensure_outbound_api_key(cid)
+        return {
+            "url": company_tenancy.company_send_api_url(company),
+            "method": "POST",
+            "contentType": "application/json",
+            "header": "X-Api-Key",
+            "apiKey": api_key,
+            "channels": company_tenancy.describe_company_outbound_channels(cid),
+        }
+
+    def dispatch_company_external_send(self, company, body):
+        """Send from one company only. channel=all uses every connected channel that has a destination."""
+        cid = company_tenancy.normalize_company_id((company or {}).get("id"))
+        data = body if isinstance(body, dict) else {}
+        channel = str(data.get("channel") or "all").strip().lower()
+        if channel in ("internal_notifications", "notifications", "staff"):
+            channel = "internal"
+        if channel not in ("all", "email", "whatsapp", "facebook", "internal"):
+            channel = "all"
+        raw_to = str(data.get("to") or "").strip()
+        email_to = str(data.get("email") or "").strip()
+        phone = str(data.get("phone") or data.get("whatsapp") or "").strip()
+        psid = str(data.get("psid") or data.get("facebookId") or "").strip()
+        if raw_to and "@" in raw_to and not email_to:
+            email_to = raw_to
+        elif raw_to and "@" not in raw_to and not phone and not psid:
+            phone = raw_to
+        message = str(data.get("message") or data.get("text") or data.get("html") or "").strip()
+        subject = str(data.get("subject") or "").strip()
+        if not subject:
+            subject = str((company or {}).get("name") or "Message").strip()
+        mailbox = str(data.get("mailbox") or data.get("emailAccountId") or "").strip()
+        phone_id = str(data.get("phoneNumberId") or "").strip()
+        results = {}
+
+        if channel in ("all", "email"):
+            if not email_to:
+                if channel == "email":
+                    results["email"] = {"ok": False, "error": "missing_email"}
+            else:
+                ok = bool(self.send_email(
+                    email_to,
+                    subject,
+                    message or subject,
+                    mailbox=mailbox or None,
+                    company_id=cid,
+                ))
+                results["email"] = {"ok": ok, "to": email_to, "error": "" if ok else "email_send_failed"}
+
+        if channel in ("all", "whatsapp"):
+            if not phone:
+                if channel == "whatsapp":
+                    results["whatsapp"] = {"ok": False, "error": "missing_phone"}
+            else:
+                acc = None
+                if phone_id:
+                    owner = company_tenancy.lookup_company_id_for_phone(phone_id)
+                    if company_tenancy.normalize_company_id(owner) != cid:
+                        results["whatsapp"] = {"ok": False, "error": "phone_not_on_this_company"}
+                    else:
+                        acc = company_tenancy.find_customer_whatsapp_account(phone_number_id=phone_id, company_id=cid)
+                if "whatsapp" not in results:
+                    if not acc:
+                        acc = company_tenancy.find_customer_whatsapp_account(company_id=cid)
+                    provider = str((acc or {}).get("provider") or "").strip().lower()
+                    receiving = ""
+                    if provider == "evolution":
+                        inst = str((acc or {}).get("instanceName") or "").strip()
+                        receiving = str((acc or {}).get("phoneNumberId") or "").strip() or (f"evo:{inst}" if inst else "")
+                    elif provider == "meta":
+                        receiving = str((acc or {}).get("phoneNumberId") or "").strip()
+                    if not receiving:
+                        results["whatsapp"] = {"ok": False, "error": "whatsapp_not_connected"}
+                    else:
+                        company_tenancy.bind_booking_company(cid)
+                        try:
+                            ok, err = self.send_whatsapp_message(
+                                phone,
+                                text=message or subject,
+                                location=company_tenancy.company_customer_inbox_location(cid, ""),
+                                receiving_phone_id=receiving,
+                            )
+                        finally:
+                            company_tenancy.unbind_booking_company()
+                        results["whatsapp"] = {
+                            "ok": bool(ok),
+                            "to": phone,
+                            "error": "" if ok else "whatsapp_send_failed",
+                        }
+
+        if channel == "internal":
+            staff_phone = str(data.get("staffPhone") or phone or "").strip()
+            if not staff_phone:
+                results["internal"] = {"ok": False, "error": "missing_phone"}
+            else:
+                ok = bool(self.send_internal_notifications_whatsapp_text(
+                    staff_phone,
+                    message or subject,
+                    company_id=cid,
+                ))
+                results["internal"] = {
+                    "ok": ok,
+                    "to": staff_phone,
+                    "error": "" if ok else "internal_not_connected",
+                }
+
+        if channel in ("all", "facebook"):
+            if not psid:
+                if channel == "facebook":
+                    results["facebook"] = {"ok": False, "error": "missing_psid"}
+            else:
+                company_tenancy.bind_booking_company(cid)
+                try:
+                    ok, err = self.send_facebook_message(psid, text=message or subject)
+                finally:
+                    company_tenancy.unbind_booking_company()
+                results["facebook"] = {
+                    "ok": bool(ok),
+                    "error": "" if ok else "facebook_not_connected",
+                }
+
+        if not results:
+            return False, {"error": "nothing_to_send", "channels": {}}
+        any_ok = any(bool(item.get("ok")) for item in results.values())
+        return any_ok, {"channels": results}
 
     def learn_from_human_edits(self):
         """
@@ -14689,6 +14862,28 @@ Conversation:
         )
         if company_send is not None:
             return company_send
+        locked_company = ""
+        active_company = company_tenancy.active_booking_company_id()
+        if active_company and not company_tenancy.is_default_company(active_company):
+            locked_company = active_company
+        if not locked_company and receiving_phone_id:
+            phone_owner = company_tenancy.lookup_company_id_for_phone(receiving_phone_id)
+            if phone_owner and not company_tenancy.is_default_company(phone_owner):
+                locked_company = phone_owner
+        if not locked_company:
+            locked_company = company_tenancy.company_id_for_inbox_location(location) or ""
+        _override_token, forced_phone_id = company_tenancy.wa_override()
+        if locked_company and not forced_phone_id:
+            logging.error("WhatsApp send blocked. Company %s has no matching channel.", locked_company)
+            return False, {
+                "error": "company_channel_missing",
+                "company_id": locked_company,
+            }
+        if (not locked_company) and receiving_phone_id:
+            phone_owner = company_tenancy.lookup_company_id_for_phone(receiving_phone_id)
+            if phone_owner and not company_tenancy.is_default_company(phone_owner):
+                logging.error("WhatsApp send blocked. Phone belongs to another company.")
+                return False, {"error": "company_channel_mismatch"}
         try:
             import json
             # Resolve the correct phone_number_id using the centralized helper
@@ -15389,6 +15584,14 @@ Conversation:
     def send_facebook_message(self, recipient_psid, text=None, media_url=None, media_type=None, media_bytes=None, media_mime=None, media_filename=None):
         """Send a Facebook Messenger message using the connected page access token."""
         try:
+            active_company = company_tenancy.active_booking_company_id()
+            if active_company and not company_tenancy.is_default_company(active_company):
+                facebook_cfg_probe = (self.config.get('facebook') or {}) if isinstance(self.config, dict) else {}
+                page_probe = str((facebook_cfg_probe or {}).get('page_id') or '').strip()
+                page_owner = company_tenancy.lookup_company_id_for_facebook_page(page_probe) if page_probe else ""
+                if company_tenancy.normalize_company_id(page_owner) != company_tenancy.normalize_company_id(active_company):
+                    logging.error("Facebook send blocked. Company %s does not own this page.", active_company)
+                    return False, {"error": "company_facebook_missing", "company_id": active_company}
             facebook_cfg = (self.config.get('facebook') or {}) if isinstance(self.config, dict) else {}
             if not isinstance(facebook_cfg, dict):
                 facebook_cfg = {}
@@ -33077,6 +33280,34 @@ Prefer the MarkItDown Extraction section below when present.
                 logging.error(f"Error in /h/<token> webhook: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
+        @app.route('/c/<company_slug>/send', methods=['POST', 'OPTIONS'])
+        @app.route('/api/c/<company_slug>/send', methods=['POST', 'OPTIONS'])
+        def api_company_external_send(company_slug):
+            """Make/n8n send for one company. The URL slug and API key must match that company."""
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            company = company_tenancy.find_company_by_public_slug(company_slug)
+            if not company:
+                return jsonify({"status": "error", "message": "Company not found"}), 404
+            presented = str(request.headers.get("X-Api-Key") or "").strip()
+            auth = str(request.headers.get("Authorization") or "").strip()
+            if auth.lower().startswith("bearer ") and not presented:
+                presented = auth[7:].strip()
+            data = request.get_json(silent=True) or {}
+            if not isinstance(data, dict):
+                data = {}
+            if not presented:
+                presented = str(data.get("apiKey") or data.get("api_key") or "").strip()
+            if not company_tenancy.outbound_api_key_matches(company.get("id"), presented):
+                return jsonify({"status": "error", "message": "Invalid API key for this company"}), 401
+            ok, detail = self.dispatch_company_external_send(company, data)
+            code = 200 if ok else 400
+            return jsonify({
+                "status": "success" if ok else "error",
+                "company": company.get("name"),
+                "data": detail,
+            }), code
+
         @app.route('/api/automation/webhook/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
         @app.route('/api/hooks/<company_slug>/<owner>/<slug>', methods=['GET', 'POST', 'OPTIONS'])
         def api_automation_user_webhook(owner, slug, company_slug=None):
@@ -38394,7 +38625,11 @@ Write ONE short message only. No JSON. No explanations."""
                         candidate_services.append((account_id, svc))
                         seen_services.add(id(svc))
 
-                if getattr(self, "gmail_service", None) and id(self.gmail_service) not in seen_services:
+                if (
+                    getattr(self, "gmail_service", None)
+                    and id(self.gmail_service) not in seen_services
+                    and self._legacy_gmail_matches(self.gmail_service, self._primary_mailbox_email())
+                ):
                     candidate_services.append(("booking", self.gmail_service))
                     seen_services.add(id(self.gmail_service))
 
@@ -42715,7 +42950,7 @@ Write ONE short message only. No JSON. No explanations."""
                 if isinstance(token_payload, str):
                     token_payload = json.loads(token_payload)
 
-                gmail_svc = GmailService(credentials_file=self._get_dashboard_oauth_email_credentials_path(), token_json=token_payload)
+                gmail_svc = GmailService(credentials_file=self._get_dashboard_oauth_email_credentials_path(), token_json=token_payload, persist_token_file=False)
                 profile_email = gmail_svc.get_profile_email() or ""
 
                 oauth_tokens = _get_dashboard_email_oauth_tokens()
@@ -42811,7 +43046,7 @@ Write ONE short message only. No JSON. No explanations."""
                 if not isinstance(token_payload, dict):
                     return jsonify({"status": "error", "message": "token_json must be a valid Gmail token JSON object"}), 400
 
-                gmail_svc = GmailService(credentials_file=self._get_dashboard_oauth_email_credentials_path(), token_json=token_payload)
+                gmail_svc = GmailService(credentials_file=self._get_dashboard_oauth_email_credentials_path(), token_json=token_payload, persist_token_file=False)
                 if not gmail_svc or not getattr(gmail_svc, "service", None):
                     return jsonify({"status": "error", "message": "Failed to authenticate Gmail with the provided token JSON"}), 400
                 profile_email = gmail_svc.get_profile_email() or ""
@@ -42989,6 +43224,7 @@ Write ONE short message only. No JSON. No explanations."""
                 conn_public = company_tenancy.connections_public_view(
                     company_tenancy.get_connections(company_id)
                 )
+                outbound_send = self._company_outbound_settings(company)
                 return jsonify({
                     "status": "success",
                     "data": {
@@ -42997,6 +43233,7 @@ Write ONE short message only. No JSON. No explanations."""
                         "publicSlug": company_tenancy.company_public_slug(company),
                         "webhookPublic": webhook_public,
                         "hooksPublicBase": hooks_base,
+                        "outboundSend": outbound_send,
                         "webhookPublicSource": "company" if company_tenancy.normalize_public_slug(company.get("name") or company.get("publicSlug")) == webhook_public or company_tenancy.company_public_slug(company) == webhook_public else "user",
                         "isDefaultCompany": company_tenancy.is_default_company(company_id),
                         "createWithPiEnabled": bool(company.get("createWithPiEnabled")),
@@ -43036,11 +43273,34 @@ Write ONE short message only. No JSON. No explanations."""
                     "companyName": saved.get("name"),
                     "publicSlug": company_tenancy.company_public_slug(saved),
                     "webhookPublic": company_tenancy.resolve_webhook_public_slug(saved, username=actor_uname),
+                    "hooksPublicBase": company_tenancy.company_webhook_public_base(saved, username=actor_uname),
+                    "outboundSend": self._company_outbound_settings(saved),
                     "isDefaultCompany": company_tenancy.is_default_company(company_id),
                     "createWithPiEnabled": bool(saved.get("createWithPiEnabled")),
                     "connections": saved_conn,
                     "webhookPublicBase": saved_conn.get("webhookPublicBase") or "",
                 },
+            }), 200
+
+        @app.route('/api/company/outbound_api/rotate', methods=['POST', 'OPTIONS'])
+        def api_rotate_company_outbound_key():
+            if request.method == 'OPTIONS':
+                return jsonify({"status": "success"}), 200
+            company_id = _actor_company_id_from_request()
+            data = request.get_json(silent=True) or {}
+            actor = data.get("actor") if isinstance(data.get("actor"), dict) else {}
+            actor_user = company_tenancy.find_dashboard_user(
+                username=str(actor.get("username") or request.args.get("actor_username") or "").strip() or None
+            )
+            if str((actor_user or {}).get("role") or actor.get("role") or "").strip().lower() != "admin":
+                return jsonify({"status": "error", "message": "Only company admins can rotate this key"}), 403
+            company = company_tenancy.get_company(company_id)
+            if not company:
+                return jsonify({"status": "error", "message": "Company not found"}), 404
+            company_tenancy.rotate_outbound_api_key(company_id)
+            return jsonify({
+                "status": "success",
+                "data": {"outboundSend": self._company_outbound_settings(company)},
             }), 200
 
         def _require_primary_admin_actor():
@@ -48155,13 +48415,20 @@ Draft to optimize:
                 data = request.json or {}
                 phone = data.get('phone', '201010323484')
                 text = data.get('text', '')
+                company_id = str(data.get('company_id') or data.get('companyId') or "").strip()
+                if not company_id:
+                    company_id = str(company_tenancy.active_booking_company_id() or "").strip()
                 if not text:
                     return jsonify({"status": "error", "message": "text is required"}), 400
 
                 # Internal Notifications number ONLY — never distribute to other Evolution numbers
                 if not hasattr(self, "send_internal_notifications_whatsapp_text_detailed"):
                     return jsonify({"status": "error", "message": "Internal notifications sender unavailable"}), 500
-                ok_internal, send_meta = self.send_internal_notifications_whatsapp_text_detailed(phone, text)
+                ok_internal, send_meta = self.send_internal_notifications_whatsapp_text_detailed(
+                    phone,
+                    text,
+                    company_id=company_id or None,
+                )
                 if ok_internal:
                     return jsonify({
                         "status": "success",
@@ -48867,7 +49134,11 @@ Draft to optimize:
                     email_config=merged_cfg,
                     account_name=account_id
                 )
-            self.process_incoming_emails(gmail_service=self.gmail_service, email_config=primary_cfg, account_name="booking")
+            booking_svc = self._connected_booking_gmail_service()
+            if booking_svc and booking_svc is not self.gmail_service:
+                pass
+            elif self._legacy_gmail_matches(self.gmail_service, self._primary_mailbox_email()):
+                self.process_incoming_emails(gmail_service=self.gmail_service, email_config=primary_cfg, account_name="booking")
             sales_cfg = primary_cfg.get('sales_inbox', {}) or {}
             if getattr(self, "sales_gmail_service", None) and sales_cfg.get('enabled'):
                 merged_cfg = dict(primary_cfg)

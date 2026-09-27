@@ -34355,39 +34355,77 @@ Prefer the MarkItDown Extraction section below when present.
         def sales_create_lead():
             try:
                 data = request.json or {}
-                name = data.get('name')
-                phone = data.get('phone', '')
-                department = data.get('department', 'Religious')
+                name = str(data.get('name') or '').strip()
+                phone = str(data.get('phone') or '').strip()
+                email = str(data.get('email') or '').strip()
+                department = str(data.get('department') or '').strip()
+                requested_location = str(data.get('location') or '').strip()
                 user_id = data.get('user_id')
-                
+                actor = data.get('actor') if isinstance(data.get('actor'), dict) else {}
+
                 if not name:
                     return jsonify({"success": False, "error": "Name is required"}), 400
-                    
+
+                actor_username = str(actor.get('username') or '').strip()
+                actor_user_id = str(actor.get('id') or actor.get('user_id') or user_id or '').strip()
+                actor_company_id = company_tenancy.resolve_company_id(
+                    username=actor_username or None,
+                    user_id=actor_user_id or None,
+                )
+                company_owned = not company_tenancy.is_default_company(actor_company_id)
+                channel = self._company_new_chat_channel(actor_company_id) if company_owned else {}
+
+                if company_owned:
+                    location = str(channel.get('location') or '').strip() or 'Unknown'
+                    receiving_phone_id = str(channel.get('receiving_phone_id') or '').strip()
+                elif department.lower() == 'religious' or requested_location == 'Religious':
+                    location = 'Religious'
+                    receiving_phone_id = ''
+                elif requested_location and requested_location not in ('Operations', 'All', 'Trash', 'NeedHelp'):
+                    location = requested_location
+                    receiving_phone_id = ''
+                else:
+                    location = 'Hurghada/Cairo'
+                    receiving_phone_id = ''
+
+                import re
+                import uuid
+                phone_digits = re.sub(r'\D', '', phone)
+                if phone_digits:
+                    source = 'WhatsApp'
+                    sender_identifier = '+' + phone_digits
+                elif email and '@' in email:
+                    source = 'Email'
+                    sender_identifier = email
+                else:
+                    source = 'WhatsApp'
+                    sender_identifier = f"new-customer-{uuid.uuid4().hex}"
+
                 import chat_db
                 chat_conv = chat_db.get_or_create_conversation(
-                    source="Manual",
-                    sender_identifier=phone or f"manual_{name.replace(' ', '_')}_{int(time.time())}",
+                    source=source,
+                    sender_identifier=sender_identifier,
                     contact_name=name,
-                    location=department,
-                    receiving_phone_id=""
+                    location=location,
+                    receiving_phone_id=receiving_phone_id,
+                    company_id=actor_company_id if company_owned else None,
                 )
-                
-                if user_id:
-                    # Fetch users to get name
+
+                if (not company_owned) and location in ('Sales', 'Religious') and user_id:
                     users_raw = chat_db.get_setting("dashboard_users")
                     user_name = "Agent"
                     if users_raw:
                         users = json.loads(users_raw)
                         for u in users:
-                            if str(u.get('id')) == str(user_id):
-                                user_name = u.get('name')
+                            if str(u.get('id')) == str(user_id) or str(u.get('username')) == str(user_id):
+                                user_name = u.get('name') or user_name
                                 break
                     chat_db.assign_sales_lead(chat_conv['chat_id'], str(user_id), user_name)
-                    
+
                 return jsonify({"success": True, "chat_id": chat_conv['chat_id']})
             except Exception as e:
-                logging.error(f"Error creating lead: {e}")
-                return jsonify({"success": False, "error": str(e)}), 500
+                logging.error(f"Error creating lead: {e}", exc_info=True)
+                return jsonify({"success": False, "error": "Could not create the customer."}), 500
 
         @app.route('/api/sales/leads/claim', methods=['POST'])
         def api_sales_leads_claim():

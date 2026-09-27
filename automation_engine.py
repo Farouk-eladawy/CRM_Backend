@@ -1084,6 +1084,37 @@ class AutomationEngine:
         channel = "WhatsApp" if use_whatsapp else "Facebook"
         if not self.agent:
             raise Exception("keyword_reply_missing_agent")
+        company_id = str((ctx or {}).get("company_id") or "").strip()
+        company_locked = False
+        try:
+            import company_tenancy
+            company_locked = bool(company_id) and not company_tenancy.is_default_company(company_id)
+            if company_locked and use_whatsapp:
+                owner = company_tenancy.lookup_company_id_for_phone(receiving_phone_id) if receiving_phone_id else ""
+                if (not receiving_phone_id) or company_tenancy.normalize_company_id(owner) != company_tenancy.normalize_company_id(company_id):
+                    acc = company_tenancy.find_customer_whatsapp_account(company_id=company_id) or {}
+                    provider = str(acc.get("provider") or "").strip().lower()
+                    if provider == "evolution":
+                        inst = str(acc.get("instanceName") or "").strip()
+                        receiving_phone_id = str(acc.get("phoneNumberId") or "").strip() or (f"evo:{inst}" if inst else "")
+                    elif provider == "meta":
+                        receiving_phone_id = str(acc.get("phoneNumberId") or "").strip()
+                    else:
+                        receiving_phone_id = ""
+                    if not receiving_phone_id:
+                        raise Exception("keyword_reply_company_channel_missing")
+            elif company_locked:
+                page_id = str(payload.get("page_id") or payload.get("facebook_page_id") or "").strip()
+                page_owner = company_tenancy.lookup_company_id_for_facebook_page(page_id) if page_id else ""
+                if company_tenancy.normalize_company_id(page_owner) != company_tenancy.normalize_company_id(company_id):
+                    raise Exception("keyword_reply_company_channel_missing")
+        except Exception as company_channel_err:
+            if company_locked or "company_channel_missing" in str(company_channel_err):
+                raise Exception("keyword_reply_company_channel_missing")
+        bound = False
+        if company_locked and use_whatsapp:
+            company_tenancy.bind_booking_company(company_id)
+            bound = True
         try:
             ok, error = self._send_keyword_reply_payload(
                 use_whatsapp=use_whatsapp,
@@ -1094,7 +1125,11 @@ class AutomationEngine:
                 receiving_phone_id=receiving_phone_id,
             )
         except Exception as e:
+            if bound:
+                company_tenancy.unbind_booking_company()
             raise Exception(f"keyword_reply_send_failed:{e}")
+        if bound:
+            company_tenancy.unbind_booking_company()
         if not ok:
             raise Exception(f"keyword_reply_send_failed:{error}")
 
@@ -1308,6 +1343,11 @@ class AutomationEngine:
         if is_fts and (ctype == "airtable" or cid in ("system_airtable", "airtable_system")):
             return {"id": "system_airtable", "type": "airtable", "fields": {}, "source": "system"}
         if ctype in ("gmail", "outlook") or cid.startswith("legacy_gmail") or cid.startswith("gmail_"):
+            if not is_fts:
+                owner = company_tenancy.lookup_company_id_for_email_account(cid)
+                if cid and company_tenancy.normalize_company_id(owner) == company_tenancy.normalize_company_id(company_id):
+                    return {"id": cid, "type": ctype or "gmail", "fields": {"accountId": cid}, "source": "company"}
+                return None
             return {"id": cid or "system_gmail", "type": ctype or "gmail", "fields": {"accountId": cid}, "source": "system"}
 
         # System / channel WhatsApp accounts (connection id often ends with phoneNumberId)
@@ -1339,27 +1379,35 @@ class AutomationEngine:
                 },
             }
 
-        # 1) Agent legacy config phone_number_ids
+        company_locked = False
         try:
-            wa_cfg = (getattr(self.agent, "config", {}) or {}).get("whatsapp") or {}
-            phone_number_ids = wa_cfg.get("phone_number_ids") if isinstance(wa_cfg, dict) else {}
-            phone_id_locations = wa_cfg.get("phone_id_locations") if isinstance(wa_cfg, dict) else {}
-            if isinstance(phone_number_ids, dict):
-                for loc_key, raw_pid in phone_number_ids.items():
-                    pid = str(raw_pid or "").strip()
-                    if not pid:
-                        continue
-                    if cid.endswith(f"_{pid}") or cid == pid or cid.endswith(f"_{str(loc_key)}"):
-                        routing = str(
-                            (phone_id_locations.get(pid) if isinstance(phone_id_locations, dict) else "")
-                            or loc_key
-                            or ""
-                        ).strip()
-                        found = _match_and_return(pid, routing=routing, label=f"Meta {routing or loc_key}")
-                        if found:
-                            return found
+            import company_tenancy
+            company_locked = bool(company_id) and not company_tenancy.is_default_company(company_id)
         except Exception:
-            pass
+            company_locked = False
+
+        # 1) Default-company numbers only. Another company must not inherit them.
+        if not company_locked:
+            try:
+                wa_cfg = (getattr(self.agent, "config", {}) or {}).get("whatsapp") or {}
+                phone_number_ids = wa_cfg.get("phone_number_ids") if isinstance(wa_cfg, dict) else {}
+                phone_id_locations = wa_cfg.get("phone_id_locations") if isinstance(wa_cfg, dict) else {}
+                if isinstance(phone_number_ids, dict):
+                    for loc_key, raw_pid in phone_number_ids.items():
+                        pid = str(raw_pid or "").strip()
+                        if not pid:
+                            continue
+                        if cid.endswith(f"_{pid}") or cid == pid or cid.endswith(f"_{str(loc_key)}"):
+                            routing = str(
+                                (phone_id_locations.get(pid) if isinstance(phone_id_locations, dict) else "")
+                                or loc_key
+                                or ""
+                            ).strip()
+                            found = _match_and_return(pid, routing=routing, label=f"Meta {routing or loc_key}")
+                            if found:
+                                return found
+            except Exception:
+                pass
 
         # 2) Company channel settings (whatsappAccounts)
         try:
@@ -1371,9 +1419,7 @@ class AutomationEngine:
                 if company_id
                 else company_tenancy.DEFAULT_COMPANY_ID
             )
-            key = "channel_settings"
-            if not company_tenancy.is_default_company(company):
-                key = f"channel_settings__{company}"
+            key = company_tenancy.channel_settings_key(company)
             raw = chat_db.get_setting(key)
             data = {}
             if isinstance(raw, str) and raw.strip():
@@ -1404,11 +1450,21 @@ class AutomationEngine:
         except Exception:
             pass
 
-        # Fallback: connection id suffix looks like a Meta phone number id
+        # Fallback only when the number belongs to this company.
         try:
+            import company_tenancy
             suffix = cid.split("_")[-1].strip()
             if suffix.isdigit() and len(suffix) >= 10:
-                return _match_and_return(suffix)
+                owner = company_tenancy.lookup_company_id_for_phone(suffix)
+                wanted = (
+                    automation_db.normalize_workflow_company_id(company_id)
+                    if company_id
+                    else company_tenancy.DEFAULT_COMPANY_ID
+                )
+                if company_tenancy.normalize_company_id(owner) == company_tenancy.normalize_company_id(wanted):
+                    if company_locked and company_tenancy.is_default_company(owner):
+                        return None
+                    return _match_and_return(suffix)
         except Exception:
             pass
         return None
@@ -1531,7 +1587,16 @@ class AutomationEngine:
         if not to_email or "@" not in to_email:
             raise Exception("send_email_missing_to")
 
-        subject = _render_template(step.get("subject") or "", ctx).strip() or "FTS Travels"
+        company_id = str((ctx or {}).get("company_id") or "").strip()
+        subject_fallback = "FTS Travels"
+        try:
+            import company_tenancy
+            if company_id and not company_tenancy.is_default_company(company_id):
+                company = company_tenancy.get_company(company_id) or {}
+                subject_fallback = str(company.get("name") or "").strip() or subject_fallback
+        except Exception:
+            company_tenancy = None
+        subject = _render_template(step.get("subject") or "", ctx).strip() or subject_fallback
         body_html = _render_template(step.get("html") or "", ctx).strip()
         if not body_html:
             return
@@ -1539,10 +1604,24 @@ class AutomationEngine:
         mailbox = str(step.get("mailbox") or step.get("connection_id") or "").strip() or None
         if mailbox in ("system_gmail", "system_outlook", ""):
             mailbox = None
-        try:
-            self.agent.send_email(to_email, subject, body_html, thread_id=thread_id, mailbox=mailbox)
-        except TypeError:
-            self.agent.send_email(to_email, subject, body_html, thread_id=thread_id)
+        if mailbox and company_id:
+            try:
+                import company_tenancy
+                owner = company_tenancy.lookup_company_id_for_email_account(mailbox)
+                if company_tenancy.normalize_company_id(owner) != company_tenancy.normalize_company_id(company_id):
+                    mailbox = None
+            except Exception:
+                mailbox = None
+        sent = self.agent.send_email(
+            to_email,
+            subject,
+            body_html,
+            thread_id=thread_id,
+            mailbox=mailbox,
+            company_id=company_id or None,
+        )
+        if not sent:
+            raise Exception("send_email_company_mailbox_missing")
 
     def _step_airtable_update(self, step: dict, ctx: dict):
         record_id = _render_template(step.get("record_id") or "", ctx).strip()
@@ -1567,9 +1646,22 @@ class AutomationEngine:
 
         if not rendered:
             return
-        if not getattr(self.agent, "table", None):
+        company_id = str((ctx or {}).get("company_id") or "").strip()
+        table = getattr(self.agent, "table", None)
+        company_locked = False
+        try:
+            import company_tenancy
+            company_locked = bool(company_id) and not company_tenancy.is_default_company(company_id)
+            if company_locked:
+                table, _table_name = self.agent._open_company_bookings_table(company_id)
+        except Exception:
+            if company_locked:
+                table = None
+        if company_locked and table is None:
             raise Exception("airtable_not_configured")
-        self.agent.table.update(record_id, rendered)
+        if table is None:
+            raise Exception("airtable_not_configured")
+        table.update(record_id, rendered)
 
     def _step_send_internal_notification(self, step: dict, ctx: dict):
         """Send via Internal Notifications Evolution channel (staff alerts)."""
@@ -1656,60 +1748,90 @@ class AutomationEngine:
                 if loc_hint and (not location or location == "Unknown"):
                     location = loc_hint
 
+        company_id = str((ctx or {}).get("company_id") or "").strip()
+        company_locked = False
+        try:
+            import company_tenancy
+            company_locked = bool(company_id) and not company_tenancy.is_default_company(company_id)
+            if company_locked:
+                owner = company_tenancy.lookup_company_id_for_phone(receiving_phone_id) if receiving_phone_id else ""
+                if (not receiving_phone_id) or company_tenancy.normalize_company_id(owner) != company_tenancy.normalize_company_id(company_id):
+                    acc = company_tenancy.find_customer_whatsapp_account(company_id=company_id) or {}
+                    provider = str(acc.get("provider") or "").strip().lower()
+                    if provider == "evolution":
+                        inst = str(acc.get("instanceName") or "").strip()
+                        receiving_phone_id = str(acc.get("phoneNumberId") or "").strip() or (f"evo:{inst}" if inst else "")
+                    elif provider == "meta":
+                        receiving_phone_id = str(acc.get("phoneNumberId") or "").strip()
+                    else:
+                        receiving_phone_id = ""
+                    if not receiving_phone_id:
+                        raise Exception("send_whatsapp_company_channel_missing")
+        except Exception as company_channel_err:
+            if company_locked or "company_channel_missing" in str(company_channel_err):
+                raise Exception("send_whatsapp_company_channel_missing")
+
         if mode == "template" and not receiving_phone_id and (not location or location == "Unknown"):
             raise Exception(
                 "send_whatsapp_missing_sender: select Sender ID (Meta phone number) like Make"
             )
 
-        ok, err = self.agent.send_whatsapp_message(
-            to_phone,
-            text=None if mode == "template" else text,
-            location=location,
-            template_name=template_name if mode == "template" else None,
-            template_language=template_language,
-            template_variables=template_variables if mode == "template" else None,
-            receiving_phone_id=receiving_phone_id,
-        )
-        if not ok:
-            detail = ""
-            try:
-                if isinstance(err, dict):
-                    detail = str(
-                        ((err.get("json") or {}).get("error") or {}).get("message")
-                        or err.get("body")
-                        or err.get("code")
-                        or err
-                    )[:400]
-                else:
-                    detail = str(err or "")[:400]
-            except Exception:
-                detail = "send_failed"
-            raise Exception(f"send_whatsapp_failed:{detail or 'unknown'}")
+        bound = False
+        if company_locked:
+            company_tenancy.bind_booking_company(company_id)
+            bound = True
+        try:
+            ok, err = self.agent.send_whatsapp_message(
+                to_phone,
+                text=None if mode == "template" else text,
+                location=location,
+                template_name=template_name if mode == "template" else None,
+                template_language=template_language,
+                template_variables=template_variables if mode == "template" else None,
+                receiving_phone_id=receiving_phone_id,
+            )
+            if not ok:
+                detail = ""
+                try:
+                    if isinstance(err, dict):
+                        detail = str(
+                            ((err.get("json") or {}).get("error") or {}).get("message")
+                            or err.get("body")
+                            or err.get("code")
+                            or err
+                        )[:400]
+                    else:
+                        detail = str(err or "")[:400]
+                except Exception:
+                    detail = "send_failed"
+                raise Exception(f"send_whatsapp_failed:{detail or 'unknown'}")
 
-        # Stash rendered summary for operation inspector
-        ctx.setdefault("vars", {})["_last_whatsapp_send"] = {
-            "to": to_phone,
-            "mode": mode,
-            "template_name": template_name if mode == "template" else None,
-            "template_language": template_language if mode == "template" else None,
-            "text": text if mode == "text" else None,
-            "location": location,
-            "receiving_phone_id": receiving_phone_id,
-        }
+            ctx.setdefault("vars", {})["_last_whatsapp_send"] = {
+                "to": to_phone,
+                "mode": mode,
+                "template_name": template_name if mode == "template" else None,
+                "template_language": template_language if mode == "template" else None,
+                "text": text if mode == "text" else None,
+                "location": location,
+                "receiving_phone_id": receiving_phone_id,
+            }
 
-        chat_id = str(_get_by_path(ctx, "chat.chat_id") or _get_by_path(ctx, "event.payload.chat_id") or "").strip()
-        if ok and chat_id:
-            try:
-                import chat_db
+            chat_id = str(_get_by_path(ctx, "chat.chat_id") or _get_by_path(ctx, "event.payload.chat_id") or "").strip()
+            if ok and chat_id:
+                try:
+                    import chat_db
 
-                log_text = (
-                    f"[Sent WhatsApp] Template: {template_name}"
-                    if mode == "template"
-                    else text
-                )
-                chat_db.add_message(chat_id=chat_id, sender_type="agent", text=log_text, status="sent", source="WhatsApp")
-            except Exception:
-                pass
+                    log_text = (
+                        f"[Sent WhatsApp] Template: {template_name}"
+                        if mode == "template"
+                        else text
+                    )
+                    chat_db.add_message(chat_id=chat_id, sender_type="agent", text=log_text, status="sent", source="WhatsApp")
+                except Exception:
+                    pass
+        finally:
+            if bound:
+                company_tenancy.unbind_booking_company()
 
     def _mark_sent_from_script_result(self, ctx: dict, result):
         """Propagate workflow script `sent: True` so sync callers can skip AI drafts."""

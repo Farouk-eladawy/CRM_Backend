@@ -103,7 +103,31 @@ def empty_connections():
         # Company bookings live in their own Airtable table. Empty means "not connected".
         "airtableBaseId": "",
         "airtableBookingsTable": "",
+        # Per-company Airtable personal access token. Empty = not connected for that company.
+        "airtableApiKey": "",
     }
+
+
+def _is_secret_placeholder(value) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return True
+    if text in ("__unchanged__", "__KEEP__", "unchanged"):
+        return True
+    if text.startswith("••••") or text.startswith("****"):
+        return True
+    if "••••" in text or "****" in text:
+        return True
+    return False
+
+
+def mask_secret(value) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    if len(text) <= 8:
+        return "••••••••"
+    return f"{text[:4]}••••{text[-4:]}"
 
 # Nile Crystal bookings share the main Airtable base, in table Nile_Crystal_Booking.
 NILE_CRYSTAL_AIRTABLE_BASE_ID = "appTp5YgSp9DV2HYc"
@@ -209,14 +233,36 @@ def sanitize_connections(raw, existing=None) -> dict:
         for key in out:
             out[key] = str(existing.get(key) or "").strip()
     for key in out:
-        if key in src:
-            out[key] = str(src.get(key) or "").strip()
+        if key not in src:
+            continue
+        val = str(src.get(key) or "").strip()
+        # Never wipe a stored Airtable token with an empty or masked UI value.
+        if key == "airtableApiKey" and _is_secret_placeholder(val):
+            continue
+        out[key] = val
     out["baserowMainUrl"] = sanitize_public_url(out.get("baserowMainUrl"))
     out["baserowReligiousUrl"] = sanitize_public_url(out.get("baserowReligiousUrl"))
     out["transportUrl"] = sanitize_public_url(out.get("transportUrl"))
     out["n8nUrl"] = sanitize_public_url(out.get("n8nUrl"))
     out["webhookPublicBase"] = sanitize_public_url(out.get("webhookPublicBase")).rstrip("/")
     return out
+
+
+def connections_public_view(connections) -> dict:
+    """Safe copy for API/UI: mask Airtable API key, expose configured flag."""
+    out = sanitize_connections(connections)
+    key = str(out.get("airtableApiKey") or "").strip()
+    out["airtableApiKeyConfigured"] = bool(key)
+    out["airtableApiKey"] = mask_secret(key) if key else ""
+    return out
+
+
+def company_airtable_api_key(company_id) -> str:
+    """Return this company's stored Airtable token only (never another tenant's)."""
+    if is_default_company(company_id):
+        return ""
+    conn = get_connections(company_id)
+    return str(conn.get("airtableApiKey") or "").strip()
 
 
 def normalize_public_slug(value, fallback="") -> str:
@@ -506,8 +552,8 @@ def public_company(company) -> dict:
         "createWithPiEnabled": bool(item.get("createWithPiEnabled")),
         "isDefaultCompany": is_default_company(cid),
         "payment": payment_public_view(item.get("payment")),
-        "connections": sanitize_connections(item.get("connections")),
-        "webhookPublicBase": str(sanitize_connections(item.get("connections")).get("webhookPublicBase") or ""),
+        "connections": connections_public_view(item.get("connections")),
+        "webhookPublicBase": str(connections_public_view(item.get("connections")).get("webhookPublicBase") or ""),
     }
 
 

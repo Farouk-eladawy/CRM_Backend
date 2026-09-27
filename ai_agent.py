@@ -2625,11 +2625,17 @@ class AIAgent:
         for account_id, account in (self.dynamic_email_accounts or {}).items():
             if account_id not in self.dynamic_gmail_services:
                 continue
+            owner = company_tenancy.lookup_company_id_for_email_account(account_id)
+            if not company_tenancy.is_default_company(owner):
+                continue
             if direction == "inbound" and bool(account.get('isDefaultInbound')):
                 return account_id
             if direction == "outbound" and bool(account.get('isDefaultOutbound')):
                 return account_id
         for account_id, account in (self.dynamic_email_accounts or {}).items():
+            owner = company_tenancy.lookup_company_id_for_email_account(account_id)
+            if not company_tenancy.is_default_company(owner):
+                continue
             if account_id in self.dynamic_gmail_services and bool(account.get('enabled', True)):
                 return account_id
         return None
@@ -2640,14 +2646,18 @@ class AIAgent:
         cid = str(company_id or "").strip()
         company_locked = bool(cid) and not company_tenancy.is_default_company(cid)
         if mailbox_key and mailbox_key in self.dynamic_gmail_services:
+            owner = company_tenancy.normalize_company_id(
+                company_tenancy.lookup_company_id_for_email_account(mailbox_key)
+            )
             if company_locked:
-                owner = company_tenancy.lookup_company_id_for_email_account(mailbox_key)
-                if company_tenancy.normalize_company_id(owner) != company_tenancy.normalize_company_id(cid):
+                if owner != company_tenancy.normalize_company_id(cid):
                     mailbox_key = ""
                 else:
                     return self.dynamic_gmail_services[mailbox_key], mailbox_key
-            else:
+            elif company_tenancy.is_default_company(owner):
                 return self.dynamic_gmail_services[mailbox_key], mailbox_key
+            else:
+                mailbox_key = ""
 
         if company_locked:
             chosen = self._company_default_email_account_id(cid, direction=direction)
@@ -3673,15 +3683,27 @@ class AIAgent:
             logging.error(f"Failed to create lead record for {email}: {e}")
             return None
 
-    def send_email(self, to_email, subject, html_content, thread_id=None, in_reply_to_message_id=None, attachments=None, record_id=None, mailbox=None):
+    def send_email(self, to_email, subject, html_content, thread_id=None, in_reply_to_message_id=None, attachments=None, record_id=None, mailbox=None, company_id=None):
         """
         Send HTML email using Gmail OAuth Service
         Respects 'draft_mode' setting in config.
         """
-        gmail_svc, selected_mailbox = self._select_gmail_service(mailbox=mailbox, direction="outbound")
+        gmail_svc, selected_mailbox = self._select_gmail_service(
+            mailbox=mailbox,
+            direction="outbound",
+            company_id=company_id,
+        )
         if not gmail_svc or not getattr(gmail_svc, "service", None):
-            logging.error("Gmail Service not authenticated. Cannot send email.")
+            logging.error(
+                "Email send blocked. No mailbox for company=%s mailbox=%s",
+                company_id or "fts",
+                mailbox or "",
+            )
             return False
+        sender_name = self.config['company_info']['name']
+        if company_id and not company_tenancy.is_default_company(company_id):
+            company = company_tenancy.get_company(company_id) or {}
+            sender_name = str(company.get("name") or sender_name).strip() or sender_name
         
         # Check Draft Mode
         email_settings = self.config.get('email', {}).get('settings', {})
@@ -3696,7 +3718,7 @@ class AIAgent:
                 to_email, 
                 subject, 
                 html_content, 
-                sender_name=self.config['company_info']['name'],
+                sender_name=sender_name,
                 thread_id=thread_id,
                 in_reply_to_message_id=in_reply_to_message_id,
                 attachments=attachments
@@ -3712,7 +3734,7 @@ class AIAgent:
             to_email, 
             subject, 
             html_content, 
-            sender_name=self.config['company_info']['name'],
+            sender_name=sender_name,
             thread_id=thread_id,
             in_reply_to_message_id=in_reply_to_message_id,
             attachments=attachments
@@ -3809,24 +3831,41 @@ class AIAgent:
             logging.warning(f"Failed to log proposed reply for learning: {e}")
 
     def _open_company_bookings_table(self, company_id):
-        """Return (pyairtable table, table name) for a tenant bookings table, or (None, '')."""
+        """Return (pyairtable table, table name) for a tenant bookings table, or (None, '').
+
+        Non-default companies read Base ID / table / API key from Company Connections.
+        The default company keeps using the global Airtable config (unchanged).
+        """
         if not company_id or company_tenancy.is_default_company(company_id):
-            return None, ""
-        if not getattr(self, "airtable_api", None):
             return None, ""
         conn = company_tenancy.get_connections(company_id)
         table_name = str(conn.get("airtableBookingsTable") or "").strip()
-        base_id = str(conn.get("airtableBaseId") or "").strip() or str(getattr(self, "base_id", "") or "").strip()
+        base_id = str(conn.get("airtableBaseId") or "").strip()
+        api_key = str(conn.get("airtableApiKey") or "").strip()
         if not table_name or not base_id:
             return None, ""
         cache = getattr(self, "_company_airtable_tables", None)
         if cache is None:
             cache = {}
             self._company_airtable_tables = cache
-        key = (base_id, table_name)
-        if key not in cache:
-            cache[key] = self.airtable_api.table(base_id, table_name)
-        return cache[key], table_name
+        # Prefer the company token. Fall back to the platform client only when this
+        # company is still on the same base and has not saved its own key yet.
+        if api_key:
+            cache_key = ("pat", base_id, table_name, api_key[-8:])
+            if cache_key not in cache:
+                cache[cache_key] = Api(api_key).table(base_id, table_name)
+            return cache[cache_key], table_name
+        platform_base = str(getattr(self, "base_id", "") or "").strip()
+        if (
+            getattr(self, "airtable_api", None)
+            and platform_base
+            and base_id == platform_base
+        ):
+            cache_key = ("shared", base_id, table_name)
+            if cache_key not in cache:
+                cache[cache_key] = self.airtable_api.table(base_id, table_name)
+            return cache[cache_key], table_name
+        return None, ""
 
     def _iter_configured_company_booking_tables(self):
         seen = set()
@@ -42947,6 +42986,9 @@ Write ONE short message only. No JSON. No explanations."""
                         company_tenancy.upsert_company(company)
                         webhook_public = company_tenancy.resolve_webhook_public_slug(company, username=actor_username)
                 hooks_base = company_tenancy.company_webhook_public_base(company, username=actor_username)
+                conn_public = company_tenancy.connections_public_view(
+                    company_tenancy.get_connections(company_id)
+                )
                 return jsonify({
                     "status": "success",
                     "data": {
@@ -42958,8 +43000,8 @@ Write ONE short message only. No JSON. No explanations."""
                         "webhookPublicSource": "company" if company_tenancy.normalize_public_slug(company.get("name") or company.get("publicSlug")) == webhook_public or company_tenancy.company_public_slug(company) == webhook_public else "user",
                         "isDefaultCompany": company_tenancy.is_default_company(company_id),
                         "createWithPiEnabled": bool(company.get("createWithPiEnabled")),
-                        "connections": company_tenancy.get_connections(company_id),
-                        "webhookPublicBase": company_tenancy.get_connections(company_id).get("webhookPublicBase") or "",
+                        "connections": conn_public,
+                        "webhookPublicBase": conn_public.get("webhookPublicBase") or "",
                     },
                 }), 200
             data = request.json or {}
@@ -42983,7 +43025,9 @@ Write ONE short message only. No JSON. No explanations."""
                 company["publicSlug"] = company_tenancy.ensure_unique_public_slug(derived, company_id=company_id)
                 company_tenancy.upsert_company(company)
             saved = company_tenancy.save_connections(company_id, raw_conn)
-            saved_conn = company_tenancy.get_connections(company_id)
+            saved_conn = company_tenancy.connections_public_view(
+                company_tenancy.get_connections(company_id)
+            )
             actor_uname = str(actor.get("username") or request.args.get("actor_username") or "").strip()
             return jsonify({
                 "status": "success",

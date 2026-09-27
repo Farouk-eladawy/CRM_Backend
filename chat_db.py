@@ -3611,6 +3611,30 @@ def get_active_ads(company_id=None):
                 
         return list(unique_ads.values())
 
+def _inbox_record_group_key(airtable_record_id, sender_identifier, chat_id):
+    """Keep platform notices with different booking numbers out of one inbox row."""
+    rid = str(airtable_record_id or "").strip()
+    cid = str(chat_id or "").strip()
+    if not rid:
+        return cid
+    sender = str(sender_identifier or "")
+    sender_l = sender.lower()
+    if "::gyg" in sender_l or "::br-" in sender_l:
+        tail = sender.split("::", 1)[-1].strip().lower()
+        if tail:
+            return f"{rid}::{tail}"
+    return rid
+
+_INBOX_RECORD_GROUP_SQL = """
+CASE
+  WHEN COALESCE(airtable_record_id, '') = '' THEN chat_id
+  WHEN instr(lower(COALESCE(sender_identifier, '')), '::gyg') > 0
+    OR instr(lower(COALESCE(sender_identifier, '')), '::br-') > 0
+  THEN airtable_record_id || '::' || lower(substr(sender_identifier, instr(sender_identifier, '::') + 2))
+  ELSE airtable_record_id
+END
+"""
+
 def get_conversations_page(
     limit=200,
     offset=0,
@@ -3746,7 +3770,7 @@ def get_conversations_page(
             pass
         c = conn.cursor()
 
-        c.execute(f"SELECT COUNT(1) as cnt FROM (SELECT 1 FROM conversations {where_sql} GROUP BY CASE WHEN COALESCE(airtable_record_id, '') != '' THEN airtable_record_id ELSE chat_id END)", params)
+        c.execute(f"SELECT COUNT(1) as cnt FROM (SELECT 1 FROM conversations {where_sql} GROUP BY {_INBOX_RECORD_GROUP_SQL})", params)
         _row = c.fetchone()
         try:
             total = int(_row["cnt"] if _row is not None else 0)
@@ -3762,7 +3786,7 @@ def get_conversations_page(
             FROM (
                 SELECT *,
                        ROW_NUMBER() OVER (
-                           PARTITION BY CASE WHEN COALESCE(airtable_record_id, '') != '' THEN airtable_record_id ELSE chat_id END
+                           PARTITION BY {_INBOX_RECORD_GROUP_SQL}
                            ORDER BY last_message_time DESC
                        ) as rn
                 FROM conversations
@@ -3884,22 +3908,22 @@ def get_conversations_page(
             rp = ",".join(["?"] * len(record_ids))
             c.execute(
                 f"""
-                SELECT airtable_record_id, GROUP_CONCAT(chat_id) AS ids, GROUP_CONCAT(source) AS sources
+                SELECT chat_id, airtable_record_id, sender_identifier, source
                 FROM conversations
                 WHERE airtable_record_id IN ({rp})
-                GROUP BY airtable_record_id
                 """,
                 record_ids,
             )
             for r in c.fetchall():
                 rid = str(r["airtable_record_id"] or "").strip()
-                ids = str(r["ids"] or "").strip()
-                sources = str(r["sources"] or "").strip()
-                if rid and ids:
-                    grouped_by_record[rid] = {
-                        "ids": [x for x in ids.split(",") if x],
-                        "sources": list(set([x for x in sources.split(",") if x]))
-                    }
+                key = _inbox_record_group_key(rid, r["sender_identifier"], r["chat_id"])
+                bucket = grouped_by_record.setdefault(key, {"ids": [], "sources": []})
+                chat_key = str(r["chat_id"] or "").strip()
+                if chat_key and chat_key not in bucket["ids"]:
+                    bucket["ids"].append(chat_key)
+                source_name = str(r["source"] or "").strip()
+                if source_name and source_name not in bucket["sources"]:
+                    bucket["sources"].append(source_name)
 
         # Safety net: pending [PROPOSED_DRAFT] awaiting human review must stay Unread
         # even if an older bug set force_read_at right after the draft insert.
@@ -3974,9 +3998,10 @@ def get_conversations_page(
                     list(backfill_updates.values()) + [cid],
                 )
             rid = str(r.get("airtable_record_id") or "").strip()
-            if rid and rid in grouped_by_record:
-                r["grouped_chat_ids"] = grouped_by_record[rid]["ids"]
-                r["sources"] = grouped_by_record[rid]["sources"]
+            group_key = _inbox_record_group_key(rid, r.get("sender_identifier"), cid) if rid else ""
+            if group_key and group_key in grouped_by_record:
+                r["grouped_chat_ids"] = grouped_by_record[group_key]["ids"]
+                r["sources"] = grouped_by_record[group_key]["sources"]
             else:
                 r["grouped_chat_ids"] = [cid] if cid else []
                 r["sources"] = [r.get("source")] if r.get("source") else []

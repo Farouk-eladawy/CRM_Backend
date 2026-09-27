@@ -65,3 +65,74 @@ Make [https://cdn.make.com/img/make/make-logo-dark-150x48@2x.png]
 
 
 THE SCENARIO SEND AUTO GUIDE TICKETS HAS BEEN STOPPED.
+
+
+===== archived 2026-09-27 17:34:19 discarded_chars=3063 =====
+
+
+[...earlier AI Chat Log truncated to fit Airtable 100k limit...]
+
+Your scenario Send Auto Guide Tickets has been stopped due to an error.
+
+ * Reason: Scenario has been deactivated because of an error.
+ * Scenario: Send Auto Guide Tickets
+   [https://us2.make.com/265034/scenarios/3827742/logs]
+ * Organization: My Organization [https://us2.make.com/organization/2465462]
+ * Team: My Team [https://us2.make.com/265034/team]
+
+To see more details, click here
+[https://us2.make.com/265034/scenarios/3827742/edit].
+
+The error requires your intervention. The scenario will remain stopped until you
+fix the issue.
+
+If you have questions or need help, please contact us.
+
+Need any help? Contact us [https://www.make.com/en/ticket]
+
+[https://cdn.make.com/img/make/ico-twt.png]
+[https://cdn.make.com/img/make/ico-twt-light.png]
+[https://twitter.com/make_hq]
+
+[https://cdn.make.com/img/make/ico-fcb.png]
+[https://cdn.make.com/img/make/ico-fcb-light.png]
+[https://facebook.com/itsMakeHQ]
+
+[https://cdn.make.com/img/make/ico-lnk.png]
+[https://cdn.make.com/img/make/ico-lnk-light.png]
+[https://www.linkedin.com/company/itsmakehq]
+
+[https://cdn.make.com/img/make/ico-ins.png]
+[https://cdn.make.com/img/make/ico-ins-light.png]
+[https://www.instagram.com/itsmakehq]
+
+[https://cdn.make.com/img/make/ico-ytb.png]
+[https://cdn.make.com/img/make/ico-ytb-light.png]
+[https://www.youtube.com/channel/UC8KWRrf8wqyowmWhXJ9DRjQ]
+
+Need assistance? Our care team [https://www.make.com/en/ticket] is here to
+help.Celonis s.r.o., Menclova 2538/2, 180 00 Prague, CzechiaPrivacy Policy
+[https://www.make.com/en/privacy-notice] | Terms & Conditions
+[https://www.make.com/en/terms-and-conditions]
+
+[api://notifications/mark-as-read-pixel.gif?id=39942769&amp;user=2649595&amp;sign=d51ec24e8134552eed3d32bcdb2b15f1]
+ 
+
+[2026-01-24 18:20:27] [AI_Learning - System]: [PROPOSED_DRAFT]
+Thank you for bringing this automated notification to our attention. I understand you've received an alert that the "Send Auto Guide Tickets" scenario has been stopped due to an error.
+
+Please note that this message appears to be a system notification from an automation platform (Make.com) and is not related to a travel booking or service issue with FTS Travels. We do not manage or have access to the scenario mentioned in the notification.
+
+For assistance with this specific automation error, you will need to contact the Make.com support team directly using the link provided in the notification or visit their help center.
+
+If you have a separate inquiry regarding a tour booking, pickup, or any other travel service with FTS Travels, please let me know and I'll be happy to assist you.
+
+[2026-05-20 19:53:04] [Email - User]: Make [https://cdn.make.com/img/make/make-logo-150x48@2x.png]
+Make [https://cdn.make.com/img/make/make-logo-dark-150x48@2x.png]
+
+
+THE SCENARIO OPERATION COLLECT AUTO HAS BEEN STOPPED.
+
+Your scenario Operation Collect Auto has been stopped due to an error.
+
+ * Reason: Scenario has been deactivated because of 3 consecutive errors.

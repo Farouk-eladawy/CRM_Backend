@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TourCare.ai — Pricing</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --soft: #f8fafc;
+      --paper: #ffffff;
+      --blue: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --blue-line: #bfdbfe;
+      --green: #047857;
+      --green-soft: #ecfdf5;
+      --amber-soft: #fffbeb;
+      --amber-line: #fde68a;
+      --amber: #b45309;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--soft);
+      color: var(--ink);
+      font: 15px/1.55 "Segoe UI", Tahoma, sans-serif;
+    }
+    main {
+      max-width: 920px;
+      margin: 28px auto 48px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 36px 40px 44px;
+    }
+    .brand {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+    h1 {
+      font-size: 28px;
+      line-height: 1.25;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 10px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 28px 0 12px;
+    }
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+    }
+    .callout {
+      margin: 22px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--blue-line);
+      background: var(--blue-soft);
+      border-radius: 14px;
+    }
+    .callout.warn {
+      border-color: var(--amber-line);
+      background: var(--amber-soft);
+    }
+    .callout strong { display: block; margin-bottom: 4px; color: var(--blue); }
+    .callout.warn strong { color: var(--amber); }
+    .callout p { margin: 0; color: var(--ink); font-size: 14px; }
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0 0;
+    }
+    .pill {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pill.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      background: var(--soft);
+    }
+    .stat .value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      direction: ltr;
+      text-align: right;
+    }
+    .stat.info .value { color: var(--blue); }
+    .stat.success .value { color: var(--green); }
+    .stat .label {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .chart {
+      margin-top: 8px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 16px 10px;
+      background: var(--soft);
+    }
+    .bars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      align-items: end;
+      height: 180px;
+    }
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .bar {
+      width: 100%;
+      max-width: 56px;
+      border-radius: 8px 8px 4px 4px;
+      background: var(--blue);
+      min-height: 8px;
+    }
+    .bar-col.active .bar { background: #1e40af; }
+    .bar-val {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--blue);
+      direction: ltr;
+    }
+    .bar-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      min-height: 2.6em;
+    }
+    .caption {
+      margin: 8px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      vertical-align: top;
+    }
+    th {
+      background: var(--soft);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    tr:last-child td { border-bottom: 0; }
+    tr.stripe td { background: #fcfcfd; }
+    tr.hl td { background: var(--blue-soft); }
+    td.num, th.num {
+      direction: ltr;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .free {
+      color: var(--green);
+      font-weight: 800;
+    }
+    details.card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-top: 12px;
+      overflow: hidden;
+      background: var(--paper);
+    }
+    details.card summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--soft);
+      font-weight: 700;
+    }
+    details.card summary::-webkit-details-marker { display: none; }
+    details.card .body { padding: 0; }
+    details.card .body .table-wrap { border: 0; border-radius: 0; border-top: 1px solid var(--line); }
+    .meta {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .foot {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .foot p { margin: 0 0 8px; }
+    @media print {
+      body { background: #fff; }
+      main { margin: 0; border: 0; border-radius: 0; max-width: none; }
+      .pill { display: none; }
+      .pill.active { display: inline-block; }
+    }
+    @media (max-width: 760px) {
+      main { margin: 0; border: 0; border-radius: 0; padding: 24px 16px 36px; }
+      .stats { grid-template-columns: 1fr; }
+      .bars { height: 150px; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="brand">TourCare.ai</p>
+    <h1>تسعير TourCare.ai</h1>
+    <p class="lead">
+      نظام تشغيل بالذكاء الاصطناعي لشركات الرحلات على GetYourGuide وViator وHeadout وTiqets.
+      التأسيس والربط مجانيان. السعر هو اشتراك شهري للمنصة والدعم فقط.
+    </p>
+
+    <div class="callout">
+      <strong>العرض المقترح لشركة جديدة قبل معرفة حجمها</strong>
+      <p>
+        ابدأ بباقة Operations باشتراك <span dir="ltr">$295</span> شهرياً — بدون رسوم تأسيس.
+        أضف التتبع أو فريق الجودة فقط إذا طُلبا. الاستشارة والعرض الحي مجانيان.
+      </p>
+    </div>
+
+    <div class="callout warn" style="margin-top:12px">
+      <strong>استهلاك الأدوات والموديلات والفلو على العميل</strong>
+      <p>
+        الاشتراك الشهري يغطي المنصة والدعم والتشغيل. أما تكلفة استهلاك نماذج الذكاء الاصطناعي،
+        والأدوات المتصلة، وتشغيل الـ Flows / الأتمتة، وواجهات المزودين (مثل OpenAI أو DeepSeek أو غيرها)
+        فهي على حساب العميل حسب استخدامه الفعلي، وليست ضمن الاشتراك.
+      </p>
+    </div>
+
+    <div class="pills" id="pills"></div>
+    <div class="stats" id="stats"></div>
+
+    <h2>الاشتراك الشهري لكل باقة</h2>
+    <div class="chart">
+      <div class="bars" id="bars"></div>
+      <p class="caption">المحور: الباقة مقابل دولار أمريكي / شهر. التأسيس مجاني لكل الباقات.</p>
+    </div>
+
+    <h2>الباقات الجاهزة للعرض</h2>
+    <div class="table-wrap">
+      <table id="packs-table">
+        <thead>
+          <tr>
+            <th>الباقة</th>
+            <th class="num">تأسيس</th>
+            <th class="num">شهري</th>
+            <th>الحد</th>
+            <th>ماذا تشمل</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="caption">شراء الميزات منفردة أغلى من الباقة. الدفع السنوي = 10 أشهر بسعر 12. استهلاك الموديلات والأدوات والفلو خارج هذا السعر.</p>
+
+    <h2>المنتجات الثلاثة إذا بيعت وحدها</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>المنتج</th>
+            <th class="num">تأسيس</th>
+            <th class="num">شهري</th>
+            <th>الدور</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="stripe"><td>AI Operations System</td><td class="num free">مجاناً</td><td class="num">$295</td><td>من الحجز حتى نهاية الرحلة: تأكيد، بيانات الضيف، تقارير، تحليلات</td></tr>
+          <tr><td>Smart Pickup &amp; Tracking</td><td class="num free">مجاناً</td><td class="num">$220</td><td>وقت التجمع والرسائل + GPS ولوحة التتبع، حتى 200 حجز و10 سائقين</td></tr>
+          <tr class="stripe"><td>Live Quality — برنامج فقط</td><td class="num free">مجاناً</td><td class="num">$195</td><td>طلب تقييم، تحليل مشاعر، شكاوى، واسترداد داخل النظام</td></tr>
+          <tr><td>Live Quality — فريق بشري</td><td class="num free">مجاناً</td><td class="num">$520</td><td>الفريق يدير الجودة حتى 200 حجز، ثم $1.75 لكل حجز إضافي</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>سعر كل ميزة عند إضافتها خارج باقتها</h2>
+    <p class="lead" style="margin-bottom:8px">إذا كانت الميزة داخل الباقة المختارة فلا تُحسب مرة ثانية. الأسعار هنا اشتراك شهري فقط — بدون تأسيس.</p>
+
+    <details class="card" open>
+      <summary>
+        <h3>نظام التشغيل</h3>
+        <span class="meta">12 ميزة</span>
+      </summary>
+      <div class="body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الميزة</th><th class="num">شهري</th><th>داخل</th></tr></thead>
+            <tbody>
+              <tr class="stripe"><td>تجميع الحجوزات من المنصات</td><td class="num">$28</td><td>Operations وما فوقها، حتى منصتين</td></tr>
+              <tr><td>رد تأكيد فوري بعد الحجز</td><td class="num">$32</td><td>Operations وما فوقها</td></tr>
+              <tr class="stripe"><td>إرسال وقت التجمع واتساب وإيميل</td><td class="num">$65</td><td>كل الباقات</td></tr>
+              <tr><td>تذكير قبل الرحلة</td><td class="num">$28</td><td>كل الباقات</td></tr>
+              <tr class="stripe"><td>جمع الفندق والغرفة والموقع بالذكاء</td><td class="num">$85</td><td>Operations وما فوقها</td></tr>
+              <tr><td>قوالب المراحل بعدة لغات</td><td class="num">$22</td><td>Operations: إنجليزي + لغة. كل لغة زائدة بهذا السعر</td></tr>
+              <tr class="stripe"><td>فاتورة ومبلغ إضافي وبوابة دفع</td><td class="num">$28</td><td>إضافة على كل الباقات. نسبة البوابة على العميل</td></tr>
+              <tr><td>إشعار الحجز اللحظي لمدير التشغيل</td><td class="num">$28</td><td>Operations وما فوقها</td></tr>
+              <tr class="stripe"><td>حساب فرعي لسائق أو مرشد أو مورد</td><td class="num">$7</td><td>Operations تشمل 5، ثم هذا السعر للمقعد</td></tr>
+              <tr><td>تقرير يومي بعدد الحجوزات لكل منصة</td><td class="num">$38</td><td>Operations وما فوقها</td></tr>
+              <tr class="stripe"><td>لوحة التحليلات</td><td class="num">$60</td><td>Operations وما فوقها</td></tr>
+              <tr><td>مستخدم إضافي في لوحة الشركة</td><td class="num">$10</td><td>Operations تشمل 3</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <h3>التتبع والبيك أب</h3>
+        <span class="meta">8 ميزات</span>
+      </summary>
+      <div class="body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الميزة</th><th class="num">شهري</th><th>داخل</th></tr></thead>
+            <tbody>
+              <tr class="stripe"><td>تتبع GPS للسائق والعميل</td><td class="num">$105</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>تنبيه تأخير أو تغيّر موقع</td><td class="num">$28</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr class="stripe"><td>لوحة عمليات حية</td><td class="num">داخل GPS</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>تواصل السائق دون إظهار الرقم</td><td class="num">$45</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr class="stripe"><td>صورة من موقع السائق للعميل</td><td class="num">$25</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>موقع حي عند عدم الحضور</td><td class="num">$32</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr class="stripe"><td>تقارير أداء السائقين والإلغاء</td><td class="num">$32</td><td>Ops + Tracking و Full Care</td></tr>
+              <tr><td>سائق إضافي بعد العاشر</td><td class="num">$8</td><td>إضافة على باقات التتبع</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <h3>الجودة والتقييمات</h3>
+        <span class="meta">8 ميزات</span>
+      </summary>
+      <div class="body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الميزة</th><th class="num">شهري أو للحالة</th><th>داخل</th></tr></thead>
+            <tbody>
+              <tr class="stripe"><td>طلب تقييم بعد الرحلة</td><td class="num">$49</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr><td>اكتشاف العميل غير الراضي مبكراً</td><td class="num">$65</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr class="stripe"><td>تحقيق الشكوى وتوثيق السبب</td><td class="num">$60</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr><td>تفاوض لتجنب الاسترداد أو تقييم سلبي</td><td class="num">$49</td><td>Full Care</td></tr>
+              <tr class="stripe"><td>إدارة طلب الاسترداد حتى الإغلاق</td><td class="num">$63</td><td>Full Care، أو برنامج الجودة</td></tr>
+              <tr><td>تقرير شهري بأسباب الرضا وعدم الرضا</td><td class="num">$38</td><td>Full Care</td></tr>
+              <tr class="stripe"><td>متابعة حذف تقييم مخالف لشروط المنصة</td><td class="num">$32 للحالة</td><td>Full Care تشمل 4 حالات شهرياً</td></tr>
+              <tr><td>فريق جودة بشري</td><td class="num">$520</td><td>Full Care حتى 200 حجز، ثم $1.75 للحجز</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <h2>إضافات اختيارية على الاشتراك</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>البند</th><th class="num">السعر</th></tr></thead>
+        <tbody>
+          <tr class="stripe"><td>ربط منصة حجز إضافية</td><td class="num">$28 شهرياً</td></tr>
+          <tr><td>ربط رقم واتساب إضافي</td><td class="num free">مجاناً عند الإعداد</td></tr>
+          <tr class="stripe"><td>ربط صندوق بريد إضافي</td><td class="num free">مجاناً عند الإعداد</td></tr>
+          <tr><td>ربط بوابة دفع</td><td class="num free">مجاناً عند الإعداد</td></tr>
+          <tr class="stripe"><td>كتابة قوالب لغة إضافية</td><td class="num">$22 شهرياً</td></tr>
+          <tr><td>جلسة تدريب للفريق</td><td class="num free">مجاناً</td></tr>
+          <tr class="stripe"><td>مسار أتمتة مخصص خارج المنتجات</td><td class="num">$55 شهرياً</td></tr>
+          <tr><td>مدينة أو وجهة إضافية على الاشتراك</td><td class="num">$32 شهرياً</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="foot">
+      <h3 style="margin-bottom:8px">ما لا يدخل في الاشتراك الشهري</h3>
+      <p>
+        <strong>استهلاك الموديلات والأدوات والفلو على العميل</strong> حسب الاستخدام الفعلي.
+        كذلك: رسوم محادثات واتساب من ميتا، ورسائل SMS، ونسبة بوابة الدفع، وأي حجز فوق حد الباقة.
+        الحجز الزائد: <span dir="ltr">$0.18</span> في Pickup Start، و<span dir="ltr">$0.32</span> في Operations وOps + Tracking.
+        حجز الجودة البشري الزائد عن 200: <span dir="ltr">$1.75</span>.
+      </p>
+      <p>
+        مسار الخدمة: ربط المنصات، ثم ضبط القواعد والقوالب، ثم الأتمتة، ثم النمو.
+        مسار العرض الحي: حجز، جمع بيانات، وقت تجمع، طلب تقييم، ثم حجز استشارة.
+      </p>
+      <p dir="ltr" style="margin-top:16px">TourCare.ai · Internal pricing card · Updated Sep 2026</p>
+    </div>
+  </main>
+
+  <script>
+    const PACKS = [
+      {
+        id: "start",
+        name: "Pickup Start",
+        monthly: 135,
+        cap: "150 حجز / شهر",
+        fit: "شركة تريد إرسال وقت التجمع فقط",
+        limit: "150 حجز، منصة واحدة، مدينة واحدة",
+        include: "وقت التجمع + تذكير عبر واتساب وإيميل",
+      },
+      {
+        id: "ops",
+        name: "Operations",
+        monthly: 295,
+        cap: "300 حجز / شهر",
+        fit: "العرض الافتراضي لشركة جديدة",
+        limit: "300 حجز، منصتان، 3 مستخدمين، 5 حسابات فرعية",
+        include: "كل مسار التشغيل بدون GPS وبدون فريق جودة بشري",
+      },
+      {
+        id: "track",
+        name: "Ops + Tracking",
+        monthly: 450,
+        cap: "300 حجز و 10 سائقين",
+        fit: "تشغيل مع تتبع السائقين",
+        limit: "300 حجز و10 سائقين",
+        include: "Operations + تتبع حي وتواصل مخفي وصورة السائق",
+      },
+      {
+        id: "full",
+        name: "Full Care",
+        monthly: 690,
+        cap: "جودة بشرية حتى 200 حجز",
+        fit: "التشغيل والتتبع وفريق الجودة",
+        limit: "جودة بشرية حتى 200 حجز ثم $1.75 للحجز",
+        include: "التتبع + التقييمات والشكاوى والاسترداد ومتابعة حذف التقييم المخالف",
+      },
+    ];
+
+    const usd = (n) => "$" + n.toLocaleString("en-US");
+    let packId = "ops";
+    const maxMonthly = Math.max(...PACKS.map((p) => p.monthly));
+
+    function render() {
+      const pack = PACKS.find((p) => p.id === packId) || PACKS[1];
+
+      document.getElementById("pills").innerHTML = PACKS.map((p) =>
+        `<button type="button" class="pill ${p.id === packId ? "active" : ""}" data-id="${p.id}">${p.name}</button>`
+      ).join("");
+
+      document.getElementById("stats").innerHTML = `
+        <div class="stat success"><div class="value" style="direction:rtl;text-align:right">مجاناً</div><div class="label">تأسيس وربط المنصات</div></div>
+        <div class="stat info"><div class="value">${usd(pack.monthly)}</div><div class="label">اشتراك شهري</div></div>
+        <div class="stat"><div class="value">${usd(pack.monthly * 10)}</div><div class="label">سنوي (شهرين مجاناً)</div></div>
+      `;
+
+      document.getElementById("bars").innerHTML = PACKS.map((p) => {
+        const h = Math.max(8, Math.round((p.monthly / maxMonthly) * 140));
+        return `<div class="bar-col ${p.id === packId ? "active" : ""}">
+          <div class="bar-val">${usd(p.monthly)}</div>
+          <div class="bar" style="height:${h}px"></div>
+          <div class="bar-name">${p.name}</div>
+        </div>`;
+      }).join("");
+
+      document.querySelector("#packs-table tbody").innerHTML = PACKS.map((p, i) => `
+        <tr class="${p.id === packId ? "hl" : (i % 2 ? "" : "stripe")}">
+          <td>${p.name}</td>
+          <td class="num free">مجاناً</td>
+          <td class="num">${usd(p.monthly)}</td>
+          <td>${p.limit}</td>
+          <td>${p.include}</td>
+        </tr>
+      `).join("");
+
+      document.querySelectorAll(".pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          packId = btn.getAttribute("data-id");
+          render();
+        });
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -141,7 +141,19 @@ def main(argv: list[str]) -> int:
             for _ in range(10):
                 try:
                     cur = conn.execute(
-                        "UPDATE conversations SET location = ?, contact_name = ? WHERE chat_id = ?",
+                        """
+                        UPDATE conversations
+                        SET location = ?,
+                            contact_name = ?,
+                            lead_owner_user_id = NULL,
+                            lead_owner_name = NULL,
+                            lead_owner_assigned_at = NULL,
+                            assigned_to = NULL,
+                            sales_inbox = 0,
+                            airtable_record_id = NULL,
+                            booking_number = NULL
+                        WHERE chat_id = ?
+                        """,
                         ("Guides", new_name, chat_id),
                     )
                     if cur.rowcount > 0:

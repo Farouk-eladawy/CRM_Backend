@@ -1,5 +1,27 @@
 """Shared inbox routing helpers derived from Airtable destination (des)."""
 
+STAFF_INBOX_LOCATIONS = frozenset({"Guides", "Drivers"})
+
+
+def is_staff_inbox_location(location):
+    return str(location or "").strip() in STAFF_INBOX_LOCATIONS
+
+
+def resolve_inbox_location(current_location, incoming_location):
+    """Keep Guides/Drivers pinned; allow staff incoming to override customer inboxes."""
+    incoming = str(incoming_location or "").strip()
+    current = str(current_location or "").strip()
+    if incoming in STAFF_INBOX_LOCATIONS:
+        return incoming
+    if current in STAFF_INBOX_LOCATIONS:
+        return current
+    if incoming and incoming.lower() not in ("unknown", "needhelp", "all"):
+        if not current or current.lower() in ("unknown", ""):
+            return incoming
+        return current
+    return current or incoming or "Unknown"
+
+
 SHARM_DESTINATION_KEYS = (
     "sharm",
     "sharm el",
@@ -14,6 +36,8 @@ SHARM_DESTINATION_KEYS = (
 
 def derive_chat_location_from_des(des, fallback_location="Unknown"):
     """Map Airtable des to dashboard inbox location (Sharm vs Hurghada/Cairo)."""
+    if is_staff_inbox_location(fallback_location):
+        return str(fallback_location).strip()
     destination_text = str(des or "").strip().lower()
     if any(key in destination_text for key in SHARM_DESTINATION_KEYS):
         return "Sharm"

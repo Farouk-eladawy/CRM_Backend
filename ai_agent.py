@@ -3923,6 +3923,11 @@ class AIAgent:
 
     def _derive_chat_location_from_fields(self, fields, fallback_location="Unknown", receiving_phone_id=None, is_leads_table=False):
         """Normalize dashboard chat routing with inbox pinning before Airtable fallbacks."""
+        from chat_location import is_staff_inbox_location
+
+        if is_staff_inbox_location(fallback_location):
+            return str(fallback_location).strip()
+
         raw_fields = fields or {}
 
         phone_id_locations = (self.config.get('whatsapp', {}) or {}).get('phone_id_locations', {}) or {}
@@ -7655,6 +7660,39 @@ User request:
         except Exception:
             return False, None
 
+    def resolve_whatsapp_staff_inbox(self, phone):
+        try:
+            is_driver, driver_name = self.match_driver_by_phone(phone)
+        except Exception:
+            is_driver, driver_name = False, None
+        try:
+            is_guide, guide_name = self.match_guide_by_phone(phone)
+        except Exception:
+            is_guide, guide_name = False, None
+        if is_driver:
+            name = str(driver_name or "").strip()
+            return "Drivers", (f"Driver - {name}" if name else "Driver")
+        if is_guide:
+            name = str(guide_name or "").strip()
+            return "Guides", (f"Guide - {name}" if name else "Guide")
+        return None, None
+
+    def apply_staff_inbox_to_chat(self, chat_id, phone, fallback_name=""):
+        loc, name = self.resolve_whatsapp_staff_inbox(phone)
+        if not loc or not chat_id:
+            return False
+        display = name or str(fallback_name or "").strip() or None
+        try:
+            import chat_db
+            return bool(chat_db.classify_staff_conversation(
+                chat_id,
+                loc,
+                contact_name=display,
+                unlink_customer=True,
+            ))
+        except Exception:
+            return False
+
     def _find_religious_booking_by_contact(self, email, phone, booking_nr):
         if not self.religious_base_id:
             return None
@@ -10439,6 +10477,12 @@ Conversation:
                     pinned_location = str(phone_id_locations.get(str(receiving_phone_id)) or "").strip()
                     if pinned_location:
                         location = pinned_location
+                if str(source or "").strip().lower() == "whatsapp":
+                    staff_loc, staff_name = self.resolve_whatsapp_staff_inbox(sender_identifier)
+                    if staff_loc:
+                        location = staff_loc
+                        if staff_name:
+                            temp_contact_name = staff_name
                     
                 chat_conv = chat_db.get_or_create_conversation(
                     source=source,
@@ -10453,19 +10497,25 @@ Conversation:
                     company_id=company_id
                 )
                 self._current_chat_id = chat_conv['chat_id']
-                try:
-                    self._try_immediate_ota_booking_link(
-                        chat_conv['chat_id'],
-                        message_body=message_body,
-                        subject=subject,
-                        thread_id=thread_id,
-                        sender_identifier=sender_identifier,
-                        location=location,
-                        receiving_phone_id=receiving_phone_id,
-                        source=source,
-                    )
-                except Exception as e:
-                    logging.warning("Immediate OTA booking link failed: %s", e)
+                if location in ("Guides", "Drivers"):
+                    try:
+                        self.apply_staff_inbox_to_chat(chat_conv['chat_id'], sender_identifier, temp_contact_name)
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        self._try_immediate_ota_booking_link(
+                            chat_conv['chat_id'],
+                            message_body=message_body,
+                            subject=subject,
+                            thread_id=thread_id,
+                            sender_identifier=sender_identifier,
+                            location=location,
+                            receiving_phone_id=receiving_phone_id,
+                            source=source,
+                        )
+                    except Exception as e:
+                        logging.warning("Immediate OTA booking link failed: %s", e)
                 if source == "Email" and incoming_external_message_id:
                     try:
                         existing_id = chat_db.get_message_id_by_external_id(chat_conv['chat_id'], incoming_external_message_id)
@@ -10559,19 +10609,25 @@ Conversation:
                     company_id=company_id
                 )
                 self._current_chat_id = chat_conv['chat_id']
-                try:
-                    self._try_immediate_ota_booking_link(
-                        chat_conv['chat_id'],
-                        message_body=message_body,
-                        subject=subject,
-                        thread_id=thread_id,
-                        sender_identifier=sender_identifier,
-                        location=location,
-                        receiving_phone_id=receiving_phone_id,
-                        source=source,
-                    )
-                except Exception as e:
-                    logging.warning("Immediate OTA booking link failed: %s", e)
+                if location in ("Guides", "Drivers"):
+                    try:
+                        self.apply_staff_inbox_to_chat(chat_conv['chat_id'], sender_identifier, temp_contact_name)
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        self._try_immediate_ota_booking_link(
+                            chat_conv['chat_id'],
+                            message_body=message_body,
+                            subject=subject,
+                            thread_id=thread_id,
+                            sender_identifier=sender_identifier,
+                            location=location,
+                            receiving_phone_id=receiving_phone_id,
+                            source=source,
+                        )
+                    except Exception as e:
+                        logging.warning("Immediate OTA booking link failed: %s", e)
             except Exception as e:
                 logging.error(f"Error retrieving chat_id when skip_db_save=True: {e}")
                 self._current_chat_id = None
@@ -12768,6 +12824,12 @@ Conversation:
         )
 
         logging.info(f"Processing WhatsApp message from {sender_name} ({sender_phone}) for {location}")
+
+        staff_loc, staff_name = self.resolve_whatsapp_staff_inbox(sender_phone)
+        if staff_loc:
+            location = staff_loc
+            if staff_name:
+                sender_name = staff_name
         
         # Determine Message Time
         msg_time = datetime.now()
@@ -12788,7 +12850,7 @@ Conversation:
              if not skip_db_save:
                  try:
                      import chat_db
-                     if phone_id and phone_id in phone_id_locations:
+                     if not staff_loc and phone_id and phone_id in phone_id_locations:
                          location = str(phone_id_locations[phone_id]).strip() or location
                      chat_conv = chat_db.get_or_create_conversation(
                          source="WhatsApp",
@@ -12799,6 +12861,8 @@ Conversation:
                          receiving_phone_id=phone_id if phone_id else "",
                          company_id=inbound_company_id
                      )
+                     if staff_loc:
+                         self.apply_staff_inbox_to_chat(chat_conv.get("chat_id"), sender_phone, staff_name)
                      chat_db.add_message(
                          chat_id=chat_conv['chat_id'],
                          sender_type='customer',
@@ -12822,7 +12886,7 @@ Conversation:
         import chat_db
         chat_conv = None
         try:
-            if phone_id and phone_id in phone_id_locations:
+            if not staff_loc and phone_id and phone_id in phone_id_locations:
                 location = str(phone_id_locations[phone_id]).strip() or location
             chat_conv = chat_db.get_or_create_conversation(
                 source="WhatsApp",
@@ -12833,6 +12897,8 @@ Conversation:
                 receiving_phone_id=phone_id if phone_id else "",
                 company_id=inbound_company_id
             )
+            if staff_loc and chat_conv:
+                self.apply_staff_inbox_to_chat(chat_conv.get("chat_id"), sender_phone, staff_name)
             
             # Apply Shift-Based Routing for Religious
             if chat_conv and location == "Religious":
@@ -12857,6 +12923,10 @@ Conversation:
                 )
             except Exception as save_err:
                 logging.error("Failed to save WhatsApp message while skipping AI: %s", save_err)
+
+        if staff_loc and chat_conv:
+            _save_inbound_without_ai(chat_conv.get("chat_id"))
+            return
 
         # If a workflow/human/echo already replied to this customer turn during debounce,
         # do not spend AI tokens or insert a late PROPOSED_DRAFT.
@@ -14493,6 +14563,26 @@ Conversation:
         except Exception as e:
             logging.error("Company Evolution WhatsApp send failed: %s", e, exc_info=True)
             return False, {"error": "exception", "message": str(e)}
+
+    def _company_new_chat_channel(self, company_id):
+        """Channel used when a company user starts a new customer conversation."""
+        cid = company_tenancy.normalize_company_id(company_id)
+        if company_tenancy.is_default_company(cid):
+            return {"company_id": cid, "location": "", "receiving_phone_id": "", "provider": "meta"}
+        acc = company_tenancy.find_customer_whatsapp_account(company_id=cid) or {}
+        provider = str(acc.get("provider") or "").strip().lower()
+        receiving = ""
+        if provider == "evolution":
+            inst = str(acc.get("instanceName") or "").strip()
+            receiving = str(acc.get("phoneNumberId") or "").strip() or (f"evo:{inst}" if inst else "")
+        elif provider == "meta":
+            receiving = str(acc.get("phoneNumberId") or "").strip()
+        return {
+            "company_id": cid,
+            "location": company_tenancy.company_customer_inbox_location(cid, ""),
+            "receiving_phone_id": receiving,
+            "provider": provider or "evolution",
+        }
 
     def _prepare_company_whatsapp_send(
         self,
@@ -17440,16 +17530,17 @@ Conversation:
             values.append(str(catalog.get(picked) or "") if picked else "")
         return values
 
-    def _fetch_whatsapp_templates_from_meta(self, location=None, statuses=None, max_pages=25):
+    def _fetch_whatsapp_templates_from_meta(self, location=None, statuses=None, max_pages=25, access_token=None, waba_id=None):
         """
         Fetch WhatsApp message templates for the WABA linked to `location`.
         Follows Meta pagination cursors (important: accounts often have >100 templates).
         `statuses`: None = return all statuses; or iterable like {"APPROVED"}.
         """
         location = str(location or "default").strip() or "default"
-        token = self._get_whatsapp_access_token()
-        waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {}) or {}
-        waba_id = waba_ids.get(location, waba_ids.get('default'))
+        token = str(access_token or "").strip() or self._get_whatsapp_access_token()
+        if not str(waba_id or "").strip():
+            waba_ids = self.config.get('whatsapp', {}).get('waba_ids', {}) or {}
+            waba_id = waba_ids.get(location, waba_ids.get('default'))
         if not token or not waba_id:
             return {
                 "templates": [],
@@ -31629,6 +31720,12 @@ Prefer the MarkItDown Extraction section below when present.
                     receiving_phone_id=receiving_phone_id,
                     sales_inbox=None,
                 )
+                if str(location or "") in ("Guides", "Drivers"):
+                    try:
+                        self.apply_staff_inbox_to_chat(conv.get("chat_id"), phone, contact_name)
+                        conv = chat_db.get_conversation(conv.get("chat_id")) or conv
+                    except Exception:
+                        pass
                 return jsonify({"status": "success", "chat_id": conv.get("chat_id"), "conversation": conv}), 200
             except Exception as e:
                 logging.error(f"Error in /api/chats/ensure_whatsapp: {e}", exc_info=True)
@@ -38338,16 +38435,80 @@ Write ONE short message only. No JSON. No explanations."""
                 import requests
                 location = request.args.get('location', 'default')
                 include_pending = str(request.args.get('include_pending') or '').strip().lower() in ('1', 'true', 'yes')
-                if not company_tenancy.is_default_company(_actor_company_id_from_request()):
+                actor_company_id = _actor_company_id_from_request()
+                if not company_tenancy.is_default_company(actor_company_id):
+                    channel = self._company_new_chat_channel(actor_company_id)
+                    provider = str(channel.get("provider") or "").strip().lower()
+                    if provider != "meta":
+                        return jsonify({
+                            "status": "success",
+                            "data": [],
+                            "from": {
+                                "location": channel.get("location") or location,
+                                "provider": provider or "evolution",
+                            },
+                            "meta": {
+                                "channel": provider or "evolution",
+                                "approved_count": 0,
+                                "pending_count": 0,
+                                "other_count": 0,
+                                "pages_fetched": 0,
+                                "include_pending": bool(include_pending),
+                            },
+                        }), 200
+                    acc = company_tenancy.find_customer_whatsapp_account(company_id=actor_company_id) or {}
+                    company_token = str(acc.get("accessToken") or "").strip()
+                    company_waba = str(acc.get("businessAccountId") or "").strip()
+                    if not company_token or not company_waba:
+                        return jsonify({
+                            "status": "error",
+                            "message": "Company WhatsApp templates are not connected yet.",
+                            "from": {"location": channel.get("location") or location, "provider": "meta"},
+                        }), 400
+                    fetched = self._fetch_whatsapp_templates_from_meta(
+                        location=channel.get("location") or location,
+                        statuses=None,
+                        access_token=company_token,
+                        waba_id=company_waba,
+                    )
+                    all_templates = list(fetched.get("templates") or [])
+                    if fetched.get("error") and not all_templates:
+                        return jsonify({
+                            "status": "error",
+                            "message": f"Failed to fetch company templates. Details: {fetched.get('error')}",
+                            "from": {
+                                "location": channel.get("location") or location,
+                                "provider": "meta",
+                                "phone_number_id": channel.get("receiving_phone_id") or "",
+                                "waba_id": company_waba,
+                            },
+                        }), 502
+                    approved, pending, other = [], [], []
+                    for t in all_templates:
+                        st = str((t or {}).get("status") or "").strip().upper()
+                        if st == "APPROVED":
+                            approved.append(t)
+                        elif st in ("PENDING", "IN_APPEAL", "IN APPEAL"):
+                            pending.append(t)
+                        else:
+                            other.append(t)
+                    data_out = list(approved) + (list(pending) if include_pending else [])
                     return jsonify({
                         "status": "success",
-                        "data": [],
-                        "from": {"location": location},
+                        "data": data_out,
+                        "from": {
+                            "location": channel.get("location") or location,
+                            "provider": "meta",
+                            "phone_number_id": channel.get("receiving_phone_id") or "",
+                            "waba_id": company_waba,
+                            "verified_name": acc.get("label") or acc.get("name") or "",
+                        },
                         "meta": {
-                            "approved_count": 0,
-                            "pending_count": 0,
-                            "other_count": 0,
-                            "pages_fetched": 0,
+                            "channel": "meta",
+                            "approved_count": len(approved),
+                            "pending_count": len(pending),
+                            "other_count": len(other),
+                            "pages_fetched": fetched.get("pages_fetched") or 0,
                             "include_pending": bool(include_pending),
                         },
                     }), 200
@@ -45114,19 +45275,35 @@ Write ONE short message only. No JSON. No explanations."""
                     formula_parts.append(f"FIND({_formula_string(phone_clean)}, {normalized_phone_formula})")
 
                 formula = f"OR({','.join(formula_parts)})"
-                headers = {"Authorization": f"Bearer {self.config['airtable']['api_key']}"}
+                actor_company_id = _actor_company_id_from_request()
+                company_channel = self._company_new_chat_channel(actor_company_id)
+                company_owned = not company_tenancy.is_default_company(actor_company_id)
+                if company_owned:
+                    company_table, _company_table_name = self._open_company_bookings_table(actor_company_id)
+                    records = []
+                    if company_table is not None:
+                        try:
+                            records = company_table.all(formula=formula) or []
+                        except Exception as company_lookup_err:
+                            logging.warning(
+                                "Company booking lookup failed for %s: %s",
+                                actor_company_id,
+                                company_lookup_err,
+                            )
+                            records = []
+                else:
+                    headers = {"Authorization": f"Bearer {self.config['airtable']['api_key']}"}
 
-                response = requests.get(
-                    f"https://api.airtable.com/v0/{self.config['airtable']['base_id']}/{TABLE_NAME}",
-                    headers=headers,
-                    params={"filterByFormula": formula},
-                    timeout=15
-                )
-                if response.status_code != 200:
-                    logging.error(f"Airtable query failed: {response.text}")
-                    return jsonify({"status": "error", "message": "Failed to query Airtable"}), 500
-                    
-                records = response.json().get('records', [])
+                    response = requests.get(
+                        f"https://api.airtable.com/v0/{self.config['airtable']['base_id']}/{TABLE_NAME}",
+                        headers=headers,
+                        params={"filterByFormula": formula},
+                        timeout=15
+                    )
+                    if response.status_code != 200:
+                        logging.error(f"Airtable query failed: {response.text}")
+                        return jsonify({"status": "error", "message": "Failed to query Airtable"}), 500
+                    records = response.json().get('records', [])
                 if not records:
                     return jsonify({"status": "error", "message": "No customer found with the provided details."}), 404
                     
@@ -45165,7 +45342,7 @@ Write ONE short message only. No JSON. No explanations."""
                 req_location = data.get('location')
                 is_sales = (str(req_location).strip() == 'Sales')
 
-                if source == "WhatsApp":
+                if source == "WhatsApp" and not company_owned:
                     existing_whatsapp_chat = chat_db.find_whatsapp_conversation_by_phone(sender_identifier)
                     if existing_whatsapp_chat:
                         existing_record_id = str(existing_whatsapp_chat.get('airtable_record_id') or '').strip()
@@ -45190,12 +45367,15 @@ Write ONE short message only. No JSON. No explanations."""
                         chat = existing_whatsapp_chat
 
                 if chat is None:
+                    chat_location = company_channel.get("location") or location if company_owned else location
                     chat = chat_db.get_or_create_conversation(
                         source=source,
                         sender_identifier=sender_identifier,
                         contact_name=name,
                         airtable_record_id=record['id'],
-                        location=location
+                        location=chat_location,
+                        receiving_phone_id=company_channel.get("receiving_phone_id") or "" if company_owned else "",
+                        company_id=actor_company_id if company_owned else None,
                     )
                     # Mark as read/no-help and persist booking number so it appears immediately in Inbox metadata.
                     update_payload2 = {"needs_help": 0, "booking_number": booking_nr}
@@ -45959,6 +46139,11 @@ Write ONE short message only. No JSON. No explanations."""
                 if not clean_phone or len(clean_phone) < 8:
                     return jsonify({"status": "error", "message": "Invalid phone number"}), 400
                 sender_identifier = "+" + clean_phone
+                actor_company_id = _actor_company_id_from_request()
+                company_channel = self._company_new_chat_channel(actor_company_id)
+                company_owned = not company_tenancy.is_default_company(actor_company_id)
+                if company_owned and company_channel.get("location"):
+                    location = company_channel.get("location")
 
                 import sqlite3
                 with sqlite3.connect(get_data_path(get_data_path('chat_history.db')), timeout=15.0) as conn:
@@ -45969,6 +46154,10 @@ Write ONE short message only. No JSON. No explanations."""
                         (clean_phone,),
                     )
                     existing = c.fetchone()
+                if existing and dict(existing).get('airtable_record_id'):
+                    existing_company = company_tenancy.normalize_company_id(dict(existing).get("company_id"))
+                    if company_tenancy.normalize_company_id(actor_company_id) != existing_company:
+                        existing = None
                 if existing and dict(existing).get('airtable_record_id'):
                     return jsonify(
                         {
@@ -45983,14 +46172,17 @@ Write ONE short message only. No JSON. No explanations."""
                     ), 200
 
                 is_religious_location = str(location).strip().lower() == 'religious'
-                if is_religious_location and not getattr(self, "religious_leads_table", None):
-                    return jsonify({"status": "error", "message": "Religious inquiries table not configured"}), 500
-                if not is_religious_location and not self.leads_table:
-                    return jsonify({"status": "error", "message": "Leads CRM table not configured"}), 500
-
+                record_id = ""
+                record_table_name = ""
                 from datetime import datetime
                 lead_name = name or f"New Lead {sender_identifier}"
-                if is_religious_location:
+                if company_owned:
+                    record = None
+                elif is_religious_location and not getattr(self, "religious_leads_table", None):
+                    return jsonify({"status": "error", "message": "Religious inquiries table not configured"}), 500
+                elif (not is_religious_location) and not self.leads_table:
+                    return jsonify({"status": "error", "message": "Leads CRM table not configured"}), 500
+                elif is_religious_location:
                     record_table_name = self._religious_leads_table_name()
                     fields = {
                         ReligiousLeadFieldIds.CUSTOMER_NAME: lead_name,
@@ -46014,9 +46206,10 @@ Write ONE short message only. No JSON. No explanations."""
                         LeadFieldIds.LAST_INTERACTION: datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     }
                     record = self._create_airtable_table_record(self.leads_table, fields, typecast=True)
-                record_id = record.get('id')
-                if not record_id:
-                    return jsonify({"status": "error", "message": "Failed to create lead record"}), 500
+                if not company_owned:
+                    record_id = record.get('id')
+                    if not record_id:
+                        return jsonify({"status": "error", "message": "Failed to create lead record"}), 500
 
                 import chat_db
                 chat = chat_db.get_or_create_conversation(
@@ -46024,7 +46217,9 @@ Write ONE short message only. No JSON. No explanations."""
                     sender_identifier=sender_identifier,
                     contact_name=lead_name,
                     airtable_record_id=record_id,
-                    location=location
+                    location=location,
+                    receiving_phone_id=company_channel.get("receiving_phone_id") or "" if company_owned else "",
+                    company_id=actor_company_id if company_owned else None,
                 )
                 update_payload = {"needs_help": 0}
                 if location == 'Sales':
@@ -46032,13 +46227,14 @@ Write ONE short message only. No JSON. No explanations."""
                 chat_db.update_conversation_info(chat['chat_id'], **update_payload)
 
                 try:
-                    self.append_to_chat_log(
-                        record_id,
-                        f"Temporary lead created from Dashboard by {actor_name}",
-                        sender="System",
-                        source="Audit",
-                        table_name=record_table_name
-                    )
+                    if record_id:
+                        self.append_to_chat_log(
+                            record_id,
+                            f"Temporary lead created from Dashboard by {actor_name}",
+                            sender="System",
+                            source="Audit",
+                            table_name=record_table_name
+                        )
                 except Exception:
                     pass
 
@@ -47265,6 +47461,19 @@ Draft to optimize:
                                         receiving_phone_id=phone_id if phone_id else ""
                                     )
                                     if is_driver or is_guide:
+                                        try:
+                                            staff_label = (
+                                                ("Driver - " + str(driver_name).strip()) if (is_driver and driver_name)
+                                                else ("Guide - " + str(guide_name).strip()) if (is_guide and guide_name)
+                                                else effective_sender_name
+                                            )
+                                            self.apply_staff_inbox_to_chat(
+                                                chat_conv.get("chat_id"),
+                                                sender_phone,
+                                                staff_label,
+                                            )
+                                        except Exception:
+                                            pass
                                         if msg_type == "reaction":
                                             chat_db.add_message(
                                                 chat_id=chat_conv['chat_id'],
@@ -49352,6 +49561,15 @@ Draft to optimize:
                 # Arabic Hajj/Religious inquiries and links them to wrong bookings.
                 if source and str(source).strip().lower() == 'facebook':
                     continue
+                conv_location = str(conv.get("location") or "").strip()
+                if conv_location in ("Guides", "Drivers"):
+                    continue
+                try:
+                    staff_loc, _staff_name = self.resolve_whatsapp_staff_inbox(sender_identifier)
+                    if staff_loc:
+                        continue
+                except Exception:
+                    pass
 
                 messages = chat_db.get_messages(chat_id)
                 if not messages:

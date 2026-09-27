@@ -2122,6 +2122,127 @@ def _company_channel_thread_id(source, thread_id, receiving_phone_id, company_id
     return f"co:{company_id}:{channel}"
 
 
+def _merge_staff_inbox_location(existing_location, incoming_location):
+    try:
+        from chat_location import resolve_inbox_location
+        return resolve_inbox_location(existing_location, incoming_location)
+    except Exception:
+        incoming = str(incoming_location or "").strip()
+        current = str(existing_location or "").strip()
+        return incoming or current or "Unknown"
+
+
+def _persist_merged_inbox_location(c, conn, chat_id, existing_location, incoming_location):
+    merged = _merge_staff_inbox_location(existing_location, incoming_location)
+    existing = str(existing_location or "").strip()
+    if merged and merged != existing:
+        c.execute("UPDATE conversations SET location = ? WHERE chat_id = ?", (merged, chat_id))
+        conn.commit()
+    return merged
+
+
+def classify_staff_conversation(chat_id, location, contact_name=None, unlink_customer=True):
+    """Pin a WhatsApp thread to Guides/Drivers and drop customer-lead assignment."""
+    chat_id = str(chat_id or "").strip()
+    loc = str(location or "").strip()
+    if not chat_id or loc not in ("Guides", "Drivers"):
+        return False
+    with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute("PRAGMA table_info(conversations)")
+        columns = [col[1] for col in c.fetchall()]
+        c.execute("SELECT * FROM conversations WHERE chat_id = ?", (chat_id,))
+        row = c.fetchone()
+        if not row:
+            return False
+        c.execute("UPDATE conversations SET location = ? WHERE chat_id = ?", (loc, chat_id))
+        name = str(contact_name or "").strip()
+        if name:
+            c.execute("UPDATE conversations SET contact_name = ? WHERE chat_id = ?", (name, chat_id))
+        if "lead_owner_user_id" in columns:
+            c.execute(
+                """
+                UPDATE conversations
+                SET lead_owner_user_id = NULL,
+                    lead_owner_name = NULL,
+                    lead_owner_assigned_at = NULL
+                WHERE chat_id = ?
+                """,
+                (chat_id,),
+            )
+        if "assigned_to" in columns:
+            c.execute("UPDATE conversations SET assigned_to = NULL WHERE chat_id = ?", (chat_id,))
+        if "sales_inbox" in columns:
+            c.execute("UPDATE conversations SET sales_inbox = 0 WHERE chat_id = ?", (chat_id,))
+        if unlink_customer:
+            c.execute(
+                """
+                UPDATE conversations
+                SET airtable_record_id = NULL,
+                    booking_number = NULL
+                WHERE chat_id = ?
+                """,
+                (chat_id,),
+            )
+        conn.commit()
+    return True
+
+
+def repair_guide_conversations_by_phone(phone_name_map):
+    """Move known guide WhatsApp chats into the Guides inbox and clear employee Assign."""
+    mapping = {}
+    for raw_phone, raw_name in (phone_name_map or {}).items():
+        digits = re.sub(r"\D", "", str(raw_phone or ""))
+        if not digits:
+            continue
+        mapping[digits] = str(raw_name or "").strip()
+    if not mapping:
+        return []
+    repaired = []
+    with sqlite3.connect(DB_FILE, timeout=30.0) as conn:
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute(
+            """
+            SELECT chat_id, sender_identifier, contact_name, location,
+                   lead_owner_name, lead_owner_user_id, airtable_record_id, booking_number
+            FROM conversations
+            WHERE LOWER(COALESCE(source, '')) = 'whatsapp'
+              AND sender_identifier IS NOT NULL
+              AND TRIM(sender_identifier) <> ''
+            """
+        )
+        rows = c.fetchall() or []
+    for row in rows:
+        digits = re.sub(r"\D", "", str(row["sender_identifier"] or ""))
+        matched_name = ""
+        for phone_digits, guide_name in mapping.items():
+            if not digits:
+                continue
+            if digits == phone_digits or digits.endswith(phone_digits[-9:]) or phone_digits.endswith(digits[-9:] if len(digits) >= 9 else digits):
+                matched_name = guide_name
+                break
+        if not matched_name:
+            continue
+        display = matched_name if matched_name.lower().startswith("guide") else f"Guide - {matched_name}"
+        ok = classify_staff_conversation(
+            row["chat_id"],
+            "Guides",
+            contact_name=display,
+            unlink_customer=True,
+        )
+        if ok:
+            repaired.append({
+                "chat_id": row["chat_id"],
+                "sender_identifier": row["sender_identifier"],
+                "from_location": row["location"],
+                "from_owner": row["lead_owner_name"],
+                "contact_name": display,
+            })
+    return repaired
+
+
 def get_or_create_conversation(source, sender_identifier, contact_name="", airtable_record_id="", location="Unknown", thread_id="", receiving_phone_id="", sales_inbox=None, email_account_id=None, company_id=None):
     resolved_company_id = _resolve_conversation_company_id(company_id, receiving_phone_id, email_account_id)
     thread_id = _company_channel_thread_id(source, thread_id, receiving_phone_id, resolved_company_id)
@@ -2224,6 +2345,9 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 # we do NOT blindly update the sender_identifier if it breaks the logic.
                 # Actually, updating sender_identifier here causes the bug where a new email from OTA
                 # overwrites the customer's real email in the local DB. Let's just return the row.
+                _persist_merged_inbox_location(c, conn, row["chat_id"], row["location"], location)
+                c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
+                row = c.fetchone()
                 return dict(row)
 
         if source == "Email" and thread_id:
@@ -2362,6 +2486,7 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                 and str(location or "").strip()
                 and str(location).strip().lower() not in ("unknown", "needhelp", "all")
             ):
+                merged_loc = _merge_staff_inbox_location(row["location"], location)
                 c.execute(
                     """
                     UPDATE conversations
@@ -2370,9 +2495,10 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                     WHERE chat_id = ?
                       AND COALESCE(NULLIF(company_id, ''), 'fts') = ?
                     """,
-                    (str(location).strip(), receiving_phone_id, row["chat_id"], resolved_company_id),
+                    (merged_loc, receiving_phone_id, row["chat_id"], resolved_company_id),
                 )
                 conn.commit()
+            _persist_merged_inbox_location(c, conn, row["chat_id"], row["location"], location)
             c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
             row = c.fetchone()
             return dict(row)
@@ -2470,6 +2596,9 @@ def get_or_create_conversation(source, sender_identifier, contact_name="", airta
                         conn.commit()
                         c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row['chat_id'],))
                         row = c.fetchone()
+                    _persist_merged_inbox_location(c, conn, row["chat_id"], row["location"], location)
+                    c.execute("SELECT * FROM conversations WHERE chat_id = ?", (row["chat_id"],))
+                    row = c.fetchone()
                     return dict(row)
                 raise
 
@@ -2502,7 +2631,7 @@ def sync_conversation_locations_from_des(airtable_record_id, des):
     Update inbox location for every chat linked to this Airtable record when des is set.
     Returns the number of conversations updated.
     """
-    from chat_location import derive_chat_location_from_des, extract_des_from_fields
+    from chat_location import derive_chat_location_from_des, extract_des_from_fields, is_staff_inbox_location
 
     record_id = str(airtable_record_id or "").strip()
     if not record_id:
@@ -2525,6 +2654,8 @@ def sync_conversation_locations_from_des(airtable_record_id, des):
         )
         rows = c.fetchall() or []
         for chat_id, current_loc in rows:
+            if is_staff_inbox_location(current_loc):
+                continue
             if str(current_loc or "").strip() == new_location:
                 continue
             c.execute(
@@ -2886,7 +3017,11 @@ def update_conversation_routing(chat_id, location=None, receiving_phone_id=None)
             c.execute("ALTER TABLE conversations ADD COLUMN receiving_phone_id TEXT")
             conn.commit()
         if location is not None:
-            c.execute("UPDATE conversations SET location = ? WHERE chat_id = ?", (location, chat_id))
+            c.execute("SELECT location FROM conversations WHERE chat_id = ?", (chat_id,))
+            current_row = c.fetchone()
+            current_loc = current_row[0] if current_row else ""
+            merged_loc = _merge_staff_inbox_location(current_loc, location)
+            c.execute("UPDATE conversations SET location = ? WHERE chat_id = ?", (merged_loc, chat_id))
         if receiving_phone_id is not None:
             c.execute("UPDATE conversations SET receiving_phone_id = ? WHERE chat_id = ?", (receiving_phone_id, chat_id))
         conn.commit()

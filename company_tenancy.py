@@ -127,7 +127,16 @@ def payment_public_view(settings):
 def resolve_payment_provider(currency, settings):
     """Pick stripe or wetravel from company payment settings + invoice currency."""
     item = sanitize_payment_settings(settings if isinstance(settings, dict) else None)
-    cur = str(currency or "").strip().upper()
+    cur_raw = str(currency or "").strip().upper()
+    # Normalize to a single ISO code (handles "EUR / USD", "€", lists-as-text, etc.)
+    cur = ""
+    for code in ("USD", "EUR", "GBP", "EGP"):
+        if re.search(rf"\b{re.escape(code)}\b", cur_raw) or code == cur_raw:
+            cur = code
+            break
+    if not cur:
+        m = re.search(r"([A-Z]{3})", cur_raw)
+        cur = m.group(1) if m else cur_raw
     preferred = str(item.get("preferredProvider") or "auto").strip().lower()
     stripe_on = bool(item.get("stripeEnabled"))
     wetravel_on = bool(item.get("wetravelEnabled"))
@@ -137,17 +146,25 @@ def resolve_payment_provider(currency, settings):
     def _currency_matches(codes):
         if not cur:
             return False
-        return any(code and code in cur for code in codes)
+        return cur in {str(code).upper() for code in (codes or []) if str(code or "").strip()}
 
+    # Forced preferred only when that provider actually supports the currency
+    # (or when the other provider is off / does not match).
     if preferred == "stripe" and stripe_on:
-        return "stripe"
+        if _currency_matches(stripe_curs) or not (wetravel_on and _currency_matches(wetravel_curs)):
+            return "stripe"
     if preferred == "wetravel" and wetravel_on:
-        return "wetravel"
+        if _currency_matches(wetravel_curs) or not (stripe_on and _currency_matches(stripe_curs)):
+            return "wetravel"
 
-    # auto (or preferred provider disabled): match currency lists
-    stripe_match = _currency_matches(stripe_curs) or ("USD" in cur)
+    # auto: match currency lists exactly
+    stripe_match = _currency_matches(stripe_curs)
     wetravel_match = _currency_matches(wetravel_curs)
 
+    if stripe_match and stripe_on and not wetravel_match:
+        return "stripe"
+    if wetravel_match and wetravel_on and not stripe_match:
+        return "wetravel"
     if stripe_match and stripe_on:
         return "stripe"
     if wetravel_match and wetravel_on:

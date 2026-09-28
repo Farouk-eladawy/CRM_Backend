@@ -3409,6 +3409,130 @@ class AIAgent:
                 )
         return result
 
+    def _coerce_payment_currency_for_airtable(self, currency_val):
+        """Currency is multipleSelects on List / Nile_Crystal_Booking — always send a list."""
+        if currency_val is None:
+            return None
+        if isinstance(currency_val, list):
+            cleaned = []
+            for item in currency_val:
+                if isinstance(item, dict):
+                    item = item.get("name") or item.get("value") or item.get("id")
+                s = str(item or "").strip().upper()
+                if s:
+                    cleaned.append(s)
+            return cleaned or None
+        text = str(currency_val or "").strip().upper()
+        if not text:
+            return None
+        for code in ("USD", "EUR", "GBP", "EGP"):
+            if re.search(rf"\b{re.escape(code)}\b", text) or text == code:
+                return [code]
+        m = re.search(r"([A-Z]{3})", text)
+        return [m.group(1)] if m else [text]
+
+    def _save_payment_fields_to_booking(self, table, record_id, created, amount_val=None, currency_val=None, include_amount=False, include_currency=False):
+        """
+        Persist payment id/url/status after Stripe/WeTravel create.
+
+        IMPORTANT: Never prefer FTS List field IDs here. Company tables (e.g. Nile_Crystal_Booking)
+        share readable names but have different field IDs. Mixing FTS IDs + Amount/Currency names
+        caused an early success that saved only Amount and skipped Stripe invoice.
+        """
+        payment_id = str((created or {}).get("payment_id") or "").strip()
+        payment_url = str((created or {}).get("payment_url") or "").strip()
+        currency_payload = self._coerce_payment_currency_for_airtable(currency_val) if include_currency else None
+
+        # Ordered from most complete → minimal. Readable names only (table-agnostic).
+        base_attempts = [
+            {
+                "Trip UUID": payment_id,
+                "Stripe invoice": payment_url,
+                "Invoice Status": "pending",
+            },
+            {
+                "Stripe invoice": payment_url,
+                "Invoice Status": "pending",
+            },
+            {"Stripe invoice": payment_url},
+            {"Payment Link": payment_url},
+            {"Invoice URL": payment_url},
+            {"Trip UUID": payment_id},
+        ]
+
+        last_error = None
+        last_partial = None
+        last_partial_warning = None
+
+        for attempt in base_attempts:
+            updates = {k: v for k, v in attempt.items() if v not in (None, "")}
+            if not updates and not (include_amount and amount_val is not None) and not currency_payload:
+                continue
+            if include_amount and amount_val is not None:
+                updates["Amount"] = amount_val
+            if currency_payload:
+                updates["Currency"] = currency_payload
+
+            payloads_to_try = [dict(updates)]
+            # Also try dropping optional status if select options differ.
+            if "Invoice Status" in updates and len(updates) > 1:
+                without_status = {k: v for k, v in updates.items() if k != "Invoice Status"}
+                payloads_to_try.append(without_status)
+
+            for payload in payloads_to_try:
+                if not payload:
+                    continue
+                try:
+                    self._update_airtable_table_record(table, str(record_id), payload, typecast=True)
+                    return payload, None
+                except Exception as e:
+                    last_error = e
+                    msg = str(e)
+                    unknown = None
+                    m = re.search(r'Unknown field name:\s*"([^"]+)"', msg)
+                    if m:
+                        unknown = m.group(1)
+                    if not unknown:
+                        continue
+                    # Drop unknown fields one-by-one, but never treat Amount-only as final
+                    # success while Stripe invoice / Trip UUID were requested and still missing.
+                    remaining = dict(payload)
+                    dropped = []
+                    while unknown and remaining:
+                        dropped.append(unknown)
+                        remaining = {k: v for k, v in remaining.items() if str(k) != unknown}
+                        if not remaining:
+                            break
+                        try:
+                            self._update_airtable_table_record(table, str(record_id), remaining, typecast=True)
+                            warning = f"Skipped unknown Airtable field(s): {', '.join(dropped)}"
+                            has_payment_link = bool(
+                                remaining.get("Stripe invoice")
+                                or remaining.get("Payment Link")
+                                or remaining.get("Invoice URL")
+                                or remaining.get("Trip UUID")
+                            )
+                            requested_payment = bool(payment_url or payment_id)
+                            if has_payment_link or not requested_payment:
+                                return remaining, warning
+                            # Amount/Currency saved but payment link fields unknown — keep trying
+                            # other name aliases (Payment Link / Invoice URL).
+                            last_partial = remaining
+                            last_partial_warning = warning
+                            break
+                        except Exception as e2:
+                            last_error = e2
+                            msg2 = str(e2)
+                            m2 = re.search(r'Unknown field name:\s*"([^"]+)"', msg2)
+                            unknown = m2.group(1) if m2 else None
+                            if not unknown:
+                                break
+                    continue
+
+        if last_partial:
+            return last_partial, last_partial_warning or str(last_error or "Partial payment field save")
+        return {}, str(last_error or "Failed to save payment fields to Airtable")
+
     def _filter_updates_for_leads_crm(self, updates):
         """Keep only fields that exist on Leads CRM; drop List-only keys."""
         if not isinstance(updates, dict) or not updates:
@@ -17773,15 +17897,190 @@ Conversation:
                 matched.append(item)
         return matched[:5]
 
-    def _get_payment_record_context(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None, company_id=None):
+    def _resolve_payment_booking_record(self, record_id, company_id=None, chat_id=None, booking_number_hint=None):
+        """
+        Resolve the bookings-table row for invoice creation — company-scoped only.
+
+        Never searches other companies' tables and never falls back to FTS List for
+        a tenant. Chat company_id wins when present. Lead-linked chats are remapped
+        by booking number / phone / email inside THAT company's bookings table only.
+        """
         record_id = str(record_id or "").strip()
         if not record_id:
             raise ValueError("Missing record_id")
-        bookings_table, _pay_company = self._payment_bookings_table(company_id)
-        rec = bookings_table.get(record_id)
-        if not isinstance(rec, dict):
-            raise ValueError("Booking record not found")
-        fields = (rec.get("fields") or {}) if isinstance(rec.get("fields"), dict) else {}
+
+        chat_booking_nr = str(booking_number_hint or "").strip()
+        chat_phone = ""
+        chat_email = ""
+        chat_company_id = ""
+        if chat_id:
+            try:
+                import chat_db
+                conv = chat_db.get_conversation(str(chat_id))
+                if isinstance(conv, dict):
+                    chat_company_id = str(conv.get("company_id") or "").strip()
+                    chat_booking_nr = chat_booking_nr or str(conv.get("booking_number") or "").strip()
+                    sender = str(conv.get("sender_identifier") or "").strip()
+                    source = str(conv.get("source") or "").strip().lower()
+                    if "@" in sender:
+                        chat_email = sender
+                        if "<" in chat_email and ">" in chat_email:
+                            chat_email = chat_email.split("<", 1)[1].split(">", 1)[0].strip()
+                    elif source in ("whatsapp", "wa", "facebook", "instagram") or re.search(r"\d{8,}", sender):
+                        chat_phone = re.sub(r"\D", "", sender)
+            except Exception:
+                pass
+
+        # Chat company locks the tenant. Never let another company's table win.
+        pay_company = company_tenancy.normalize_company_id(
+            chat_company_id or company_id or company_tenancy.active_booking_company_id()
+        )
+        bookings_table, pay_company = self._payment_bookings_table(pay_company)
+
+        main_list_name = (
+            str((self.config.get("airtable") or {}).get("tables", {}).get("main_list") or "").strip()
+            or "List"
+        )
+        bookings_table_name = main_list_name
+        if not company_tenancy.is_default_company(pay_company):
+            try:
+                _t, configured_name = self._open_company_bookings_table(pay_company)
+                if configured_name:
+                    bookings_table_name = str(configured_name).strip() or bookings_table_name
+            except Exception:
+                pass
+        else:
+            bookings_table_name = main_list_name
+
+        def _tag_booking(rec):
+            if not isinstance(rec, dict) or not rec.get("id"):
+                return None
+            # Never treat lead/CRM rows as invoice targets.
+            if self._is_lead_like_record(rec):
+                return None
+            classified = str(rec.get("table_name") or "").strip()
+            if self._is_lead_like_table(classified):
+                return None
+            out = dict(rec)
+            out["table_name"] = bookings_table_name
+            return out
+
+        booking = None
+        contact_phone = chat_phone
+        contact_email = chat_email
+        contact_booking_nr = chat_booking_nr
+
+        # 1) Direct get ONLY on this company's bookings table (no cross-table fetch).
+        try:
+            direct = bookings_table.get(record_id)
+        except Exception:
+            direct = None
+        booking = _tag_booking(direct)
+
+        if isinstance(direct, dict):
+            fields = direct.get("fields") if isinstance(direct.get("fields"), dict) else {}
+            try:
+                contact_phone = contact_phone or str(fields.get("Customer Phone") or "").strip()
+                contact_email = contact_email or str(
+                    fields.get("Customer personal email") or fields.get("Customer Email") or ""
+                ).strip()
+                contact_booking_nr = contact_booking_nr or str(
+                    self.get_field_value(fields, FieldIds.BOOKING_NR)
+                    or fields.get("Booking Nr.")
+                    or ""
+                ).strip()
+            except Exception:
+                pass
+
+        # 2) Same-company search only (lead → bookings remap / wrong record_id).
+        if not booking and (contact_booking_nr or contact_phone or contact_email):
+            found = self._find_booking_in_company_table(
+                bookings_table,
+                email=contact_email or None,
+                phone=contact_phone or None,
+                booking_nr=contact_booking_nr or None,
+            )
+            booking = _tag_booking(found)
+
+        # 3) FTS only: optional lead-contact enrichment then retry same List table.
+        # Never touch other companies' bases or iterate all tenant tables.
+        if not booking and company_tenancy.is_default_company(pay_company):
+            lead_fields = {}
+            try:
+                if getattr(self, "leads_table", None):
+                    lead_rec = self.leads_table.get(record_id)
+                    if isinstance(lead_rec, dict):
+                        lead_fields = lead_rec.get("fields") if isinstance(lead_rec.get("fields"), dict) else {}
+            except Exception:
+                lead_fields = {}
+            if lead_fields:
+                contact_phone = contact_phone or str(lead_fields.get("Customer Phone") or "").strip()
+                contact_email = contact_email or str(
+                    lead_fields.get("Customer personal email") or lead_fields.get("Customer Email") or ""
+                ).strip()
+                contact_booking_nr = contact_booking_nr or str(lead_fields.get("Booking Nr.") or "").strip()
+                if contact_booking_nr or contact_phone or contact_email:
+                    found = self._find_booking_in_company_table(
+                        bookings_table,
+                        email=contact_email or None,
+                        phone=contact_phone or None,
+                        booking_nr=contact_booking_nr or None,
+                    )
+                    booking = _tag_booking(found)
+
+        if not booking:
+            raise ValueError(
+                f"No booking found in company '{pay_company}' bookings table "
+                f"('{bookings_table_name}'). Link a booking for this chat first, then create the invoice."
+            )
+
+        resolved_id = str(booking.get("id") or "").strip()
+        if chat_id and resolved_id and resolved_id != record_id:
+            try:
+                import chat_db
+                booking_fields = booking.get("fields") if isinstance(booking.get("fields"), dict) else {}
+                bn = str(
+                    self.get_field_value(booking_fields, FieldIds.BOOKING_NR)
+                    or booking_fields.get("Booking Nr.")
+                    or chat_booking_nr
+                    or ""
+                ).strip()
+                chat_db.update_conversation_info(
+                    str(chat_id),
+                    airtable_record_id=resolved_id,
+                    booking_number=bn or None,
+                )
+                logging.info(
+                    "Payment booking remapped chat=%s company=%s from %s -> %s (table=%s)",
+                    chat_id,
+                    pay_company,
+                    record_id,
+                    resolved_id,
+                    bookings_table_name,
+                )
+            except Exception as remap_err:
+                logging.warning("Could not remap chat %s to booking %s: %s", chat_id, resolved_id, remap_err)
+
+        return {
+            "record": booking,
+            "record_id": resolved_id,
+            "fields": booking.get("fields") if isinstance(booking.get("fields"), dict) else {},
+            "table": bookings_table,
+            "table_name": bookings_table_name,
+            "company_id": pay_company,
+            "source_record_id": record_id,
+            "remapped_from_lead": bool(resolved_id and resolved_id != record_id),
+        }
+
+    def _get_payment_record_context(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None, company_id=None, chat_id=None, booking_number_hint=None):
+        resolved = self._resolve_payment_booking_record(
+            record_id,
+            company_id=company_id,
+            chat_id=chat_id,
+            booking_number_hint=booking_number_hint,
+        )
+        record_id = str(resolved.get("record_id") or "").strip()
+        fields = resolved.get("fields") if isinstance(resolved.get("fields"), dict) else {}
         amount = amount_in if amount_in is not None else fields.get("Amount")
         currency = currency_in if currency_in is not None else fields.get("Currency")
         try:
@@ -17831,6 +18130,11 @@ Conversation:
             "existing_payment_url": str(fields.get("Stripe invoice") or "").strip(),
             "existing_payment_id": str(fields.get("Trip UUID") or "").strip(),
             "invoice_status": str(fields.get("Invoice Status") or "").strip(),
+            "table_name": resolved.get("table_name"),
+            "company_id": resolved.get("company_id"),
+            "table": resolved.get("table"),
+            "remapped_from_lead": bool(resolved.get("remapped_from_lead")),
+            "source_record_id": resolved.get("source_record_id"),
         }
 
     def _infer_booking_communication_profile(self, booking_fields):
@@ -18300,10 +18604,201 @@ Conversation:
             "wetravelRefreshToken": str(settings.get("wetravelRefreshToken") or "").strip() if wetravel_on else "",
         }
 
+    def _company_primary_outbound_email(self, company_id=None):
+        """Primary outbound mailbox for the company that owns the invoice."""
+        cid = company_tenancy.normalize_company_id(company_id or company_tenancy.DEFAULT_COMPANY_ID)
+        account_id = self._company_default_email_account_id(cid, direction="outbound")
+        if account_id:
+            acc = self._get_dynamic_email_account(account_id) or {}
+            email = str(acc.get("emailAddress") or acc.get("email") or "").strip()
+            if email and "@" in email:
+                return email
+        try:
+            channels = company_tenancy.describe_company_outbound_channels(cid) or {}
+            for row in (channels.get("email") or []):
+                if not isinstance(row, dict):
+                    continue
+                email = str(row.get("email") or "").strip()
+                if email and "@" in email:
+                    return email
+        except Exception:
+            pass
+        if company_tenancy.is_default_company(cid):
+            email = self._primary_mailbox_email()
+            if email and "@" in email:
+                return email
+        return ""
+
+    def _company_outbound_display_phone(self, company_id=None):
+        """Visible WhatsApp send number for the company that owns the invoice."""
+        cid = company_tenancy.normalize_company_id(company_id or company_tenancy.DEFAULT_COMPANY_ID)
+        try:
+            acc = company_tenancy.find_customer_whatsapp_account(company_id=cid)
+        except Exception:
+            acc = None
+        if isinstance(acc, dict):
+            for key in ("phoneNumber", "displayPhone", "display_number", "phone"):
+                phone = re.sub(r"\D", "", str(acc.get(key) or ""))
+                if len(phone) >= 8:
+                    return phone
+        try:
+            import chat_db
+            raw = chat_db.get_setting(company_tenancy.channel_settings_key(cid))
+            settings = json.loads(raw) if isinstance(raw, str) and raw.strip() else (raw or {})
+            if not isinstance(settings, dict):
+                settings = {}
+            best = ""
+            for item in (settings.get("whatsappAccounts") or []):
+                if not isinstance(item, dict) or item.get("enabled") is False:
+                    continue
+                if str(item.get("usage") or "customers").strip().lower() == "internal_notifications":
+                    continue
+                phone = re.sub(r"\D", "", str(item.get("phoneNumber") or item.get("displayPhone") or item.get("phone") or ""))
+                if len(phone) < 8:
+                    continue
+                if bool(item.get("isDefault")):
+                    return phone
+                if not best:
+                    best = phone
+            if best:
+                return best
+        except Exception:
+            pass
+        if company_tenancy.is_default_company(cid):
+            wa = (self.config.get("whatsapp") or {}) if isinstance(self.config, dict) else {}
+            for key in ("default_display_phone", "business_phone", "phone"):
+                phone = re.sub(r"\D", "", str(wa.get(key) or ""))
+                if len(phone) >= 8:
+                    return phone
+        return ""
+
+    def _resolve_invoice_customer_contact(self, company_id, customer_email=None, customer_phone=None):
+        """
+        Fill Stripe/WeTravel customer contact from booking, with company fallbacks:
+        - no booking email → company primary outbound email (requires booking phone)
+        - no booking phone → company WhatsApp send/display number (requires booking email)
+        """
+        cid = company_tenancy.normalize_company_id(company_id or company_tenancy.DEFAULT_COMPANY_ID)
+        email = str(customer_email or "").strip()
+        phone_raw = str(customer_phone or "").strip()
+        phone = re.sub(r"\D", "", phone_raw)
+        email_source = "customer" if email else ""
+        phone_source = "customer" if phone else ""
+
+        if not email and not phone:
+            raise ValueError(
+                "Cannot create invoice: booking has neither customer email nor phone. "
+                "Add at least one contact on the booking."
+            )
+
+        if not email:
+            if not phone:
+                raise ValueError("Cannot create invoice without customer email or phone.")
+            company_email = self._company_primary_outbound_email(cid)
+            if not company_email:
+                raise ValueError(
+                    "Booking has no email. Configure the company primary outbound email "
+                    "in Settings → Channels, or add a customer email on the booking."
+                )
+            email = company_email
+            email_source = "company"
+
+        if not phone:
+            if not email:
+                raise ValueError("Cannot create invoice without customer email or phone.")
+            company_phone = self._company_outbound_display_phone(cid)
+            if not company_phone:
+                raise ValueError(
+                    "Booking has no phone. Configure the company WhatsApp send number "
+                    "in Settings → Channels, or add a customer phone on the booking."
+                )
+            phone = company_phone
+            phone_source = "company"
+
+        return {
+            "email": email,
+            "phone": phone,
+            "email_source": email_source or "customer",
+            "phone_source": phone_source or "customer",
+            "company_id": cid,
+        }
+
     def _payment_bookings_table(self, company_id=None):
-        cid = company_tenancy.normalize_company_id(company_id or company_tenancy.active_booking_company_id())
+        """Return (bookings_table, company_id). Never fall back across companies."""
+        cid = company_tenancy.normalize_company_id(
+            company_id or company_tenancy.active_booking_company_id() or company_tenancy.DEFAULT_COMPANY_ID
+        )
+        if company_tenancy.is_default_company(cid):
+            return self.table, cid
         table, _name = self._open_company_bookings_table(cid)
-        return (table or self.table), cid
+        if table is None:
+            raise ValueError(
+                f"Company '{cid}' has no bookings Airtable table configured in Company Connections. "
+                "Connect Base ID + Bookings table before creating invoices."
+            )
+        return table, cid
+
+    def _find_booking_in_company_table(self, bookings_table, *, email=None, phone=None, booking_nr=None):
+        """Search ONE company bookings table only (no cross-company / no leads)."""
+        if bookings_table is None:
+            return None
+        if not email and not phone and not booking_nr:
+            return None
+        conditions = []
+        if email:
+            email_lower = str(email).lower().strip().replace("'", "\\'")
+            if email_lower:
+                conditions.append(f"LOWER({{Customer personal email}})='{email_lower}'")
+                conditions.append(f"LOWER({{Customer Email}})='{email_lower}'")
+                conditions.append(f"SEARCH('{email_lower}', LOWER({{Customer personal email}}))")
+                conditions.append(f"SEARCH('{email_lower}', LOWER({{Customer Email}}))")
+        if phone:
+            phone_variants = self._generate_phone_variants(phone) if hasattr(self, "_generate_phone_variants") else [str(phone)]
+            db_phone_clean = "SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({Customer Phone}, ' ', ''), '-', ''), '+', '')"
+            for p in phone_variants:
+                p = str(p or "").strip()
+                if not p:
+                    continue
+                safe_p = p.replace("'", "\\'")
+                conditions.append(f"{{Customer Phone}}='{safe_p}'")
+                p_clean = re.sub(r"\D", "", p)
+                if len(p_clean) > 5:
+                    conditions.append(f"SEARCH('{p_clean}', {db_phone_clean})")
+                    if len(p_clean) >= 8:
+                        conditions.append(f"SEARCH('{p_clean[-8:]}', {db_phone_clean})")
+        if booking_nr:
+            bn = str(booking_nr).strip().replace("'", "\\'")
+            if bn:
+                conditions.append(f"{{Booking Nr.}}='{bn}'")
+        if not conditions:
+            return None
+        formula = "OR(" + ",".join(conditions) + ")"
+        try:
+            records = bookings_table.all(formula=formula)
+        except Exception as e:
+            logging.warning("Company-scoped booking search failed: %s", e)
+            return None
+        if not records:
+            return None
+
+        def _rank(rec):
+            fields = rec.get("fields") or {}
+            booking_value = self.get_field_value(fields, FieldIds.BOOKING_NR) or fields.get("Booking Nr.")
+            has_real = (
+                not self._is_placeholder_booking_number(booking_value)
+                if hasattr(self, "_is_placeholder_booking_number")
+                else bool(booking_value)
+            )
+            date_value = (
+                self.get_field_value(fields, FieldIds.DATE_TRIP)
+                or fields.get("Date Trip")
+                or fields.get("Date")
+                or ""
+            )
+            return (1 if has_real else 0, str(date_value))
+
+        sorted_records = sorted(records, key=_rank, reverse=True)
+        return sorted_records[0] if sorted_records else None
 
     def _execute_invoice_capability(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None, allow_existing=False):
         preview = self._preview_invoice_capability(
@@ -18325,11 +18820,23 @@ Conversation:
             selected_add_ons=selected_add_ons,
             company_id=pay_company,
         )
+        record_id = str(ctx.get("record_id") or record_id).strip()
         amount_val = float(ctx.get("amount"))
         currency_val = str(ctx.get("currency") or "").strip()
         customer_name = str(ctx.get("customer_name") or "").strip() or None
-        customer_email = str(ctx.get("customer_email") or "").strip() or None
-        customer_phone = str(ctx.get("customer_phone") or "").strip() or None
+        contact = self._resolve_invoice_customer_contact(
+            pay_company,
+            customer_email=ctx.get("customer_email"),
+            customer_phone=ctx.get("customer_phone"),
+        )
+        customer_email = str(contact.get("email") or "").strip() or None
+        customer_phone = str(contact.get("phone") or "").strip() or None
+        logging.info(
+            "Invoice contact resolved company=%s email_source=%s phone_source=%s",
+            contact.get("company_id"),
+            contact.get("email_source"),
+            contact.get("phone_source"),
+        )
         trip_name = str(ctx.get("trip_name") or "").strip() or None
         booking_nr = str(ctx.get("booking_number") or "").strip() or None
         date_trip = ctx.get("trip_date")
@@ -18357,9 +18864,22 @@ Conversation:
                 raise ValueError(f"Stripe error ({res.status_code}): {body}")
             return body
 
+        def _normalize_stripe_currency(raw):
+            text = str(raw or "").strip().upper()
+            for code in ("USD", "EUR", "GBP", "EGP"):
+                if re.search(rf"\b{re.escape(code)}\b", text) or text == code:
+                    return code.lower()
+            m = re.search(r"([A-Z]{3})", text)
+            if m:
+                return m.group(1).lower()
+            return text.lower()
+
         def _create_stripe_invoice():
             import time
             name = customer_name or "Guest"
+            stripe_currency = _normalize_stripe_currency(currency_val)
+            if not re.fullmatch(r"[a-z]{3}", stripe_currency or ""):
+                raise ValueError(f"Stripe currency missing or invalid: {currency_val!r}")
             cust = _stripe_request("POST", "/v1/customers", {
                 "name": name,
                 "email": customer_email or "",
@@ -18376,17 +18896,25 @@ Conversation:
             if booking_nr:
                 desc_parts.append(f"({booking_nr})")
             description = " ".join(desc_parts) if desc_parts else "Booking Payment"
+            # Exclude leftover pending items from earlier failed attempts (mixed currencies).
             inv = _stripe_request("POST", "/v1/invoices", {
                 "customer": cust.get("id"),
+                "currency": stripe_currency,
                 "auto_advance": "false",
                 "collection_method": "send_invoice",
                 "days_until_due": "7",
+                "pending_invoice_items_behavior": "exclude",
             })
+            inv_currency = str(inv.get("currency") or "").strip().lower()
+            if inv_currency and inv_currency != stripe_currency:
+                raise ValueError(
+                    f"Stripe invoice currency mismatch after create: wanted={stripe_currency} got={inv_currency}"
+                )
             ii = _stripe_request("POST", "/v1/invoiceitems", {
                 "customer": cust.get("id"),
                 "invoice": inv.get("id"),
                 "amount": cents,
-                "currency": currency_val.strip().lower(),
+                "currency": stripe_currency,
                 "description": description,
             })
             _ = ii
@@ -18514,19 +19042,28 @@ Conversation:
             updates["Amount"] = amount_val
         if str(currency_in or "").strip():
             updates["Currency"] = currency_val
-        try:
-            self._update_airtable_table_record(bookings_table, str(record_id), updates, typecast=True)
-        except Exception:
-            fallback_updates = {
-                "Trip UUID": created.get("payment_id"),
-                "Stripe invoice": created.get("payment_url"),
-                "Invoice Status": "pending",
-            }
-            self._update_airtable_table_record(bookings_table, str(record_id), fallback_updates, typecast=True)
+        applied, airtable_warning = self._save_payment_fields_to_booking(
+            bookings_table,
+            str(record_id),
+            created,
+            amount_val=amount_val,
+            currency_val=currency_val,
+            include_amount=(amount_in is not None) or (amount_val is not None),
+            include_currency=bool(str(currency_val or "").strip()),
+        )
+        if airtable_warning:
+            logging.warning(
+                "Payment created but Airtable update incomplete record=%s warning=%s",
+                record_id,
+                airtable_warning,
+            )
+        if applied:
+            updates = applied
         return {
             "record_id": str(record_id),
             **created,
             "airtable_updates": updates,
+            "airtable_warning": airtable_warning,
         }
 
     def _build_pi_brain_current_context_payload(self, actor, session_state=None, case_id=None, intent_name=None, case_context=None):
@@ -36644,11 +37181,25 @@ Write ONE short message only. No JSON. No explanations."""
                 logging.error(f"Error in /api/customer_bookings/<chat_id>: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
 
-        def _create_payment_link_for_record(record_id, amount_in=None, currency_in=None, selected_add_ons=None, company_id=None):
-            bookings_table, resolved_company = self._payment_bookings_table(company_id)
+        def _create_payment_link_for_record(record_id, amount_in=None, currency_in=None, selected_add_ons=None, company_id=None, chat_id=None):
+            resolved = self._resolve_payment_booking_record(
+                record_id,
+                company_id=company_id,
+                chat_id=chat_id,
+            )
+            record_id = str(resolved.get("record_id") or record_id).strip()
+            bookings_table = resolved.get("table") or self._payment_bookings_table(company_id)[0]
+            resolved_company = resolved.get("company_id") or company_tenancy.normalize_company_id(company_id)
             payment_runtime = self._company_payment_runtime(resolved_company)
-            rec = bookings_table.get(str(record_id))
-            fields = (rec or {}).get('fields', {}) or {}
+            fields = resolved.get("fields") if isinstance(resolved.get("fields"), dict) else {}
+            logging.info(
+                "Payment booking resolved company=%s source=%s booking=%s table=%s remapped=%s",
+                resolved_company,
+                resolved.get("source_record_id"),
+                record_id,
+                resolved.get("table_name"),
+                bool(resolved.get("remapped_from_lead")),
+            )
 
             amount = amount_in if amount_in is not None else fields.get('Amount')
             currency = currency_in if currency_in is not None else fields.get('Currency')
@@ -36683,8 +37234,19 @@ Write ONE short message only. No JSON. No explanations."""
                 raise ValueError("Missing or invalid Amount/Currency")
 
             customer_name = str(fields.get('Customer Name') or '').strip() or None
-            customer_email = str(fields.get('Customer personal email') or fields.get('Customer Email') or '').strip() or None
-            customer_phone = str(fields.get('Customer Phone') or '').strip() or None
+            contact = self._resolve_invoice_customer_contact(
+                resolved_company,
+                customer_email=str(fields.get('Customer personal email') or fields.get('Customer Email') or '').strip() or None,
+                customer_phone=str(fields.get('Customer Phone') or '').strip() or None,
+            )
+            customer_email = str(contact.get("email") or "").strip() or None
+            customer_phone = str(contact.get("phone") or "").strip() or None
+            logging.info(
+                "Invoice contact resolved company=%s email_source=%s phone_source=%s",
+                contact.get("company_id"),
+                contact.get("email_source"),
+                contact.get("phone_source"),
+            )
             trip_name = str(fields.get('trip Name') or fields.get('Trip Name') or '').strip() or None
             booking_nr = str(fields.get('Booking Nr.') or '').strip() or None
             date_trip = fields.get('Date Trip') or fields.get('Date') or None
@@ -36723,6 +37285,17 @@ Write ONE short message only. No JSON. No explanations."""
             def _create_stripe_invoice():
                 import time
                 name = customer_name or "Guest"
+                text = str(currency_val or "").strip().upper()
+                stripe_currency = ""
+                for code in ("USD", "EUR", "GBP", "EGP"):
+                    if re.search(rf"\b{re.escape(code)}\b", text) or text == code:
+                        stripe_currency = code.lower()
+                        break
+                if not stripe_currency:
+                    m = re.search(r"([A-Z]{3})", text)
+                    stripe_currency = (m.group(1).lower() if m else text.lower())
+                if not re.fullmatch(r"[a-z]{3}", stripe_currency or ""):
+                    raise ValueError(f"Stripe currency missing or invalid: {currency_val!r}")
                 cust = _stripe_request("POST", "/v1/customers", {
                     "name": name,
                     "email": customer_email or "",
@@ -36739,22 +37312,38 @@ Write ONE short message only. No JSON. No explanations."""
                 if booking_nr:
                     desc_parts.append(f"({booking_nr})")
                 description = " ".join(desc_parts) if desc_parts else "Booking Payment"
+                # Exclude leftover pending items from earlier failed attempts (mixed currencies).
                 inv = _stripe_request("POST", "/v1/invoices", {
                     "customer": cust.get("id"),
+                    "currency": stripe_currency,
                     "auto_advance": "false",
                     "collection_method": "send_invoice",
                     "days_until_due": "7",
+                    "pending_invoice_items_behavior": "exclude",
                 })
                 try:
-                    logging.info(f"Stripe invoice created (draft): id={inv.get('id')} total={inv.get('total')} amount_due={inv.get('amount_due')} status={inv.get('status')}")
+                    logging.info(
+                        "Stripe invoice created (draft): id=%s wanted_currency=%s got_currency=%s total=%s amount_due=%s status=%s",
+                        inv.get("id"),
+                        stripe_currency,
+                        inv.get("currency"),
+                        inv.get("total"),
+                        inv.get("amount_due"),
+                        inv.get("status"),
+                    )
                 except Exception:
                     pass
+                inv_currency = str(inv.get("currency") or "").strip().lower()
+                if inv_currency and inv_currency != stripe_currency:
+                    raise ValueError(
+                        f"Stripe invoice currency mismatch after create: wanted={stripe_currency} got={inv_currency}"
+                    )
 
                 ii = _stripe_request("POST", "/v1/invoiceitems", {
                     "customer": cust.get("id"),
                     "invoice": inv.get("id"),
                     "amount": cents,
-                    "currency": str(currency_val).strip().lower(),
+                    "currency": stripe_currency,
                     "description": description,
                 })
                 try:
@@ -36920,20 +37509,29 @@ Write ONE short message only. No JSON. No explanations."""
                 updates["Amount"] = amount_val
             if str(currency_in or '').strip():
                 updates["Currency"] = currency_val
-            try:
-                self._update_airtable_table_record(bookings_table, str(record_id), updates, typecast=True)
-            except Exception:
-                fallback_updates = {
-                    "Trip UUID": created.get("payment_id"),
-                    "Stripe invoice": created.get("payment_url"),
-                    "Invoice Status": "pending",
-                }
-                self._update_airtable_table_record(bookings_table, str(record_id), fallback_updates, typecast=True)
+            applied, airtable_warning = self._save_payment_fields_to_booking(
+                bookings_table,
+                str(record_id),
+                created,
+                amount_val=amount_val,
+                currency_val=currency_val,
+                include_amount=(amount_in is not None) or (amount_val is not None),
+                include_currency=bool(str(currency_val or "").strip()),
+            )
+            if airtable_warning:
+                logging.warning(
+                    "Payment created but Airtable update incomplete record=%s warning=%s",
+                    record_id,
+                    airtable_warning,
+                )
+            if applied:
+                updates = applied
 
             return {
                 "record_id": str(record_id),
                 **created,
                 "airtable_updates": updates,
+                "airtable_warning": airtable_warning,
             }
 
         @app.route('/api/payments/create', methods=['POST'])
@@ -36979,6 +37577,7 @@ Write ONE short message only. No JSON. No explanations."""
                     currency_in=currency_in,
                     selected_add_ons=selected_add_ons,
                     company_id=pay_company_id,
+                    chat_id=chat_id,
                 )
                 return jsonify({
                     "status": "success",
@@ -37148,6 +37747,14 @@ Write ONE short message only. No JSON. No explanations."""
                 if max_records > 200:
                     max_records = 200
 
+                bulk_company_id = None
+                try:
+                    bulk_company_id = _actor_company_id_from_request()
+                except Exception:
+                    bulk_company_id = None
+                bulk_company_id = company_tenancy.normalize_company_id(bulk_company_id)
+                bulk_bookings_table, bulk_company_id = self._payment_bookings_table(bulk_company_id)
+
                 records = []
                 if isinstance(record_ids, list) and record_ids:
                     for rid in record_ids[:max_records]:
@@ -37155,14 +37762,14 @@ Write ONE short message only. No JSON. No explanations."""
                         if not rid_s:
                             continue
                         try:
-                            records.append(self.table.get(rid_s))
+                            records.append(bulk_bookings_table.get(rid_s))
                         except Exception:
                             records.append({"id": rid_s, "fields": {}})
                 else:
                     view_s = str(view or '').strip()
                     if not view_s:
                         return jsonify({"status": "error", "message": "Missing view or record_ids"}), 400
-                    records = self.table.all(view=view_s, max_records=max_records)
+                    records = bulk_bookings_table.all(view=view_s, max_records=max_records)
 
                 results = []
                 success_count = 0
@@ -37382,7 +37989,7 @@ Write ONE short message only. No JSON. No explanations."""
                             rid,
                             amount_in=amount_raw,
                             currency_in=currency_raw,
-                            company_id=_actor_company_id_from_request(),
+                            company_id=bulk_company_id,
                         )
                         success_count += 1
                         notify_meta = {}

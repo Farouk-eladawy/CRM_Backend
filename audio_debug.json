@@ -220716,3 +220716,167 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB051FA1627B05A186835"
+    },
+    "keyId": "3EB051FA1627B05A186835",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hello ahmadyeladawy 👋\n\nThank you for choosing TourCare.AI! Your trip is confirmed 🎉\n\nTrip: Orange Bay Snorkeling Cruise with Lunch from Hurghada\nBooking Number: GYG123456\nPickup Info: Details will be sent one day before at 6:00 PM\n\n🎓 Students can get discounts by showing a valid EU ID.\n\nPlease send us the following details:\n• Traveler names\n• Children's ages (if any)\n• Hotel name\n• Room number\n\nLooking forward to seeing you soon 🌴\n\nThe TourCare.AI Team\n✉️ Support@tourcare.ai\n🌐 https://tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790442320,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790615122,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-28T10:05:23.192Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0D080571262D259DAE8"
+    },
+    "keyId": "3EB0D080571262D259DAE8",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hello ahmadyeladawy 👋\n\nThank you for choosing TourCare.AI! Your trip is confirmed 🎉\n\nPlease send us the following details:\n• Traveler names\n• Children's ages (if any)\n• Hotel name\n• Room number\n\nLooking forward to seeing you soon 🌴\n\nThe TourCare.AI Team\n✉️ Support@tourcare.ai\n🌐 https://tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790442348,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790615150,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-28T10:05:50.925Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB03895A4BB90D6BCDBFE"
+    },
+    "keyId": "3EB03895A4BB90D6BCDBFE",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Dear ahmadyeladawy, 👋\n\nHere are your pickup details:\n\nBooking Number: GYG12345\nDate: 19/10/2025\nTime: 01:10\nLocation: The Makadi Spa Hotel, Hurghada\n\n📍 Meeting point: at the street’s main entry gate.\n\n⏰ Be Ready on Time!\nPlease be ready 5 minutes before pickup — the driver can wait up to 5 minutes.\n\n✅ Check Your Belongings!\nMake sure you have all your items before leaving.\n\n⚠️ Quick Confirmation Needed!\nKindly reply to confirm your pickup details for priority support.\n\nThe TourCare.AI Team\n✉️ Support@tourcare.ai\n🌐 https://tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790442379,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790615181,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-28T10:06:22.340Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB09CB78DBB192522EA85"
+    },
+    "keyId": "3EB09CB78DBB192522EA85",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Hi ahmadyeladawy 🌟\n\nWe hope you had a great time with TourCare.AI on your trip to Orange Bay Snorkeling Cruise with Lunch from Hurghada!\n\nWe’d love to hear your feedback — it helps us improve and offer even better experiences. 💬\n\nCould you please take a minute to rate your trip?\n👉 \n\nThank you so much for your time and support 🙏\n\nThe TourCare.AI Team\n✉️ Support@tourcare.ai\n🌐 https://tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790442404,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790615206,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-28T10:06:46.784Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

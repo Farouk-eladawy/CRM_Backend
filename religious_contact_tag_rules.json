@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-25T11:18:15Z",
+  "updated_at": "2026-09-28T09:38:57Z",
   "rules": [
     {
       "id": "default-not-interested",
@@ -135,6 +135,15 @@
         "2025",
         "٢٠٢٦",
         "2026"
+      ],
+      "enabled": true,
+      "match": "contains"
+    },
+    {
+      "id": "fe37d557-d0ea-4b38-a615-dcfc9c400c03",
+      "tag": "حج مباشر",
+      "keywords": [
+        "حج مباشر"
       ],
       "enabled": true,
       "match": "contains"

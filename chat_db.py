@@ -3763,6 +3763,9 @@ def get_conversations_page(
     dedicated_whatsapp=None,
     ad_id=None,
     company_id=None,
+    airtable_record_ids=None,
+    booking_numbers=None,
+    view_scope_active=0,
 ):
     purge_trashed_conversations(retention_days=7)
     try:
@@ -3866,6 +3869,32 @@ def get_conversations_page(
         else:
             where.append("facebook_ad_id = ?")
             params.append(str(ad_id))
+
+    # Team View ID scope: only conversations linked to records/bookings in the assigned view.
+    try:
+        view_scope_i = 1 if str(view_scope_active or "0").strip().lower() in ("1", "true", "yes") else 0
+    except Exception:
+        view_scope_i = 0
+    if view_scope_i == 1:
+        rids = [str(x).strip() for x in (airtable_record_ids or []) if str(x).strip()]
+        bns = [str(x).strip() for x in (booking_numbers or []) if str(x).strip()]
+        if not rids and not bns:
+            where.append("1 = 0")
+        else:
+            scope_parts = []
+
+            def _append_in_chunks(column, values, parts_list, params_list, chunk_size=400):
+                for i in range(0, len(values), chunk_size):
+                    chunk = values[i:i + chunk_size]
+                    parts_list.append(f"{column} IN (" + ",".join(["?"] * len(chunk)) + ")")
+                    params_list.extend(chunk)
+
+            if rids:
+                _append_in_chunks("airtable_record_id", rids, scope_parts, params)
+            if bns:
+                _append_in_chunks("booking_number", bns, scope_parts, params)
+            if scope_parts:
+                where.append("(" + " OR ".join(scope_parts) + ")")
 
     resolved_company_id = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
     where.append(f"{_COMPANY_ID_SQL} = ?")
@@ -4719,7 +4748,15 @@ def get_sales_state(chat_id):
     except sqlite3.OperationalError:
         return None
 
-def list_sales_customers(actor_user_id=None, is_admin=False, locations=None, company_id=None):
+def list_sales_customers(
+    actor_user_id=None,
+    is_admin=False,
+    locations=None,
+    company_id=None,
+    airtable_record_ids=None,
+    booking_numbers=None,
+    view_scope_active=0,
+):
     try:
         with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
             conn.row_factory = sqlite3.Row
@@ -4752,6 +4789,31 @@ def list_sales_customers(actor_user_id=None, is_admin=False, locations=None, com
                     else:
                         where.append(f"LOWER(COALESCE(c.location, '')) IN ({placeholders})")
                     params.extend([x.lower() for x in locs])
+
+            try:
+                view_scope_i = 1 if str(view_scope_active or "0").strip().lower() in ("1", "true", "yes") else 0
+            except Exception:
+                view_scope_i = 0
+            if view_scope_i == 1:
+                rids = [str(x).strip() for x in (airtable_record_ids or []) if str(x).strip()]
+                bns = [str(x).strip() for x in (booking_numbers or []) if str(x).strip()]
+                if not rids and not bns:
+                    where.append("1 = 0")
+                else:
+                    scope_parts = []
+
+                    def _append_in_chunks(column, values, parts_list, params_list, chunk_size=400):
+                        for i in range(0, len(values), chunk_size):
+                            chunk = values[i:i + chunk_size]
+                            parts_list.append(f"{column} IN (" + ",".join(["?"] * len(chunk)) + ")")
+                            params_list.extend(chunk)
+
+                    if rids:
+                        _append_in_chunks("c.airtable_record_id", rids, scope_parts, params)
+                    if bns:
+                        _append_in_chunks("c.booking_number", bns, scope_parts, params)
+                    if scope_parts:
+                        where.append("(" + " OR ".join(scope_parts) + ")")
 
             where_sql = ("WHERE " + " AND ".join(where)) if where else ""
             c.execute(
@@ -4790,10 +4852,26 @@ def list_sales_customers(actor_user_id=None, is_admin=False, locations=None, com
     except sqlite3.OperationalError:
         return []
 
-def compute_sales_daily_tasks(actor_user_id=None, is_admin=False, locations=None, company_id=None):
+def compute_sales_daily_tasks(
+    actor_user_id=None,
+    is_admin=False,
+    locations=None,
+    company_id=None,
+    airtable_record_ids=None,
+    booking_numbers=None,
+    view_scope_active=0,
+):
     from datetime import datetime, date
 
-    chats = list_sales_customers(actor_user_id=actor_user_id, is_admin=is_admin, locations=locations, company_id=company_id)
+    chats = list_sales_customers(
+        actor_user_id=actor_user_id,
+        is_admin=is_admin,
+        locations=locations,
+        company_id=company_id,
+        airtable_record_ids=airtable_record_ids,
+        booking_numbers=booking_numbers,
+        view_scope_active=view_scope_active,
+    )
     today = date.today().isoformat()
     out = {
         "followups_today": [],

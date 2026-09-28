@@ -506,6 +506,39 @@ class BaserowApi:
             page += 1
         return ids
 
+    def get_view(self, view_id: int) -> dict:
+        data = self._req("GET", f"/api/database/views/{int(view_id)}/")
+        return data if isinstance(data, dict) else {}
+
+    def list_rows_for_view(
+        self,
+        table_id: int,
+        view_id: int,
+        *,
+        size: int = 200,
+        max_pages: int = 50,
+    ) -> List[dict]:
+        """Fetch all rows visible in a Baserow view (paginated)."""
+        rows: List[dict] = []
+        page = 1
+        while page <= max_pages:
+            data = self._req(
+                "GET",
+                f"/api/database/rows/table/{int(table_id)}/",
+                params={
+                    "user_field_names": "true",
+                    "size": int(size),
+                    "page": page,
+                    "view_id": int(view_id),
+                },
+            )
+            batch = list(data.get("results") or []) if isinstance(data, dict) else []
+            rows.extend(batch)
+            if not (isinstance(data, dict) and data.get("next")):
+                break
+            page += 1
+        return rows
+
     def find_table_by_name(self, database_id: int, name: str) -> Optional[dict]:
         for t in self.list_tables(database_id):
             if str(t.get("name") or "") == name:

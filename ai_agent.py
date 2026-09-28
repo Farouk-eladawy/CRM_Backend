@@ -3559,6 +3559,237 @@ class AIAgent:
                 variants.append(prefixed)
         return variants
 
+    # --- Team View ID ACL (Airtable + Baserow) ---
+    _VIEW_SCOPE_CACHE = {}
+    _VIEW_SCOPE_TTL_SEC = 90
+    _LEGACY_AIRTABLE_VIEW_BY_USERNAME = {
+        "bassant_khalled": "bassant_Khaled",
+        "nadeen_hossam": "nadeen_Hossam",
+        "ahmed_saad": "ahmedsaad_sales",
+    }
+
+    def _normalize_username_key(self, username):
+        return str(username or "").strip().lower()
+
+    def _find_dashboard_user_for_view_scope(self, actor_id=None, actor_username=None):
+        """Return dashboard user dict matching actor id or username, or None."""
+        try:
+            raw = chat_db.get_setting("dashboard_users")
+            if not raw:
+                return None
+            import json as _json
+            users = _json.loads(raw) if isinstance(raw, str) else raw
+            if not isinstance(users, list):
+                return None
+            aid = str(actor_id or "").strip()
+            aun = self._normalize_username_key(actor_username)
+            for u in users:
+                if not isinstance(u, dict):
+                    continue
+                if aid and (str(u.get("id") or "") == aid or str(u.get("username") or "") == aid):
+                    return u
+                if aun and self._normalize_username_key(u.get("username")) == aun:
+                    return u
+        except Exception:
+            logging.exception("Failed loading dashboard user for view scope")
+        return None
+
+    def _user_view_ids(self, user_obj):
+        """Return (airtable_view_id, baserow_view_id) including legacy sales map fallback."""
+        user_obj = user_obj if isinstance(user_obj, dict) else {}
+        at_view = str(user_obj.get("airtableViewId") or "").strip()
+        br_view = str(user_obj.get("baserowViewId") or "").strip()
+        if not at_view:
+            uname = self._normalize_username_key(user_obj.get("username"))
+            at_view = str(self._LEGACY_AIRTABLE_VIEW_BY_USERNAME.get(uname) or "").strip()
+        return at_view, br_view
+
+    def _user_has_view_scope(self, user_obj):
+        at_view, br_view = self._user_view_ids(user_obj)
+        return bool(at_view or br_view)
+
+    def _extract_booking_nr_from_fields(self, fields):
+        fields = fields if isinstance(fields, dict) else {}
+        for key in ("Booking Nr.", "Booking Nr", "booking_nr", "Booking Number", "booking_number"):
+            val = fields.get(key)
+            if val is None:
+                continue
+            s = str(val).strip()
+            if s:
+                return s
+        try:
+            from airtable_fields import FieldIds
+            val = fields.get(FieldIds.BOOKING_NR)
+            if val is not None and str(val).strip():
+                return str(val).strip()
+        except Exception:
+            pass
+        return ""
+
+    def _fetch_airtable_view_scope(self, view_ref):
+        """Fetch record ids + booking numbers from an Airtable view (id or name)."""
+        view_ref = str(view_ref or "").strip()
+        record_ids = set()
+        booking_numbers = set()
+        if not view_ref:
+            return record_ids, booking_numbers
+        try:
+            import requests as _req
+            from urllib.parse import quote
+            from airtable_fields import TABLE_NAME
+            base_id = (self.config.get("airtable") or {}).get("base_id")
+            api_key = (self.config.get("airtable") or {}).get("api_key")
+            if not base_id or not api_key:
+                raise RuntimeError("Missing Airtable config")
+            url = f"https://api.airtable.com/v0/{base_id}/{quote(str(TABLE_NAME))}"
+            headers = {"Authorization": f"Bearer {api_key}"}
+            offset = None
+            pages = 0
+            while pages < 50:
+                params = {"view": view_ref, "pageSize": 100}
+                if offset:
+                    params["offset"] = offset
+                resp = _req.get(url, headers=headers, params=params, timeout=30)
+                if resp.status_code != 200:
+                    raise RuntimeError(f"Airtable view fetch failed: {resp.status_code} {resp.text[:300]}")
+                data = resp.json() or {}
+                for rec in data.get("records") or []:
+                    rid = str(rec.get("id") or "").strip()
+                    if rid:
+                        record_ids.add(rid)
+                    bn = self._extract_booking_nr_from_fields(rec.get("fields") or {})
+                    if bn:
+                        booking_numbers.add(bn)
+                offset = data.get("offset")
+                pages += 1
+                if not offset:
+                    break
+        except Exception:
+            logging.exception("Airtable view scope fetch failed for %s", view_ref)
+            raise
+        return record_ids, booking_numbers
+
+    def _fetch_baserow_view_scope(self, view_id):
+        """Fetch Record ID / booking numbers from a Baserow view."""
+        record_ids = set()
+        booking_numbers = set()
+        view_id_s = str(view_id or "").strip()
+        if not view_id_s:
+            return record_ids, booking_numbers
+        try:
+            view_id_i = int(view_id_s)
+        except Exception:
+            raise RuntimeError(f"Invalid Baserow view id: {view_id_s}")
+        try:
+            from tools.migrate_airtable_to_baserow import BaserowApi
+            br_cfg = (self.config.get("baserow") or {}) if isinstance(self.config, dict) else {}
+            br = BaserowApi.from_config(br_cfg)
+            view_meta = br.get_view(view_id_i) or {}
+            table_id = int(view_meta.get("table_id") or view_meta.get("table") or 0)
+            if not table_id:
+                raise RuntimeError(f"Baserow view {view_id_i} has no table_id")
+            rows = br.list_rows_for_view(table_id, view_id_i)
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                for key in ("Record ID", "airtable_record_id", "record_id", "Airtable Record ID"):
+                    val = row.get(key)
+                    if val is None:
+                        continue
+                    s = str(val).strip()
+                    if s.startswith("rec") or (s and len(s) >= 10):
+                        record_ids.add(s)
+                        break
+                bn = self._extract_booking_nr_from_fields(row)
+                if bn:
+                    booking_numbers.add(bn)
+        except Exception:
+            logging.exception("Baserow view scope fetch failed for %s", view_id_s)
+            raise
+        return record_ids, booking_numbers
+
+    def resolve_user_view_scope(self, user_obj=None, actor_id=None, actor_username=None):
+        """
+        Resolve Airtable/Baserow view IDs on a user into record/booking allowlists.
+        Returns dict:
+          active: bool  — True when user has a view scope configured
+          record_ids: list[str]
+          booking_numbers: list[str]
+          airtable_view_id: str
+          baserow_view_id: str
+        Fail-closed: if scope is configured but all fetches fail, returns empty lists with active=True.
+        """
+        user_obj = user_obj if isinstance(user_obj, dict) else None
+        if user_obj is None:
+            user_obj = self._find_dashboard_user_for_view_scope(actor_id=actor_id, actor_username=actor_username) or {}
+        at_view, br_view = self._user_view_ids(user_obj)
+        if not at_view and not br_view:
+            return {
+                "active": False,
+                "record_ids": [],
+                "booking_numbers": [],
+                "airtable_view_id": "",
+                "baserow_view_id": "",
+            }
+
+        cache_key = f"{at_view}|{br_view}"
+        now = time.time()
+        cached = self._VIEW_SCOPE_CACHE.get(cache_key)
+        if cached and (now - float(cached.get("ts") or 0)) < self._VIEW_SCOPE_TTL_SEC:
+            return dict(cached.get("value") or {})
+
+        record_ids = set()
+        booking_numbers = set()
+        ok_any = False
+        if at_view:
+            try:
+                rids, bns = self._fetch_airtable_view_scope(at_view)
+                record_ids.update(rids)
+                booking_numbers.update(bns)
+                ok_any = True
+            except Exception as e:
+                logging.warning("View scope Airtable failed (%s): %s", at_view, e)
+        if br_view:
+            try:
+                rids, bns = self._fetch_baserow_view_scope(br_view)
+                record_ids.update(rids)
+                booking_numbers.update(bns)
+                ok_any = True
+            except Exception as e:
+                logging.warning("View scope Baserow failed (%s): %s", br_view, e)
+
+        if not ok_any:
+            logging.error(
+                "View scope configured but all sources failed (airtable=%s baserow=%s) — returning empty allowlist",
+                at_view,
+                br_view,
+            )
+
+        value = {
+            "active": True,
+            "record_ids": sorted(record_ids),
+            "booking_numbers": sorted(booking_numbers),
+            "airtable_view_id": at_view,
+            "baserow_view_id": br_view,
+        }
+        self._VIEW_SCOPE_CACHE[cache_key] = {"ts": now, "value": value}
+        return dict(value)
+
+    def conversation_allowed_by_view_scope(self, conv, scope):
+        """Return True if conversation is inside an active view scope (or scope inactive)."""
+        if not scope or not scope.get("active"):
+            return True
+        conv = conv if isinstance(conv, dict) else {}
+        rid = str(conv.get("airtable_record_id") or "").strip()
+        bn = str(conv.get("booking_number") or "").strip()
+        allowed_rids = set(scope.get("record_ids") or [])
+        allowed_bns = set(scope.get("booking_numbers") or [])
+        if rid and rid in allowed_rids:
+            return True
+        if bn and bn in allowed_bns:
+            return True
+        return False
+
     def find_booking_by_number(self, booking_nr):
         """Find a booking record by Booking Nr. using ID query"""
         booking_nr = str(booking_nr or "").strip()
@@ -31822,6 +32053,13 @@ Prefer the MarkItDown Extraction section below when present.
                         except Exception:
                             pass
 
+                # Team View ID scope (Airtable and/or Baserow)
+                view_scope = self.resolve_user_view_scope(
+                    actor_id=actor_id,
+                    actor_username=request.args.get("actor_username"),
+                )
+                view_scope_active = 1 if view_scope.get("active") else 0
+
                 page = chat_db.get_conversations_page(
                     limit=limit,
                     offset=offset,
@@ -31841,6 +32079,9 @@ Prefer the MarkItDown Extraction section below when present.
                         username=request.args.get("actor_username"),
                         user_id=actor_id,
                     ),
+                    airtable_record_ids=view_scope.get("record_ids") if view_scope_active else None,
+                    booking_numbers=view_scope.get("booking_numbers") if view_scope_active else None,
+                    view_scope_active=view_scope_active,
                 )
                 items = page.get("items") or []
                 pagination = {
@@ -33570,6 +33811,18 @@ Prefer the MarkItDown Extraction section below when present.
             try:
                 import time as _time
                 _t0 = _time.time()
+                # Enforce Team View ID scope when actor is provided
+                actor_id = request.args.get("actor_id") or request.args.get("actor_user_id")
+                actor_username = request.args.get("actor_username") or request.args.get("username")
+                if actor_id or actor_username:
+                    view_scope = self.resolve_user_view_scope(
+                        actor_id=actor_id,
+                        actor_username=actor_username,
+                    )
+                    if view_scope.get("active"):
+                        conv = chat_db.get_conversation_info(chat_id) or {}
+                        if not self.conversation_allowed_by_view_scope(conv, view_scope):
+                            return jsonify({"status": "error", "message": "Forbidden: outside assigned view"}), 403
                 scope = str(request.args.get('scope') or '').strip().lower()
                 merge_by_record = scope not in ['single', 'chat', 'chat_only']
                 messages = chat_db.get_messages(chat_id, merge_by_record=merge_by_record)
@@ -35487,14 +35740,24 @@ Prefer the MarkItDown Extraction section below when present.
             try:
                 actor_user_id = request.args.get('actor_user_id') or ""
                 actor_role = request.args.get('actor_role') or ""
+                actor_username = request.args.get('actor_username') or actor_user_id
                 resolved = _resolve_actor(actor_user_id, actor_role)
                 is_admin = _actor_is_admin(resolved)
                 company_id = company_tenancy.resolve_company_id(username=actor_user_id, user_id=actor_user_id)
+                view_scope = self.resolve_user_view_scope(
+                    user_obj=(resolved or {}).get("user"),
+                    actor_id=actor_user_id,
+                    actor_username=actor_username,
+                )
+                view_scope_active = 1 if view_scope.get("active") else 0
                 chats = chat_db.list_sales_customers(
                     actor_user_id=str(resolved.get("user_id") or ""),
                     is_admin=bool(is_admin),
                     locations=["sales"],
                     company_id=company_id,
+                    airtable_record_ids=view_scope.get("record_ids") if view_scope_active else None,
+                    booking_numbers=view_scope.get("booking_numbers") if view_scope_active else None,
+                    view_scope_active=view_scope_active,
                 )
                 return jsonify({"status": "success", "data": chats}), 200
             except Exception as e:
@@ -35506,14 +35769,24 @@ Prefer the MarkItDown Extraction section below when present.
             try:
                 actor_user_id = request.args.get('actor_user_id') or ""
                 actor_role = request.args.get('actor_role') or ""
+                actor_username = request.args.get('actor_username') or actor_user_id
                 resolved = _resolve_actor(actor_user_id, actor_role)
                 is_admin = _actor_is_admin(resolved)
                 company_id = company_tenancy.resolve_company_id(username=actor_user_id, user_id=actor_user_id)
+                view_scope = self.resolve_user_view_scope(
+                    user_obj=(resolved or {}).get("user"),
+                    actor_id=actor_user_id,
+                    actor_username=actor_username,
+                )
+                view_scope_active = 1 if view_scope.get("active") else 0
                 data = chat_db.compute_sales_daily_tasks(
                     actor_user_id=str(resolved.get("user_id") or ""),
                     is_admin=bool(is_admin),
                     locations=["sales"],
                     company_id=company_id,
+                    airtable_record_ids=view_scope.get("record_ids") if view_scope_active else None,
+                    booking_numbers=view_scope.get("booking_numbers") if view_scope_active else None,
+                    view_scope_active=view_scope_active,
                 )
                 return jsonify({"status": "success", "data": data}), 200
             except Exception as e:
@@ -41277,6 +41550,15 @@ Write ONE short message only. No JSON. No explanations."""
                 offset_param = request.args.get('offset')
                 limit_param = request.args.get('limit')
                 is_religious = request.args.get('is_religious', 'false').lower() == 'true'
+                actor_username = request.args.get('actor_username') or ""
+                # Force Team View ID scope when user has airtableViewId assigned
+                try:
+                    view_scope = self.resolve_user_view_scope(actor_username=actor_username)
+                    forced_at_view = str(view_scope.get("airtable_view_id") or "").strip() if view_scope.get("active") else ""
+                    if forced_at_view and not is_religious:
+                        view_name = forced_at_view
+                except Exception as vs_err:
+                    logging.warning("operations/bookings view scope resolve failed: %s", vs_err)
                 try:
                     if getattr(self, "airtable_mirror", None) and view_name in [
                         'Booking_today', 'Booking_tomorrow', 'Booking_Weekly',
@@ -41323,6 +41605,20 @@ Write ONE short message only. No JSON. No explanations."""
                     'حجاج تحسين', 'حجاج بري', 'حجاج كوكتيل', 'إحصائيات البرامج', 'استفسارات جديدة'
                 ]
                 
+                # Dynamically allow the actor's assigned Airtable view (id or name)
+                if view_name and view_name not in allowed_views:
+                    try:
+                        vs = self.resolve_user_view_scope(actor_username=actor_username)
+                        assigned = str(vs.get("airtable_view_id") or "").strip()
+                        if assigned and view_name == assigned:
+                            allowed_views.append(view_name)
+                        elif str(view_name).startswith("viw"):
+                            # Explicit Airtable view ids are allowed when assigned to the actor
+                            if assigned and view_name == assigned:
+                                allowed_views.append(view_name)
+                    except Exception:
+                        pass
+
                 if is_religious and view_name in religious_views:
                     pass
                 elif view_name and view_name not in allowed_views:
@@ -41596,6 +41892,14 @@ Write ONE short message only. No JSON. No explanations."""
                 filters = data.get('filters')
                 sorts = data.get('sorts')
                 actor_username = data.get('actor_username')
+                # Force Team View ID scope when user has airtableViewId assigned
+                try:
+                    view_scope = self.resolve_user_view_scope(actor_username=actor_username)
+                    forced_at_view = str(view_scope.get("airtable_view_id") or "").strip() if view_scope.get("active") else ""
+                    if forced_at_view:
+                        view_name = forced_at_view
+                except Exception as vs_err:
+                    logging.warning("bookings_query view scope resolve failed: %s", vs_err)
                 from airtable_fields import TABLE_NAME as _LIST_TABLE_NAME
                 table_name = str(data.get("table_name") or data.get("table") or _LIST_TABLE_NAME).strip() or _LIST_TABLE_NAME
                 is_list_table = table_name.lower() == str(_LIST_TABLE_NAME).strip().lower()
@@ -43582,6 +43886,8 @@ Write ONE short message only. No JSON. No explanations."""
                         "shiftEnd": shift_fields.get("shiftEnd"),
                         "additionalShifts": shift_fields.get("additionalShifts"),
                         "dedicatedWhatsApp": user_obj.get("dedicatedWhatsApp"),
+                        "airtableViewId": str(user_obj.get("airtableViewId") or "").strip(),
+                        "baserowViewId": str(user_obj.get("baserowViewId") or "").strip(),
                         "toolPhone": re.sub(r"\D", "", str(user_obj.get("toolPhone") or "")),
                         "allowIntents": [
                             str(x).strip()
@@ -43742,6 +44048,8 @@ Write ONE short message only. No JSON. No explanations."""
                                             "shiftEnd": u.get("shiftEnd"),
                                             "additionalShifts": u.get("additionalShifts"),
                                             "dedicatedWhatsApp": u.get("dedicatedWhatsApp"),
+                                            "airtableViewId": str(u.get("airtableViewId") or "").strip(),
+                                            "baserowViewId": str(u.get("baserowViewId") or "").strip(),
                                             "toolPhone": re.sub(r"\D", "", str(u.get("toolPhone") or "")),
                                             "allowIntents": [
                                                 str(x).strip()

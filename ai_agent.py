@@ -18185,7 +18185,14 @@ Conversation:
             blocked_reasons.append("invoice_already_exists")
         if existing_invoice_present and allow_existing_invoice:
             warnings.append("existing_invoice_will_be_replaced")
-        provider = "stripe" if "USD" in str(ctx.get("currency") or "").upper() else "wetravel"
+        try:
+            pay_company = company_tenancy.active_booking_company_id()
+            provider = company_tenancy.resolve_payment_provider(
+                ctx.get("currency"),
+                self._company_payment_runtime(pay_company),
+            )
+        except Exception:
+            provider = "stripe" if "USD" in str(ctx.get("currency") or "").upper() else "wetravel"
         return {
             "capability_key": "create_invoice",
             "simulate_only": True,
@@ -18208,19 +18215,74 @@ Conversation:
             "dry_run_supported": True,
         }
 
+    def _global_payment_secrets(self):
+        stripe_key = os.environ.get("STRIPE_SECRET_KEY") or ((self.config.get("stripe") or {}).get("secret_key"))
+        wetravel = os.environ.get("WETRAVEL_REFRESH_TOKEN") or ((self.config.get("wetravel") or {}).get("refresh_token"))
+        return {
+            "stripeSecretKey": str(stripe_key or "").strip(),
+            "wetravelRefreshToken": str(wetravel or "").strip(),
+        }
+
+    def _payment_public_for_company(self, company):
+        item = company if isinstance(company, dict) else {}
+        view = company_tenancy.payment_public_view(item.get("payment"))
+        # FTS master keys may still live in config/env until saved from the UI.
+        if company_tenancy.is_default_company(item.get("id")):
+            secrets = self._global_payment_secrets()
+            if not view.get("stripeConfigured"):
+                view["stripeConfigured"] = bool(secrets.get("stripeSecretKey"))
+            if not view.get("wetravelConfigured"):
+                view["wetravelConfigured"] = bool(secrets.get("wetravelRefreshToken"))
+        return view
+
+    def _sync_fts_payment_secrets_to_config(self, payment_settings):
+        """Keep config.json stripe/wetravel in sync when FTS payment keys are edited in the UI."""
+        if not isinstance(payment_settings, dict):
+            return
+        stripe_key = str(payment_settings.get("stripeSecretKey") or "").strip()
+        wetravel = str(payment_settings.get("wetravelRefreshToken") or "").strip()
+        stripe_cfg = dict(self.config.get("stripe") or {}) if isinstance(self.config.get("stripe"), dict) else {}
+        wetravel_cfg = dict(self.config.get("wetravel") or {}) if isinstance(self.config.get("wetravel"), dict) else {}
+        dirty = False
+        if "stripeSecretKey" in payment_settings:
+            if stripe_cfg.get("secret_key") != stripe_key:
+                stripe_cfg["secret_key"] = stripe_key
+                self.config["stripe"] = stripe_cfg
+                dirty = True
+        if "wetravelRefreshToken" in payment_settings:
+            if wetravel_cfg.get("refresh_token") != wetravel:
+                wetravel_cfg["refresh_token"] = wetravel
+                self.config["wetravel"] = wetravel_cfg
+                dirty = True
+        if not dirty:
+            return
+        try:
+            config_path = os.path.join(SCRIPT_DIR, get_data_path(get_data_path("config.json")))
+            with open(config_path, "w", encoding="utf-8") as fh:
+                json.dump(self.config, fh, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logging.warning("Could not sync FTS payment secrets to config.json: %s", e)
+
     def _company_payment_runtime(self, company_id=None):
         """Resolve Stripe/WeTravel keys for a company. FTS path uses the global account."""
         cid = company_tenancy.normalize_company_id(company_id or company_tenancy.active_booking_company_id())
         settings = company_tenancy.payment_settings(cid)
         use_fts = company_tenancy.is_default_company(cid) or bool(settings.get("useFtsPayment", True))
+        global_secrets = self._global_payment_secrets()
         if use_fts:
-            stripe_key = os.environ.get("STRIPE_SECRET_KEY") or ((self.config.get("stripe") or {}).get("secret_key"))
-            wetravel = os.environ.get("WETRAVEL_REFRESH_TOKEN") or ((self.config.get("wetravel") or {}).get("refresh_token"))
+            # Prefer keys saved on the FTS company record; fall back to config/env.
+            company_stripe = str(settings.get("stripeSecretKey") or "").strip()
+            company_wetravel = str(settings.get("wetravelRefreshToken") or "").strip()
+            stripe_key = company_stripe or global_secrets.get("stripeSecretKey") or ""
+            wetravel = company_wetravel or global_secrets.get("wetravelRefreshToken") or ""
             return {
                 "companyId": cid,
                 "useFtsPayment": True,
-                "stripeEnabled": True,
-                "wetravelEnabled": True,
+                "stripeEnabled": bool(settings.get("stripeEnabled", True)),
+                "wetravelEnabled": bool(settings.get("wetravelEnabled", True)),
+                "preferredProvider": str(settings.get("preferredProvider") or "auto"),
+                "stripeCurrencies": list(settings.get("stripeCurrencies") or ["USD"]),
+                "wetravelCurrencies": list(settings.get("wetravelCurrencies") or ["EUR", "GBP", "EGP"]),
                 "stripeSecretKey": str(stripe_key or "").strip(),
                 "wetravelRefreshToken": str(wetravel or "").strip(),
             }
@@ -18231,6 +18293,9 @@ Conversation:
             "useFtsPayment": False,
             "stripeEnabled": stripe_on,
             "wetravelEnabled": wetravel_on,
+            "preferredProvider": str(settings.get("preferredProvider") or "auto"),
+            "stripeCurrencies": list(settings.get("stripeCurrencies") or ["USD"]),
+            "wetravelCurrencies": list(settings.get("wetravelCurrencies") or ["EUR", "GBP", "EGP"]),
             "stripeSecretKey": str(settings.get("stripeSecretKey") or "").strip() if stripe_on else "",
             "wetravelRefreshToken": str(settings.get("wetravelRefreshToken") or "").strip() if wetravel_on else "",
         }
@@ -18431,13 +18496,14 @@ Conversation:
             bool((payment_runtime or {}).get("useFtsPayment")),
             currency_val,
         )
-        if "USD" in currency_val.upper():
+        provider = company_tenancy.resolve_payment_provider(currency_val, payment_runtime or {})
+        if provider == "stripe":
             if not (payment_runtime or {}).get("stripeEnabled"):
-                raise ValueError("Stripe is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
+                raise ValueError("Stripe is turned off for this company. Enable it in Settings → Company Connections / Companies, or turn on the shared payment path.")
             created = _create_stripe_invoice()
         else:
             if not (payment_runtime or {}).get("wetravelEnabled"):
-                raise ValueError("WeTravel is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
+                raise ValueError("WeTravel is turned off for this company. Enable it in Settings → Company Connections / Companies, or turn on the shared payment path.")
             created = _create_wetravel_link()
         updates = {
             "Trip UUID": created.get("payment_id"),
@@ -36835,13 +36901,14 @@ Write ONE short message only. No JSON. No explanations."""
                 bool((payment_runtime or {}).get("useFtsPayment")),
                 currency_val,
             )
-            if "USD" in currency_val.upper():
+            provider = company_tenancy.resolve_payment_provider(currency_val, payment_runtime or {})
+            if provider == "stripe":
                 if not (payment_runtime or {}).get("stripeEnabled"):
-                    raise ValueError("Stripe is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
+                    raise ValueError("Stripe is turned off for this company. Enable it in Settings → Company Connections / Companies, or turn on the shared payment path.")
                 created = _create_stripe_invoice()
             else:
                 if not (payment_runtime or {}).get("wetravelEnabled"):
-                    raise ValueError("WeTravel is turned off for this company. Enable it in Settings, Companies, or turn on the FTS payment path.")
+                    raise ValueError("WeTravel is turned off for this company. Enable it in Settings → Company Connections / Companies, or turn on the shared payment path.")
                 created = _create_wetravel_link()
 
             updates = {
@@ -43543,6 +43610,7 @@ Write ONE short message only. No JSON. No explanations."""
                         "createWithPiEnabled": bool(company.get("createWithPiEnabled")),
                         "connections": conn_public,
                         "webhookPublicBase": conn_public.get("webhookPublicBase") or "",
+                        "payment": self._payment_public_for_company(company),
                     },
                 }), 200
             data = request.json or {}
@@ -43565,24 +43633,36 @@ Write ONE short message only. No JSON. No explanations."""
                 derived = company_tenancy.resolve_webhook_public_slug(company, username=actor_uname)
                 company["publicSlug"] = company_tenancy.ensure_unique_public_slug(derived, company_id=company_id)
                 company_tenancy.upsert_company(company)
+            if isinstance(data.get("payment"), dict):
+                company = company_tenancy.get_company(company_id) or company
+                company["payment"] = company_tenancy.sanitize_payment_settings(
+                    data.get("payment"),
+                    company.get("payment"),
+                )
+                if company_tenancy.is_default_company(company_id):
+                    company["payment"]["useFtsPayment"] = True
+                    self._sync_fts_payment_secrets_to_config(company["payment"])
+                company_tenancy.upsert_company(company)
             saved = company_tenancy.save_connections(company_id, raw_conn)
             saved_conn = company_tenancy.connections_public_view(
                 company_tenancy.get_connections(company_id)
             )
             actor_uname = str(actor.get("username") or request.args.get("actor_username") or "").strip()
+            refreshed = company_tenancy.get_company(company_id) or saved
             return jsonify({
                 "status": "success",
                 "data": {
                     "companyId": company_id,
-                    "companyName": saved.get("name"),
-                    "publicSlug": company_tenancy.company_public_slug(saved),
-                    "webhookPublic": company_tenancy.resolve_webhook_public_slug(saved, username=actor_uname),
-                    "hooksPublicBase": company_tenancy.company_webhook_public_base(saved, username=actor_uname),
-                    "outboundSend": self._company_outbound_settings(saved),
+                    "companyName": refreshed.get("name"),
+                    "publicSlug": company_tenancy.company_public_slug(refreshed),
+                    "webhookPublic": company_tenancy.resolve_webhook_public_slug(refreshed, username=actor_uname),
+                    "hooksPublicBase": company_tenancy.company_webhook_public_base(refreshed, username=actor_uname),
+                    "outboundSend": self._company_outbound_settings(refreshed),
                     "isDefaultCompany": company_tenancy.is_default_company(company_id),
-                    "createWithPiEnabled": bool(saved.get("createWithPiEnabled")),
+                    "createWithPiEnabled": bool(refreshed.get("createWithPiEnabled")),
                     "connections": saved_conn,
                     "webhookPublicBase": saved_conn.get("webhookPublicBase") or "",
+                    "payment": self._payment_public_for_company(refreshed),
                 },
             }), 200
 
@@ -43630,7 +43710,14 @@ Write ONE short message only. No JSON. No explanations."""
             if err:
                 return err
             if request.method == 'GET':
-                return jsonify({"status": "success", "data": company_tenancy.list_companies_admin_view()}), 200
+                rows = company_tenancy.list_companies_admin_view()
+                enriched = []
+                for row in rows:
+                    item = dict(row or {})
+                    company = company_tenancy.get_company(item.get("id")) or item
+                    item["payment"] = self._payment_public_for_company(company)
+                    enriched.append(item)
+                return jsonify({"status": "success", "data": enriched}), 200
             data = request.json or {}
             name = str(data.get("name") or data.get("companyName") or "").strip()
             if not name:
@@ -43691,12 +43778,15 @@ Write ONE short message only. No JSON. No explanations."""
                 )
                 if company_tenancy.is_default_company(company_id):
                     company["payment"]["useFtsPayment"] = True
+                    self._sync_fts_payment_secrets_to_config(company["payment"])
             saved = company_tenancy.upsert_company(company)
             if data.get("webhookPublicBase") is not None:
                 conns = company_tenancy.get_connections(company_id)
                 conns["webhookPublicBase"] = str(data.get("webhookPublicBase") or "").strip()
                 saved = company_tenancy.save_connections(company_id, conns)
-            return jsonify({"status": "success", "data": company_tenancy.public_company(saved)}), 200
+            public = company_tenancy.public_company(saved)
+            public["payment"] = self._payment_public_for_company(saved)
+            return jsonify({"status": "success", "data": public}), 200
 
         @app.route('/api/admin/companies/<company_id>/features', methods=['POST', 'OPTIONS'])
         def api_admin_company_features(company_id):
@@ -50265,39 +50355,65 @@ Draft to optimize:
                     contact_phone = extracted_phone
                 if not contact_phone and customer_email and str(customer_email).isdigit():
                     contact_phone = str(customer_email)
-                    
-                # 2. Try to find booking
-                booking_record = self.find_booking_strictly(
-                    history_text, 
-                    sender_email=customer_email, 
-                    sender_phone=contact_phone,
-                    ai_extracted_data=extracted_data,
-                    department=conv.get('location')
-                )
-                
-                if booking_record:
-                    # Check if it's actually a confirmed booking, not just a newly created lead
-                    is_lead = booking_record.get('table_name') == LEADS_TABLE_NAME
-                    
-                    if not is_lead:
-                        logging.info(f"Orphan chat {chat_id} successfully linked to Booking {booking_record['id']}.")
-                        
-                        # Determine location from Airtable DES to avoid pickup-time strings polluting chat routing.
-                        db_location = self._derive_chat_location_from_fields(
-                            booking_record.get('fields', {}),
-                            fallback_location=conv.get('location', "Unknown"),
-                            receiving_phone_id=conv.get('receiving_phone_id')
-                        )
 
-                        # Link in DB
-                        booking_nr_val = self.get_field_value(booking_record.get('fields', {}), FieldIds.BOOKING_NR)
-                        chat_db.update_conversation_info(chat_id, airtable_record_id=booking_record['id'], location=db_location, booking_number=booking_nr_val)
-                        
-                        # Update booking details based on customer's earlier messages
-                        self.update_booking_from_extracted_data(booking_record, extracted_data)
-                        
-                        # Optionally, send a confirmation message? The prompt already told them we saved it. 
-                        # We don't want to spam them now, but we've successfully updated it.
+                # Search only this chat's company bookings. A number that exists on
+                # another company must not attach that company's customer here.
+                conv_company = company_tenancy.normalize_company_id(conv.get("company_id"))
+                company_table, company_table_name = (None, "")
+                if not company_tenancy.is_default_company(conv_company):
+                    company_table, company_table_name = self._open_company_bookings_table(conv_company)
+                    if company_table is None:
+                        logging.info(
+                            "Skipping orphan link for chat %s: company %s has no bookings table",
+                            chat_id,
+                            conv_company,
+                        )
+                        continue
+
+                company_tenancy.bind_booking_company(conv_company, company_table, company_table_name)
+                try:
+                    booking_record = self.find_booking_strictly(
+                        history_text,
+                        sender_email=customer_email,
+                        sender_phone=contact_phone,
+                        ai_extracted_data=extracted_data,
+                        department=conv.get('location')
+                    )
+                    if booking_record and not company_tenancy.is_default_company(conv_company):
+                        found_table = str(booking_record.get("table_name") or "").strip()
+                        if found_table != company_table_name:
+                            logging.warning(
+                                "Blocked cross-company orphan link chat %s company %s record %s table %s",
+                                chat_id,
+                                conv_company,
+                                booking_record.get("id"),
+                                found_table or "-",
+                            )
+                            booking_record = None
+
+                    if booking_record:
+                        # Check if it's actually a confirmed booking, not just a newly created lead
+                        is_lead = booking_record.get('table_name') == LEADS_TABLE_NAME
+
+                        if not is_lead:
+                            logging.info(f"Orphan chat {chat_id} successfully linked to Booking {booking_record['id']}.")
+
+                            if not company_tenancy.is_default_company(conv_company):
+                                db_location = company_tenancy.company_customer_inbox_location(conv_company, "")
+                            else:
+                                # Determine location from the booking destination to avoid pickup-time strings.
+                                db_location = self._derive_chat_location_from_fields(
+                                    booking_record.get('fields', {}),
+                                    fallback_location=conv.get('location', "Unknown"),
+                                    receiving_phone_id=conv.get('receiving_phone_id')
+                                )
+
+                            booking_nr_val = self.get_field_value(booking_record.get('fields', {}), FieldIds.BOOKING_NR)
+                            chat_db.update_conversation_info(chat_id, airtable_record_id=booking_record['id'], location=db_location, booking_number=booking_nr_val)
+
+                            self.update_booking_from_extracted_data(booking_record, extracted_data)
+                finally:
+                    company_tenancy.unbind_booking_company()
         except Exception as e:
             logging.error(f"Error in sync_orphan_chats: {e}")
 

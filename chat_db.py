@@ -4226,13 +4226,23 @@ def get_messages(chat_id, merge_by_record=True):
             pass
         c = conn.cursor()
         
-        c.execute("SELECT airtable_record_id FROM conversations WHERE chat_id = ?", (chat_id,))
+        c.execute("SELECT airtable_record_id, company_id FROM conversations WHERE chat_id = ?", (chat_id,))
         row = c.fetchone()
         record_id = row["airtable_record_id"] if row else None
+        company_key = str((row["company_id"] if row else "") or "").strip() or "fts"
 
         if record_id and merge_by_record:
             try:
-                c.execute("UPDATE conversations SET unread_count = 0 WHERE airtable_record_id = ? AND unread_count > 0", (record_id,))
+                c.execute(
+                    """
+                    UPDATE conversations
+                    SET unread_count = 0
+                    WHERE airtable_record_id = ?
+                      AND unread_count > 0
+                      AND COALESCE(NULLIF(company_id, ''), 'fts') = ?
+                    """,
+                    (record_id, company_key),
+                )
                 if c.rowcount > 0:
                     conn.commit()
             except sqlite3.OperationalError:
@@ -4243,8 +4253,9 @@ def get_messages(chat_id, merge_by_record=True):
                 FROM messages m
                 JOIN conversations c ON m.chat_id = c.chat_id
                 WHERE c.airtable_record_id = ?
+                  AND COALESCE(NULLIF(c.company_id, ''), 'fts') = ?
                 ORDER BY m.timestamp ASC
-            """, (record_id,))
+            """, (record_id, company_key))
         else:
             try:
                 c.execute("UPDATE conversations SET unread_count = 0 WHERE chat_id = ? AND unread_count > 0", (chat_id,))

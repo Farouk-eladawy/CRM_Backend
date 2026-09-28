@@ -168,7 +168,7 @@
     "secret_key": "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"
   },
   "wetravel": {
-    "refresh_token": "eyJraWQiOiJkNjFiYzMxMiIsImFsZyI6IkVTMjU2In0.eyJpZCI6MTI1MjIxMSwidmVyIjo1LCJwdWIiOnRydWUsInNjb3BlcyI6WyJydzphbGwiXSwiZXhwIjoyMDcyODIyNDAwLCJqdGkiOiI3NWQ5MTQzYi1mYzA4LTRhZTQtODYzOC1kMDY3MDliMzIzYTYiLCJraW5kIjoicmVmcmVzaCIsInNiZCI6bnVsbH0.AHHmXJ23eSItcMyp28R3d1fGEEh4Fy7IKFQOaZP3JFKGJRzxmNb8gqyI8gqFwwIsjMzrKxz9Uvcs9UCLr-8afg"
+    "refresh_token": ""
   },
   "facebook": {
     "page_access_token": "EAAOioPl0MaMBSkZCGzD5EYd2kU6oLZAUi4oCZBm9EFLrCsIEtMhy2AQgoiglsPdJpKZArAAQshJir4gWfWp8Y24aFRHyZBD1jEcHiAPBb5EI4h5fJb1iaXGheXDJEr1ZBsnjMon5fcrYENkkwu3EVA6N21ZAWDfSXrSiJbhwe5GnotZA5oTeg9g4QdqKovGg5ntlyxcZD",

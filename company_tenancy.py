@@ -31,9 +31,30 @@ def empty_payment_settings():
         "useFtsPayment": True,
         "stripeEnabled": True,
         "wetravelEnabled": True,
+        # auto = pick by currency lists; stripe/wetravel = force that provider when enabled
+        "preferredProvider": "auto",
+        "stripeCurrencies": ["USD"],
+        "wetravelCurrencies": ["EUR", "GBP", "EGP"],
         "stripeSecretKey": "",
         "wetravelRefreshToken": "",
     }
+
+
+def _sanitize_currency_list(raw, fallback):
+    out = []
+    seen = set()
+    src = raw if isinstance(raw, (list, tuple)) else []
+    for item in src:
+        code = str(item or "").strip().upper()
+        if not code or code in seen:
+            continue
+        if not re.fullmatch(r"[A-Z]{3}", code):
+            continue
+        seen.add(code)
+        out.append(code)
+    if out:
+        return out
+    return list(fallback or [])
 
 
 def sanitize_payment_settings(raw, previous=None):
@@ -51,6 +72,20 @@ def sanitize_payment_settings(raw, previous=None):
     if "wetravelEnabled" in src:
         merged["wetravelEnabled"] = coerce_bool(src.get("wetravelEnabled"), default=True)
 
+    preferred = str(src.get("preferredProvider") if "preferredProvider" in src else merged.get("preferredProvider") or "auto").strip().lower()
+    if preferred not in ("auto", "stripe", "wetravel"):
+        preferred = "auto"
+    merged["preferredProvider"] = preferred
+
+    if "stripeCurrencies" in src:
+        merged["stripeCurrencies"] = _sanitize_currency_list(src.get("stripeCurrencies"), ["USD"])
+    else:
+        merged["stripeCurrencies"] = _sanitize_currency_list(merged.get("stripeCurrencies"), ["USD"])
+    if "wetravelCurrencies" in src:
+        merged["wetravelCurrencies"] = _sanitize_currency_list(src.get("wetravelCurrencies"), ["EUR", "GBP", "EGP"])
+    else:
+        merged["wetravelCurrencies"] = _sanitize_currency_list(merged.get("wetravelCurrencies"), ["EUR", "GBP", "EGP"])
+
     def _secret(field):
         if field not in src or src.get(field) is None:
             return str(prev.get(field) or "")
@@ -66,6 +101,12 @@ def sanitize_payment_settings(raw, previous=None):
     merged["useFtsPayment"] = bool(merged.get("useFtsPayment", True))
     merged["stripeEnabled"] = bool(merged.get("stripeEnabled", True))
     merged["wetravelEnabled"] = bool(merged.get("wetravelEnabled", True))
+
+    # If only one provider is enabled, force preferred to that provider.
+    if merged["stripeEnabled"] and not merged["wetravelEnabled"]:
+        merged["preferredProvider"] = "stripe"
+    elif merged["wetravelEnabled"] and not merged["stripeEnabled"]:
+        merged["preferredProvider"] = "wetravel"
     return merged
 
 
@@ -75,18 +116,57 @@ def payment_public_view(settings):
         "useFtsPayment": bool(item.get("useFtsPayment")),
         "stripeEnabled": bool(item.get("stripeEnabled")),
         "wetravelEnabled": bool(item.get("wetravelEnabled")),
+        "preferredProvider": str(item.get("preferredProvider") or "auto"),
+        "stripeCurrencies": list(item.get("stripeCurrencies") or ["USD"]),
+        "wetravelCurrencies": list(item.get("wetravelCurrencies") or ["EUR", "GBP", "EGP"]),
         "stripeConfigured": bool(str(item.get("stripeSecretKey") or "").strip()),
         "wetravelConfigured": bool(str(item.get("wetravelRefreshToken") or "").strip()),
     }
 
 
+def resolve_payment_provider(currency, settings):
+    """Pick stripe or wetravel from company payment settings + invoice currency."""
+    item = sanitize_payment_settings(settings if isinstance(settings, dict) else None)
+    cur = str(currency or "").strip().upper()
+    preferred = str(item.get("preferredProvider") or "auto").strip().lower()
+    stripe_on = bool(item.get("stripeEnabled"))
+    wetravel_on = bool(item.get("wetravelEnabled"))
+    stripe_curs = [str(x).upper() for x in (item.get("stripeCurrencies") or ["USD"])]
+    wetravel_curs = [str(x).upper() for x in (item.get("wetravelCurrencies") or ["EUR", "GBP", "EGP"])]
+
+    def _currency_matches(codes):
+        if not cur:
+            return False
+        return any(code and code in cur for code in codes)
+
+    if preferred == "stripe" and stripe_on:
+        return "stripe"
+    if preferred == "wetravel" and wetravel_on:
+        return "wetravel"
+
+    # auto (or preferred provider disabled): match currency lists
+    stripe_match = _currency_matches(stripe_curs) or ("USD" in cur)
+    wetravel_match = _currency_matches(wetravel_curs)
+
+    if stripe_match and stripe_on:
+        return "stripe"
+    if wetravel_match and wetravel_on:
+        return "wetravel"
+    if stripe_on and not wetravel_on:
+        return "stripe"
+    if wetravel_on and not stripe_on:
+        return "wetravel"
+    if stripe_on:
+        return "stripe"
+    return "wetravel"
+
+
 def payment_settings(company_id=None):
-    if is_default_company(company_id):
-        settings = empty_payment_settings()
-        settings["useFtsPayment"] = True
-        return settings
     company = get_company(company_id) or {}
     settings = sanitize_payment_settings(company.get("payment"))
+    # FTS is the shared payment account itself — always "use FTS path".
+    if is_default_company(company_id):
+        settings["useFtsPayment"] = True
     return settings
 
 

@@ -8,7 +8,9 @@ This environment is a **sandbox**:
 - Confirmations look like `FTS-TEST-88421`
 - **No live inventory and no Airtable writes**
 
-Base URL: `https://crm.ftstravels.com`
+Base URL: `https://api.ftstravels.com`
+
+Do **not** use `https://crm.ftstravels.com` — that host serves the TourCare dashboard (HTML). Supplier APIs live on `api.ftstravels.com` (same host as Viator/GYG supplier endpoints).
 
 Auth (all routes except health and OpenAPI):
 

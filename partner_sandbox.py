@@ -340,7 +340,7 @@ def openapi_document() -> dict:
                 "No live inventory and no Airtable writes. Align production fields to your spec later."
             ),
         },
-        "servers": [{"url": "https://crm.ftstravels.com", "description": "FTS CRM (sandbox paths)"}],
+        "servers": [{"url": "https://api.ftstravels.com", "description": "FTS API (sandbox paths)"}],
         "security": [{"bearerAuth": []}],
         "components": {
             "securitySchemes": {

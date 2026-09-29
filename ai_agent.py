@@ -7086,6 +7086,67 @@ User request:
             return
 
         try:
+            # Hard guard: never write extracted fields onto a booking when the active chat
+            # identity clearly belongs to a different customer (cross-contamination).
+            try:
+                import chat_db as _chat_db_ident
+                chat_id = getattr(self, "_current_chat_id", None)
+                conv = _chat_db_ident.get_conversation(chat_id) if chat_id else None
+            except Exception:
+                conv = None
+            if conv:
+                sender = str(conv.get("sender_identifier") or "").strip().lower()
+                chat_name = str(conv.get("contact_name") or "").strip().lower()
+                fields = record.get("fields") or {}
+                booking_name = str(
+                    self.get_field_value(fields, FieldIds.CUSTOMER_NAME)
+                    or self.get_field_value(fields, FieldIds.TRAVELER_NAME)
+                    or ""
+                ).strip().lower()
+                booking_emails = []
+                for key in (FieldIds.CUSTOMER_PERSONAL_EMAIL, FieldIds.CUSTOMER_EMAIL):
+                    val = self.get_field_value(fields, key)
+                    if isinstance(val, str) and "@" in val:
+                        booking_emails.append(val.strip().lower())
+                sender_emails = re.findall(r"[\w\.-]+@[\w\.-]+\.\w+", sender)
+                personal_sender_emails = [
+                    e for e in sender_emails
+                    if not any(d in e for d in (
+                        "getyourguide.com", "headout.com", "ftstravels.com",
+                        "noreply", "mailer-daemon", "tiqets.com", "viator.com",
+                    ))
+                ]
+                identity_clash = False
+                if booking_name and chat_name and chat_name not in ("guest", "make") and booking_name != chat_name:
+                    # Allow partial token overlap (first/last name)
+                    b_tokens = set(re.findall(r"[a-zA-ZÀ-ÿ]{3,}", booking_name))
+                    c_tokens = set(re.findall(r"[a-zA-ZÀ-ÿ]{3,}", chat_name))
+                    if b_tokens and c_tokens and not (b_tokens & c_tokens):
+                        # Email can still prove same person
+                        if personal_sender_emails and any(e in booking_emails for e in personal_sender_emails):
+                            identity_clash = False
+                        elif personal_sender_emails and booking_emails:
+                            identity_clash = True
+                        elif personal_sender_emails and not booking_emails:
+                            identity_clash = True
+                        else:
+                            identity_clash = True
+                if identity_clash:
+                    booking_label = (
+                        self.get_field_value(fields, FieldIds.BOOKING_NR)
+                        or record.get("id")
+                        or "Unknown"
+                    )
+                    logging.warning(
+                        "Blocked Airtable field update for booking %s due to chat/booking identity mismatch "
+                        "(chat_name=%r sender=%r booking_name=%r).",
+                        booking_label,
+                        conv.get("contact_name"),
+                        (conv.get("sender_identifier") or "")[:80],
+                        self.get_field_value(fields, FieldIds.CUSTOMER_NAME),
+                    )
+                    return
+
             table_name = str(record.get('table_name') or '').strip()
             contact_field_keys = self._contact_field_keys_for_table(table_name)
             name_field_key = contact_field_keys.get("name")
@@ -7330,8 +7391,46 @@ User request:
             return False
 
 
+    def _strip_email_quoted_history(self, text):
+        """Remove replied/forwarded quote blocks so old booking numbers do not leak into matching."""
+        raw = str(text or "")
+        if not raw.strip():
+            return raw
+        cut_patterns = [
+            r"(?im)^\s*On .+ wrote:\s*$",
+            r"(?im)^\s*From:\s*.+$",
+            r"(?im)^\s*-{2,}\s*Original Message\s*-{2,}\s*$",
+            r"(?im)^\s*_{5,}\s*$",
+            r"(?im)^\s*Op .+ schreef .+:\s*$",
+            r"(?im)^\s*Op .+ heeft .+ het volgende geschreven:\s*$",
+            r"(?im)^\s*Am .+ schrieb .+:\s*$",
+            r"(?im)^\s*Am .+ um .+ schrieb .+:\s*$",
+            r"(?im)^\s*Le .+ a écrit\s*:\s*$",
+            r"(?im)^\s*>+\s*\[?FTS Travels",
+            r"(?im)^\s*GetYourGuide\s+Booking\s+Reference",
+        ]
+        cut_at = None
+        for pat in cut_patterns:
+            m = re.search(pat, raw)
+            if not m:
+                continue
+            idx = m.start()
+            # Keep enough of the customer reply above the quote.
+            if idx >= 40 and (cut_at is None or idx < cut_at):
+                cut_at = idx
+        if cut_at is not None:
+            raw = raw[:cut_at]
+        # Drop remaining quoted lines.
+        lines = []
+        for line in raw.splitlines():
+            if re.match(r"^\s*>+\s?", line):
+                continue
+            lines.append(line)
+        return "\n".join(lines).strip() or str(text or "")
+
     def extract_booking_numbers_regex(self, text):
         """Extract potential booking numbers using Regex. Returns list of (code, confidence)."""
+        text = self._strip_email_quoted_history(text)
         
         # 1. Ignore automated guide/driver reports and alerts to prevent cross-contamination
         ignore_patterns = ['daily_guide_driver_report', 'last-minute booking alert', 'تم تخصيص الرحلة التالية', 'المرشد السياحي:']
@@ -11787,6 +11886,50 @@ Conversation:
         if source_lower == "facebook" and customer_name != "Guest" and customer_name_source in {"booking_record", "ai"}:
             if not self._is_safe_facebook_fallback_customer_name(customer_name):
                 customer_name = "Guest"
+
+        # Prevent booking-name overwrite when the chat sender is clearly a different person
+        # (this was a major cause of Olivia Agnes Brown appearing on unrelated email chats).
+        try:
+            import chat_db as _chat_db_name_guard
+            _existing_for_name = None
+            if hasattr(self, "_current_chat_id") and self._current_chat_id:
+                _existing_for_name = _chat_db_name_guard.get_conversation(self._current_chat_id)
+            if _existing_for_name and customer_name_source == "booking_record":
+                sender_l = str(_existing_for_name.get("sender_identifier") or "").lower()
+                existing_name = self._normalize_customer_name(_existing_for_name.get("contact_name") or "")
+                gyg_name_m = re.search(r'::\s*"?([^"<]+?)\s+via\s+GetYourGuide', sender_l, re.I)
+                personal_emails = [
+                    e for e in re.findall(r"[\w\.-]+@[\w\.-]+\.\w+", sender_l)
+                    if not any(d in e for d in (
+                        "getyourguide.com", "headout.com", "ftstravels.com",
+                        "noreply", "mailer-daemon", "tiqets.com", "viator.com",
+                    ))
+                ]
+                booking_emails = []
+                for key in (FieldIds.CUSTOMER_PERSONAL_EMAIL, FieldIds.CUSTOMER_EMAIL):
+                    val = self.get_field_value((booking_record or {}).get("fields") or {}, key)
+                    if isinstance(val, str) and "@" in val:
+                        booking_emails.append(val.strip().lower())
+                email_matches_booking = bool(personal_emails and any(e in booking_emails for e in personal_emails))
+                if gyg_name_m:
+                    gyg_name = self._normalize_customer_name(gyg_name_m.group(1))
+                    if gyg_name and gyg_name != "Guest" and gyg_name.lower() != str(customer_name or "").lower():
+                        if not email_matches_booking:
+                            customer_name = gyg_name
+                            customer_name_source = "sender_identifier"
+                elif existing_name and existing_name != "Guest" and existing_name.lower() != str(customer_name or "").lower():
+                    if personal_emails and not email_matches_booking:
+                        customer_name = existing_name
+                        customer_name_source = "existing_chat"
+                    elif not personal_emails and not email_matches_booking:
+                        # Keep existing distinct chat name rather than forcing booking customer name.
+                        b_tokens = set(re.findall(r"[a-zA-ZÀ-ÿ]{3,}", str(customer_name or "").lower()))
+                        e_tokens = set(re.findall(r"[a-zA-ZÀ-ÿ]{3,}", existing_name.lower()))
+                        if b_tokens and e_tokens and not (b_tokens & e_tokens):
+                            customer_name = existing_name
+                            customer_name_source = "existing_chat"
+        except Exception as _name_guard_err:
+            logging.debug(f"contact name identity guard skipped: {_name_guard_err}")
 
         # --- UPDATE CONVERSATION WITH RECORD ID AND NAME ---
         if hasattr(self, '_current_chat_id') and self._current_chat_id:
@@ -41367,10 +41510,17 @@ Write ONE short message only. No JSON. No explanations."""
                 except Exception:
                     pass
                 
-                # Auto-remove Needs Help status ONLY for Religious department AND if NOT a proposed draft
-                if str(conv_dict.get('location') or '').strip().lower() == 'religious':
-                    if not (text and str(text).startswith('[PROPOSED_DRAFT]')):
+                # Auto-remove Needs Help / Unread when a human agent actually replies
+                # (all departments). Proposed drafts must NOT clear the unread state.
+                if not (text and str(text).startswith('[PROPOSED_DRAFT]')):
+                    try:
                         chat_db.update_conversation_info(chat_id, needs_help=0)
+                    except Exception:
+                        pass
+                    try:
+                        chat_db.mark_conversation_read(chat_id)
+                    except Exception:
+                        pass
 
                 try:
                     if str(desired_channel or '').strip().lower() == 'whatsapp':

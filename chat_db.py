@@ -2943,6 +2943,14 @@ def update_conversation_info(
             c.execute("UPDATE conversations SET airtable_record_id = ? WHERE chat_id = ?", (airtable_record_id, chat_id))
         if location is not None:
             c.execute("UPDATE conversations SET location = ? WHERE chat_id = ?", (location, chat_id))
+            # Religious chats must never linger in the Sales inbox via sales_inbox=1.
+            # (Sales filter historically matched sales_inbox OR location=Sales.)
+            if str(location).strip() == "Religious" and sales_inbox is None:
+                c.execute("PRAGMA table_info(conversations)")
+                _cols = [col[1] for col in c.fetchall()]
+                if "sales_inbox" not in _cols:
+                    c.execute("ALTER TABLE conversations ADD COLUMN sales_inbox INTEGER DEFAULT 0")
+                c.execute("UPDATE conversations SET sales_inbox = 0 WHERE chat_id = ?", (chat_id,))
         if booking_number is not None:
             c.execute("UPDATE conversations SET booking_number = ? WHERE chat_id = ?", (booking_number, chat_id))
         if email_account_id is not None:
@@ -3323,16 +3331,18 @@ def add_message(chat_id, sender_type, text, status='sent', increment_unread=True
                 WHERE chat_id = ?
             """, (chat_id,))
 
-        # Reset unread_count if it's from the assistant/agent (Automation/Workflow)
-        if sender_type in ('ai', 'agent', 'system') and not is_proposed_draft:
-            c.execute("SELECT location FROM conversations WHERE chat_id = ?", (chat_id,))
-            row = c.fetchone()
-            if row and row[0] == 'Religious':
-                c.execute("""
-                    UPDATE conversations 
-                    SET unread_count = 0
-                    WHERE chat_id = ?
-                """, (chat_id,))
+        # Reset unread_count on real assistant/agent replies (all locations).
+        # System logs and proposed drafts must not clear unread.
+        if (
+            sender_type in ('ai', 'agent', 'system')
+            and not is_proposed_draft
+            and not text_s.startswith('[System Log]')
+        ):
+            c.execute("""
+                UPDATE conversations 
+                SET unread_count = 0
+                WHERE chat_id = ?
+            """, (chat_id,))
 
         if sender_type == 'customer':
             try:
@@ -3819,7 +3829,8 @@ def get_conversations_page(
             params.append(nh)
 
     if int(sales_only or 0) == 1:
-        where.append("(sales_inbox = 1 OR location = 'Sales')")
+        # Never pull Religious chats into Sales via a leftover sales_inbox flag.
+        where.append("((sales_inbox = 1 OR location = 'Sales') AND IFNULL(location, '') != 'Religious')")
     else:
         if locations and isinstance(locations, (list, tuple)) and len(locations) > 0:
             locs = [str(x) for x in locations if str(x).strip() != ""]
@@ -3984,6 +3995,7 @@ def get_conversations_page(
               JOIN conv c2 ON c2.chat_id = m2.chat_id
               WHERE (c2.force_read_at IS NULL OR m2.timestamp > c2.force_read_at)
                 AND IFNULL(m2.text, '') NOT LIKE '[PROPOSED_DRAFT]%'
+                AND IFNULL(m2.text, '') NOT LIKE '[System Log]%'
             ),
             unread_one AS (
               SELECT chat_id, is_unread_computed
@@ -4796,7 +4808,10 @@ def list_sales_customers(
                 if locs:
                     placeholders = ",".join(["?"] * len(locs))
                     if any(x.lower() == "sales" for x in locs):
-                        where.append(f"(LOWER(COALESCE(c.location, '')) IN ({placeholders}) OR COALESCE(c.sales_inbox, 0) = 1)")
+                        where.append(
+                            f"((LOWER(COALESCE(c.location, '')) IN ({placeholders}) OR COALESCE(c.sales_inbox, 0) = 1) "
+                            f"AND LOWER(COALESCE(c.location, '')) != 'religious')"
+                        )
                     else:
                         where.append(f"LOWER(COALESCE(c.location, '')) IN ({placeholders})")
                     params.extend([x.lower() for x in locs])

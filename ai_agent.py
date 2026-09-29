@@ -3684,13 +3684,11 @@ class AIAgent:
         return variants
 
     # --- Team View ID ACL (Airtable + Baserow) ---
+    # Explicit airtableViewId / baserowViewId on the user record only.
+    # Do NOT hardcode username→view fallbacks (that leaked chats to Ahmed_Saad
+    # even when Team settings left View ID empty).
     _VIEW_SCOPE_CACHE = {}
     _VIEW_SCOPE_TTL_SEC = 90
-    _LEGACY_AIRTABLE_VIEW_BY_USERNAME = {
-        "bassant_khalled": "bassant_Khaled",
-        "nadeen_hossam": "nadeen_Hossam",
-        "ahmed_saad": "ahmedsaad_sales",
-    }
 
     def _normalize_username_key(self, username):
         return str(username or "").strip().lower()
@@ -3719,13 +3717,10 @@ class AIAgent:
         return None
 
     def _user_view_ids(self, user_obj):
-        """Return (airtable_view_id, baserow_view_id) including legacy sales map fallback."""
+        """Return (airtable_view_id, baserow_view_id) from Team settings only."""
         user_obj = user_obj if isinstance(user_obj, dict) else {}
         at_view = str(user_obj.get("airtableViewId") or "").strip()
         br_view = str(user_obj.get("baserowViewId") or "").strip()
-        if not at_view:
-            uname = self._normalize_username_key(user_obj.get("username"))
-            at_view = str(self._LEGACY_AIRTABLE_VIEW_BY_USERNAME.get(uname) or "").strip()
         return at_view, br_view
 
     def _user_has_view_scope(self, user_obj):
@@ -3848,6 +3843,8 @@ class AIAgent:
             user_obj = self._find_dashboard_user_for_view_scope(actor_id=actor_id, actor_username=actor_username) or {}
         at_view, br_view = self._user_view_ids(user_obj)
         if not at_view and not br_view:
+            # No View ID assigned in Team settings → no scope filter.
+            # Sales agents then see the full Sales inbox; with a View ID they see only that view.
             return {
                 "active": False,
                 "record_ids": [],

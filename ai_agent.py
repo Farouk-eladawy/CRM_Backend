@@ -13410,9 +13410,11 @@ Conversation:
 
     def check_and_release_stale_sales_leads(self, timeout_minutes=10):
         """
-        External Sales leads: if a customer message sits unanswered for timeout_minutes,
-        release ownership so any sales agent can take it. Whoever replies next owns it
-        (see assign_sales_lead on dashboard send).
+        External Sales only (location = Sales).
+
+        If a customer message sits unanswered for timeout_minutes, release ownership
+        so any external sales agent can take it. Whoever replies next owns it.
+        Religious chats are never selected.
         """
         import chat_db
         import sqlite3
@@ -13433,8 +13435,6 @@ Conversation:
             with sqlite3.connect(chat_db.DB_FILE, timeout=15.0) as conn:
                 conn.row_factory = sqlite3.Row
                 c = conn.cursor()
-                # Owned Sales chats whose latest customer message is older than cutoff
-                # and has no real agent/ai reply after that message.
                 c.execute(
                     """
                     SELECT
@@ -13453,11 +13453,9 @@ Conversation:
                         ) AS last_customer_ts
                     FROM conversations c
                     WHERE COALESCE(NULLIF(TRIM(c.lead_owner_user_id), ''), '') != ''
-                      AND (
-                            LOWER(COALESCE(c.location, '')) = 'sales'
-                            OR COALESCE(c.sales_inbox, 0) = 1
-                      )
+                      AND LOWER(COALESCE(c.location, '')) = 'sales'
                       AND COALESCE(c.is_deleted, 0) = 0
+                      AND COALESCE(c.is_closed, 0) = 0
                     """
                 )
                 rows = c.fetchall() or []
@@ -13472,12 +13470,10 @@ Conversation:
                     if not chat_id or not last_customer_ts or not owner_id:
                         continue
 
-                    # Compare ISO prefixes (Cairo naive timestamps used across the app).
                     ts_cmp = last_customer_ts.replace("Z", "").split("+")[0].split(".")[0]
                     if ts_cmp > cutoff_s:
                         continue
 
-                    # Confirm no real reply after the last customer message.
                     with sqlite3.connect(chat_db.DB_FILE, timeout=15.0) as conn2:
                         c2 = conn2.cursor()
                         c2.execute(

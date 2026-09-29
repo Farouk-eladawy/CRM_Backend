@@ -7208,6 +7208,127 @@ User request:
         # But since we will update callers, it's fine.
         pass
 
+    def _sync_booking_fields_from_customer_text(
+        self,
+        chat_id,
+        message_body,
+        *,
+        source="WhatsApp",
+        sender_identifier=None,
+        history_text="",
+    ):
+        """
+        Extract booking fields from a customer message and write them to Airtable
+        even when AI auto-reply/draft is paused (human agent is handling the chat).
+
+        Used for room number, hotel name, personal email, notes, etc.
+        """
+        chat_key = str(chat_id or "").strip()
+        text = str(message_body or "").strip()
+        if not chat_key or not text:
+            return False
+
+        lower = text.lower()
+        # Pure media placeholders rarely contain structured booking fields.
+        if lower.startswith("[customer sent an audio") or lower.startswith("[customer sent a video") \
+                or lower.startswith("[customer sent a sticker") or lower.startswith("[customer sent a document") \
+                or lower.startswith("[customer sent a message of type:"):
+            return False
+
+        try:
+            import chat_db
+            conv = chat_db.get_conversation(chat_key) or {}
+            record_id = str(conv.get("airtable_record_id") or "").strip()
+            booking_nr = str(conv.get("booking_number") or "").strip()
+            conv_company = str(conv.get("company_id") or "").strip()
+
+            booking_record = None
+            if record_id:
+                # Prefer the company bookings table when configured.
+                try:
+                    if conv_company and not company_tenancy.is_default_company(conv_company):
+                        company_table, company_table_name = self._open_company_bookings_table(conv_company)
+                        if company_table is not None:
+                            try:
+                                booking_record = company_table.get(record_id)
+                                if isinstance(booking_record, dict):
+                                    booking_record = dict(booking_record)
+                                    booking_record["table_name"] = company_table_name
+                            except Exception:
+                                booking_record = None
+                except Exception:
+                    booking_record = None
+                if not booking_record:
+                    try:
+                        booking_record = self._get_record_from_any_table(record_id)
+                    except Exception:
+                        booking_record = None
+
+            if not booking_record and booking_nr:
+                try:
+                    booking_record = self.find_booking_by_number(booking_nr)
+                except Exception:
+                    booking_record = None
+
+            if not isinstance(booking_record, dict) or not booking_record.get("id"):
+                logging.info(
+                    "Booking field sync skipped chat=%s — no linked booking (record=%s booking=%s)",
+                    chat_key,
+                    record_id or "-",
+                    booking_nr or "-",
+                )
+                return False
+
+            email_for_extraction = None
+            sender = str(sender_identifier or conv.get("sender_identifier") or "").strip()
+            if "@" in sender:
+                email_for_extraction = sender
+                if any(d in sender.lower() for d in ("headout.com", "getyourguide.com", "trip.com", "viator.com")):
+                    email_for_extraction = None
+
+            search_text = text
+            hist = str(history_text or "").strip()
+            if hist:
+                # Keep prompt small: last history chunk + latest message.
+                search_text = f"{hist[-2500:]}\n\nLATEST CUSTOMER MESSAGE:\n{text}"
+
+            extracted = self.extract_booking_data_using_ai(search_text, sender_email=email_for_extraction) or {}
+            if not isinstance(extracted, dict) or not extracted:
+                logging.info("Booking field sync: AI extracted nothing for chat=%s", chat_key)
+                return False
+
+            # Drop empty / nullish values
+            cleaned = {}
+            for k, v in extracted.items():
+                if v is None:
+                    continue
+                s = str(v).strip()
+                if not s or s.lower() in {"none", "n/a", "unknown", "null"}:
+                    continue
+                cleaned[k] = v
+
+            if not cleaned:
+                return False
+
+            before_keys = set(cleaned.keys())
+            self.update_booking_from_extracted_data(booking_record, cleaned)
+            logging.info(
+                "Booking field sync OK chat=%s record=%s source=%s fields=%s",
+                chat_key,
+                booking_record.get("id"),
+                source,
+                sorted(before_keys),
+            )
+            return True
+        except Exception as e:
+            logging.error(
+                "Booking field sync failed chat=%s: %s",
+                chat_key,
+                e,
+                exc_info=True,
+            )
+            return False
+
 
     def extract_booking_numbers_regex(self, text):
         """Extract potential booking numbers using Regex. Returns list of (code, confidence)."""
@@ -13487,6 +13608,32 @@ Conversation:
                 )
             except Exception as save_err:
                 logging.error("Failed to save WhatsApp message while skipping AI: %s", save_err)
+            # Still extract hotel/room/email/notes into Airtable while human is handling.
+            try:
+                self._sync_booking_fields_from_customer_text(
+                    chat_id,
+                    message_body,
+                    source="WhatsApp",
+                    sender_identifier=sender_phone,
+                    history_text=history_text,
+                )
+            except Exception as sync_err:
+                logging.warning("WhatsApp booking field sync after skip-AI failed: %s", sync_err)
+
+        def _sync_booking_fields_only(chat_id):
+            """When inbound was already saved (skip_db_save) but AI reply is paused."""
+            if not chat_id or not str(message_body or "").strip():
+                return
+            try:
+                self._sync_booking_fields_from_customer_text(
+                    chat_id,
+                    message_body,
+                    source="WhatsApp",
+                    sender_identifier=sender_phone,
+                    history_text=history_text,
+                )
+            except Exception as sync_err:
+                logging.warning("WhatsApp booking field sync failed: %s", sync_err)
 
         if staff_loc and chat_conv:
             _save_inbound_without_ai(chat_conv.get("chat_id"))
@@ -13501,7 +13648,10 @@ Conversation:
                     "Skipping WhatsApp AI processing for chat %s because system/workflow already replied after last customer message.",
                     early_chat_id,
                 )
-                _save_inbound_without_ai(early_chat_id)
+                if skip_db_save:
+                    _sync_booking_fields_only(early_chat_id)
+                else:
+                    _save_inbound_without_ai(early_chat_id)
                 try:
                     self._reconcile_stale_proposed_draft(early_chat_id)
                 except Exception:
@@ -13598,6 +13748,11 @@ Conversation:
                                 logging.info(f"WhatsApp Draft generation continued despite human hold until {hold_dt.isoformat()} for chat {chat_conv.get('chat_id')}")
                             else:
                                 logging.info(f"WhatsApp auto-reply paused (human hold) until {hold_dt.isoformat()} for chat {chat_conv.get('chat_id')}")
+                                # Human is handling — still sync booking fields from customer text.
+                                if skip_db_save:
+                                    _sync_booking_fields_only(chat_conv.get("chat_id") if chat_conv else None)
+                                else:
+                                    _save_inbound_without_ai(chat_conv.get("chat_id") if chat_conv else None)
                                 return
                         try:
                             if now_cairo >= hold_dt:
@@ -13610,7 +13765,10 @@ Conversation:
         needs_help_paused = bool((is_auto_location and not is_draft_location) and chat_conv and int(chat_conv.get("needs_help") or 0) == 1)
         if needs_help_paused:
             logging.info(f"WhatsApp auto-reply paused (needs_help=1) for chat {chat_conv.get('chat_id')}")
-            _save_inbound_without_ai(chat_conv.get("chat_id") if chat_conv else None)
+            if skip_db_save:
+                _sync_booking_fields_only(chat_conv.get("chat_id") if chat_conv else None)
+            else:
+                _save_inbound_without_ai(chat_conv.get("chat_id") if chat_conv else None)
             return
 
         if is_auto_location:
@@ -13618,7 +13776,10 @@ Conversation:
             if lower_body.startswith("[customer sent an audio message.") or lower_body.startswith("[customer sent a video.") or lower_body.startswith("[customer sent a sticker.") or lower_body.startswith("[customer sent a document.") or lower_body.startswith("[customer sent a message of type:"):
                 try:
                     if chat_conv and chat_conv.get("chat_id"):
-                        _save_inbound_without_ai(chat_conv.get("chat_id"))
+                        if skip_db_save:
+                            _sync_booking_fields_only(chat_conv.get("chat_id"))
+                        else:
+                            _save_inbound_without_ai(chat_conv.get("chat_id"))
                         chat_db.update_conversation_info(chat_conv["chat_id"], needs_help=True)
                 except Exception:
                     pass
@@ -16690,6 +16851,15 @@ Conversation:
                 needs_help_paused = bool(is_auto_location and chat_conv and int(chat_conv.get("needs_help") or 0) == 1)
                 if needs_help_paused:
                     logging.info(f"Facebook auto-reply paused (needs_help=1) for chat {chat_conv.get('chat_id')}")
+                    try:
+                        self._sync_booking_fields_from_customer_text(
+                            chat_conv.get("chat_id"),
+                            message_body,
+                            source="Facebook",
+                            sender_identifier=sender_psid,
+                        )
+                    except Exception as sync_err:
+                        logging.warning("Facebook booking field sync while needs_help paused failed: %s", sync_err)
                     return
                 # Never draft/reply to Facebook Ad Referral metadata alone.
                 try:
@@ -16709,9 +16879,19 @@ Conversation:
                             "Skipping Facebook AI/draft for chat %s because system/workflow already replied.",
                             fb_chat_id,
                         )
-                        self._reconcile_stale_proposed_draft(fb_chat_id)
-                        # Only mark read when a live reply truly covers this customer turn.
-                        # Never mark read just because a stale in-memory workflow flag existed.
+                        try:
+                            self._sync_booking_fields_from_customer_text(
+                                fb_chat_id,
+                                message_body,
+                                source="Facebook",
+                                sender_identifier=sender_psid,
+                            )
+                        except Exception as sync_err:
+                            logging.warning("Facebook booking field sync after skip-AI failed: %s", sync_err)
+                        try:
+                            self._reconcile_stale_proposed_draft(fb_chat_id)
+                        except Exception:
+                            pass
                         try:
                             self._mark_read_only_if_turn_covered(fb_chat_id)
                         except Exception:

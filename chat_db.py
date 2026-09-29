@@ -3845,6 +3845,7 @@ def get_conversations_page(
             elif int(include_unknown or 0) == 1 and loc == "Hurghada/Cairo":
                 # Keep legitimate Unknown chats visible in the external inbox, but hide
                 # synthetic Email placeholders created from Airtable record IDs or PSIDs.
+                # Sales-inbox chats stay in Sales only (avoid Cairo/Sales filter overlap).
                 where.append(
                     "((location = ? OR "
                     "(((location = 'Unknown' OR location = '') "
@@ -3853,7 +3854,8 @@ def get_conversations_page(
                     "(COALESCE(sender_identifier, '') <> '' "
                     "AND COALESCE(sender_identifier, '') GLOB '[0-9]*' "
                     "AND COALESCE(sender_identifier, '') NOT GLOB '*[^0-9]*')))))"
-                    ") OR (location = 'Quality' AND quality_from_location = ?))"
+                    ") OR (location = 'Quality' AND quality_from_location = ?)) "
+                    "AND IFNULL(sales_inbox, 0) = 0"
                 )
                 params.extend([loc, loc])
             else:
@@ -3995,7 +3997,11 @@ def get_conversations_page(
               JOIN conv c2 ON c2.chat_id = m2.chat_id
               WHERE (c2.force_read_at IS NULL OR m2.timestamp > c2.force_read_at)
                 AND IFNULL(m2.text, '') NOT LIKE '[PROPOSED_DRAFT]%'
-                AND IFNULL(m2.text, '') NOT LIKE '[System Log]%'
+                AND NOT (
+                  IFNULL(m2.text, '') LIKE '[System Log]%'
+                  AND IFNULL(m2.text, '') NOT LIKE '%Conversation dismissed%'
+                  AND IFNULL(m2.text, '') NOT LIKE '%تم سحب المحادثة%'
+                )
             ),
             unread_one AS (
               SELECT chat_id, is_unread_computed

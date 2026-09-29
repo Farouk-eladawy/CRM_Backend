@@ -41743,19 +41743,11 @@ Write ONE short message only. No JSON. No explanations."""
                     text=log_text
                 )
                 
-                # Update conversation status to remove from Unread/Need Help
+                # Update conversation status to remove from Unread/Need Help.
+                # Use chat_db (Cairo time). A raw UTC force_read was older than message
+                # timestamps, so dismissed chats stayed in Unread.
                 chat_db.update_conversation_info(chat_id, needs_help=False)
-                # Also force read to clear unread status
-                import datetime
-                import sqlite3
-                conn = sqlite3.connect(get_data_path(get_data_path('chat_history.db')))
-                c = conn.cursor()
-                c.execute(
-                    "UPDATE conversations SET force_read_at = ? WHERE chat_id = ?",
-                    (datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat(), chat_id)
-                )
-                conn.commit()
-                conn.close()
+                chat_db.mark_conversation_read(chat_id)
                 
                 return jsonify({"status": "success", "message": "Chat dismissed successfully"})
             except Exception as e:

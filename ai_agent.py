@@ -13265,6 +13265,144 @@ Conversation:
         except Exception as e:
             logging.error(f"Error checking and reassigning religious chats: {e}")
 
+    def check_and_release_stale_sales_leads(self, timeout_minutes=10):
+        """
+        External Sales leads: if a customer message sits unanswered for timeout_minutes,
+        release ownership so any sales agent can take it. Whoever replies next owns it
+        (see assign_sales_lead on dashboard send).
+        """
+        import chat_db
+        import sqlite3
+        from datetime import datetime, timedelta
+
+        try:
+            minutes = int(timeout_minutes or 10)
+        except Exception:
+            minutes = 10
+        if minutes < 1:
+            minutes = 10
+
+        try:
+            now_cairo = datetime.utcnow() + CAIRO_OFFSET
+            cutoff = now_cairo - timedelta(minutes=minutes)
+            cutoff_s = cutoff.strftime("%Y-%m-%dT%H:%M:%S")
+
+            with sqlite3.connect(chat_db.DB_FILE, timeout=15.0) as conn:
+                conn.row_factory = sqlite3.Row
+                c = conn.cursor()
+                # Owned Sales chats whose latest customer message is older than cutoff
+                # and has no real agent/ai reply after that message.
+                c.execute(
+                    """
+                    SELECT
+                        c.chat_id,
+                        c.lead_owner_user_id,
+                        c.lead_owner_name,
+                        (
+                            SELECT m.timestamp
+                            FROM messages m
+                            WHERE m.chat_id = c.chat_id
+                              AND m.sender_type = 'customer'
+                              AND IFNULL(m.text, '') NOT LIKE '[Facebook Ad Referral]%'
+                              AND IFNULL(m.text, '') NOT LIKE '[Facebook Referral]%'
+                            ORDER BY m.timestamp DESC, m.rowid DESC
+                            LIMIT 1
+                        ) AS last_customer_ts
+                    FROM conversations c
+                    WHERE COALESCE(NULLIF(TRIM(c.lead_owner_user_id), ''), '') != ''
+                      AND (
+                            LOWER(COALESCE(c.location, '')) = 'sales'
+                            OR COALESCE(c.sales_inbox, 0) = 1
+                      )
+                      AND COALESCE(c.is_deleted, 0) = 0
+                    """
+                )
+                rows = c.fetchall() or []
+
+            released = 0
+            for row in rows:
+                try:
+                    chat_id = str(row["chat_id"] or "").strip()
+                    last_customer_ts = str(row["last_customer_ts"] or "").strip()
+                    owner_id = str(row["lead_owner_user_id"] or "").strip()
+                    owner_name = str(row["lead_owner_name"] or owner_id or "").strip()
+                    if not chat_id or not last_customer_ts or not owner_id:
+                        continue
+
+                    # Compare ISO prefixes (Cairo naive timestamps used across the app).
+                    ts_cmp = last_customer_ts.replace("Z", "").split("+")[0].split(".")[0]
+                    if ts_cmp > cutoff_s:
+                        continue
+
+                    # Confirm no real reply after the last customer message.
+                    with sqlite3.connect(chat_db.DB_FILE, timeout=15.0) as conn2:
+                        c2 = conn2.cursor()
+                        c2.execute(
+                            """
+                            SELECT 1
+                            FROM messages
+                            WHERE chat_id = ?
+                              AND sender_type IN ('agent', 'ai')
+                              AND timestamp >= ?
+                              AND IFNULL(text, '') NOT LIKE '[PROPOSED_DRAFT]%'
+                              AND IFNULL(text, '') NOT LIKE '[System Log]%'
+                            LIMIT 1
+                            """,
+                            (chat_id, last_customer_ts),
+                        )
+                        if c2.fetchone():
+                            continue
+
+                    res = chat_db.release_sales_lead(chat_id, owner_id, allow_any=True)
+                    if not res.get("ok"):
+                        continue
+                    released += 1
+                    try:
+                        chat_db.upsert_sales_state(
+                            chat_id=chat_id,
+                            updates={"assigned_sales_user": None, "needs_ai_review": 1},
+                        )
+                    except Exception:
+                        pass
+                    try:
+                        chat_db.log_sales_activity(
+                            chat_id=chat_id,
+                            event_type="lead_auto_released",
+                            actor_user_id="system",
+                            actor_name="System",
+                            meta={
+                                "reason": "unanswered_customer_timeout",
+                                "timeout_minutes": minutes,
+                                "previous_owner_user_id": owner_id,
+                                "previous_owner_name": owner_name,
+                                "last_customer_ts": last_customer_ts,
+                            },
+                        )
+                    except Exception:
+                        pass
+                    try:
+                        sys_msg = (
+                            f"[System Log] تم فك ملكية الليد من '{owner_name}' تلقائياً "
+                            f"بعد مرور {minutes} دقائق بدون رد على رسالة العميل. "
+                            f"المحادثة متاحة الآن لجميع موظفي المبيعات."
+                        )
+                        chat_db.add_message(chat_id, "agent", sys_msg, status="sent", increment_unread=False)
+                    except Exception:
+                        pass
+                    logging.info(
+                        "Auto-released Sales lead chat=%s previous_owner=%s after %s min unanswered",
+                        chat_id,
+                        owner_id,
+                        minutes,
+                    )
+                except Exception as one_err:
+                    logging.warning("Sales lead auto-release skipped for a row: %s", one_err)
+
+            if released:
+                logging.info("Sales lead auto-release finished: released=%s timeout_min=%s", released, minutes)
+        except Exception as e:
+            logging.error(f"Error checking and releasing stale sales leads: {e}", exc_info=True)
+
     def _whatsapp_phone_key_variants(self, phone):
         raw = str(phone or "").strip()
         digits = re.sub(r"\D", "", raw)
@@ -40501,11 +40639,15 @@ Write ONE short message only. No JSON. No explanations."""
 
                     try:
                         allowed_locations = actor.get('allowedLocations') or []
+                        actor_role = str(actor.get('role') or '').strip().lower()
                         is_sales_actor = (
                             isinstance(allowed_locations, list)
                             and 'Sales' in allowed_locations
-                            and str(actor.get('role') or '').lower() != 'admin'
-                            and len(allowed_locations) == 1
+                            and actor_role != 'admin'
+                        )
+                        chat_is_sales = (
+                            str(location or '').strip() == 'Sales'
+                            or int(conv_dict.get('sales_inbox') or 0) == 1
                         )
                         if is_sales_actor:
                             phone_number_ids = (self.config.get('whatsapp', {}) or {}).get('phone_number_ids', {}) or {}
@@ -40517,11 +40659,27 @@ Write ONE short message only. No JSON. No explanations."""
                                 chat_db.update_conversation_routing(chat_id, location=location, receiving_phone_id=receiving_phone_id or "")
                             except Exception:
                                 pass
+                        # Whoever from Sales replies owns the lead (including after auto-release).
+                        if is_sales_actor or chat_is_sales:
                             try:
                                 owner_user_id = actor.get('username') or actor.get('id') or actor.get('user_id')
                                 owner_name = actor.get('name') or actor.get('username') or actor.get('user_name') or owner_user_id
-                                if owner_user_id:
-                                    chat_db.claim_sales_lead(chat_id=chat_id, owner_user_id=str(owner_user_id), owner_name=str(owner_name or ""))
+                                if owner_user_id and actor_role != 'admin':
+                                    chat_db.assign_sales_lead(
+                                        chat_id,
+                                        str(owner_user_id),
+                                        str(owner_name or ""),
+                                    )
+                                    try:
+                                        chat_db.upsert_sales_state(
+                                            chat_id=chat_id,
+                                            updates={
+                                                "assigned_sales_user": str(owner_user_id),
+                                                "needs_ai_review": 1,
+                                            },
+                                        )
+                                    except Exception:
+                                        pass
                             except Exception:
                                 pass
                     except Exception:
@@ -41136,6 +41294,37 @@ Write ONE short message only. No JSON. No explanations."""
                 except Exception as learning_err:
                     logging.error(f"Error in self-learning from UI: {learning_err}")
                 # ---------------------------------------------------------------------
+
+                # Sales ownership: any Sales agent reply claims/takes the lead.
+                try:
+                    allowed_locations = actor.get('allowedLocations') or []
+                    actor_role = str(actor.get('role') or '').strip().lower()
+                    is_sales_actor = (
+                        isinstance(allowed_locations, list)
+                        and 'Sales' in allowed_locations
+                        and actor_role != 'admin'
+                    )
+                    chat_is_sales = (
+                        str(conv_dict.get('location') or '').strip() == 'Sales'
+                        or int(conv_dict.get('sales_inbox') or 0) == 1
+                    )
+                    if is_sales_actor or chat_is_sales:
+                        owner_user_id = actor.get('username') or actor.get('id') or actor.get('user_id')
+                        owner_name = actor.get('name') or actor.get('username') or actor.get('user_name') or owner_user_id
+                        if owner_user_id and actor_role != 'admin':
+                            chat_db.assign_sales_lead(chat_id, str(owner_user_id), str(owner_name or ""))
+                            try:
+                                chat_db.upsert_sales_state(
+                                    chat_id=chat_id,
+                                    updates={
+                                        "assigned_sales_user": str(owner_user_id),
+                                        "needs_ai_review": 1,
+                                    },
+                                )
+                            except Exception:
+                                pass
+                except Exception as own_err:
+                    logging.warning("Sales lead assign-on-reply failed for chat %s: %s", chat_id, own_err)
 
                 # Save agent message to DB
                 if not texts_to_save:
@@ -51293,10 +51482,14 @@ Draft to optimize:
                         self.check_and_reassign_religious_chats()
                     except Exception as e:
                         logging.error(f"Reassign loop error: {e}")
+                    try:
+                        self.check_and_release_stale_sales_leads(timeout_minutes=10)
+                    except Exception as e:
+                        logging.error(f"Sales lead release loop error: {e}")
                     time.sleep(60) # Check every minute
             reassign_thread = threading.Thread(target=_reassign_loop, daemon=True)
             reassign_thread.start()
-            logging.info("Shift-based Reassignment task started.")
+            logging.info("Shift-based Reassignment + Sales lead timeout task started.")
         except Exception as e:
             logging.error(f"Failed to start Reassignment task: {e}")
 

@@ -230480,3 +230480,302 @@
   "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB07B17E0E6F02AC6524D",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB07B17E0E6F02AC6524D",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 124,
+          "1": 221,
+          "2": 45,
+          "3": 242,
+          "4": 12,
+          "5": 4,
+          "6": 31,
+          "7": 132,
+          "8": 129,
+          "9": 43,
+          "10": 187,
+          "11": 166,
+          "12": 166,
+          "13": 213,
+          "14": 82,
+          "15": 172,
+          "16": 89,
+          "17": 110,
+          "18": 192,
+          "19": 35,
+          "20": 69,
+          "21": 60,
+          "22": 216,
+          "23": 143,
+          "24": 123,
+          "25": 152,
+          "26": 246,
+          "27": 60,
+          "28": 208,
+          "29": 255,
+          "30": 169,
+          "31": 198
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "اشتغل ياحب خلاص"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790776723,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1,
+        "initiatedByMe": true
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790780808,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T08:06:48.887Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB00CFDF819900D80D891"
+    },
+    "keyId": "3EB00CFDF819900D80D891",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:16322 in send_whatsapp_message\nLogger: root\nReason: Failed to send WhatsApp message. Status: 500, Attempt: 1/3, Response: {\"error\":{\"message\":\"(#131000) Something went wrong\",\"code\":131000,\"type\":\"OAuthException\",\"error_data\":{\"messaging_product\":\"whatsapp\",\"details\":\"Something went wrong\"},\"fbtrace_id\":\"AY_1ix-KDeAmKEB69RKxpKY\"}}\nAt: 2026-09-30 08:31:09"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790609469,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790782269,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T08:31:10.781Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB04BEB0638D5D9B37F1D",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB04BEB0638D5D9B37F1D",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 150,
+          "1": 129,
+          "2": 1,
+          "3": 213,
+          "4": 193,
+          "5": 239,
+          "6": 154,
+          "7": 25,
+          "8": 207,
+          "9": 203,
+          "10": 73,
+          "11": 86,
+          "12": 132,
+          "13": 177,
+          "14": 58,
+          "15": 146,
+          "16": 30,
+          "17": 229,
+          "18": 43,
+          "19": 103,
+          "20": 175,
+          "21": 89,
+          "22": 174,
+          "23": 242,
+          "24": 113,
+          "25": 157,
+          "26": 47,
+          "27": 14,
+          "28": 43,
+          "29": 187,
+          "30": 177,
+          "31": 39
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "ثواني برستر"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790776723,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1,
+        "initiatedByMe": true
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790780760,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T08:06:00.563Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---

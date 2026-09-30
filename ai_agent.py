@@ -19321,6 +19321,31 @@ Conversation:
         sorted_records = sorted(records, key=_rank, reverse=True)
         return sorted_records[0] if sorted_records else None
 
+    def _stripe_invoice_item_description(self, add_ons_text, trip_name, booking_nr, limit=500):
+        """Stripe invoice item description accepts at most 500 characters."""
+        limit = max(1, int(limit or 500))
+        booking = str(booking_nr or "").strip()
+        suffix = f" ({booking})" if booking else ""
+        parts = []
+        trip = re.sub(r"\s+", " ", str(trip_name or "")).strip()
+        add_ons = re.sub(r"\s+", " ", str(add_ons_text or "")).strip()
+        if trip:
+            parts.append(trip)
+        if add_ons:
+            parts.append(add_ons)
+        head = " ".join(parts).strip()
+        if not head and not suffix:
+            return "Booking Payment"
+        if len(suffix) >= limit:
+            return suffix[-limit:].strip() or "Booking Payment"
+        room = limit - len(suffix)
+        if len(head) > room:
+            ellipsis = "…"
+            cut = max(0, room - len(ellipsis))
+            head = (head[:cut].rstrip() + ellipsis) if cut else ""
+        text = (head + suffix).strip()
+        return text[:limit] or "Booking Payment"
+
     def _execute_invoice_capability(self, record_id, amount_in=None, currency_in=None, selected_add_ons=None, allow_existing=False):
         preview = self._preview_invoice_capability(
             record_id,
@@ -19409,14 +19434,7 @@ Conversation:
             cents = int(round(float(amount_val) * 100))
             if cents <= 0:
                 raise ValueError("Stripe amount is too small after converting to cents")
-            desc_parts = []
-            if add_ons_text:
-                desc_parts.append(add_ons_text)
-            if trip_name:
-                desc_parts.append(trip_name)
-            if booking_nr:
-                desc_parts.append(f"({booking_nr})")
-            description = " ".join(desc_parts) if desc_parts else "Booking Payment"
+            description = self._stripe_invoice_item_description(add_ons_text, trip_name, booking_nr)
             # Exclude leftover pending items from earlier failed attempts (mixed currencies).
             inv = _stripe_request("POST", "/v1/invoices", {
                 "customer": cust.get("id"),
@@ -37849,14 +37867,7 @@ Write ONE short message only. No JSON. No explanations."""
                 cents = int(round(float(amount_val) * 100))
                 if cents <= 0:
                     raise ValueError("Stripe amount is too small after converting to cents")
-                desc_parts = []
-                if add_ons_text:
-                    desc_parts.append(add_ons_text)
-                if trip_name:
-                    desc_parts.append(trip_name)
-                if booking_nr:
-                    desc_parts.append(f"({booking_nr})")
-                description = " ".join(desc_parts) if desc_parts else "Booking Payment"
+                description = self._stripe_invoice_item_description(add_ons_text, trip_name, booking_nr)
                 # Exclude leftover pending items from earlier failed attempts (mixed currencies).
                 inv = _stripe_request("POST", "/v1/invoices", {
                     "customer": cust.get("id"),

@@ -222397,3 +222397,2500 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0EDC07AE6177727FF6A",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0EDC07AE6177727FF6A",
+    "fromMe": true,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Nile crystal",
+    "status": "SERVER_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "senderTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "recipientTimestamp": {
+            "low": 1790728782,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2
+      },
+      "reactionMessage": {
+        "key": {
+          "remoteJid": "183026071916719@lid",
+          "fromMe": false,
+          "id": "3EB0E7140E5C6B1BD97FCE"
+        },
+        "text": "❤️",
+        "senderTimestampMs": {
+          "low": -224568432,
+          "high": 416,
+          "unsigned": false
+        }
+      }
+    },
+    "messageType": "reactionMessage",
+    "messageTimestamp": 1790776795,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T06:59:55.524Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0B90F9F88189229BEE4",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0B90F9F88189229BEE4",
+    "fromMe": true,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Nile crystal",
+    "status": "SERVER_ACK",
+    "message": {
+      "conversation": "حاضر"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790776723,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1,
+        "initiatedByMe": false
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776823,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:23.563Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB08A833667875F87BA1B"
+    },
+    "keyId": "3EB08A833667875F87BA1B",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:6013 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-09-30 07:02:53"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790604177,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776977,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:02:58.632Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB048D150777D1E332049"
+    },
+    "keyId": "3EB048D150777D1E332049",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:10263 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-09-30 07:02:58"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790604180,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776980,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:03:01.605Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0396BE6912B9566793F",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0396BE6912B9566793F",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "وقولي",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 0,
+          "1": 80,
+          "2": 13,
+          "3": 17,
+          "4": 119,
+          "5": 235,
+          "6": 141,
+          "7": 203,
+          "8": 155,
+          "9": 99,
+          "10": 32,
+          "11": 58,
+          "12": 28,
+          "13": 106,
+          "14": 114,
+          "15": 147,
+          "16": 67,
+          "17": 78,
+          "18": 137,
+          "19": 146,
+          "20": 152,
+          "21": 167,
+          "22": 60,
+          "23": 96,
+          "24": 36,
+          "25": 47,
+          "26": 40,
+          "27": 45,
+          "28": 100,
+          "29": 155,
+          "30": 227,
+          "31": 156
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776814,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:14.425Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB096B035B9B8DADDF1FF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB096B035B9B8DADDF1FF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "خش جرب بنفسك ياحب",
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 158,
+          "1": 219,
+          "2": 198,
+          "3": 31,
+          "4": 231,
+          "5": 240,
+          "6": 231,
+          "7": 85,
+          "8": 195,
+          "9": 91,
+          "10": 176,
+          "11": 160,
+          "12": 51,
+          "13": 6,
+          "14": 163,
+          "15": 40,
+          "16": 220,
+          "17": 106,
+          "18": 27,
+          "19": 126,
+          "20": 110,
+          "21": 220,
+          "22": 141,
+          "23": 205,
+          "24": 250,
+          "25": 73,
+          "26": 45,
+          "27": 237,
+          "28": 66,
+          "29": 52,
+          "30": 144,
+          "31": 21
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790776811,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-09-30T07:00:12.099Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---

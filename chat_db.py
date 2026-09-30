@@ -2714,6 +2714,62 @@ def find_whatsapp_conversation_by_phone(phone):
         row = c.fetchone()
         return dict(row) if row else None
 
+
+def find_conversation_for_customer(company_id, airtable_record_id="", booking_number="", phone=""):
+    """Return the existing company conversation for this customer, if one already exists."""
+    company_key = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
+    record_id = str(airtable_record_id or "").strip()
+    booking = str(booking_number or "").strip()
+    phone_digits = re.sub(r"\D", "", str(phone or ""))
+    with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        def _one(sql, params):
+            c.execute(sql, params)
+            row = c.fetchone()
+            return dict(row) if row else None
+
+        base = f"IFNULL(is_deleted, 0) = 0 AND {_COMPANY_ID_SQL} = ?"
+        if record_id:
+            found = _one(
+                f"""
+                SELECT * FROM conversations
+                WHERE airtable_record_id = ? AND {base}
+                ORDER BY last_message_time DESC
+                LIMIT 1
+                """,
+                (record_id, company_key),
+            )
+            if found:
+                return found
+        if booking:
+            found = _one(
+                f"""
+                SELECT * FROM conversations
+                WHERE LOWER(TRIM(COALESCE(booking_number, ''))) = LOWER(?) AND {base}
+                ORDER BY last_message_time DESC
+                LIMIT 1
+                """,
+                (booking, company_key),
+            )
+            if found:
+                return found
+        if len(phone_digits) >= 8:
+            found = _one(
+                f"""
+                SELECT * FROM conversations
+                WHERE REPLACE(REPLACE(REPLACE(sender_identifier, '+', ''), ' ', ''), '-', '') = ?
+                  AND {base}
+                ORDER BY last_message_time DESC
+                LIMIT 1
+                """,
+                (phone_digits, company_key),
+            )
+            if found:
+                return found
+    return None
+
 def find_whatsapp_phone_by_record_id(record_id):
     if not record_id:
         return None

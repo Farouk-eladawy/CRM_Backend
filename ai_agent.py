@@ -47166,8 +47166,8 @@ Write ONE short message only. No JSON. No explanations."""
                 formula_parts.append(f"LOWER(TRIM({email_field}))={_formula_string(term_lower)}")
                 formula_parts.append(f"LOWER(TRIM({personal_email_field}))={_formula_string(term_lower)}")
                 formula_parts.append(f"LOWER(TRIM({name_field}))={_formula_string(term_lower)}")
-                formula_parts.append(f"FIND({_formula_string(term)}, {phone_field})")
-                if phone_clean:
+                # A short fragment must not match inside another customer's phone.
+                if len(phone_clean) >= 8:
                     formula_parts.append(f"FIND({_formula_string(phone_clean)}, {normalized_phone_formula})")
 
                 formula = f"OR({','.join(formula_parts)})"
@@ -47202,10 +47202,41 @@ Write ONE short message only. No JSON. No explanations."""
                     records = response.json().get('records', [])
                 if not records:
                     return jsonify({"status": "error", "message": "No customer found with the provided details."}), 404
-                    
-                # Take the most recent booking if there are multiple
-                records.sort(key=lambda x: x.get('createdTime', ''), reverse=True)
-                record = records[0]
+
+                def _match_rank(candidate):
+                    candidate_fields = candidate.get('fields') or {}
+                    booking_value = str(self.get_field_value(candidate_fields, FieldIds.BOOKING_NR) or '').strip().lower()
+                    email_values = {
+                        str(self.get_field_value(candidate_fields, FieldIds.CUSTOMER_EMAIL) or '').strip().lower(),
+                        str(self.get_field_value(candidate_fields, FieldIds.CUSTOMER_PERSONAL_EMAIL) or '').strip().lower(),
+                    }
+                    name_value = str(self.get_field_value(candidate_fields, FieldIds.CUSTOMER_NAME) or '').strip().lower()
+                    phone_digits = re.sub(r'\D', '', str(self.get_field_value(candidate_fields, FieldIds.CUSTOMER_PHONE) or ''))
+                    if booking_value and booking_value == term_lower:
+                        return 0
+                    if term_lower and term_lower in email_values:
+                        return 1
+                    if len(phone_clean) >= 8 and phone_digits and (
+                        phone_digits == phone_clean
+                        or phone_digits.endswith(phone_clean)
+                        or phone_clean.endswith(phone_digits)
+                    ):
+                        return 2
+                    if name_value and name_value == term_lower:
+                        return 3
+                    return None
+
+                ranked = []
+                for candidate in records:
+                    rank = _match_rank(candidate)
+                    if rank is None:
+                        continue
+                    ranked.append((rank, str(candidate.get('createdTime') or ''), candidate))
+                if not ranked:
+                    return jsonify({"status": "error", "message": "No customer found with the provided details."}), 404
+                ranked.sort(key=lambda item: item[1], reverse=True)
+                ranked.sort(key=lambda item: item[0])
+                record = ranked[0][2]
                 fields = record.get('fields', {})
                 
                 booking_nr = self.get_field_value(fields, FieldIds.BOOKING_NR) or ''
@@ -47238,7 +47269,32 @@ Write ONE short message only. No JSON. No explanations."""
                 req_location = data.get('location')
                 is_sales = (str(req_location).strip() == 'Sales') and not company_owned
 
-                if source == "WhatsApp" and not company_owned:
+                existing_customer_chat = chat_db.find_conversation_for_customer(
+                    company_id=actor_company_id,
+                    airtable_record_id=record.get('id'),
+                    booking_number=booking_nr,
+                    phone=sender_identifier if source == "WhatsApp" else "",
+                )
+                if existing_customer_chat:
+                    reuse_payload = {
+                        "needs_help": 0,
+                        "booking_number": booking_nr,
+                    }
+                    if not str(existing_customer_chat.get("contact_name") or "").strip():
+                        reuse_payload["contact_name"] = name
+                    if company_owned:
+                        reuse_payload["sales_inbox"] = False
+                        current_location = str(existing_customer_chat.get("location") or "").strip().lower()
+                        company_location = str(company_channel.get("location") or "").strip()
+                        if company_location and current_location in ("", "unknown", "sales", "needhelp"):
+                            reuse_payload["location"] = company_location
+                    elif is_sales:
+                        reuse_payload["sales_inbox"] = True
+                    chat_db.update_conversation_info(existing_customer_chat["chat_id"], **reuse_payload)
+                    self._touch_conversation_activity(existing_customer_chat["chat_id"])
+                    chat = existing_customer_chat
+
+                if source == "WhatsApp" and not company_owned and chat is None:
                     existing_whatsapp_chat = chat_db.find_whatsapp_conversation_by_phone(sender_identifier)
                     if existing_whatsapp_chat:
                         existing_record_id = str(existing_whatsapp_chat.get('airtable_record_id') or '').strip()

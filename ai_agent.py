@@ -14923,6 +14923,52 @@ Conversation:
         logging.warning(f"Failed to download media weblink: {last_err}")
         return None, None, None
 
+    def _persist_chat_media_url(self, url, media_type="image"):
+        """Copy a temporary remote file onto the existing uploader and return its permanent link."""
+        raw = str(url or "").strip()
+        if not raw:
+            return raw
+        if "res.cloudinary.com" in raw.lower():
+            return raw
+        data, ctype, _used = self._download_media_bytes(raw, timeout=25)
+        if not data:
+            logging.warning("Inbound media was not copied; keeping the original link")
+            return raw
+        if len(data) > 20 * 1024 * 1024:
+            logging.warning("Inbound media is too large to copy; keeping the original link")
+            return raw
+        mt = str(media_type or "").strip().lower()
+        content = str(ctype or "").split(";")[0].strip().lower()
+        if mt == "image" or content.startswith("image/"):
+            resource_type = "image"
+        elif mt in ("video", "audio") or content.startswith("video/") or content.startswith("audio/"):
+            resource_type = "video"
+        elif "pdf" in content or mt in ("file", "document"):
+            resource_type = "raw" if "pdf" in content else "auto"
+        else:
+            resource_type = "auto"
+        try:
+            import io
+            import uuid
+            import cloudinary
+            import cloudinary.uploader
+            if not cloudinary.config().cloud_name:
+                self.setup_cloudinary()
+            public_id = f"inbox_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+            res = cloudinary.uploader.upload(
+                io.BytesIO(data),
+                resource_type=resource_type,
+                folder="chat_inbox",
+                public_id=public_id,
+            )
+            uploaded = str((res or {}).get("secure_url") or (res or {}).get("url") or "").strip()
+            if uploaded:
+                logging.info("Inbound %s media copied to permanent link", mt or "file")
+                return uploaded
+        except Exception as e:
+            logging.warning("Inbound media copy failed: %s", e)
+        return raw
+
     def _upload_whatsapp_media_bytes(self, phone_number_id, access_token, file_bytes, mime_type, filename):
         if not file_bytes or not phone_number_id or not access_token:
             return None
@@ -48832,6 +48878,8 @@ Draft to optimize:
                                         else:
                                             url = payload.get('url')
                                             if url:
+                                                if att_type in ("image", "video", "audio", "file", "document"):
+                                                    url = self._persist_chat_media_url(url, att_type)
                                                 parts.append(f"[Facebook {att_type}: {url}]")
                                             else:
                                                 parts.append(f"[{'Agent' if sender_type == 'agent' else 'Customer'} sent a Facebook {att_type}]")

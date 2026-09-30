@@ -3721,6 +3721,457 @@ def check_if_system_replied_recently(chat_id):
                 return True
     return False
 
+_IDENTITY_PHONE_RE = re.compile(r"\D+")
+_IDENTITY_EMAIL_RE = re.compile(r"[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}", re.I)
+_IDENTITY_BLOCKED_EMAIL_DOMAINS = (
+    "ftstravels.com",
+    "fts.com",
+    "headout.com",
+    "viator.com",
+    "tiqets.com",
+    "booking.com",
+    "expedia.com",
+    "agoda.com",
+    "system.local",
+    "trip.com",
+    "alibaba.com",
+    "platinumlist.net",
+)
+_IDENTITY_BLOCKED_LOCAL_PREFIXES = (
+    "noreply",
+    "no-reply",
+    "donotreply",
+    "do-not-reply",
+    "mailer-daemon",
+    "bookings",
+    "notification",
+    "system-notification",
+)
+_IDENTITY_IGNORED_NAMES = {
+    "",
+    "?",
+    "guest",
+    "unknown",
+    "lead",
+    "make",
+    "new lead",
+    "lead new",
+}
+_PROJECTION_LOCK = threading.Lock()
+_PROJECTION_CACHE = {"mtime": None, "by_phone": {}, "by_record": {}}
+_PHONE_SAFETY_CACHE = {"mtime": None, "unsafe": set()}
+_CONV_IDENTITY_LOCK = threading.Lock()
+_CONV_IDENTITY_CACHE = {"ts": 0.0, "company": "", "by_phone": {}, "by_email": {}, "by_record": {}}
+
+
+def _identity_phone_key(raw):
+    digits = _IDENTITY_PHONE_RE.sub("", str(raw or ""))
+    if digits.startswith("00"):
+        digits = digits[2:]
+    if len(digits) < 10 or len(digits) > 15:
+        return ""
+    return digits
+
+
+def _identity_email_key(raw):
+    text = str(raw or "").strip().lower()
+    if "::" in text:
+        text = text.split("::", 1)[0].strip()
+    parsed = parseaddr(text)[1] or text
+    match = _IDENTITY_EMAIL_RE.search(str(parsed or ""))
+    if not match:
+        return ""
+    addr = match.group(0).strip().lower()
+    local, _, domain = addr.partition("@")
+    if len(local) < 3 or not domain:
+        return ""
+    if any(local.startswith(prefix) for prefix in _IDENTITY_BLOCKED_LOCAL_PREFIXES):
+        return ""
+    if domain == "reply.getyourguide.com" and local.startswith("customer-"):
+        return addr
+    if domain.endswith("getyourguide.com"):
+        return ""
+    if any(domain == blocked or domain.endswith("." + blocked) for blocked in _IDENTITY_BLOCKED_EMAIL_DOMAINS):
+        return ""
+    return addr
+
+
+def _identity_location_bucket(location):
+    return "religious" if str(location or "").strip().lower() == "religious" else "other"
+
+
+def _identity_name_key(raw):
+    text = re.sub(r"\s+", " ", str(raw or "").strip().lower())
+    if text in _IDENTITY_IGNORED_NAMES:
+        return ""
+    return text
+
+
+def _projection_phone_index():
+    path = get_data_path("airtable_mirror.db")
+    if not path or not os.path.exists(path):
+        return {}, {}
+    try:
+        mtime = os.path.getmtime(path)
+    except Exception:
+        mtime = None
+    with _PROJECTION_LOCK:
+        if _PROJECTION_CACHE.get("mtime") == mtime and _PROJECTION_CACHE.get("by_phone"):
+            return _PROJECTION_CACHE["by_phone"], _PROJECTION_CACHE["by_record"]
+        by_phone = {}
+        by_record = {}
+        conn = None
+        try:
+            conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=10)
+            for record_id, phone in conn.execute(
+                "SELECT airtable_id, customer_phone FROM mirror_list_projection"
+            ):
+                key = _identity_phone_key(phone)
+                record_key = str(record_id or "").strip()
+                if not key or not record_key:
+                    continue
+                by_record[record_key] = key
+                bucket = by_phone.setdefault(key, [])
+                if record_key not in bucket:
+                    bucket.append(record_key)
+        except Exception as exc:
+            logging.warning("Inbox identity phone index skipped: %s", exc)
+            return {}, {}
+        finally:
+            try:
+                if conn is not None:
+                    conn.close()
+            except Exception:
+                pass
+        _PROJECTION_CACHE["mtime"] = mtime
+        _PROJECTION_CACHE["by_phone"] = by_phone
+        _PROJECTION_CACHE["by_record"] = by_record
+        _PHONE_SAFETY_CACHE["mtime"] = mtime
+        _PHONE_SAFETY_CACHE["unsafe"] = set()
+        return by_phone, by_record
+
+
+def _mirror_customer_names(record_ids):
+    ids = [str(x).strip() for x in (record_ids or []) if str(x or "").strip()]
+    if not ids:
+        return {}
+    path = get_data_path("airtable_mirror.db")
+    if not path or not os.path.exists(path):
+        return {}
+    names = {}
+    conn = None
+    try:
+        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=10)
+        for start in range(0, len(ids), 300):
+            chunk = ids[start:start + 300]
+            marks = ",".join(["?"] * len(chunk))
+            for record_id, raw in conn.execute(
+                f"SELECT airtable_id, fields_json FROM mirror_records WHERE airtable_id IN ({marks})",
+                chunk,
+            ):
+                try:
+                    fields = json.loads(raw or "{}")
+                except Exception:
+                    fields = {}
+                name = _identity_name_key(fields.get("Customer Name") or fields.get("Traveler Name") or "")
+                if name:
+                    names[str(record_id)] = name
+    except Exception as exc:
+        logging.warning("Inbox identity name lookup skipped: %s", exc)
+        return {}
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
+    return names
+
+
+def _phone_is_unsafe(phone_key, by_phone):
+    """A phone used by 4 or more different customer names is not an identity key."""
+    if not phone_key:
+        return True
+    with _PROJECTION_LOCK:
+        if phone_key in _PHONE_SAFETY_CACHE.get("unsafe", set()):
+            return True
+    record_ids = list(by_phone.get(phone_key) or [])
+    if len(record_ids) > 25:
+        with _PROJECTION_LOCK:
+            _PHONE_SAFETY_CACHE.setdefault("unsafe", set()).add(phone_key)
+        return True
+    if len(record_ids) < 4:
+        return False
+    names = set(_mirror_customer_names(record_ids).values())
+    if len(names) >= 4:
+        with _PROJECTION_LOCK:
+            _PHONE_SAFETY_CACHE.setdefault("unsafe", set()).add(phone_key)
+        return True
+    return False
+
+
+def _chat_identity_keys(row, by_record, blocked_phones):
+    phones = set()
+    emails = set()
+    sender = str((row or {}).get("sender_identifier") or "")
+    source = str((row or {}).get("source") or "").strip().lower()
+    sender_phone = _identity_phone_key(sender)
+    if sender_phone and (source in ("", "whatsapp") or "@" not in sender):
+        phones.add(sender_phone)
+    stored_phone = _identity_phone_key((row or {}).get("customer_phone"))
+    if stored_phone:
+        phones.add(stored_phone)
+    record_id = str((row or {}).get("airtable_record_id") or "").strip()
+    record_phone = by_record.get(record_id) if record_id else ""
+    if record_phone:
+        phones.add(record_phone)
+    email = _identity_email_key(sender)
+    if email:
+        emails.add(email)
+    phones = {phone for phone in phones if phone not in blocked_phones}
+    return phones, emails
+
+
+def _conversation_identity_index(cursor, company_id):
+    company_key = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
+    now = time.time()
+    with _CONV_IDENTITY_LOCK:
+        cache = _CONV_IDENTITY_CACHE
+        if (
+            cache.get("company") == company_key
+            and (now - float(cache.get("ts") or 0)) < 45
+            and cache.get("by_record") is not None
+            and cache.get("ts")
+        ):
+            return cache["by_phone"], cache["by_email"], cache["by_record"]
+    cursor.execute(
+        f"""
+        SELECT chat_id, source, sender_identifier, customer_phone, contact_name,
+               airtable_record_id, location, booking_number
+        FROM conversations
+        WHERE IFNULL(is_deleted, 0) = 0 AND {_COMPANY_ID_SQL} = ?
+        """,
+        (company_key,),
+    )
+    by_phone = {}
+    by_email = {}
+    by_record = {}
+    for raw in cursor.fetchall():
+        row = dict(raw)
+        sender = str(row.get("sender_identifier") or "")
+        if "@" not in sender:
+            phone = _identity_phone_key(sender)
+            if phone:
+                by_phone.setdefault(phone, []).append(row)
+        stored_phone = _identity_phone_key(row.get("customer_phone"))
+        if stored_phone:
+            bucket = by_phone.setdefault(stored_phone, [])
+            if not bucket or bucket[-1].get("chat_id") != row.get("chat_id"):
+                bucket.append(row)
+        email = _identity_email_key(sender)
+        if email:
+            by_email.setdefault(email, []).append(row)
+        record_id = str(row.get("airtable_record_id") or "").strip()
+        if record_id:
+            by_record.setdefault(record_id, []).append(row)
+    with _CONV_IDENTITY_LOCK:
+        _CONV_IDENTITY_CACHE.update(
+            ts=time.time(),
+            company=company_key,
+            by_phone=by_phone,
+            by_email=by_email,
+            by_record=by_record,
+        )
+    return by_phone, by_email, by_record
+
+
+def _attach_customer_identity_groups(cursor, conv_rows, company_id):
+    """
+    Collapse inbox rows for the same phone or the same private email.
+    Booking records stay on their own conversations and are never rewritten here.
+    """
+    if not conv_rows:
+        return
+    by_phone, by_record = _projection_phone_index()
+    company_key = str(company_id or DEFAULT_COMPANY_ID).strip() or DEFAULT_COMPANY_ID
+
+    seed_phones = set()
+    seed_emails = set()
+    seed_records = set()
+    for row in conv_rows:
+        record_id = str(row.get("airtable_record_id") or "").strip()
+        if record_id:
+            seed_records.add(record_id)
+            record_phone = by_record.get(record_id)
+            if record_phone:
+                seed_phones.add(record_phone)
+        sender_phone = _identity_phone_key(row.get("sender_identifier"))
+        if sender_phone and "@" not in str(row.get("sender_identifier") or ""):
+            seed_phones.add(sender_phone)
+        stored_phone = _identity_phone_key(row.get("customer_phone"))
+        if stored_phone:
+            seed_phones.add(stored_phone)
+        email = _identity_email_key(row.get("sender_identifier"))
+        if email:
+            seed_emails.add(email)
+
+    blocked_phones = {phone for phone in seed_phones if _phone_is_unsafe(phone, by_phone)}
+    safe_phones = seed_phones - blocked_phones
+    for phone in safe_phones:
+        seed_records.update(by_phone.get(phone) or [])
+
+    if not safe_phones and not seed_emails and not seed_records:
+        return
+
+    by_chat_phone, by_chat_email, by_chat_record = _conversation_identity_index(cursor, company_key)
+    candidates = []
+    seen_chats = set()
+
+    def _take(bucket):
+        for row in bucket or []:
+            chat_id = str(row.get("chat_id") or "")
+            if not chat_id or chat_id in seen_chats:
+                continue
+            seen_chats.add(chat_id)
+            candidates.append(row)
+
+    for phone in safe_phones:
+        _take(by_chat_phone.get(phone))
+    for email in seed_emails:
+        _take(by_chat_email.get(email))
+    for record_id in seed_records:
+        _take(by_chat_record.get(record_id))
+
+    email_names = {}
+    for row in candidates:
+        email = _identity_email_key(row.get("sender_identifier"))
+        name = _identity_name_key(row.get("contact_name"))
+        if email and name:
+            email_names.setdefault(email, set()).add(name)
+    blocked_emails = {email for email, names in email_names.items() if len(names) >= 4}
+
+    parent = {}
+
+    def find(chat_id):
+        parent.setdefault(chat_id, chat_id)
+        while parent[chat_id] != chat_id:
+            parent[chat_id] = parent[parent[chat_id]]
+            chat_id = parent[chat_id]
+        return chat_id
+
+    def union(left, right):
+        root_left = find(left)
+        root_right = find(right)
+        if root_left != root_right:
+            parent[root_right] = root_left
+
+    keyed = {}
+    phone_to_chats = {}
+    email_to_chats = {}
+    for row in candidates:
+        chat_id = str(row.get("chat_id") or "").strip()
+        if not chat_id:
+            continue
+        phones, emails = _chat_identity_keys(row, by_record, blocked_phones)
+        emails = {email for email in emails if email not in blocked_emails}
+        if not phones and not emails:
+            continue
+        bucket = _identity_location_bucket(row.get("location"))
+        keyed[chat_id] = row
+        parent.setdefault(chat_id, chat_id)
+        for phone in phones:
+            phone_to_chats.setdefault((bucket, phone), []).append(chat_id)
+        for email in emails:
+            email_to_chats.setdefault((bucket, email), []).append(chat_id)
+
+    for ids in list(phone_to_chats.values()) + list(email_to_chats.values()):
+        if len(ids) < 2:
+            continue
+        head = ids[0]
+        for other in ids[1:]:
+            union(head, other)
+
+    components = {}
+    for chat_id in list(keyed.keys()):
+        components.setdefault(find(chat_id), []).append(chat_id)
+
+    page_ids = {str(row.get("chat_id") or "") for row in conv_rows}
+    component_by_chat = {}
+    for ids in components.values():
+        unique_ids = []
+        seen = set()
+        for chat_id in ids:
+            if chat_id in seen:
+                continue
+            seen.add(chat_id)
+            unique_ids.append(chat_id)
+        if len(unique_ids) < 2 or not (page_ids & set(unique_ids)):
+            continue
+        record_ids = sorted({
+            str((keyed.get(chat_id) or {}).get("airtable_record_id") or "").strip()
+            for chat_id in unique_ids
+            if str((keyed.get(chat_id) or {}).get("airtable_record_id") or "").strip()
+        })
+        booking_numbers = []
+        for chat_id in unique_ids:
+            booking_number = str((keyed.get(chat_id) or {}).get("booking_number") or "").strip()
+            if booking_number and booking_number not in booking_numbers:
+                booking_numbers.append(booking_number)
+        group_key = _identity_location_bucket((keyed.get(unique_ids[0]) or {}).get("location")) + ":" + min(unique_ids)
+        for chat_id in unique_ids:
+            component_by_chat[chat_id] = (group_key, unique_ids, booking_numbers, record_ids)
+
+    if not component_by_chat:
+        return
+
+    for row in conv_rows:
+        chat_id = str(row.get("chat_id") or "")
+        found = component_by_chat.get(chat_id)
+        if not found:
+            continue
+        group_key, ids, booking_numbers, record_ids = found
+        current_ids = [str(x) for x in (row.get("grouped_chat_ids") or []) if str(x)]
+        merged_ids = []
+        for item in current_ids + ids:
+            if item not in merged_ids:
+                merged_ids.append(item)
+        row["grouped_chat_ids"] = merged_ids
+        row["inbox_group_key"] = group_key
+        row["identity_booking_numbers"] = booking_numbers
+        row["identity_record_ids"] = record_ids
+        sources = [str(x) for x in (row.get("sources") or []) if str(x)]
+        for item in ids:
+            source = str((keyed.get(item) or {}).get("source") or "").strip()
+            if source and source not in sources:
+                sources.append(source)
+        if sources:
+            row["sources"] = sources
+
+
+def _collapse_identity_page_rows(rows):
+    """Keep one inbox row per phone/email group. Each booking record stays on its own chat."""
+    newest = {}
+    for row in rows or []:
+        key = str(row.get("inbox_group_key") or "").strip()
+        if not key:
+            continue
+        current = newest.get(key)
+        if current is None or str(row.get("last_message_time") or "") > str(current.get("last_message_time") or ""):
+            newest[key] = row
+    seen = set()
+    kept = []
+    for row in rows or []:
+        key = str(row.get("inbox_group_key") or "").strip()
+        if not key:
+            kept.append(row)
+            continue
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(newest.get(key) or row)
+    return kept
+
+
 def get_conversations():
     page = get_conversations_page(limit=1000000, offset=0)
     return page.get("items") or []
@@ -4163,6 +4614,12 @@ def get_conversations_page(
                 r["grouped_chat_ids"] = [cid] if cid else []
                 r["sources"] = [r.get("source")] if r.get("source") else []
             out.append(r)
+
+        try:
+            _attach_customer_identity_groups(c, out, resolved_company_id)
+            out = _collapse_identity_page_rows(out)
+        except Exception as identity_exc:
+            logging.warning("Inbox identity grouping skipped: %s", identity_exc)
 
         if referral_meta:
             conn.commit()

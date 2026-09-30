@@ -15566,6 +15566,27 @@ Conversation:
             logging.error("Company Evolution WhatsApp send failed: %s", e, exc_info=True)
             return False, {"error": "exception", "message": str(e)}
 
+    def _touch_conversation_activity(self, chat_id):
+        """Raise a new dashboard chat to the top of the inbox without failing the request."""
+        chat_id = str(chat_id or "").strip()
+        if not chat_id:
+            return
+        try:
+            import chat_db
+            import sqlite3
+            fn = getattr(chat_db, "touch_conversation_last_message_time", None)
+            if callable(fn):
+                fn(chat_id)
+                return
+            with sqlite3.connect(chat_db.DB_FILE, timeout=15.0) as conn:
+                conn.execute(
+                    "UPDATE conversations SET last_message_time = ? WHERE chat_id = ?",
+                    (chat_db.get_cairo_time(), chat_id),
+                )
+                conn.commit()
+        except Exception as exc:
+            logging.warning("Could not refresh conversation time for %s: %s", chat_id, exc)
+
     def _company_new_chat_channel(self, company_id):
         """Channel used when a company user starts a new customer conversation."""
         cid = company_tenancy.normalize_company_id(company_id)
@@ -33090,6 +33111,24 @@ Prefer the MarkItDown Extraction section below when present.
                 if location and str(location).strip().lower() in ["all", "any", "none"]:
                     location = None
 
+                inbox_company_id = company_tenancy.resolve_company_id(
+                    username=request.args.get("actor_username"),
+                    user_id=actor_id,
+                )
+                if not company_tenancy.is_default_company(inbox_company_id):
+                    allowed_locations = {
+                        str(item).strip().lower()
+                        for item in company_tenancy._company_inbox_filter_ids(inbox_company_id)
+                        if str(item).strip()
+                    }
+                    # A Nile user must not inherit an FTS filter such as Sales or Hurghada.
+                    # That filter hides the company conversation that was just created.
+                    if chat_id or (location and str(location).strip().lower() not in allowed_locations):
+                        location = None
+                        include_unknown = None
+                    if sales_only and "sales" not in allowed_locations:
+                        sales_only = None
+
                 # Extract Religious Agent Constraints
                 dedicated_whatsapp = None
                 assigned_to = None
@@ -33132,10 +33171,7 @@ Prefer the MarkItDown Extraction section below when present.
                     assigned_to=assigned_to,
                     dedicated_whatsapp=dedicated_whatsapp,
                     ad_id=ad_id,
-                    company_id=company_tenancy.resolve_company_id(
-                        username=request.args.get("actor_username"),
-                        user_id=actor_id,
-                    ),
+                    company_id=inbox_company_id,
                     airtable_record_ids=view_scope.get("record_ids") if view_scope_active else None,
                     booking_numbers=view_scope.get("booking_numbers") if view_scope_active else None,
                     view_scope_active=view_scope_active,
@@ -35990,6 +36026,15 @@ Prefer the MarkItDown Extraction section below when present.
                     receiving_phone_id=receiving_phone_id,
                     company_id=actor_company_id if company_owned else None,
                 )
+
+                if company_owned:
+                    chat_db.update_conversation_info(
+                        chat_conv['chat_id'],
+                        location=location,
+                        sales_inbox=False,
+                        needs_help=0,
+                    )
+                self._touch_conversation_activity(chat_conv['chat_id'])
 
                 if (not company_owned) and location in ('Sales', 'Religious') and user_id:
                     users_raw = chat_db.get_setting("dashboard_users")
@@ -47191,7 +47236,7 @@ Write ONE short message only. No JSON. No explanations."""
 
                 chat = None
                 req_location = data.get('location')
-                is_sales = (str(req_location).strip() == 'Sales')
+                is_sales = (str(req_location).strip() == 'Sales') and not company_owned
 
                 if source == "WhatsApp" and not company_owned:
                     existing_whatsapp_chat = chat_db.find_whatsapp_conversation_by_phone(sender_identifier)
@@ -47230,9 +47275,13 @@ Write ONE short message only. No JSON. No explanations."""
                     )
                     # Mark as read/no-help and persist booking number so it appears immediately in Inbox metadata.
                     update_payload2 = {"needs_help": 0, "booking_number": booking_nr}
-                    if is_sales:
+                    if company_owned:
+                        update_payload2["location"] = company_channel.get("location") or chat_location
+                        update_payload2["sales_inbox"] = False
+                    elif is_sales:
                         update_payload2["sales_inbox"] = True
                     chat_db.update_conversation_info(chat['chat_id'], **update_payload2)
+                    self._touch_conversation_activity(chat['chat_id'])
                 
                 return jsonify({
                     "status": "success",
@@ -48073,9 +48122,13 @@ Write ONE short message only. No JSON. No explanations."""
                     company_id=actor_company_id if company_owned else None,
                 )
                 update_payload = {"needs_help": 0}
-                if location == 'Sales':
+                if company_owned:
+                    update_payload["location"] = location
+                    update_payload["sales_inbox"] = False
+                elif location == 'Sales':
                     update_payload["sales_inbox"] = True
                 chat_db.update_conversation_info(chat['chat_id'], **update_payload)
+                self._touch_conversation_activity(chat['chat_id'])
 
                 try:
                     if record_id:

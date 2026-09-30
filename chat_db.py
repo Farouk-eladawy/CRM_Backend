@@ -2882,6 +2882,19 @@ def find_conversations_by_booking_number(booking_number, limit=20):
         except sqlite3.OperationalError:
             return []
 
+def touch_conversation_last_message_time(chat_id):
+    """Move a conversation to the top of the inbox after it is created from the dashboard."""
+    chat_id = str(chat_id or "").strip()
+    if not chat_id:
+        return
+    with sqlite3.connect(DB_FILE, timeout=15.0) as conn:
+        conn.execute(
+            "UPDATE conversations SET last_message_time = ? WHERE chat_id = ?",
+            (get_cairo_time(), chat_id),
+        )
+        conn.commit()
+
+
 def update_conversation_info(
     chat_id,
     contact_name=None,

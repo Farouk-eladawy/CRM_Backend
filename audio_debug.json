@@ -232788,3 +232788,208 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB06972EE264184B531D4"
+    },
+    "keyId": "3EB06972EE264184B531D4",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:49925 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgLMzM3ODExMjEzNjQVAgARGBI0RTM3NDUwODg4QjgwQkI0OEEA | recipient=33781121364 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=26627732740262342&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-10-01 05:45:08"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790685908,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790858709,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-01T05:45:10.440Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB036973B91461A34880C"
+    },
+    "keyId": "3EB036973B91461A34880C",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:49925 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgNNDkxNTEyNzU2OTYyNhUCABEYEjcwMEM0RjFBQ0I4RDlGMjBEMwA= | recipient=4915127569626 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because your WhatsApp Business account has unsettled payments. Visit https://business.facebook.com/billing_hub/accounts/details/?business_id=523604618979180&asset_id=26627732740262342&wizard_name=PAY_NOW&account_type=whatsapp-business-account to resolve this issue.\nAt: 2026-10-01 06:03:33"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790687013,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790859814,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-01T06:03:35.619Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB05D4FC5FB7004C89349"
+    },
+    "keyId": "3EB05D4FC5FB7004C89349",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Meta WhatsApp\nSource: ai_agent.py:49925 in webhook\nLogger: root\nReason: WhatsApp delivery failed via Meta status webhook | message_id=wamid.HBgLODUyOTYyNTkwMzkVAgARGBI1RTYyQTc1OTNDQUEyQzQxRDAA | recipient=85296259039 | code=131042 | title=Business eligibility payment issue | message=Business eligibility payment issue | details=Message failed to send because there were one or more errors related to your payment method.\nAt: 2026-10-01 06:11:54"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790687515,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790860315,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-01T06:11:55.989Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0DDF9BEC25462EE38FD"
+    },
+    "keyId": "3EB0DDF9BEC25462EE38FD",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:10263 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-10-01 06:22:40"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790688161,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790860961,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-01T06:22:42.363Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB016DF91CF56833EB25A"
+    },
+    "keyId": "3EB016DF91CF56833EB25A",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:6013 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 429 Client Error: Too Many Requests for url: https://api.openai.com/v1/chat/completions\nAt: 2026-10-01 06:24:16"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790688257,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1790861057,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-01T06:24:17.976Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

@@ -521,11 +521,10 @@ def run(agent, payload=None):
     table_id = str(payload.get("table_id") or (scenario or {}).get("table_id") or "tblJodXmOWKiYqiXS").strip()
     base_id = str(payload.get("base_id") or (scenario or {}).get("base_id") or "appTp5YgSp9DV2HYc").strip()
     mode = str(payload.get("mode") or (scenario or {}).get("mode") or "last_minute").strip().lower()
-    # Phones from scenarios JSON are the source of truth when scenario_id resolves.
-    if scenario is not None:
-        phones_raw = scenario.get("phones") or []
-    else:
-        phones_raw = payload.get("phones")
+    # Phones: n8n / request body wins when provided; scenarios JSON is fallback only.
+    phones_raw = payload.get("phones")
+    if not isinstance(phones_raw, list) or not phones_raw:
+        phones_raw = (scenario or {}).get("phones") or []
     # Unique phones only (preserve order)
     phones = []
     for p in phones_raw or []:

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-29T16:59:27Z",
+  "updated_at": "2026-10-02T19:16:05Z",
   "rules": [
     {
       "id": "default-not-interested",
@@ -144,6 +144,36 @@
       "tag": "حج مباشر",
       "keywords": [
         "حج مباشر"
+      ],
+      "enabled": true,
+      "match": "contains"
+    },
+    {
+      "id": "18f67fec-2046-4847-aff7-024dc9a009c5",
+      "tag": "عمرة",
+      "keywords": [
+        "عمره",
+        "عمرة"
+      ],
+      "enabled": true,
+      "match": "contains"
+    },
+    {
+      "id": "d38c676e-fe7f-4e9d-8562-3bfb9afa22a2",
+      "tag": "نوفمبر",
+      "keywords": [
+        "نوفمبر"
+      ],
+      "enabled": true,
+      "match": "contains"
+    },
+    {
+      "id": "b190d907-c8ef-414b-9345-40fd85830b57",
+      "tag": "رمضان",
+      "keywords": [
+        "عمره رمضان",
+        "عمرة رمضان",
+        "رمضان"
       ],
       "enabled": true,
       "match": "contains"

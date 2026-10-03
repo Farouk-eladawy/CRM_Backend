@@ -507,6 +507,13 @@ def _should_suppress_internal_error_alert(record):
         return True
     if "requested entity was not found" in message_text and ("thread" in message_text or "gmail" in message_text):
         return True
+    # A slow reply from Google is a dropped connection, not a broken mailbox.
+    if (
+        "winerror 10060" in message_text
+        or "connected party did not properly respond" in message_text
+        or "connection attempt failed" in message_text
+    ):
+        return True
     return False
 
 

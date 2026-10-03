@@ -351,6 +351,11 @@ class GmailService:
             "ssl:",
             "tls",
             "eof occurred in violation of protocol",
+            "winerror 10060",
+            "timed out",
+            "timeout",
+            "connected party did not properly respond",
+            "connection attempt failed",
         ))
 
     def create_draft(self, to_email, subject, html_content, sender_name="FTS Travels", thread_id=None, in_reply_to_message_id=None, attachments=None):

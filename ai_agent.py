@@ -7125,6 +7125,44 @@ User request:
             logging.error(f"Error parsing operations filter prompt: {e}", exc_info=True)
             return []
 
+    def _store_alternative_phone(self, record, phone):
+        """Save the customer's extra number on the same booking without replacing WhatsApp."""
+        if not record or not phone:
+            return
+        clean = self.clean_phone_for_whatsapp(phone)
+        if not clean:
+            return
+        table_name = str(record.get("table_name") or "").strip()
+        phone_field = (self._contact_field_keys_for_table(table_name) or {}).get("phone")
+        current = ""
+        if phone_field:
+            current = str(self.get_field_value(record.get("fields") or {}, phone_field) or "").strip()
+        current_digits = re.sub(r"\D", "", current)
+        new_digits = re.sub(r"\D", "", str(clean))
+        if phone_field and not current_digits:
+            self.update_booking_record(record["id"], {phone_field: clean}, table_name=record.get("table_name"))
+            logging.info("Saved phone %s on booking %s because the phone field was empty.", clean, record.get("id"))
+            return
+        if current_digits and new_digits and (current_digits.endswith(new_digits[-9:]) or new_digits.endswith(current_digits[-9:])):
+            return
+        marker = "Alternative phone:"
+        current_remarks = str(self.get_field_value(record.get("fields") or {}, FieldIds.REMARKS) or "")
+        kept = [ln for ln in current_remarks.splitlines() if not ln.strip().lower().startswith(marker.lower())]
+        kept.append(f"{marker} {clean}")
+        new_remarks = "\n".join(ln for ln in kept if str(ln).strip()).strip()
+        if new_remarks == current_remarks.strip():
+            return
+        self.update_booking_record(record["id"], {FieldIds.REMARKS: new_remarks}, table_name=record.get("table_name"))
+        if "fields" not in record:
+            record["fields"] = {}
+        record["fields"][FieldIds.REMARKS] = new_remarks
+        logging.info(
+            "Saved alternative phone %s on booking %s. Main phone stays %s.",
+            clean,
+            record.get("id"),
+            current or "-",
+        )
+
     def update_booking_from_extracted_data(self, record, extracted_data):
         """Update a booking record with data extracted by AI."""
         if not record or not extracted_data:
@@ -7201,6 +7239,12 @@ User request:
             updates = {}
             for json_key, v in extracted_data.items():
                 if json_key == 'Booking Nr.':
+                    continue
+                if json_key == 'Alternative Phone':
+                    try:
+                        self._store_alternative_phone(record, v)
+                    except Exception as alt_phone_err:
+                        logging.warning("Could not save alternative phone %s: %s", v, alt_phone_err)
                     continue
                 if not v:
                     continue
@@ -7416,6 +7460,7 @@ User request:
             if not cleaned:
                 return False
 
+            cleaned = self._redirect_foreign_contact_to_note(text, cleaned)
             before_keys = set(cleaned.keys())
             self.update_booking_from_extracted_data(booking_record, cleaned)
             logging.info(
@@ -8062,6 +8107,135 @@ User request:
             
         return None
 
+    def _snippet_around_mention(self, text, value):
+        raw = str(text or "")
+        needle = str(value or "").strip()
+        if not raw:
+            return ""
+        if not needle:
+            return raw[-400:]
+        idx = raw.lower().find(needle.lower())
+        if idx < 0:
+            digits = re.sub(r"\D", "", needle)
+            if len(digits) >= 8:
+                compact = re.sub(r"\D", "", raw)
+                didx = compact.find(digits)
+                if didx >= 0:
+                    return raw[max(0, didx - 40): didx + len(digits) + 80]
+            return raw[-400:]
+        return raw[max(0, idx - 90): idx + len(needle) + 90]
+
+    def _mention_link_intent(self, text, value, kind):
+        """own | inquiry | other | unclear.
+
+        A phone, email, or booking number written inside the message is not
+        automatically this customer's identity. Link only when the wording says
+        it is theirs, or the question is about that booking number.
+        """
+        window = self._snippet_around_mention(text, value).lower()
+        alternate_markers = (
+            "alternative phone", "alternate phone", "another phone", "another number",
+            "second number", "other number", "extra number", "additional number",
+            "additional phone", "alternative number", "alt number", "alt phone",
+            "رقم بديل", "رقم اخر", "رقم آخر", "رقم اضافي", "رقم إضافي",
+        )
+        other_markers = (
+            "wife", "husband", "friend", "companion", "colleague",
+            "hotel phone", "reception", "driver phone", "driver's phone",
+            "her number", "his number", "their number", "call him", "call her",
+            "رقم زوج", "زوجتي", "زوجي", "صديقي", "صديقتي", "السائق",
+        )
+        own_markers = (
+            "my phone", "my number", "my mobile", "my email", "my e-mail",
+            "my booking", "this is my", "i booked", "our booking",
+            "booking number", "booking ref", "booking reference", "reference number",
+            "رقم هاتفي", "رقم تليفوني", "رقمي", "ايميلي", "إيميلي", "بريدي",
+            "رقم الحجز", "رقم حجز", "حجزي", "حجزى", "حجزنا",
+        )
+        if any(marker in window for marker in alternate_markers):
+            return "alternate"
+        if any(marker in window for marker in other_markers):
+            return "other"
+        if any(marker in window for marker in own_markers):
+            return "inquiry" if kind == "booking" else "own"
+        if kind == "booking":
+            return "inquiry"
+        return "unclear"
+
+    def _chat_has_linked_booking(self):
+        chat_id = str(getattr(self, "_current_chat_id", "") or "").strip()
+        if not chat_id:
+            return False
+        try:
+            import chat_db
+            conv = chat_db.get_conversation(chat_id) or {}
+        except Exception:
+            return False
+        return bool(str(conv.get("airtable_record_id") or "").strip() or str(conv.get("booking_number") or "").strip())
+
+    def _allow_text_identifier_link(self, message_text, value, kind):
+        intent = self._mention_link_intent(message_text, value, kind)
+        if intent == "alternate":
+            if self._chat_has_linked_booking():
+                logging.info(
+                    "Alternative %s %s belongs to this customer. Keep the current booking and do not switch records.",
+                    kind,
+                    value,
+                )
+                return False
+            logging.info(
+                "Alternative %s %s belongs to this customer. Use it only to find their booking.",
+                kind,
+                value,
+            )
+            return True
+        if intent == "other":
+            logging.info(
+                "Skip booking link for %s %s: the message does not say it belongs to this customer.",
+                kind,
+                value,
+            )
+            return False
+        if intent in ("own", "inquiry"):
+            return True
+        if kind in ("phone", "email") and self._chat_has_linked_booking():
+            logging.info(
+                "Skip booking link for in-text %s %s: ownership is unclear and this chat is already linked.",
+                kind,
+                value,
+            )
+            return False
+        return True
+
+    def _redirect_foreign_contact_to_note(self, message_text, extracted_data):
+        """Keep another person's phone or email out of the customer identity fields."""
+        if not isinstance(extracted_data, dict):
+            return extracted_data
+        data = dict(extracted_data)
+        notes = []
+        phone = str(data.get("Customer Phone") or "").strip()
+        phone_intent = self._mention_link_intent(message_text, phone, "phone") if phone else ""
+        if phone and phone_intent == "alternate":
+            data.pop("Customer Phone", None)
+            data["Alternative Phone"] = phone
+            logging.info("Customer sent alternative phone %s. It will be saved without replacing the WhatsApp number.", phone)
+        elif phone and phone_intent != "own" and (phone_intent == "other" or self._chat_has_linked_booking()):
+            notes.append(f"Additional phone from chat (not the customer identity): {phone}")
+            data.pop("Customer Phone", None)
+            logging.info("Kept mentioned phone %s off the booking customer-phone field.", phone)
+        email_key = "Customer personal email" if data.get("Customer personal email") else ("Customer Email" if data.get("Customer Email") else "")
+        email = str(data.get(email_key) or "").strip() if email_key else ""
+        email_intent = self._mention_link_intent(message_text, email, "email") if email else ""
+        if email and email_key and email_intent != "own" and (email_intent == "other" or self._chat_has_linked_booking()):
+            notes.append(f"Additional email from chat (not the customer identity): {email}")
+            data.pop(email_key, None)
+            logging.info("Kept mentioned email %s off the booking customer-email field.", email)
+        if notes:
+            existing = str(data.get("Note") or data.get("Notes") or "").strip()
+            combined = "\n".join([p for p in [existing, *notes] if p])
+            data["Note"] = combined
+        return data
+
     def find_booking_strictly(self, message_text, sender_email=None, sender_phone=None, ai_extracted_data=None, department="general"):
         """
         Strict Lookup Order as requested:
@@ -8103,15 +8277,18 @@ User request:
         if ai_extracted_data:
             ai_booking_nr = ai_extracted_data.get('Booking Nr.')
             if ai_booking_nr and not self._is_placeholder_booking_number(ai_booking_nr):
-                logging.info(f"Checking AI Extracted Booking Nr: {ai_booking_nr}")
-                rec = _find_by_booking_number_scoped(ai_booking_nr)
+                if not self._allow_text_identifier_link(message_text, ai_booking_nr, "booking"):
+                    ai_booking_nr = ""
+                else:
+                    logging.info(f"Checking AI Extracted Booking Nr: {ai_booking_nr}")
+                rec = _find_by_booking_number_scoped(ai_booking_nr) if ai_booking_nr else None
                 if rec:
                     logging.info(f"Found booking by AI Booking Nr: {ai_booking_nr}")
                     # Update email if needed
                     if sender_email:
                         self._link_email_if_needed(rec, sender_email)
                     return rec
-                else:
+                elif ai_booking_nr:
                      logging.warning(f"AI Extracted Booking Nr '{ai_booking_nr}' NOT found in DB.")
             elif ai_booking_nr:
                 logging.info(f"Ignoring placeholder AI Extracted Booking Nr: {ai_booking_nr}")
@@ -8123,6 +8300,8 @@ User request:
         # User might mention a booking number that is wrong, but their phone/email is correct.
         
         for cand, confidence in candidates:
+            if not self._allow_text_identifier_link(message_text, cand, "booking"):
+                continue
             logging.info(f"Checking Booking Nr ({confidence}): {cand}")
             rec = _find_by_booking_number_scoped(cand)
             if rec:
@@ -8138,8 +8317,11 @@ User request:
         if ai_extracted_data:
             ai_email = ai_extracted_data.get('Customer personal email')
             if ai_email and ai_email.lower() != (sender_email or "").lower():
-                 logging.info(f"Checking AI Extracted Email: {ai_email}")
-                 rec = _find_by_contact_scoped(email=ai_email)
+                 if not self._allow_text_identifier_link(message_text, ai_email, "email"):
+                     ai_email = ""
+                 else:
+                     logging.info(f"Checking AI Extracted Email: {ai_email}")
+                 rec = _find_by_contact_scoped(email=ai_email) if ai_email else None
                  if rec:
                      logging.info(f"Found booking by AI Extracted Email: {ai_email}")
                      return rec
@@ -8154,6 +8336,8 @@ User request:
                 logging.info(f"Skipping Agency Email in text: {email}")
                 continue
 
+            if not self._allow_text_identifier_link(message_text, email, "email"):
+                continue
             logging.info(f"Checking Email candidate from text: {email}")
             rec = _find_by_contact_scoped(email=email)
             if rec:
@@ -8180,8 +8364,11 @@ User request:
         if ai_extracted_data:
             ai_phone = ai_extracted_data.get('Customer Phone')
             if ai_phone:
-                 logging.info(f"Checking AI Extracted Phone: {ai_phone}")
-                 rec = _find_by_contact_scoped(phone=ai_phone)
+                 if not self._allow_text_identifier_link(message_text, ai_phone, "phone"):
+                     ai_phone = ""
+                 else:
+                     logging.info(f"Checking AI Extracted Phone: {ai_phone}")
+                 rec = _find_by_contact_scoped(phone=ai_phone) if ai_phone else None
                  if rec:
                      logging.info(f"Found booking by AI Extracted Phone: {ai_phone}")
                      return rec
@@ -11881,6 +12068,7 @@ Conversation:
                     self.update_booking_record(booking_record['id'], updates, table_name=booking_record.get('table_name'))
                     logging.info(f"Updated booking {booking_record['id']} with new extracted details: {updates}")
 
+            extracted_data = self._redirect_foreign_contact_to_note(message_body, extracted_data)
             self.update_booking_from_extracted_data(booking_record, extracted_data)
 
             # --- SPECIAL LOGIC: WhatsApp Email Update (No Inquiry) ---
@@ -50971,7 +51159,7 @@ Draft to optimize:
         # SORT THREADS: Oldest to Newest (based on historyId)
         # This ensures we process older messages first if multiple are waiting.
         if threads:
-            threads.sort(key=lambda x: int(x.get('historyId', 0)))
+            threads.sort(key=lambda x: int(x.get('historyId', 0)), reverse=True)
         
         if not threads:
             logging.info("No new emails found.")
@@ -51761,6 +51949,7 @@ Draft to optimize:
                             booking_nr_val = self.get_field_value(booking_record.get('fields', {}), FieldIds.BOOKING_NR)
                             chat_db.update_conversation_info(chat_id, airtable_record_id=booking_record['id'], location=db_location, booking_number=booking_nr_val)
 
+                            extracted_data = self._redirect_foreign_contact_to_note(history_text, extracted_data)
                             self.update_booking_from_extracted_data(booking_record, extracted_data)
                 finally:
                     company_tenancy.unbind_booking_company()
@@ -51877,10 +52066,12 @@ Draft to optimize:
             legacy_booking_scheduler_enabled = False
         if legacy_booking_scheduler_enabled:
             schedule.every(2).minutes.do(self.process_new_bookings)
-        schedule.every(2).minutes.do(self.process_incoming_emails)
-
         def _company_email_loop():
             while True:
+                try:
+                    self.process_incoming_emails()
+                except Exception as booking_loop_err:
+                    logging.error("Booking email loop failed: %s", booking_loop_err)
                 try:
                     self._poll_company_email_accounts()
                 except Exception as company_loop_err:

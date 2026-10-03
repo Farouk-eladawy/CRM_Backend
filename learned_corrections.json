@@ -1,23 +1,5 @@
 [
   {
-    "timestamp": "2026-09-27T00:26:48.006129",
-    "original": "تحت أمرك في تفاصيل الحج المباشر الاقتصادي 🕋\n\nالحج المباشر بتأشيرة رسمية من غير قرعة خالص — مناسب لحضرتك لأنك حجيت قبل ٢٠١٠، وده مسار خاص لأن الوزارة بتطبق قاعدة القناة الواحدة.\n\nالبرنامج نفس برنامج طيران التحسين: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nالسعر ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وعدد التأشيرات محدود كل سنة وبيخلص بالأسبقية.\n\nبالنسبة للتقسيط، بيتحدد حسب البرنامج والعدد، والأدق إني أكلمك ٥ دقايق أحسبها لحضرتك بالظبط — أكلم حضرتك على أي رقم؟ 😊",
-    "corrected": "سيتم التواصل",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T01:22:23.322230",
-    "original": "تمام يا فندم، سجلت رقم حضرتك: ٠١١٥٨٨٠٠٩٠٢ ✅\n\nفريق المبيعات هيتواصل مع حضرتك على الواتساب في أقرب وقت إن شاء الله يشرحلك كل تفاصيل الحج المباشر وخطوات تثبيت المكان.",
-    "corrected": "سيتم التواصل",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T01:24:30.749751",
-    "original": "أيوه يا فندم، السعر اللي بنتكلم عنه هو الإجمالي النهائي بعد خصم الحجز المبكر من سعر الوزارة الرسمي — ومفيش أي زيادات مخفية تاني.\n\nبس في نقطة مهمة حسب البرنامج اللي حضرتك بتفكر فيه:\n- برامج الطيران (اقتصادي ٢٤٥ ألف / تحسين ٢٧٥ ألف): تذكرة الطيران بتتضاف بسعرها وقت الحجز، لأنها مش داخلة في السعر.\n- البرنامج البري (٢٢٠ ألف): تذكرة العبّارة ذهاب وعودة بتتضاف بسعرها وقت الحجز.\n\nيعني السعر المعلن نهائي ومفيش زيادة تانية غير التذكرة بس.\n\nحضرتك بتفكر في أنهي برنامج — البري ولا الطيران؟ وأسهل حاجة أكلمك دقيقتين أوضحلك كل حاجة بالتفصيل — رقم حضرتك عليه واتساب؟\n\nمع خالص التحية،\nمسؤول المبيعات عبدالرحمن إبراهيم",
-    "corrected": "لا يا فندم دا السعر من غير تذكره الطيران",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T01:25:18.961889",
     "original": "تمام يا فندم، وصلني رقم حضرتك: 01505310778 ✅\n\nبخصوص إن حضرتك حجيت قبل كده تبع شركة سياحة بحج القرعة — ده معناه إن حضرتك مش هتقدر تقدم في قرعة السياحة نفس السنة دي، لأن الوزارة بتطبق قاعدة القناة الواحدة والسيستم بيرفض الرقم القومي تلقائيًا.\n\nلكن في خبر كويس: المتاح لحضرتك هو الحج المباشر بتأشيرة مباشرة — من غير أي قرعة خالص، يعني مفيش انتظار نتيجة ولا احتمال رفض. والبرنامج هو نفس برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nعدد التأشيرات محدود كل سنة وبيخلص بالأسبقية، والأدق إني أكلم حضرتك دقيقتين أشرحلك التفاصيل كاملة — ينفع أكلم حضرتك على نفس الرقم ده واتساب؟",
     "corrected": "سيتم التواصل",
@@ -597,6 +579,24 @@
     "timestamp": "2026-10-03T02:01:39.791354",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you very much for sharing your room number with us. We have received the information and updated your booking accordingly.\n\nWe appreciate your cooperation and look forward to welcoming you on your trip.\n\nKind regards,\nFTS Travels Customer Support Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T04:00:57.049615",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for sending over your details. I have safely noted your hotel (Empire Hotel Aqua Park, Hurghada), room number (502), and that there are no children on this booking. These details will be linked to your reservation automatically.\n\nI can also confirm your pickup details for your **Hurghada to Cairo: Pyramids & Museum for First-Time Visitors** tour:\n\n- **Booking Reference:** GYG996R2X25X\n- **Date:** Sunday, 4 October 2026\n- **Pickup Time:** 00:50\n- **Pickup Location:** Empire Hotel Aqua Park\n\nPlease be ready at your hotel entrance about 5 minutes before 00:50, and keep your phone reachable in case the driver needs to contact you.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T04:04:57.865046",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for letting us know. If you have a valid EU student ID, please make sure to bring it with you on the day of the tour.\n\nThe student discount is available for any additional entrance tickets or attractions that are not included in your current booking. If you decide to add any additional visits during the tour, our guide will assist you with the arrangements and apply the applicable student discount upon presentation of your valid student ID.\n\nYour current booking remains unchanged, and the discount does not apply to the services already included in your reservation.\n\nWe look forward to welcoming you and hope you have a wonderful experience with us.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T04:16:31.282172",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for reaching out with your question about the Luxor Valley of the Kings & Tutankhamun Tomb Trip.\n\nRegarding your query about the guide's presence during ticket purchases: yes, your Egyptologist guide will remain with you throughout the entire experience. They will accompany you while you purchase your entrance tickets on-site using your student IDs, and they will stay with you for the full duration of the tour — guiding you through the Valley of the Kings, Karnak Temple, and all other sites on the itinerary. You will not be left on your own at any point.\n\nA quick note on the student discount: please make sure to bring your valid student IDs with you on the day of the tour, as the discount is applied at the ticket office upon presentation of the ID.\n\nYour booking is confirmed for Monday, October 5, 2026, with pickup from Edlma Sahl Hasheesh (Room B107). Your confirmed pickup time will be sent to you via WhatsApp and email one day before your trip, typically by 6:00 PM.\n\nIf there is anything else you would like to know about the itinerary or what to expect on the day, I am happy to help.",
     "context": "UI Manual Edit"
   }
 ]

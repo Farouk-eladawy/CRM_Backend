@@ -11451,7 +11451,8 @@ Conversation:
                 "penniestosave.com", "mail.beehiiv.com", "stripe.com", "amazonses.com", "tawk.to", "aemktng.shutterstock.com", "tawk.to",
                 "excursionmania.com", "waleed@maximrestaurants.com",
                 "us2.make.com", "noreply@trip.com", "businessprofile-noreply@google.com",
-                "bookings@headout.com" # Added to completely ignore these confirmation emails
+                "bookings@headout.com", # Added to completely ignore these confirmation emails
+                "support@tourcare.ai", # Internal assignment mailbox. Never bind it to a customer booking.
             ]
             if any(d in customer_email.lower() for d in ignored_domains):
                 logging.info(f"Skipping ignored domain email from {customer_email}")

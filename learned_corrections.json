@@ -1,29 +1,5 @@
 [
   {
-    "timestamp": "2026-09-26T23:55:30.621454",
-    "original": "Sure, let's go through a typical scenario to illustrate how we can apply these guidelines. Suppose a user asks about their booking details:\n\n### Scenario:\nA user emails support and says: \"I booked a trip with FTS Travels on August 15th. Can you please confirm the flight details?\"\n\n### Response:\nBased on our strict rules, here’s how we would respond:\n\n```plaintext\nHello [User's Name],\n\nThank you for reaching out to us. I understand your concern about the flight details of your booking.\n\nI have reviewed the official booking record and the internal trips catalog (Source 1 & 2). The flight information is as follows:\n- Your flight departs at 07:00 AM on August 15th, with a departure airport code MS.\n- You selected the [Selected Option] package.\n\nAdditionally, I have checked our historical emails and found that lunch is included in your booking (Source 3). Please note that any add-ons or operational details are already handled by operations and do not require additional payment.\n\nIf you need further clarification on any other aspect of your trip, please let me know. \n\nI will verify this detail with our operations team to ensure I give you the correct information regarding [ITEM], and I will get back to you as soon as possible.\n\nThank you for bringing this to our attention.\nBest regards,\n[Your Name]\nFTS Travels Support Team\n```\n\n### Explanation of Response:\n1. **Empathy**: The response starts with a neutral but professional tone, acknowledging the user's concern without over-apologizing.\n2. **Verification**: We confirm the flight details from Source 1 and add-ons from Source 3.\n3. **Historical Emails**: We cross-verify against historical emails (Source 3) to ensure accuracy.\n4. **Clarification**: If needed, we provide a clear response about what is included or not included in the booking.\n5. **Escalation**: No escalations are made unless explicitly required by user actions.\n\nThis approach ensures that all information is accurate and follows strict guidelines for handling customer support queries.",
-    "corrected": "حضرتك، الحصة محدودة والحجز بترتيب التسجيل، وأكتر من نصها اتقفل فعلاً.\n\nأنا أحمد خليل من فريق الحجوزات، ومكانك ممكن يتثبّت في مكالمة دقيقتين بس.\n\n📞 01288427370 — اتصل بيا دلوقتي، الرقم واتساب كمان.\n\nلو مش فاضي تتصل، ابعتلي رقم حضرتك وأنا أتصل بيك خلال دقايق.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T00:17:42.436246",
-    "original": "تمام يا فندم، وصلني رقم حضرتك: 01006161846 ✅\n\nبخصوص سؤال حضرتك عن برامج العمرة لشهر ١١ — فريق المبيعات هيتواصل مع حضرتك على الواتساب في أقرب وقت يشرحلك كل التفاصيل والمواعيد المتاحة إن شاء الله.\n\nلو حابب تسرّع الأمور، ممكن تقولي حضرتك مهتم بعمرة لمدة كام يوم تقريبًا؟\n\nمع خالص التحية،\nمسؤول المبيعات أيه محمد",
-    "corrected": "حضرتك، الحصة محدودة والحجز بترتيب التسجيل، وأكتر من نصها اتقفل فعلاً.\n\nأنا أحمد خليل من فريق الحجوزات، ومكانك ممكن يتثبّت في مكالمة دقيقتين بس.\n\n📞 01288427370 — اتصل بيا دلوقتي، الرقم واتساب كمان.\n\nلو مش فاضي تتصل، ابعتلي رقم حضرتك وأنا أتصل بيك خلال دقايق.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T00:25:37.503298",
-    "original": "أهلاً بحضرتك 🕋\n\nبخصوص استفسارك عن عمرة النص التاني من شهر شعبان لمدة ١٥ يوم — عندنا برنامج عمرة اقتصادي ١٥ يوم شامل الطيران والتأشيرة والإقامة في مكة والمدينة والانتقالات:\n\nسعر الفرد في الغرفة الرباعية: ٤٠٬٩٥٠ جنيه\nسعر الفرد في الغرفة الثلاثية: ٤٣٬١٠٠ جنيه\nسعر الفرد في الغرفة الثنائية: ٤٧٬٤٥٠ جنيه\n\n✨ ١٥ يوم معناها إن حضرتك بتأدي العمرة براحتك ومن غير استعجال — وقت كافي للعبادة والطواف والصلاة من غير ضغط.\n\n🕌 المدينة المنورة — إقامة فعلية ٣ ليالي مش مجرد زيارة، فندق طيبة هيلز أقل من ٥ دقايق مشي من الحرم النبوي.\n🕋 مكة المكرمة — ١١ ليلة في فندق منازل العين بامتداد شارع أجياد، باصات متوفرة طول اليوم توصّلك الحرم في حوالي ٥ دقايق.\n✈️ الطيران مباشر على الخطوط السعودية أو مصر للطيران.\n\nبخصوص المواعيد المحددة للنص التاني من شعبان، هتأكدلك من النقطة دي مع فريق العمليات وأكلمك — رقم حضرتك عليه واتساب؟\n\nمع خالص التحية،\nمسؤول المبيعات ملك ماهر",
-    "corrected": "أخيرًا يا فندم — ضوابط الحج نزلت رسميًا ✅ والتقديم بدأ من يوم ٤ سبتمبر لغاية ٢٧ سبتمبر، والنتيجة هتعلن يوم ٣٠ سبتمبر.\n\nوبمناسبة نزول الضوابط، في خصم خاص ساري لمدة أسبوع واحد بس — أو لحد اكتمال آخر حصة متاحة للشركة، أيهما أقرب:\n\n🚌 بري — ٢٢٠ ألف بدل ٢٣٠ ألف (خصم ١٠ آلاف جنيه): نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n\n✈️ طيران اقتصادي — ٢٤٥ ألف بدل ٢٧٠ ألف (خصم ٢٥ ألف جنيه): نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n\n⭐ طيران تحسين — ٢٧٥ ألف بدل ٣٠٤ آلاف (خصم ٢٩ ألف جنيه): بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n\nالأماكن محدودة والتقديم بيقفل ٢٧ سبتمبر — حضرتك إيه الأهم بالنسبالك، التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين على التليفون أرشحلك الأنسب — أقدر أكلم حضرتك على أي رقم؟ 🌿",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T00:26:16.427215",
-    "original": "أيوه يا فندم، فكرة المرافق لوالدتك ممكنة تمامًا — والبرامج عندنا بتسمح بوجود مرافق مع الحاج، والتفاصيل بتتظبط حسب حالة الوالدة والبرنامج اللي هتختاروه.\n\nبس النقطة دي بالذات محتاجة حد من فريقنا يسمع منك التفاصيل كاملة ويقولك بالظبط إيه المتاح وإزاي بيتحسب، لأنها بتختلف حسب البرنامج والسن.\n\nأسهل حاجة إني أكلمك دقيقتين أظبطلك كل حاجة — أكلم حضرتك على أي رقم؟ 📞\n\nمع خالص التحية،\nمسؤول المبيعات ملك ماهر",
-    "corrected": "أخيرًا يا فندم — ضوابط الحج نزلت رسميًا ✅ والتقديم بدأ من يوم ٤ سبتمبر لغاية ٢٧ سبتمبر، والنتيجة هتعلن يوم ٣٠ سبتمبر.\n\nوبمناسبة نزول الضوابط، في خصم خاص ساري لمدة أسبوع واحد بس — أو لحد اكتمال آخر حصة متاحة للشركة، أيهما أقرب:\n\n🚌 بري — ٢٢٠ ألف بدل ٢٣٠ ألف (خصم ١٠ آلاف جنيه): نفس المناسك ونفس الإشراف، والسفر بري بأتوبيسات حديثة — الأوفر لو التكلفة هي الأهم.\n\n✈️ طيران اقتصادي — ٢٤٥ ألف بدل ٢٧٠ ألف (خصم ٢٥ ألف جنيه): نفس مستوى البري لكن السفر طيران — توفير في الوقت والمجهود بفرق بسيط.\n\n⭐ طيران تحسين — ٢٧٥ ألف بدل ٣٠٤ آلاف (خصم ٢٩ ألف جنيه): بعد المناسك ٧ أيام على ساحة الحرم — مشاوير أقل وصلاة أسهل بعد تعب عرفات ومنى.\n\nالأماكن محدودة والتقديم بيقفل ٢٧ سبتمبر — حضرتك إيه الأهم بالنسبالك، التكلفة ولا الراحة؟ وأسهل حاجة أكلمك دقيقتين على التليفون أرشحلك الأنسب — أقدر أكلم حضرتك على أي رقم؟ 🌿",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T00:26:48.006129",
     "original": "تحت أمرك في تفاصيل الحج المباشر الاقتصادي 🕋\n\nالحج المباشر بتأشيرة رسمية من غير قرعة خالص — مناسب لحضرتك لأنك حجيت قبل ٢٠١٠، وده مسار خاص لأن الوزارة بتطبق قاعدة القناة الواحدة.\n\nالبرنامج نفس برنامج طيران التحسين: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nالسعر ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وعدد التأشيرات محدود كل سنة وبيخلص بالأسبقية.\n\nبالنسبة للتقسيط، بيتحدد حسب البرنامج والعدد، والأدق إني أكلمك ٥ دقايق أحسبها لحضرتك بالظبط — أكلم حضرتك على أي رقم؟ 😊",
     "corrected": "سيتم التواصل",
@@ -597,6 +573,30 @@
     "timestamp": "2026-10-02T11:50:54.548528",
     "original": "بخصوص الحج المباشر: هو تأشيرة حج رسمية، يعني مش بتدخل قرعة ومش بتستنى نتيجة.. حجك مضمون ١٠٠٪ حتى لو حجيت قبل كده أو ما طلعش اسمك في القرعة السنة دي.\n\nالسعر أعلى من البرامج العادية لأنه بيتضاف عليه تأشيرة بالدولار، وبيوصل لحوالي ٦٠٠ ألف جنيه شامل تكلفة التأشيرة المباشرة.\n\nوالبرنامج هو نفس برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nعشان أشرحلك كل التفاصيل والخطوات بالظبط، أسهل حاجة مكالمة قصيرة — أكلم حضرتك على أي رقم؟ 📞",
     "corrected": "بخصوص الحج المباشر: هو تأشيرة حج رسمية، يعني مش بتدخل قرعة ومش بتستنى نتيجة.. حجك مضمون ١٠٠٪ حتى لو حجيت قبل كده أو ما طلعش اسمك في القرعة السنة دي.\n\nالسعر أعلى من البرامج العادية لأنه بيتضاف عليه تأشيرة بالدولار، وبيوصل لحوالي ٦٠٠ ألف جنيه شامل تكلفة التأشيرة المباشر الدولارية.\n\nالعدد المتاح لكل شركة كان ٢ تأشيرة بس، واتحجزوا بالفعل. لكن التأشيرات دي بتتوفر فجأة وبتخلص في نفس اليوم، فاللي بياخدها هو اللي اسمه مسجّل عندنا قبلها.\n\nتحب نسجّل بيانات حضرتك في قائمة انتظار الحج المباشر، بحيث أول ما تتوفر تأشيرة نكلمك قبل أي حد؟ وساعتها هيكون المطلوب منك قرار سريع عشان نثبّتها باسمك.\n\nوفي نفس الوقت نقدر نسجّل اسم حضرتك معانا في قرعة حج السنة الجاية بنفس الخصم الحالي على سعر الوزارة، عشان تكون مضمون في الحالتين.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T01:43:27.982510",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "I want to confirm that your room number (2504) is correctly noted on your booking record for the Luxor trip.\n\nIf there is anything else I can help you with, I'm here for you anytime.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T01:47:56.567794",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Customer,\n\nCertainly, there is no problem at all. We have changed the date of your tour from 10 October to 11 October as requested.\n\nThe change has already been completed successfully, and your booking remains under the same booking reference and all the same booking details.\n\nYour tour is now confirmed for Sunday, 11 October.\n\nThank you for informing us, and we wish you a wonderful experience.\n\nKind regards,\nFTS Travels Customer Support Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T01:56:44.574361",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Guten Tag,\n\nvielen Dank für Ihre Nachricht.\n\nBitte beachten Sie, dass für Ihre Buchung ein gemeinsames Zimmer für beide Personen vorgesehen ist. Es handelt sich nicht um zwei separate Zimmer.\n\nFalls Sie noch Fragen zu Ihrer Unterkunft oder zu Ihrer Buchung haben, können Sie sich jederzeit gerne an uns wenden.\n\nMit freundlichen Grüßen\nFTS Travels Customer Support Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-03T02:01:39.791354",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you very much for sharing your room number with us. We have received the information and updated your booking accordingly.\n\nWe appreciate your cooperation and look forward to welcoming you on your trip.\n\nKind regards,\nFTS Travels Customer Support Team",
     "context": "UI Manual Edit"
   }
 ]

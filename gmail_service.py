@@ -215,13 +215,11 @@ class GmailService:
                         creds = None
 
                 if not creds:
-                    if not os.path.exists(self.credentials_file):
-                        logging.error("credentials.json not found! Please download it from Google Cloud Console.")
-                        print("ERROR: credentials.json not found! Please place it in the AIAgentProject folder.")
-                        return None
-
-                    flow = InstalledAppFlow.from_client_secrets_file(self.credentials_file, SCOPES)
-                    creds = flow.run_local_server(port=0)
+                    logging.error(
+                        "Gmail token is missing or revoked. Connect the mailbox from the dashboard. "
+                        "Local browser login is disabled so the API can keep running."
+                    )
+                    return None
 
                 self._persist_credentials(creds)
 

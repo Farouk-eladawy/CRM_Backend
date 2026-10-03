@@ -307,7 +307,11 @@ class GmailService:
     @staticmethod
     def build_web_auth_url(credentials_file=None, redirect_uri=None, state=None):
         credentials_path = credentials_file or DEFAULT_CREDENTIALS_FILE
-        flow = Flow.from_client_secrets_file(credentials_path, scopes=SCOPES)
+        flow = Flow.from_client_secrets_file(
+            credentials_path,
+            scopes=SCOPES,
+            autogenerate_code_verifier=False,
+        )
         if redirect_uri:
             flow.redirect_uri = redirect_uri
         auth_url, next_state = flow.authorization_url(
@@ -321,7 +325,11 @@ class GmailService:
     @staticmethod
     def exchange_web_code(code, credentials_file=None, redirect_uri=None):
         credentials_path = credentials_file or DEFAULT_CREDENTIALS_FILE
-        flow = Flow.from_client_secrets_file(credentials_path, scopes=SCOPES)
+        flow = Flow.from_client_secrets_file(
+            credentials_path,
+            scopes=SCOPES,
+            autogenerate_code_verifier=False,
+        )
         if redirect_uri:
             flow.redirect_uri = redirect_uri
         flow.fetch_token(code=code)

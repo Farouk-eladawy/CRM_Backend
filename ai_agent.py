@@ -1087,9 +1087,54 @@ def _get_dashboard_email_oauth_states():
     return raw if isinstance(raw, dict) else {}
 
 def _save_dashboard_email_oauth_states(states_map):
-    normalized = states_map if isinstance(states_map, dict) else {}
+    normalized = dict(states_map) if isinstance(states_map, dict) else {}
     _write_setting_value("dashboard_email_oauth_states", normalized)
     return normalized
+
+_OAUTH_STATE_LOCK = threading.Lock()
+
+def _oauth_state_row_key(state):
+    token = str(state or "").strip()
+    if not token or any(ch.isspace() for ch in token) or len(token) > 180:
+        return ""
+    return "gmail_oauth_state:" + token
+
+def _write_oauth_state_row(state, payload):
+    key = _oauth_state_row_key(state)
+    if not key or not isinstance(payload, dict):
+        return False
+    body = dict(payload)
+    body["state"] = str(state)
+    chat_db.set_setting(key, json.dumps(body, ensure_ascii=False))
+    try:
+        _SETTINGS_CACHE.pop(f"settings:{key}", None)
+    except Exception:
+        pass
+    return True
+
+def _consume_oauth_state_row(state):
+    key = _oauth_state_row_key(state)
+    if not key:
+        return None
+    try:
+        raw = chat_db.get_setting(key)
+    except Exception:
+        raw = None
+    if raw is None or not str(raw).strip():
+        return None
+    try:
+        payload = json.loads(raw) if isinstance(raw, str) else raw
+    except Exception:
+        payload = None
+    try:
+        chat_db.set_setting(key, "")
+    except Exception:
+        pass
+    try:
+        _SETTINGS_CACHE.pop(f"settings:{key}", None)
+    except Exception:
+        pass
+    return payload if isinstance(payload, dict) else None
 
 def _get_dashboard_email_oauth_results():
     raw = _read_setting_value("dashboard_email_oauth_results")
@@ -44478,14 +44523,24 @@ Write ONE short message only. No JSON. No explanations."""
 
                 redirect_uri = self._get_dashboard_oauth_public_base_url() + '/api/gmail_accounts/oauth/callback'
                 state = secrets.token_urlsafe(24)
-                oauth_states = _get_dashboard_email_oauth_states()
-                oauth_states[state] = {
+                state_payload = {
                     "account_id": account_id,
                     "company_id": account_company_id,
                     "redirect_uri": redirect_uri,
                     "created_at": int(time.time()),
                 }
-                _save_dashboard_email_oauth_states(oauth_states)
+                with _OAUTH_STATE_LOCK:
+                    oauth_states = dict(_get_dashboard_email_oauth_states() or {})
+                    now_ts = int(time.time())
+                    pruned = {}
+                    for key, item in oauth_states.items():
+                        created_at = int(item.get("created_at") or 0) if isinstance(item, dict) else 0
+                        if created_at and now_ts - created_at > 1800:
+                            continue
+                        pruned[str(key)] = item
+                    pruned[state] = state_payload
+                    _save_dashboard_email_oauth_states(pruned)
+                    _write_oauth_state_row(state, state_payload)
 
                 # scopes must be passed by name; SCOPES= is rejected by google-auth-oauthlib.
                 auth_url, returned_state = GmailService.build_web_auth_url(
@@ -44493,13 +44548,19 @@ Write ONE short message only. No JSON. No explanations."""
                     redirect_uri=redirect_uri,
                     state=state
                 )
-                if returned_state and returned_state != state:
-                    payload = oauth_states.pop(state, None)
-                    if payload:
-                        oauth_states[returned_state] = payload
+                final_state = returned_state or state
+                if final_state != state:
+                    with _OAUTH_STATE_LOCK:
+                        oauth_states = dict(_get_dashboard_email_oauth_states() or {})
+                        moved = oauth_states.pop(state, None) or dict(state_payload)
+                        oauth_states[final_state] = moved
                         _save_dashboard_email_oauth_states(oauth_states)
+                        _write_oauth_state_row(final_state, moved)
+                        old_key = _oauth_state_row_key(state)
+                        if old_key:
+                            chat_db.set_setting(old_key, "")
 
-                return jsonify({"status": "success", "auth_url": auth_url, "state": returned_state or state}), 200
+                return jsonify({"status": "success", "auth_url": auth_url, "state": final_state}), 200
             except Exception as e:
                 logging.error(f"Error in api_gmail_accounts_oauth_start: {e}", exc_info=True)
                 return jsonify({"status": "error", "message": str(e)}), 500
@@ -44512,9 +44573,19 @@ Write ONE short message only. No JSON. No explanations."""
             payload = {"type": "gmail-oauth-complete", "success": False, "accountId": None}
             success = False
             try:
-                oauth_states = _get_dashboard_email_oauth_states()
-                state_payload = oauth_states.pop(state, None)
-                _save_dashboard_email_oauth_states(oauth_states)
+                state_payload = _consume_oauth_state_row(state)
+                if not state_payload:
+                    with _OAUTH_STATE_LOCK:
+                        try:
+                            fresh = chat_db.get_setting("dashboard_email_oauth_states")
+                            oauth_states = json.loads(fresh) if fresh else {}
+                        except Exception:
+                            oauth_states = {}
+                        if not isinstance(oauth_states, dict):
+                            oauth_states = {}
+                        state_payload = oauth_states.pop(state, None) if state else None
+                        if state_payload:
+                            _save_dashboard_email_oauth_states(oauth_states)
                 if not state_payload:
                     raise Exception("OAuth state is invalid or expired.")
                 if not code:

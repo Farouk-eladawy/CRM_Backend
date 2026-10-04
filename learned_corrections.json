@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-27T03:51:21.378632",
-    "original": "لسه القرعة يوم ٣٠ سبتمبر ٢٠٢٦ — يعني فاضل أيام قليلة والنتيجة بتظهر رسميًا من الوزارة، ومفيش حد يقدر يضمن القبول قبلها لأنها قرعة إلكترونية رسمية.\n\nوعشان مكانك يبقى داخل السحب فعلاً، لازم تكون مسجّل ومسدّد جدية الحجز قبل غلق التسجيل يوم ٢٧ سبتمبر.\n\nأسهل حاجة أطمنك على تفاصيل حجزك بالظبط وأقولك موقفك إيه — أكلم حضرتك على أي رقم؟ 📞\n\nمع خالص التحية،\nمسؤول المبيعات ملك ماهر",
-    "corrected": "يوم ٣٠",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T04:20:36.370997",
     "original": "أهلًا بحضرتك 🕋 برنامج الـ٥ نجوم من أقوى برامجنا، وبيتميز بإقامة فندقية فاخرة قريبة جدًا من الحرم وخدمة على أعلى مستوى.\n\nبس عشان أخدمك صح، الأسعار الرسمية للـ٥ نجوم لسه قيد الاعتماد من الوزارة، فمش هينفع أقولك رقم دلوقتي وأضللك.\n\nأسهل حاجة إني أكلمك دقيقتين أشرحلك كل تفاصيل البرنامج والمميزات وأقولك السعر الرسمي أول ما يثبت — أكلم حضرتك على أي رقم؟ 📞",
     "corrected": "طب ممكن الرقم",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-03T21:32:08.636972",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you so much for your wonderful feedback! We are absolutely thrilled to hear that you loved your Luxor trip — the Valley of the Kings and Tutankhamun's Tomb truly are unforgettable, and it means the world to us that you had such a great experience with us.\n\nIf you haven't already, we would be very grateful if you could share a quick review on Viator. Your kind words help other travelers discover this amazing experience, and they mean a lot to our team.\n\nWe hope to welcome you again on your next visit to Egypt — you can find us on Viator anytime by searching for our company name.\n\nBest regards,\nFarah Elkhatib",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-04T01:44:34.742448",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Flavia,\nThank you for contacting us. We wish you and your companion a very speedy recovery.\nRegarding your request, we deeply regret to inform you that we are unable to process a refund or adjust the number of participants for your booking. As per Viator’s strict cancellation policy, any modifications or cancellations made less than 24 hours prior to the scheduled tour start time are non-refundable.\nWe truly appreciate your understanding and hope you feel much better soon.\nBest regards,\nFTS Travels Team",
     "context": "UI Manual Edit"
   }
 ]

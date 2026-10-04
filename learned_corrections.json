@@ -1,17 +1,5 @@
 [
   {
-    "timestamp": "2026-09-27T05:58:47.982568",
-    "original": "الحج المباشر ده مسار خاص للي حج قبل كده أو قدّم في قرعة الداخلية أو الجمعيات، لأن قاعدة القناة الواحدة بتمنع التقديم في قرعة السياحة نفس السنة.\n\nالبرنامج نفسه هو برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين من المدينة لمكة، مخيمات مكيفة في المناسك، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nالسعر بعد نزول ضوابط ١٤٤٨: ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، من غير أي قرعة ولا انتظار نتيجة. وعدد التأشيرات محدود كل سنة وبيخلص بالأسبقية.\n\nتفاصيل السداد والأوراق بنمشيها في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "ممكن رقم حضرتك للتواصل",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T05:59:37.655731",
-    "original": "أنا معاك، وبما إن حضرتك حجيت العام الماضي، فده معناه إن حجك كان بعد ٢٠١٠ — وبالتالي مش متاح لحضرتك التقديم في قرعة الحج السياحي، المتاح هو الحج المباشر عن طريق الوزارة فقط.\n\nالحج المباشر عندنا ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وبنفس برنامج التحسين (١٩ يوم، و٧ أيام على ساحة الحرم بعد المناسك).\n\nالموضوع ده محتاج دقيقتين مكالمة عشان أتأكد من تفاصيل حالتك وأشرحلك الخطوات بالظبط — أكلم حضرتك على أي رقم؟",
-    "corrected": "ربنا يكتبها لحضرتك.. بيكونوا حوالي 250 الف",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T06:03:41.199325",
     "original": "ولا يهمك خالص يا فندم، مفيش أي مشكلة — القرار فعلاً محتاج تفكير وربنا يكتبلك اللي فيه الخير.\n\nبس حابب أطمنك على نقطة مهمة: التسجيل في برامج الحج بيقفل يوم ٢٧ سبتمبر، ونتيجة القرعة بتظهر يوم ٣٠ سبتمبر — يعني مش هتستنى كتير عشان تعرف موقفك.\n\nولو حبيت تعرف تفاصيل أي برنامج أو تحسبها صح، أنا موجود في أي وقت — تحب أكلمك دقيقتين أشرحلك الفرق بين البرامج وأسعارها؟ رقم الموبايل لو سمحت.",
     "corrected": "ولا يهمك خالص يا فندم، مفيش أي مشكلة — القرار فعلاً محتاج تفكير وربنا يكتبلك اللي فيه الخير.",
@@ -597,6 +585,18 @@
     "timestamp": "2026-10-04T09:54:53.613294",
     "original": "Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Hello Brian,\n\nWe have checked directly with the Go-Karting center regarding your booking.\n\nThey confirmed that you received the 20 laps, not 15 laps. The driver also paid the difference to the center to ensure that you received the full 20-lap package.\n\nSo, we can confirm that you received the 20 laps included in your booking.\n\nThank you for your understanding.\n\nBest regards,\nAzzam\nQuality Manager\nFTS Travels",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-04T11:51:21.057356",
+    "original": "Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for sending over your details — I've safely noted them:\n\n- **Travelers:** Else Hauge, Herbjoern Gabrielsen\n- **Hotel:** Ajira Bay Hotel, Marina, Hurghada, Red Sea Governorate, 84517, Egypt\n- **Trip:** Hurghada: Full-Day Cairo Tour by Airplane (Entry to the Giza Pyramids, Sphinx and Grand Egyptian Museum)\n- **Booking Number:** 42494\n\nOnce we have your room number, your pickup time will be determined and sent to you via WhatsApp and email the day before your trip, typically by 6:00 PM.\n\nBest regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-04T11:59:10.120185",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for sending over all the details — I've safely noted them:\n\n- **Travelers:** Valentina Papic Bogadi, Saša Bogadi, Eva Papic Bogadi (17), Noa Papic Bogadi (14)\n- **Hotel:** Pickalbatros Aqua Blu Resort Hurghada, Safaga Road, Hurghada\n- **Trip:** Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip\n- **Travel Date:** Friday, 16 October 2026\n\nI can confirm we have received your email and your pickup request from the Aqua Blu Resort. Your details are now recorded on your booking.\n\nYour confirmed pickup time will be sent to you via WhatsApp and Email the day before your trip, typically by 6:00 PM. Since you don't have your room number yet, please share it with us once you check in on the 15th, so we can finalize the pickup arrangements.\n\nBest regards,",
     "context": "UI Manual Edit"
   }
 ]

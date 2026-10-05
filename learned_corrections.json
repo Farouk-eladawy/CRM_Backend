@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-27T12:35:01.774739",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Dear Gerhard,\nWe are truly sorry for the frustrating experience you had on your tour. We take your detailed feedback very seriously, and we have immediately opened a full investigation with our operations team regarding the guide, driver, and the services provided.\nAs an exception and to make things right while we investigate this matter, we would like to offer you one of the following complimentary options:\n1. Re-do the same trip free of charge.\n2. Ras Mohamed Day Trip completely free of charge.\n3. Sharm El Sheikh City Tour completely free of charge.\nPlease let us know which option you would prefer, and we will arrange it for you right away.\nBest regards,\nFTS Quality Team",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T13:19:28.021374",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "La prise en charge n'est pas prévue à 6 heures du matin ; l'heure de prise en charge vous sera communiquée la veille de votre excursion.",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-05T07:03:53.210268",
     "original": "تمام يا فندم، وصلت رسالتك وربنا يكرمنا ويقدرنا على خدمتكم أحسن خدمة 🤲\n\nلو حضرتك عايزة أي حاجة تخص برامج الحج أو العمرة، أو عندك استفسار عن حجز الوالدة، أنا تحت أمرك في أي وقت.\n\nأسهل حاجة إني أخدمك صح — أكلم حضرتك دقيقتين على الواتساب؟ رقمك إيه؟ 📞",
     "corrected": "في خدمه حضرتك دايما - شرف لينا وجود حضرتك معانا في حج 1448",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-05T07:47:02.722864",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for your message.\n\nYes, that is correct. Upon arrival at Cairo Airport, our representative will be waiting for you **outside the arrivals hall**, holding a sign with our company name (FTS) for easy identification. You will need to exit the arrival hall entirely and proceed to the outside area, where our guide will meet you.\n\nYour booking is fully confirmed for tomorrow, 6 October 2026, with pickup at **05:10** from the **Royal Star Beach Resort**.\n\nWishing you a wonderful trip to Cairo!\n\nBest regards,",
     "context": "UI Manual Edit"
   }
 ]

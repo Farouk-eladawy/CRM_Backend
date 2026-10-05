@@ -1,17 +1,5 @@
 [
   {
-    "timestamp": "2026-09-27T11:47:10.556568",
-    "original": "As this booking was made via Headout, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Unfortunately, cancellation is not possible at this time.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T12:25:16.411140",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Dear Sanjana,\nThank you for reaching out to us!\nRegarding the student discount, please note that it is strictly available for cultural tours only (such as historical trips to Cairo or Luxor). It does not apply to safari tours, quad biking, or water/sea activities.\nAdditionally, as your booking was made through GetYourGuide, all discounts, pricing, and payment terms are managed directly according to their platform's policies.\nIf you have any further questions or would like to explore our available cultural tours, please let us know—we're happy to help!\nBest regards,\nFTS Travels Team",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T12:35:01.774739",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Dear Gerhard,\nWe are truly sorry for the frustrating experience you had on your tour. We take your detailed feedback very seriously, and we have immediately opened a full investigation with our operations team regarding the guide, driver, and the services provided.\nAs an exception and to make things right while we investigate this matter, we would like to offer you one of the following complimentary options:\n1. Re-do the same trip free of charge.\n2. Ras Mohamed Day Trip completely free of charge.\n3. Sharm El Sheikh City Tour completely free of charge.\nPlease let us know which option you would prefer, and we will arrange it for you right away.\nBest regards,\nFTS Quality Team",
@@ -597,6 +585,18 @@
     "timestamp": "2026-10-05T04:18:13.081117",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Dear Thierry,\n\nThank you for sharing your room number with us.\n\nWe are pleased to confirm that your pickup time is 03:10 AM tomorrow, 6 October 2026, from KAI Sol Romance Resort.\n\nPlease be ready at the hotel reception a few minutes before the scheduled pickup time to ensure a smooth departure.\n\nBest regards,\nFTS Travels Customer Support Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-05T06:23:53.845569",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Mr. Grovejahn,\n\nThank you for your message.\n\nWe will send you the exact pickup time one day before your trip. Please keep an eye on your messages.\n\nBest regards,\nFTS Travels",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-05T07:03:53.210268",
+    "original": "تمام يا فندم، وصلت رسالتك وربنا يكرمنا ويقدرنا على خدمتكم أحسن خدمة 🤲\n\nلو حضرتك عايزة أي حاجة تخص برامج الحج أو العمرة، أو عندك استفسار عن حجز الوالدة، أنا تحت أمرك في أي وقت.\n\nأسهل حاجة إني أخدمك صح — أكلم حضرتك دقيقتين على الواتساب؟ رقمك إيه؟ 📞",
+    "corrected": "في خدمه حضرتك دايما - شرف لينا وجود حضرتك معانا في حج 1448",
     "context": "UI Manual Edit"
   }
 ]

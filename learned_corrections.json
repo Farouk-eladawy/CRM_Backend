@@ -1,17 +1,5 @@
 [
   {
-    "timestamp": "2026-09-27T06:03:41.199325",
-    "original": "ولا يهمك خالص يا فندم، مفيش أي مشكلة — القرار فعلاً محتاج تفكير وربنا يكتبلك اللي فيه الخير.\n\nبس حابب أطمنك على نقطة مهمة: التسجيل في برامج الحج بيقفل يوم ٢٧ سبتمبر، ونتيجة القرعة بتظهر يوم ٣٠ سبتمبر — يعني مش هتستنى كتير عشان تعرف موقفك.\n\nولو حبيت تعرف تفاصيل أي برنامج أو تحسبها صح، أنا موجود في أي وقت — تحب أكلمك دقيقتين أشرحلك الفرق بين البرامج وأسعارها؟ رقم الموبايل لو سمحت.",
-    "corrected": "ولا يهمك خالص يا فندم، مفيش أي مشكلة — القرار فعلاً محتاج تفكير وربنا يكتبلك اللي فيه الخير.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-27T06:05:35.766388",
-    "original": "أهلاً بحضرتك 🕋 وصلتني رسالتك الصوتية، ويشرفنا نكمل معاك خطوات الحجز.\n\nبما إن حضرتك جاي من إعلان برامجنا، حابب أتأكد من نقطة واحدة بس عشان أخدمك صح: حضرتك مهتم ببرامج الحج ولا العمرة؟\n\nوفي الحالتين، أسهل حاجة إني أكلمك دقيقتين أشرحلك كل التفاصيل وأجاوبك على أي سؤال — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "عليكم السلام ورحمة الله وبركاتة",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-27T06:22:01.031457",
     "original": "تمام يا فندم، متقلقيش خالص 🙏\n\nالإيصال بيوصل على الواتساب عادي، وفريقنا بيتابعه أول بأول. وبما إن حضرتك حوّلتي ٥ آلاف على الإنستا، فده مسجّل عندنا وهنأكدلك الاستلام في نفس اليوم.\n\nعشان نربط الإيصال بحجزك بسرعة، ممكن تبعتلي رقم الواتساب اللي هيتابع عليه مع أختنا ملك ماهر؟",
     "corrected": "ته مظبوط",
@@ -597,6 +585,18 @@
     "timestamp": "2026-10-04T11:59:10.120185",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you for sending over all the details — I've safely noted them:\n\n- **Travelers:** Valentina Papic Bogadi, Saša Bogadi, Eva Papic Bogadi (17), Noa Papic Bogadi (14)\n- **Hotel:** Pickalbatros Aqua Blu Resort Hurghada, Safaga Road, Hurghada\n- **Trip:** Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip\n- **Travel Date:** Friday, 16 October 2026\n\nI can confirm we have received your email and your pickup request from the Aqua Blu Resort. Your details are now recorded on your booking.\n\nYour confirmed pickup time will be sent to you via WhatsApp and Email the day before your trip, typically by 6:00 PM. Since you don't have your room number yet, please share it with us once you check in on the 15th, so we can finalize the pickup arrangements.\n\nBest regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-05T00:26:38.160616",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Thierry,\n\nThank you for your message.\n\nYes, the payment link you received was sent directly by FTS Travels and is specifically for the additional transfer fee from Sahl Hasheesh.\n\nPlease note that Sahl Hasheesh is outside the standard Hurghada transfer area, so the additional transfer fee is not included in the original tour price. This fee is required to arrange the transportation from your hotel in Sahl Hasheesh to the tour departure point and back.\n\nThe payment link is secure, and you can safely complete the payment through the link provided.\n\nAlternatively, if you prefer, you may pay the €10 transfer fee in cash directly to your tour guide during the trip.\n\nPlease feel free to choose whichever payment method is more convenient for you.\n\nBest regards,\nFTS Travels Customer Support Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-05T00:53:38.769230",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for confirming your preference. That is perfectly fine — you are welcome to pay the €10 transfer fee in cash directly to your guide tomorrow.",
     "context": "UI Manual Edit"
   }
 ]

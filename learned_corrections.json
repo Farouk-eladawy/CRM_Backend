@@ -1,23 +1,5 @@
 [
   {
-    "timestamp": "2026-09-30T08:02:21.134280",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Dear Sonia,\n\nThank you for providing your room number. We have noted Room 1506 at Charmillion Club Aqua Park. ✅\n\nYour pickup is confirmed for 20:50 today from the hotel.\n\nPlease be ready 5 minutes before the pickup time and keep your phone reachable in case the driver needs to contact you.\n\nWe wish you a wonderful experience at Mount Sinai and St. Catherine! 🌟\n\nBest regards,\nFTS Operation Team",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-30T08:25:57.589454",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "You don't need to; you can handle the bording there using your tickets.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-09-30T08:32:33.984235",
-    "original": "أيوه يا فندم، القرعة رسمية وإلكترونية تحت إشراف وزارة السياحة، ونتيجتها النهاردة ٣٠ سبتمبر ٢٠٢٦ — يعني خلال ساعات قليلة إن شاء الله هتعرفوا الفائزين.\n\nوبالنسبة لتذكرة الطيران: هي مش جزء من القرعة نفسها، التذكرة بتتضاف بسعرها وقت الحجز على مصر للطيران أو السعودية (الموسم اللي فات كانت في حدود ٥٠ ألف جنيه).\n\nوربنا يكتبلك الفوز ويكرمك بحج بيته الحرام 🤲\n\nعشان نطمنك على موقف تسجيلك بالظبط، أسهل حاجة أكلم حضرتك دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "طبعا يا حاجه مني بأذن الله سحب علي تذكرة الطيران والعبارة زي كل سنه في بث مباشر علي الصفحه - احنا اهم حاجه حاليا بنرتب الاوراق للتقديم للوزارة لان لازم التضامن يكون خلصان خلال الاسبوع ده بأمر الله - وشوية وفريق الحجوزات هيبعتلكم رسالة فيه الاوراق المطلوبه حاليا",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-30T11:17:02.859664",
     "original": "قدر الله وماشاء فعل، وربنا يكتبلك اللي فيه الخير يا فندم 🤍\n\nوطبعًا كلام حضرتك صح — رب الخير لا يأتي إلا بالخير، وكل تأخيرة فيها خيرة.\n\nحضرتك كنت مسجلة معانا في برنامج الحج، ونتيجة القرعة الرسمية بتظهر يوم ٣٠ سبتمبر ٢٠٢٦ — يعني النتيجة قربت جدًا إن شاء الله، وربنا يبشرك بالخير.\n\nلو حابب نتأكد سوا من حالة التسجيل بتاعك أو أي تفاصيل تانية، أسهل حاجة أكلم حضرتك دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
     "corrected": "ربنا يجبر بخاطرك، وكلمتك دي في وقت زي ده مش سهلة، واحنا حاسين بيك.\n\nاللي أنت عملته مش ضايع، النية والسعي مكتوبين عند ربنا، وربنا لما يأخر حاجة بيعوّض بأحسن منها. إن شاء الله تجي السنة الجاية وتكون واقف قدام الكعبة بإذن الله.\n\nاحنا موجودين معاك في أي وقت وبنتشرف بخدمتك",
@@ -597,6 +579,24 @@
     "timestamp": "2026-10-06T08:09:40.229556",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-06T09:30:07.283618",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for providing your room number.\n\nI have safely noted the following details for your booking:\n\n- **Booking Number:** BR-1454113705\n- **Trip:** Hurghada: Luxor Valley of the Kings & Tutankhamun Tomb Trip\n- **Travel Date:** Wednesday, 07 October 2026\n- **Pickup Time:** 03:30\n- **Pickup Location:** La Quinta Beach Resort Hurghada\n- **Room Number:** B221\n\nYour room number has been recorded and will be linked to your reservation. Please be ready at your hotel lobby by 03:30, as the driver will wait a maximum of 5 minutes.\n\nBest regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-06T09:37:21.409380",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Bonjour,\n\nOui, votre guide parlera français.\n\nPour entrer à l’intérieur de la pyramide de Khéops, il faut prévoir un supplément de **30 € par personne**, à régler sur place.\n\nCordialement,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-06T09:48:16.375403",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Bonjour,\n\nPour le supplément d'entrée à l'intérieur de la pyramide de Khéops (30 € par personne), le paiement se fait directement sur place, en espèces. Vous pouvez régler en livres égyptiennes ou en euros, selon ce que vous avez sur vous.\n\nPour le paiement par carte, je préfère vérifier ce point précis avec notre équipe des opérations afin de vous fournir une information 100 % fiable, car les terminaux de paiement ne sont pas toujours disponibles sur les sites archéologiques. Je reviens vers vous rapidement à ce sujet.\n\nEn attendant, je vous conseille de prévoir le montant en espèces pour être tranquille le jour de la visite.\n\nCordialement,",
     "context": "UI Manual Edit"
   }
 ]

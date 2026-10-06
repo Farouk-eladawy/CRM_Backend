@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-29T11:05:55.059658",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "L'heure de prise en charge est 04h20 et non 04h30 du matin.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-30T03:10:32.980981",
     "original": "وعليكم السلام ورحمة الله وبركاته 🕋\n\nنتيجة القرعة الرسمية لسه ما ظهرتش، والموعد المعلن من وزارة السياحة هو يوم ٣٠ سبتمبر ٢٠٢٦ — يعني النتيجة بتظهر خلال ساعات قليلة إن شاء الله، وأول ما تعلن رسميًا هنبلغ حضرتك فورًا.\n\nلو حضرتك مسجل معانا، اطمن إن بياناتك محفوظة عندنا، ومجرد ما النتيجة تظهر هنكلم حضرتك على الواتساب نبلغك بالنتيجة وكل التفاصيل.\n\nممكن تأكدلي رقم الموبايل اللي سجلت بيه عشان أتابعلك حالة التسجيل بالظبط؟ 📞",
     "corrected": "🕋 نتيجة قرعة الحج ظهرت رسميًا\n\nفريق FTS بيراجع دلوقتي نتيجة كل متقدم معانا، وهنتواصل مع حضرتك بالنتيجة على نفس الرقم ده.\n\nولو حابب تستعلم بنفسك، الخطوات بسيطة:\n\n١️⃣ افتح رابط الاستعلام:\nhttps://hij.moi.gov.eg/Hij1439/InternetSearch/SearchInternetForDraw.xhtml\n\n٢️⃣ اكتب الرقم القومي ورقم المصنع (الرقم اللي على ظهر البطاقة) بنفس الشكل الموضح في الصفحة.\n\n٣️⃣ اكتب رمز التحقق اللي هيظهر على الشاشة.\n\n٤️⃣ اضغط «بحث».\n\n📌 معنى النتيجة:\n\n✅ لو ظهرت عبارة «مبروك فوزك بفرصة الحج»\nفألف مبروك، ربنا كتب لحضرتك أداء الفريضة السنة دي 🤲 وهنكلمك خلال الساعات الجاية عشان نبدأ إجراءات الحجز.\n\n⏳ لو ظهر إن اسمك في قائمة الاحتياطي\nيبقى لسه عندك فرصة في حالة اعتذار أي فائز من الأساسيين لحد احتياطي رقم 3 ، وإحنا بنتابع معاك أول بأول.\n\n🤲 كتب الله لكم الخير حيث كان، وبلغكم زيارة بيته الحرام.",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-06T02:18:15.357794",
     "original": "معلش يا فندم، إحنا مش بنبعت أرقام موظفين على الشات — بس ابعتلي رقم حضرتك عليه واتساب وأنا هخلي مسئول المبيعات يكلمك بنفسه في أسرع وقت، وهيرتبلك موضوع التقسيط على ٣ أقساط بالتفصيل.",
     "corrected": "01279471619",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-06T03:56:41.397116",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for sending the requested information.\n\nI have safely recorded the following details for your booking:\n\n- **Traveler Names:** Anita Glas, Justin Tryscien\n- **Hotel:** Steigenberger Aqua Magic\n- **Room Number:** 4327\n\nYour booking may take a few minutes to fully sync into our system from the booking platform, but rest assured your details are noted and will be automatically linked to your reservation once it appears.\n\nYour trip is scheduled for **07 October 2026**, and your pickup details will be sent to you one day before at 6:00 PM. If you have any questions in the meantime, I'm here to help.",
     "context": "UI Manual Edit"
   }
 ]

@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-29T07:02:09.150600",
-    "original": "Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-29T11:05:55.059658",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "L'heure de prise en charge est 04h20 et non 04h30 du matin.",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-06T02:05:20.614061",
     "original": "أهلًا بحضرتك، وربنا يكتبها لك 🤲\nالحج المباشر بتأشيرة مباشرة متاح لحضرتك من غير أي قرعة خالص — يعني مفيش انتظار نتيجة ولا احتمال رفض، والبرنامج هو نفسه برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n💰 السعر بعد نزول ضوابط ١٤٤٨: ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر ✅\n⏰ عدد التأشيرات محدود كل سنة وبيخلص بالأسبقية.\nأسهل حاجة أشرحلك الخطوات كاملة في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
     "corrected": "بخصوص الحج المباشر: هو تأشيرة حج رسمية، يعني مش بتدخل قرعة ومش بتستنى نتيجة.. حجك مضمون ١٠٠٪ حتى لو حجيت قبل كده أو ما طلعش اسمك في القرعة السنة دي.\n\nالسعر أعلى من البرامج العادية لأنه بيتضاف عليه تأشيرة بالدولار، وبيوصل لحوالي ٦٠٠ ألف جنيه شامل تكلفة التأشيرة المباشر الدولارية.\n\nالعدد المتاح لكل شركة كان ٢ تأشيرة بس، واتحجزوا بالفعل. لكن التأشيرات دي بتتوفر فجأة وبتخلص في نفس اليوم، فاللي بياخدها هو اللي اسمه مسجّل عندنا قبلها.\n\nتحب نسجّل بيانات حضرتك في قائمة انتظار الحج المباشر، بحيث أول ما تتوفر تأشيرة نكلمك قبل أي حد؟ وساعتها هيكون المطلوب منك قرار سريع عشان نثبّتها باسمك.\n\nوفي نفس الوقت نقدر نسجّل اسم حضرتك معانا في قرعة حج السنة الجاية بنفس الخصم الحالي على سعر الوزارة، عشان تكون مضمون في الحالتين.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-06T02:18:15.357794",
+    "original": "معلش يا فندم، إحنا مش بنبعت أرقام موظفين على الشات — بس ابعتلي رقم حضرتك عليه واتساب وأنا هخلي مسئول المبيعات يكلمك بنفسه في أسرع وقت، وهيرتبلك موضوع التقسيط على ٣ أقساط بالتفصيل.",
+    "corrected": "01279471619",
     "context": "UI Manual Edit"
   }
 ]

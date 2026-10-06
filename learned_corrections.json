@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-09-30T11:25:42.699255",
-    "original": "أيوه يا فندم، صح — حضرتك قولت إنك هتشوف ولو في نصيب هتواصل، والحمد لله تواصلت تاني 🕋\n\nوبخصوص حجز مكان الأسرة (بزوج وزوجة) — تمام، ده متاح، والأولوية بترتيب تثبيت جدية الحجز لأن الحصة محدودة.\n\nوصور البطاقة متقلقش منها خالص، مش هي سبب التأخير — إحنا بناخدها على الواتساب بعد المكالمة بس، مش هنا.\n\nأسهل حاجة أشرحلك خطوات تثبيت مكان الأسرة في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "الي بيعتذر بيتصعد مكانه حد من حجاجنا الي كان مقدم بالفعل ولازم يكون ترتيبه في الاحتياط حد اقصي رقم 4",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-09-30T11:35:15.786539",
     "original": "أهلًا بحضرتك 🕋 بخصوص سؤال حضرتك عن الحج السريع (الحج المباشر بدون قرعة) — ده برنامج مخصص لمن حج قبل كده أو قدّم في قرعة الداخلية أو الجمعيات، وسعره ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر، وبنفس تفاصيل برنامج التحسين.\n\nبس عشان أظبطلك التفاصيل بالظبط وأشوف البرنامج الأنسب لحضرتك، أسهل حاجة إني أكلمك دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
     "corrected": "الموسم الحالي كان السعر 245 الف بدلا من 270 الف",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-06T11:36:11.061938",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Merci pour ces informations.\n\nJ'ai bien noté les détails suivants pour votre réservation :\n\n- **Réservation :** GYG2Q89F3YFN\n- **Voyage :** From Cairo: 4x4 Desert Safari, Waterfalls & Magic Lake\n- **Date du voyage :** vendredi 09 octobre 2026\n- **Hôtel :** El Safwa Resort\n- **Chambre :** chalet numéro 5\n- **Voyageurs :** Mme Florence Doisneau et M. Anthony Doisneau\n- **Langue du guide :** Français\n\nVotre horaire de prise en charge confirmé vous sera envoyé par WhatsApp et par e-mail la veille de votre excursion, généralement avant 18h00.\n\nSi vous avez la moindre autre question, je suis là pour vous aider.\n\nBien cordialement,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-06T12:33:42.630821",
+    "original": "تمام يا فندم، وصلت رسالتك واستأذنك بلغت قسم الحجوزات بالفعل وهما هيتواصلوا مع حضرتك في أقرب وقت يطمنوك على كل تفاصيل المسابقة.\n\nولو حضرتك حابب نكلمك إحنا على الواتساب مباشرة، ابعتلنا رقمك وهنكلمك فورًا.",
+    "corrected": "وعليكم السلام ورحمة الله وبركاته",
     "context": "UI Manual Edit"
   }
 ]

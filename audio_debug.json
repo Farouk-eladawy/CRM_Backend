@@ -237982,3 +237982,17 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "internal_bypass_1791406313"
+    },
+    "message": {
+      "conversation": "Test"
+    }
+  }
+}
+---

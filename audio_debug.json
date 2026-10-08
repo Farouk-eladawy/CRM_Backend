@@ -239295,3 +239295,168 @@
   }
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB0830B67EB30CD05359E",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0830B67EB30CD05359E",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 222,
+          "1": 132,
+          "2": 79,
+          "3": 206,
+          "4": 169,
+          "5": 108,
+          "6": 180,
+          "7": 241,
+          "8": 51,
+          "9": 165,
+          "10": 190,
+          "11": 182,
+          "12": 145,
+          "13": 144,
+          "14": 246,
+          "15": 186,
+          "16": 28,
+          "17": 239,
+          "18": 97,
+          "19": 230,
+          "20": 20,
+          "21": 216,
+          "22": 88,
+          "23": 196,
+          "24": 177,
+          "25": 241,
+          "26": 208,
+          "27": 209,
+          "28": 237,
+          "29": 44,
+          "30": 39,
+          "31": 176
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "@all"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1
+      },
+      "nonJidMentions": 1
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791484700,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-08T11:38:21.147Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB04901BFFA77E89D4FC2"
+    },
+    "keyId": "3EB04901BFFA77E89D4FC2",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Email\nSource: ai_agent.py:38384 in api_create_payment_link\nLogger: root\nReason: Error in /api/payments/create: Stripe error (400): {'error': {'code': 'email_invalid', 'doc_url': 'https://stripe.com/docs/error-codes/email-invalid', 'message': 'Invalid email address: gh', 'param': 'email', 'request_log_url': 'https://dashboard.stripe.com/acct_1P0oapLp8xDOkodw/workbench/logs?object=req_8AzO5tLDZGPOEB', 'type': 'invalid_request_error'}}\nException: ValueError: Stripe error (400): {'error': {'code': 'email_invalid', 'doc_url': 'https://stripe.com/docs/error-codes/email-invalid', 'message': 'Invalid email address: gh', 'param': 'email', 'request_log_url': 'https://dashboard.stripe.com/acct_1P0oapLp8xDOkodw/workbench/logs?object=req_8AzO5tLDZGPOEB', 'type': 'invalid_request_error'}}\nAt: 2026-10-08 12:11:15"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791313882,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791486684,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-08T12:11:25.371Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0120AD4AA408A9B8253"
+    },
+    "keyId": "3EB0120AD4AA408A9B8253",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Email\nSource: gmail_service.py:906 in get_thread_history\nLogger: root\nReason: Error retrieving thread history: <HttpError 403 when requesting https://gmail.googleapis.com/gmail/v1/users/me/threads/1a113407e6bbed2e?alt=json returned \"Quota exceeded for quota metric 'Total Query Cost' and limit 'Units per minute per user' of service 'gmail.googleapis.com' for consumer 'project_number:322933451717'.\". Details: \"[{'message': \"Quota exceeded for quota metric 'Total Query Cost' and limit 'Units per minute per user' of service 'gmail.googleapis.com' for consumer 'project_number:322933451717'.\", 'domain': 'usageLimits', 'reason': 'rateLimitExceeded'}]\">\nAt: 2026-10-08 12:12:45"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791313967,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791486767,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-08T12:12:48.124Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

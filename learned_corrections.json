@@ -1,23 +1,5 @@
 [
   {
-    "timestamp": "2026-10-01T00:43:35.758886",
-    "original": "أهلاً بحضرتك 🕋 بخصوص التقسيط على ٣ أقساط — نظام التقسيط المعتمد عندنا متاح لبرامج الحج بالطيران (الاقتصادي والتحسين)، وبيتم ترتيبه مع حضرتك في مكالمة سريعة نحدد فيها البرنامج والمبلغ والمواعيد المناسبة لحضرتك.\n\nأسهل حاجة أظبطلك الموضوع ده في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "ان شاء الله هيتواصل مع حضرتك مسئول المبيعات وخير بأذن الله - الف الف مبروك يا حاجه - بأذن الله ترجعي راضيه مبسوطه فرحانه بأمر الله",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-10-01T01:14:52.825110",
-    "original": "تقبل الله منا ومنكم صالح الأعمال، وجزاكم الله خير الجزاء 🌿\n\nوصلتني بيانات حضرتك بأمان، وتم تسجيلها عندنا. ممكن الحجز ميكونش ظهر في النظام لسه لأن المزامنة مع منصة الحجز بتاخد شوية دقايق، بس بياناتك محفوظة وهتتربط بحجزك تلقائيًا أول ما يوصل.\n\nوعشان نتأكد إن كل حاجة مترابطة صح، ممكن تبعتلي رقم الحجز أو رقم الموبايل اللي حجزت بيه؟ وأسهل حاجة كمان إني أكلمك دقيقتين أظبطلك كل التفاصيل — رقم حضرتك عليه واتساب؟",
-    "corrected": "حضرنك اتقبلت يفندم فعلا",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-10-01T01:30:56.484292",
-    "original": "الحمد لله على كل حال، وربنا يتمملك على خير ويكتبلك اللي فيه الخير 🤲\n\nبخصوص \"مفيش احتياطي\" — ياريت توضحيلي حضرتك قصدك إيه بالظبط: هل المقصود إن مفيش مبلغ احتياطي معاك دلوقتي لسداد جدية الحجز، ولا حاجة تانية؟\n\nعشان أقدر أساعدك صح، ممكن تبعتلي رقم الحجز بتاعك أو رقم الموبايل اللي حجزت بيه؟",
-    "corrected": "ربنا يجبر بخاطر حضرتك، وكلمة زي دي في وقت زي ده مش سهلة، واحنا حاسين بده.\n\nسعي حضرتك ونيتك مش ضايعين، دول مكتوبين عند ربنا، وربنا لما يأخّر حاجة بيعوّض بأحسن منها. وإن شاء الله السنة الجاية تكون الوقفة قدام الكعبة بإذن الله.\n\nاحنا موجودين مع حضرتك في أي وقت، وبنتشرف بكده دايمًا.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-01T01:32:46.674771",
     "original": "الحمد لله على كل حال، وربنا يجعلها في ميزان حسناتك يا فندم 🤲\n\nواطمن حضرتك، حجزك في برنامج التحسين مسجّل عندنا، وكل حاجة ماشية تمام. ولسه فاضل بس إننا نطمن على بيانات حضرتك في النظام.\n\nلو حابب، ابعتلي رقم الموبايل اللي سجلت بيه أو رقم الحجز، وأنا هتأكدلك إن كل حاجة مربوطة صح.",
     "corrected": "ربنا يجبر بخاطر حضرتك، وكلمة زي دي في وقت زي ده مش سهلة، واحنا حاسين بده.\n\nسعي حضرتك ونيتك مش ضايعين، دول مكتوبين عند ربنا، وربنا لما يأخّر حاجة بيعوّض بأحسن منها. وإن شاء الله السنة الجاية تكون الوقفة قدام الكعبة بإذن الله.\n\nاحنا موجودين مع حضرتك في أي وقت، وبنتشرف بكده دايمًا.",
@@ -597,6 +579,24 @@
     "timestamp": "2026-10-08T06:32:07.558696",
     "original": "Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Dear Luca,\n\nThank you for checking. To confirm, the €50 per person “All Entry Fees / Pax” option includes the entrance tickets for all five of the following sites:\n\nKarnak Temple\nTemple of Luxor\nTemple of Hatshepsut\nValley of the Kings\nTutankhamun’s Tomb (adult ticket)\n\nTherefore, if you select the All Entry Fees / Pax option, you do not need to purchase these entrance tickets separately.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-08T08:18:09.241278",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Luca,\n\nThank you for confirming the booking.\n\nEverything is noted correctly, including the 4 × All Entry Fees/Pax option and the pickup at Luxor Airport.\n\nTo arrange the airport pickup smoothly, please send us only your flight numbers for:\n\nCairo → Luxor, arriving at 08:20\nLuxor → Cairo, departing at 22:00\n\nOnce we have the flight numbers, we will coordinate the airport pickup accordingly.\n\nKind regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-08T08:41:42.862942",
+    "original": "Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Alexander,\n\nThank you for reaching out.\n\nWe would like to clarify that the “up to 100 participants” refers to the total number of travelers who may book the experience overall, not the size of an individual group.\n\nThe actual tour operates in small groups, with each group traveling in a minibus. Each minibus accommodates approximately 9–12 participants.\n\nTherefore, even if the total number of participants for the excursion reaches up to 100, they are divided into several separate small groups/minibuses rather than traveling together as one group.\n\nWe hope this clarifies the group-size information for the customer.\n\nKind regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-08T09:10:11.872748",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nإذا ترغب بالتحدث مع فريق الكواليتي، اكتب: جودة\n\nمع خالص التحية،\nفرح",
+    "corrected": "Nous vous remercions pour votre message et prenons bonne note de votre question concernant le point de rendez-vous pour la prise en charge de demain matin.\n\nPour votre excursion **« Depuis Hurghada : excursion d'une journée au Caire en avion » (Option 2 – Le Grand Musée égyptien et les pyramides de Gizeh)**, référence **GYG7VKL2M449**, la prise en charge est bien prévue :\n\n- **Date :** vendredi 9 octobre 2026\n- **Heure :** 04h00\n- **Lieu :** Blend Club Aqua Resort, Sahl Hasheesh Rd, Hurghada\n\nEn attendant, nous vous recommandons d'être prêts dès 03h55 devant l'entrée principale de l'hôtel, afin de ne manquer le chauffeur en aucun cas.\n\nمع خالص التحية،",
     "context": "UI Manual Edit"
   }
 ]

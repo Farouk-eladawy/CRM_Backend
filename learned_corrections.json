@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-10-01T02:21:37.389649",
-    "original": "تمام يا فندم، تحت أمرك في أي وقت 🌿\n\nلو حبيت تعرف أي تفاصيل عن برامج الحج أو العمرة، أو حابب تثبت مكانك، أنا معاك.",
-    "corrected": "ربنا يجبر بخاطر حضرتك، وكلمة زي دي في وقت زي ده مش سهلة، واحنا حاسين بده.\n\nسعي حضرتك ونيتك مش ضايعين، دول مكتوبين عند ربنا، وربنا لما يأخّر حاجة بيعوّض بأحسن منها. وإن شاء الله السنة الجاية تكون الوقفة قدام الكعبة بإذن الله.\n\nاحنا موجودين مع حضرتك في أي وقت، وبنتشرف بكده دايمًا.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-01T02:23:49.325438",
     "original": "بخصوص الحج المباشر (بدون قرعة): البرنامج ده متاح لمن حج قبل كده أو قدّم في قرعة الداخلية أو الجمعيات، لأنه بيتم بتأشيرة مباشرة من غير أي قرعة خالص.\n\nالسعر بعد نزول ضوابط ١٤٤٨: ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر ✅\nوالبرنامج هو نفس برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين من المدينة لمكة، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nأما بخصوص التقسيط: تفاصيله للبرنامج ده بتتحسب على حسب الحالة، والأدق إني أكلمك دقيقتين أحسبهالك بالظبط — أكلم حضرتك على أي رقم؟ 📞",
     "corrected": "بخصوص الحج المباشر: هو تأشيرة حج رسمية، يعني مش بتدخل قرعة ومش بتستنى نتيجة.. حجك مضمون ١٠٠٪ حتى لو حجيت قبل كده أو ما طلعش اسمك في القرعة السنة دي.\n\nالسعر أعلى من البرامج العادية لأنه بيتضاف عليه تأشيرة بالدولار، وبيوصل لحوالي ٦٠٠ ألف جنيه شامل تكلفة التأشيرة المباشر الدولارية.\n\nالعدد المتاح لكل شركة كان ٢ تأشيرة بس، واتحجزوا بالفعل. لكن التأشيرات دي بتتوفر فجأة وبتخلص في نفس اليوم، فاللي بياخدها هو اللي اسمه مسجّل عندنا قبلها.\n\nتحب نسجّل بيانات حضرتك في قائمة انتظار الحج المباشر، بحيث أول ما تتوفر تأشيرة نكلمك قبل أي حد؟ وساعتها هيكون المطلوب منك قرار سريع عشان نثبّتها باسمك.\n\nوفي نفس الوقت نقدر نسجّل اسم حضرتك معانا في قرعة حج السنة الجاية بنفس الخصم الحالي على سعر الوزارة، عشان تكون مضمون في الحالتين.",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-09T08:56:47.169677",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you for reaching out and for the detailed information — it is completely fine that you do not have your final hotel confirmed yet.\n\nI have safely noted the following details for your booking **GYGBLHAKH4G6** (Cairo: Customizable Private Tour with Guide & Car, on 27 October 2026):\n\n- **Travelers:** 3 adults — Andrea Kunz, Horst Oehme, Daniela Oehme\n- **Arrival:** Late on 26 October in Cairo (via Phoenixreisen)\n- **Hotel:** Not yet confirmed (possibly Concorde El Salam)\n\nThere is no problem at all with this. As soon as you receive your exact hotel name and room number from Phoenixreisen, simply reply to this email and I will add it to your booking right away. Your confirmed pickup time and driver details will be sent to you the day before your tour, typically by 6:00 PM.\n\nWe are just as excited as you are — Cairo is truly unforgettable, and your guide will make sure you experience it at its very best!\n\nBest regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-09T10:06:30.299812",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9WUFVBQkxhYnd6dVlXUXVNN3ZOY1NpNGZQeElhNG52LDE4MjA5ODQ3Mw0200ZdEDL5Jw?s=ap",
     "context": "UI Manual Edit"
   }
 ]

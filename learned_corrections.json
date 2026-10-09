@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-10-01T02:23:49.325438",
-    "original": "بخصوص الحج المباشر (بدون قرعة): البرنامج ده متاح لمن حج قبل كده أو قدّم في قرعة الداخلية أو الجمعيات، لأنه بيتم بتأشيرة مباشرة من غير أي قرعة خالص.\n\nالسعر بعد نزول ضوابط ١٤٤٨: ٥٥٠ ألف جنيه شامل تأشيرة الحج المباشر ✅\nوالبرنامج هو نفس برنامج طيران التحسين بالظبط: ١٩ يوم، قطار الحرمين من المدينة لمكة، وأهم ميزة ٧ أيام إقامة فندقية على ساحة الحرم مباشرة بعد المناسك.\n\nأما بخصوص التقسيط: تفاصيله للبرنامج ده بتتحسب على حسب الحالة، والأدق إني أكلمك دقيقتين أحسبهالك بالظبط — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "بخصوص الحج المباشر: هو تأشيرة حج رسمية، يعني مش بتدخل قرعة ومش بتستنى نتيجة.. حجك مضمون ١٠٠٪ حتى لو حجيت قبل كده أو ما طلعش اسمك في القرعة السنة دي.\n\nالسعر أعلى من البرامج العادية لأنه بيتضاف عليه تأشيرة بالدولار، وبيوصل لحوالي ٦٠٠ ألف جنيه شامل تكلفة التأشيرة المباشر الدولارية.\n\nالعدد المتاح لكل شركة كان ٢ تأشيرة بس، واتحجزوا بالفعل. لكن التأشيرات دي بتتوفر فجأة وبتخلص في نفس اليوم، فاللي بياخدها هو اللي اسمه مسجّل عندنا قبلها.\n\nتحب نسجّل بيانات حضرتك في قائمة انتظار الحج المباشر، بحيث أول ما تتوفر تأشيرة نكلمك قبل أي حد؟ وساعتها هيكون المطلوب منك قرار سريع عشان نثبّتها باسمك.\n\nوفي نفس الوقت نقدر نسجّل اسم حضرتك معانا في قرعة حج السنة الجاية بنفس الخصم الحالي على سعر الوزارة، عشان تكون مضمون في الحالتين.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-01T04:55:55.404638",
     "original": "الحمد لله رب العالمين، اللهم آمين يا رب 🤲\n\nربنا يتقبل منا ومنكم صالح الأعمال، ويكتب لنا ولكم القبول والبركة في الطاعة.\n\nلو حضرتك محتاج أي تفاصيل عن برامج الحج أو العمرة، أو حابب تعرف خطوات التسجيل، أنا في خدمتك في أي وقت.",
     "corrected": "وعليكم السلام ورحمة الله وبركاته",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-09T10:06:30.299812",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "https://invoice.stripe.com/i/acct_1P0oapLp8xDOkodw/live_YWNjdF8xUDBvYXBMcDh4RE9rb2R3LF9WUFVBQkxhYnd6dVlXUXVNN3ZOY1NpNGZQeElhNG52LDE4MjA5ODQ3Mw0200ZdEDL5Jw?s=ap",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-09T10:22:25.541100",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Hello Eeva,\n\nThank you for your message!\n\nWe expect to return to your hotel between 10:00 PM and 11:00 PM.\n\nLunch will be served as an open buffet, so you can choose from the available dishes according to your preferences.\n\nWe look forward to welcoming you on our trip!\n\nBest regards,\nFTS Travels Operations Team",
     "context": "UI Manual Edit"
   }
 ]

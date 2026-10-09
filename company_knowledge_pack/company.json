@@ -1,0 +1,19 @@
+{
+  "company_id": "fts",
+  "company_name": "FTS Travels",
+  "assistant_name": "Farah Elkhatib",
+  "what_to_edit": [
+    "company.json: الاسم والتوقيع ومعرّف الشركة",
+    "reply_rules.md: سياسات الرد التي كانت داخل الكود",
+    "documents: السياسات والبرامج",
+    "trips.json و strict_qa.json و learned_corrections.json",
+    "facebook_ad_products.json: ربط إعلان فيسبوك بالمنتج",
+    "catalogs: كتالوجات المنصات",
+    "pi_agent_instructions.md: تعليمات المساعد الداخلي فقط",
+    "n8n/chatwoot_ai_agent.json: عقدة Company settings للربط مع Chatwoot"
+  ],
+  "assistant_name_ar": "فرح",
+  "assistant_name_en": "Farah Elkhatib",
+  "signature_ar": "مع خالص التحية،\nفرح",
+  "signature_en": "Best regards,\nFarah Elkhatib"
+}

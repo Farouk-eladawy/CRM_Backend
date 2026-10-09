@@ -1,0 +1,74 @@
+{
+  "exported_at": "2026-10-09T04:38:24",
+  "documents": 12,
+  "trips": 275,
+  "strict_qa": 29,
+  "files": [
+    "learned_corrections.json",
+    "catalogs/Get_Your_Guide_data.json",
+    "catalogs/Viator_data.json",
+    "catalogs/Headout_data.json"
+  ],
+  "document_files": [
+    {
+      "file": "سياسة الإلغاء والتعديل _ Cancellation And Modification Policy.md",
+      "department": "General",
+      "chars": 151
+    },
+    {
+      "file": "سياسة الإلغاء والتعديل _ Cancellation And Modification Policy (English).md",
+      "department": "General",
+      "chars": 209
+    },
+    {
+      "file": "إجراء_ تحديث العميل بالتغيير التشغيلي _ Procedure_ Inform Customer About Operational Change.md",
+      "department": "Operations",
+      "chars": 182
+    },
+    {
+      "file": "إجراء_ تحديث العميل بالتغيير التشغيلي _ Procedure_ Inform Customer About Operational Change (English).md",
+      "department": "Operations",
+      "chars": 241
+    },
+    {
+      "file": "Ad_ID_Routing.md",
+      "department": "Religious",
+      "chars": 899
+    },
+    {
+      "file": "Company_Info_FTS_v2.md",
+      "department": "Religious",
+      "chars": 3085
+    },
+    {
+      "file": "Core_Guidelines_Hajj_Agent_v5.md",
+      "department": "Religious",
+      "chars": 19731
+    },
+    {
+      "file": "Safety_Rules_Handover_v4.md",
+      "department": "Religious",
+      "chars": 12606
+    },
+    {
+      "file": "برامج_الحج_v5.md",
+      "department": "Religious",
+      "chars": 17807
+    },
+    {
+      "file": "برامج_العمرة (1).md",
+      "department": "Religious",
+      "chars": 6521
+    },
+    {
+      "file": "تعليمات_AI_Agent_v2.md",
+      "department": "Religious",
+      "chars": 4290
+    },
+    {
+      "file": "قواعد_عرض_الأسعار_v3.md",
+      "department": "Religious",
+      "chars": 6549
+    }
+  ]
+}

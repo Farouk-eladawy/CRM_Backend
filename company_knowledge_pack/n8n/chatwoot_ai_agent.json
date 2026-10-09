@@ -1,0 +1,728 @@
+{
+  "name": "Company AI Agent | Chatwoot",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Chatwoot AI Agent\nعدّل عقدة Company settings فقط للربط:\n- chatwoot_base_url: رابط Chatwoot بدون / في الآخر\n- knowledge_file: مسار knowledge_bundle.json على سيرفر n8n\n- knowledge_url: اتركه فارغاً، أو ضع رابطاً يرجّع نفس الملف\n- crm_base_url: اتركه فارغاً إذا كان Chatwoot كافياً. إذا عندك CRM حجوزات ضع رابط الـ API\n\nمفاتيح البيئة في n8n:\nCHATWOOT_API_TOKEN\nLLM_API_KEY\nCRM_API_TOKEN\n\nفي Chatwoot أضف Webhook للحدث message_created على:\n/webhook/chatwoot-ai\n\nبعد تعديل ملفات المعرفة شغّل:\npython build_n8n_bundle.py\nثم انسخ الملف الجديد إلى مسار knowledge_file.",
+        "height": 520,
+        "width": 420,
+        "color": 4
+      },
+      "id": "note-1",
+      "name": "How to edit",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot-ai",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wh-1",
+      "name": "Chatwoot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = ($json.body && typeof $json.body === 'object' && !Array.isArray($json.body)) ? $json.body : $json;\nconst event = String(raw.event || '');\nconst messageType = raw.message_type;\nconst incoming = messageType === 'incoming' || messageType === 0 || messageType === '0';\nconst content = String(raw.content || '').trim();\nif ((event && event !== 'message_created') || !incoming || raw.private === true || !content) {\n  return [];\n}\nconst conversation = raw.conversation || {};\nconst account = raw.account || {};\nconst sender = raw.sender || {};\nconst contact = (conversation.meta && conversation.meta.sender) || sender;\nconst history = Array.isArray(conversation.messages) ? conversation.messages.slice(-8) : [];\nreturn [{\n  json: {\n    content,\n    conversation_id: conversation.id,\n    account_id: account.id || '',\n    inbox_id: conversation.inbox_id || (raw.inbox && raw.inbox.id) || '',\n    sender_name: contact.name || sender.name || '',\n    sender_phone: contact.phone_number || sender.phone_number || '',\n    sender_email: contact.email || sender.email || '',\n    history_text: history.map((m) => (m.message_type === 1 || m.message_type === 'outgoing' ? 'agent' : 'customer') + ': ' + String(m.content || '')).join('\\n')\n  }\n}];"
+      },
+      "id": "code-1",
+      "name": "Keep customer messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "company_name",
+              "name": "company_name",
+              "value": "FTS Travels",
+              "type": "string"
+            },
+            {
+              "id": "assistant_name",
+              "name": "assistant_name",
+              "value": "Farah Elkhatib",
+              "type": "string"
+            },
+            {
+              "id": "signature",
+              "name": "signature",
+              "value": "Best regards,\nFarah Elkhatib",
+              "type": "string"
+            },
+            {
+              "id": "chatwoot_base_url",
+              "name": "chatwoot_base_url",
+              "value": "https://YOUR-CHATWOOT-HOST",
+              "type": "string"
+            },
+            {
+              "id": "chatwoot_account_id",
+              "name": "chatwoot_account_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "chatwoot_api_token",
+              "name": "chatwoot_api_token",
+              "value": "={{ $env.CHATWOOT_API_TOKEN }}",
+              "type": "string"
+            },
+            {
+              "id": "knowledge_file",
+              "name": "knowledge_file",
+              "value": "/opt/company_knowledge_pack/n8n/knowledge_bundle.json",
+              "type": "string"
+            },
+            {
+              "id": "knowledge_url",
+              "name": "knowledge_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "crm_base_url",
+              "name": "crm_base_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "crm_api_token",
+              "name": "crm_api_token",
+              "value": "={{ $env.CRM_API_TOKEN }}",
+              "type": "string"
+            },
+            {
+              "id": "llm_base_url",
+              "name": "llm_base_url",
+              "value": "https://api.openai.com/v1",
+              "type": "string"
+            },
+            {
+              "id": "llm_model",
+              "name": "llm_model",
+              "value": "gpt-4o-mini",
+              "type": "string"
+            },
+            {
+              "id": "llm_api_key",
+              "name": "llm_api_key",
+              "value": "={{ $env.LLM_API_KEY }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "set-1",
+      "name": "Company settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "knowledge_url",
+              "leftValue": "={{ $json.knowledge_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-1",
+      "name": "Knowledge URL set?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.knowledge_url }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "http-1",
+      "name": "Load knowledge URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "={{ $('Company settings').item.json.knowledge_file }}",
+        "options": {}
+      },
+      "id": "file-1",
+      "name": "Read knowledge file",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        440
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const settings = $('Company settings').first().json;\nlet knowledge = {};\nconst item = $input.first();\ntry {\n  if (item.binary && item.binary.data) {\n    const buf = await this.helpers.getBinaryDataBuffer(0, 'data');\n    knowledge = JSON.parse(buf.toString('utf8'));\n  } else if (item.json && (item.json.documents || item.json.reply_rules || item.json.company)) {\n    knowledge = item.json;\n  }\n} catch (error) {\n  knowledge = {};\n}\nconst company = knowledge.company || {};\nreturn [{\n  json: {\n    ...settings,\n    company_name: settings.company_name || company.company_name || '',\n    assistant_name: settings.assistant_name || company.assistant_name_en || company.assistant_name || '',\n    signature: settings.signature || company.signature_en || '',\n    reply_rules: knowledge.reply_rules || '',\n    documents: knowledge.documents || [],\n    trips: knowledge.trips || [],\n    strict_qa: knowledge.strict_qa || [],\n    facebook_ads: knowledge.facebook_ads || {},\n    learned_corrections: knowledge.learned_corrections || [],\n    knowledge_loaded: Boolean(knowledge.documents && knowledge.documents.length),\n    context_marker: 'prepare'\n  }\n}];"
+      },
+      "id": "code-2",
+      "name": "Prepare context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "crm_base_url",
+              "leftValue": "={{ $json.crm_base_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-2",
+      "name": "External CRM set?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1980,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.crm_base_url.replace(/\\/$/, '') + '?phone=' + encodeURIComponent($json.sender_phone || '') + '&email=' + encodeURIComponent($json.sender_email || '') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.crm_api_token }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "http-2",
+      "name": "Lookup external CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Prepare context').first().json;\nconst incoming = $input.first().json;\nconst crmText = incoming.context_marker === 'prepare' ? '' : JSON.stringify(incoming).slice(0, 4000);\n\nfunction tokens(value) {\n  return new Set(String(value || '').toLowerCase().split(/[^0-9A-Za-z\\u0600-\\u06FF]+/).filter((word) => word.length > 2));\n}\nfunction score(query, text) {\n  const wanted = tokens(query);\n  const found = tokens(text);\n  let count = 0;\n  for (const word of wanted) {\n    if (found.has(word)) count += 1;\n  }\n  return count;\n}\nfunction norm(value) {\n  return String(value || '').toLowerCase().replace(/[^\\u0600-\\u06FFa-z0-9\\s]/g, ' ').replace(/\\s+/g, ' ').trim();\n}\n\nconst question = norm(ctx.content);\nlet strictAnswer = '';\nfor (const rule of ctx.strict_qa || []) {\n  if (rule.is_enabled === false) continue;\n  if (norm(rule.question) && norm(rule.question) === question) {\n    strictAnswer = String(rule.answer || '').trim();\n    break;\n  }\n}\n\nconst rankedDocs = (ctx.documents || [])\n  .map((doc) => ({ doc, score: score(ctx.content, (doc.filename || '') + '\\n' + (doc.content || '')) }))\n  .filter((row) => row.score > 0)\n  .sort((a, b) => b.score - a.score)\n  .slice(0, 4)\n  .map((row) => row.doc);\nconst docs = rankedDocs.length ? rankedDocs : (ctx.documents || []).slice(0, 2);\nlet docText = docs.map((doc) => '### ' + (doc.filename || 'document') + '\\n' + String(doc.content || '').slice(0, 3500)).join('\\n\\n');\n\nconst rankedTrips = (ctx.trips || [])\n  .map((trip) => ({ trip, score: score(ctx.content, (trip.title || '') + '\\n' + (trip.description || '')) }))\n  .filter((row) => row.score > 0)\n  .sort((a, b) => b.score - a.score)\n  .slice(0, 3)\n  .map((row) => row.trip);\nconst tripText = rankedTrips.map((trip) => '- ' + trip.title + ': ' + String(trip.description || '').slice(0, 400)).join('\\n');\n\nconst adLines = Object.entries(ctx.facebook_ads || {}).map(([id, item]) => id + ' => ' + (item.program || item.family || '')).join('\\n');\nconst examples = (ctx.learned_corrections || []).slice(-5).map((row) => JSON.stringify(row).slice(0, 300)).join('\\n');\n\nconst system = [\n  'You are ' + (ctx.assistant_name || 'the assistant') + ' for ' + (ctx.company_name || 'the company') + '.',\n  'Reply in the customer language. Use only the knowledge below and the CRM lookup. If a fact is missing, say you will check with the team. Do not invent prices, phone numbers, or booking times.',\n  'If the customer explicitly asks for a human, start the reply with [ESCALATE].',\n  ctx.signature ? ('Sign the reply with:\\n' + ctx.signature) : '',\n  'REPLY RULES:\\n' + String(ctx.reply_rules || '').slice(0, 6000),\n  'DOCUMENTS:\\n' + docText.slice(0, 14000),\n  tripText ? ('TRIPS:\\n' + tripText) : '',\n  adLines ? ('AD MAP:\\n' + adLines) : '',\n  examples ? ('STYLE EXAMPLES:\\n' + examples) : ''\n].filter(Boolean).join('\\n\\n');\n\nconst user = [\n  ctx.sender_name ? ('Customer: ' + ctx.sender_name) : '',\n  ctx.sender_phone ? ('Phone: ' + ctx.sender_phone) : '',\n  ctx.sender_email ? ('Email: ' + ctx.sender_email) : '',\n  ctx.history_text ? ('Recent messages:\\n' + ctx.history_text) : '',\n  crmText ? ('External CRM lookup:\\n' + crmText) : '',\n  'Latest message:\\n' + ctx.content\n].filter(Boolean).join('\\n\\n');\n\nreturn [{\n  json: {\n    ...ctx,\n    system_prompt: system,\n    user_prompt: user,\n    strict_answer: strictAnswer,\n    use_llm: !strictAnswer\n  }\n}];"
+      },
+      "id": "code-3",
+      "name": "Build prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "use_llm",
+              "leftValue": "={{ $json.use_llm }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-3",
+      "name": "Needs model?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.llm_base_url.replace(/\\/$/, '') + '/chat/completions' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.llm_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $json.llm_model, temperature: 0.2, messages: [{ role: 'system', content: $json.system_prompt }, { role: 'user', content: $json.user_prompt }] }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "http-3",
+      "name": "Ask model",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3020,
+        180
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const built = $('Build prompt').first().json;\nconst llmReply = $json.choices && $json.choices[0] && $json.choices[0].message && $json.choices[0].message.content;\nlet reply = String(llmReply || built.strict_answer || '').trim();\nlet escalate = /\\[ESCALATE\\]/i.test(reply);\nreply = reply\n  .replace(/\\[ESCALATE\\]/gi, '')\n  .replace(/\\[LANGUAGE:[^\\]]+\\]/gi, '')\n  .replace(/\\[INTENT:[^\\]]+\\]/gi, '')\n  .replace(/\\[DEPT:[^\\]]+\\]/gi, '')\n  .trim();\nif (!reply) {\n  reply = 'Thank you for your message. A teammate will follow up shortly.';\n  escalate = true;\n}\nconst accountId = built.account_id || built.chatwoot_account_id;\nreturn [{\n  json: {\n    ...built,\n    reply,\n    escalate,\n    account_id: accountId\n  }\n}];"
+      },
+      "id": "code-4",
+      "name": "Finalize reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.chatwoot_base_url.replace(/\\/$/, '') + '/api/v1/accounts/' + $json.account_id + '/conversations/' + $json.conversation_id + '/messages' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $json.chatwoot_api_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: $json.reply, message_type: 'outgoing', private: false }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "http-4",
+      "name": "Send Chatwoot reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3540,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "escalate",
+              "leftValue": "={{ $('Finalize reply').item.json.escalate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-4",
+      "name": "Escalate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Finalize reply').item.json.chatwoot_base_url.replace(/\\/$/, '') + '/api/v1/accounts/' + $('Finalize reply').item.json.account_id + '/conversations/' + $('Finalize reply').item.json.conversation_id + '/messages' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Finalize reply').item.json.chatwoot_api_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'AI asked for a human agent.', message_type: 'outgoing', private: true }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "http-5",
+      "name": "Private note",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4060,
+        180
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Finalize reply').item.json.chatwoot_base_url.replace(/\\/$/, '') + '/api/v1/accounts/' + $('Finalize reply').item.json.account_id + '/conversations/' + $('Finalize reply').item.json.conversation_id + '/toggle_status' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Finalize reply').item.json.chatwoot_api_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: 'pending' }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "http-6",
+      "name": "Mark pending",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4320,
+        180
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Chatwoot Webhook": {
+      "main": [
+        [
+          {
+            "node": "Keep customer messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep customer messages": {
+      "main": [
+        [
+          {
+            "node": "Company settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company settings": {
+      "main": [
+        [
+          {
+            "node": "Knowledge URL set?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge URL set?": {
+      "main": [
+        [
+          {
+            "node": "Load knowledge URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read knowledge file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load knowledge URL": {
+      "main": [
+        [
+          {
+            "node": "Prepare context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read knowledge file": {
+      "main": [
+        [
+          {
+            "node": "Prepare context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare context": {
+      "main": [
+        [
+          {
+            "node": "External CRM set?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "External CRM set?": {
+      "main": [
+        [
+          {
+            "node": "Lookup external CRM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup external CRM": {
+      "main": [
+        [
+          {
+            "node": "Build prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build prompt": {
+      "main": [
+        [
+          {
+            "node": "Needs model?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs model?": {
+      "main": [
+        [
+          {
+            "node": "Ask model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask model": {
+      "main": [
+        [
+          {
+            "node": "Finalize reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize reply": {
+      "main": [
+        [
+          {
+            "node": "Send Chatwoot reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Chatwoot reply": {
+      "main": [
+        [
+          {
+            "node": "Escalate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate?": {
+      "main": [
+        [
+          {
+            "node": "Private note",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Private note": {
+      "main": [
+        [
+          {
+            "node": "Mark pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

@@ -4,6 +4,7 @@ import logging
 import re
 import json
 import threading
+import time
 import html as html_lib
 import httplib2
 import google_auth_httplib2
@@ -344,6 +345,16 @@ class GmailService:
             logging.warning(f"Failed to fetch Gmail profile email: {e}")
             return None
 
+    def quota_pause_active(self):
+        return float(getattr(self, "_quota_blocked_until", 0) or 0) > time.time()
+
+    def _remember_quota_block(self, error):
+        text = str(error or "").lower()
+        if "quota exceeded" not in text and "ratelimitexceeded" not in text:
+            return False
+        self._quota_blocked_until = time.time() + 70
+        return True
+
     def _is_retryable_tls_error(self, error):
         err_text = str(error or "").strip().lower()
         return any(token in err_text for token in (
@@ -460,10 +471,16 @@ class GmailService:
             return True
 
         except HttpError as error:
-            logging.error(f"An error occurred sending email: {error}")
+            if self._remember_quota_block(error):
+                logging.warning("Gmail send paused because the per-minute quota was reached: %s", error)
+            else:
+                logging.error(f"An error occurred sending email: {error}")
             return False
         except Exception as e:
-            logging.error(f"Unexpected error sending email: {e}")
+            if self._remember_quota_block(e):
+                logging.warning("Gmail send paused because the per-minute quota was reached: %s", e)
+            else:
+                logging.error(f"Unexpected error sending email: {e}")
             return False
 
     def get_label_id_by_name(self, label_name):
@@ -495,18 +512,23 @@ class GmailService:
             if "is:unread" not in final_query.lower():
                 final_query = (final_query + " is:unread").strip()
                 
+            list_kwargs = {
+                "userId": "me",
+                "q": final_query,
+                "maxResults": max_results,
+            }
+            if label_id:
+                list_kwargs["labelIds"] = [label_id]
             results = self._execute_gmail_call(
                 "gmail thread search",
-                lambda service: service.users().threads().list(
-                    userId='me',
-                    labelIds=[label_id],
-                    q=final_query,
-                    maxResults=max_results
-                ).execute(),
+                lambda service: service.users().threads().list(**list_kwargs).execute(),
             )
             return results.get('threads', [])
         except Exception as e:
-            logging.error(f"Error searching threads: {e}")
+            if self._remember_quota_block(e):
+                logging.warning("Gmail thread search paused because the per-minute quota was reached: %s", e)
+            else:
+                logging.error(f"Error searching threads: {e}")
             return []
 
     def _get_body_from_payload(self, payload):
@@ -903,13 +925,19 @@ class GmailService:
             if status == 404 or "not found" in str(e).lower():
                 logging.info("Gmail thread %s is not in this mailbox.", thread_id)
                 return []
-            logging.error(f"Error retrieving thread history: {e}")
+            if self._remember_quota_block(e):
+                logging.warning("Gmail thread history paused because the per-minute quota was reached: %s", e)
+            else:
+                logging.error(f"Error retrieving thread history: {e}")
             return []
         except Exception as e:
             if "not found" in str(e).lower():
                 logging.info("Gmail thread %s is not in this mailbox.", thread_id)
                 return []
-            logging.error(f"Error retrieving thread history: {e}")
+            if self._remember_quota_block(e):
+                logging.warning("Gmail thread history paused because the per-minute quota was reached: %s", e)
+            else:
+                logging.error(f"Error retrieving thread history: {e}")
             return []
 
     def modify_thread_labels(self, thread_id, add_labels=None, remove_labels=None):
@@ -934,5 +962,8 @@ class GmailService:
             logging.info(f"Thread {thread_id} labels updated.")
             return True
         except Exception as e:
-            logging.error(f"Error modifying thread labels: {e}")
+            if self._remember_quota_block(e):
+                logging.warning("Gmail label update paused because the per-minute quota was reached: %s", e)
+            else:
+                logging.error(f"Error modifying thread labels: {e}")
             return False

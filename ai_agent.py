@@ -514,6 +514,8 @@ def _should_suppress_internal_error_alert(record):
         or "connection attempt failed" in message_text
     ):
         return True
+    if "quota exceeded" in message_text or "ratelimitexceeded" in message_text:
+        return True
     return False
 
 
@@ -51096,6 +51098,10 @@ Draft to optimize:
         gmail_service = gmail_service or self.gmail_service
         email_config = email_config or (self.config.get('email', {}) or {})
 
+        if gmail_service and gmail_service.quota_pause_active():
+            logging.info("Gmail check paused for %s until the per-minute quota resets.", account_name)
+            return
+
         logging.info(f"Checking for new emails... ({account_name})")
         
         labels_config = email_config.get('labels', {})
@@ -51131,18 +51137,53 @@ Draft to optimize:
         # 1. Search Configured Label
         exclude_processed = f' -label:"{processed_label_name}"' if processed_label_name else ""
         exclude_starred = " -is:starred" if ignore_starred else ""
+        # Review notices stay out of the customer search. They are marked read separately.
+        exclude_review = ' -subject:"new review on GetYourGuide"'
+
+        def _drop_from_unread_queue(thread_id):
+            remove_labels = ["UNREAD"]
+            if search_label_id:
+                remove_labels.append(search_label_id)
+            if sharm_label_id:
+                remove_labels.append(sharm_label_id)
+            add_labels = [processed_label_id] if processed_label_id else []
+            gmail_service.modify_thread_labels(thread_id, add_labels=add_labels, remove_labels=remove_labels)
+
+        # Mark the existing review backlog read without downloading each thread.
+        review_threads = gmail_service.get_unread_threads(
+            None,
+            max_results=15,
+            query_q='newer_than:2d subject:"new review on GetYourGuide"',
+        ) or []
+        if review_threads:
+            marked_reviews = 0
+            for review_thread in review_threads:
+                if gmail_service.quota_pause_active():
+                    break
+                review_id = review_thread.get("id")
+                if review_id and gmail_service.modify_thread_labels(review_id, remove_labels=["UNREAD"]):
+                    marked_reviews += 1
+            if marked_reviews:
+                logging.info(
+                    "Marked %s GetYourGuide review threads read (%s).",
+                    marked_reviews,
+                    account_name,
+                )
+        if gmail_service.quota_pause_active():
+            logging.info("Gmail check paused for %s until the per-minute quota resets.", account_name)
+            return
         
         if search_label_id:
              # Add newer_than:2d to filter out old emails from the search result itself
              # Add -label:processed_label_name to prevent re-processing
-             q_str = f'newer_than:2d{exclude_processed}{exclude_starred}'
+             q_str = f'newer_than:2d{exclude_processed}{exclude_starred}{exclude_review}'
              label_threads = gmail_service.get_unread_threads(search_label_id, max_results=500, query_q=q_str)
              threads.extend(label_threads)
 
         # 1.5 Search Sharm Label
         if sharm_label_id:
              logging.info(f"Searching '{sharm_label_name}' for unread emails...")
-             q_str = f'newer_than:2d{exclude_processed}{exclude_starred}'
+             q_str = f'newer_than:2d{exclude_processed}{exclude_starred}{exclude_review}'
              sharm_threads = gmail_service.get_unread_threads(sharm_label_id, max_results=500, query_q=q_str)
              # Deduplicate
              existing_ids = {t['id'] for t in threads}
@@ -51154,7 +51195,7 @@ Draft to optimize:
         # 2. Search Inbox (if enabled)
         if search_in_inbox:
              logging.info("Searching INBOX for unread emails...")
-             q_str = f'newer_than:2d{exclude_processed}{exclude_starred}'
+             q_str = f'newer_than:2d{exclude_processed}{exclude_starred}{exclude_review}'
              inbox_threads = gmail_service.get_unread_threads('INBOX', max_results=500, query_q=q_str)
 
              
@@ -51181,6 +51222,12 @@ Draft to optimize:
                 thread_id = thread['id']
                 # Get full thread history for context
                 history = gmail_service.get_thread_history(thread_id)
+                if gmail_service.quota_pause_active():
+                    logging.warning(
+                        "Stopped reading more email threads because Gmail per-minute quota was reached (%s).",
+                        account_name,
+                    )
+                    break
                 
                 if not history:
                     continue
@@ -51235,22 +51282,14 @@ Draft to optimize:
                 is_blocked = any(bd.lower() in sender.lower() for bd in blocked_domains)
                 if is_blocked:
                     logging.info(f"Skipping email from {sender} (Blocked Domain).")
-                    remove_labels_list = []
-                    if search_label_id: remove_labels_list.append(search_label_id)
-                    if sharm_label_id: remove_labels_list.append(sharm_label_id)
-                    gmail_service.modify_thread_labels(thread_id, add_labels=[processed_label_id] if processed_label_id else [], remove_labels=remove_labels_list)
+                    _drop_from_unread_queue(thread_id)
                     continue
                 
                 # --- SPECIAL IGNORE: GetYourGuide Reviews ---
                 # "You have a new review on GetYourGuide"
                 if "new review on getyourguide" in subject.lower():
                     logging.info("Skipping GetYourGuide Review Notification.")
-                    # Mark as processed to remove from queue
-                    remove_labels_list = []
-                    if search_label_id: remove_labels_list.append(search_label_id)
-                    if sharm_label_id: remove_labels_list.append(sharm_label_id)
-                    
-                    gmail_service.modify_thread_labels(thread_id, remove_labels=remove_labels_list)
+                    _drop_from_unread_queue(thread_id)
                     continue
 
                 # --- SPECIAL IGNORE: Prevent Infinite Loop from GYG Auto-Forwards ---
@@ -51273,12 +51312,7 @@ Draft to optimize:
 
                 if is_pure_auto_forward:
                     logging.info("Skipping GYG Auto-Forward of our own reply to prevent infinite loop.")
-                    remove_labels_list = []
-                    if search_label_id: remove_labels_list.append(search_label_id)
-                    if sharm_label_id: remove_labels_list.append(sharm_label_id)
-                    
-                    # Add processed label so it doesn't get picked up again
-                    gmail_service.modify_thread_labels(thread_id, add_labels=[processed_label_id] if processed_label_id else [], remove_labels=remove_labels_list)
+                    _drop_from_unread_queue(thread_id)
                     continue
 
                 # --- SPECIAL IGNORE: Prevent Duplicate Processing of our own Last Reply ---
@@ -51297,11 +51331,7 @@ Draft to optimize:
                     
                     if len(text_before_gyg.strip()) < 50:
                         logging.info("Detected FTS Travels signature/template in incoming email. Skipping to prevent infinite loop.")
-                        remove_labels_list = []
-                        if search_label_id: remove_labels_list.append(search_label_id)
-                        if sharm_label_id: remove_labels_list.append(sharm_label_id)
-                        
-                        gmail_service.modify_thread_labels(thread_id, add_labels=[processed_label_id] if processed_label_id else [], remove_labels=remove_labels_list)
+                        _drop_from_unread_queue(thread_id)
                         continue
 
                 # --- CHECK FOR SUPPLIER BOOKING EMAIL ---

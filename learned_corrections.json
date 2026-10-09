@@ -1,23 +1,5 @@
 [
   {
-    "timestamp": "2026-10-01T02:11:13.927230",
-    "original": "نتيجة القرعة الرسمية يوم ٣٠ سبتمبر ٢٠٢٦، والقبول فيها بيكون من خلال القرعة الإلكترونية تحت إشراف وزارة السياحة — يعني مفيش ساعة محددة معلنة، والنتيجة بتظهر في اليوم نفسه بإذن الله.\n\nوعشان نطمن حضرتك خطوة بخطوة، أسهل حاجة أكلمك دقيقتين وأقولك كل التفاصيل — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "الساعه 4 عصرا ان شاء الله",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-10-01T02:17:56.176243",
-    "original": "تمام يا فندم، وصلت رسالتك بخصوص المبلغ 🙏\n\nبخصوص المبلغ اللي حضرتك بعته، عايز أطمنك إننا سجلناه في ملاحظات الحساب، وفريق الحسابات هيراجعه ويتواصل مع حضرتك للتأكيد. ولو حضرتك تقصد إن ده مبلغ جدية الحجز، فده بيتم تثبيته رسميًا بعد المكالمة مع فريق التسجيل.\n\nممكن حضرتك تبعتلي رقم الموبايل (واتساب) عشان فريق الحسابات يتواصل معاك مباشرة ويأكدلك كل التفاصيل؟ 📞",
-    "corrected": "ان شاء الله هيتحولوا لحضرتك من الشركه خلال 48 ساعه - لان ليس لهم علاقه بمبلغ جدية الحجز",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-10-01T02:21:09.554821",
-    "original": "أهلاً بحضرتك يا أستاذة إيمان 🕋\n\nبخصوص سؤال حضرتك عن الساعة — أقدر أقولك إن نتيجة القرعة الرسمية يوم ٣٠ سبتمبر ٢٠٢٦، والتسجيل بيقفل يوم ٢٧ سبتمبر.\n\nولو حضرتك بتسألي عن ميعاد معين تاني (زي موعد المكالمة أو موعد التسجيل)، قوليلي بالظبط عن إيه وأنا أجاوبك على طول.\n\nأسهل حاجة أشرحلك كل التفاصيل في مكالمة دقيقتين — أكلم حضرتك على أي رقم؟ 📞",
-    "corrected": "الساعه 4 العصر ان شاء الله يوم الثلاثاء",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-01T02:21:37.389649",
     "original": "تمام يا فندم، تحت أمرك في أي وقت 🌿\n\nلو حبيت تعرف أي تفاصيل عن برامج الحج أو العمرة، أو حابب تثبت مكانك، أنا معاك.",
     "corrected": "ربنا يجبر بخاطر حضرتك، وكلمة زي دي في وقت زي ده مش سهلة، واحنا حاسين بده.\n\nسعي حضرتك ونيتك مش ضايعين، دول مكتوبين عند ربنا، وربنا لما يأخّر حاجة بيعوّض بأحسن منها. وإن شاء الله السنة الجاية تكون الوقفة قدام الكعبة بإذن الله.\n\nاحنا موجودين مع حضرتك في أي وقت، وبنتشرف بكده دايمًا.",
@@ -597,6 +579,24 @@
     "timestamp": "2026-10-09T08:16:36.654385",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you for providing your room number — I have safely noted **Room 3434** for your booking.\n\nyour pickup arrangements for the **Cairo by Bus Hurghada — Pyramids & Egyptian Museum for First-Time Visitors** trip on **11 October 2026** from **Makadi Palace** will be finalized. Your confirmed pickup time will be sent to you via WhatsApp and email the day before your trip, typically by 6:00 PM.\n\nBest regards,",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-09T08:29:02.581411",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Да, конечно! Вы можете обсудить это с гидом во время экскурсии, и он поможет вам всё организовать. 😊",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-09T08:47:29.056015",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Bonsoir Franz, veuillez vous diriger vers le comptoir d’enregistrement (check-in) du Terminal 1, s’il vous plaît. Merci !",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-09T08:56:47.169677",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you for reaching out and for the detailed information — it is completely fine that you do not have your final hotel confirmed yet.\n\nI have safely noted the following details for your booking **GYGBLHAKH4G6** (Cairo: Customizable Private Tour with Guide & Car, on 27 October 2026):\n\n- **Travelers:** 3 adults — Andrea Kunz, Horst Oehme, Daniela Oehme\n- **Arrival:** Late on 26 October in Cairo (via Phoenixreisen)\n- **Hotel:** Not yet confirmed (possibly Concorde El Salam)\n\nThere is no problem at all with this. As soon as you receive your exact hotel name and room number from Phoenixreisen, simply reply to this email and I will add it to your booking right away. Your confirmed pickup time and driver details will be sent to you the day before your tour, typically by 6:00 PM.\n\nWe are just as excited as you are — Cairo is truly unforgettable, and your guide will make sure you experience it at its very best!\n\nBest regards,",
     "context": "UI Manual Edit"
   }
 ]

@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-10-03T01:56:44.574361",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Guten Tag,\n\nvielen Dank für Ihre Nachricht.\n\nBitte beachten Sie, dass für Ihre Buchung ein gemeinsames Zimmer für beide Personen vorgesehen ist. Es handelt sich nicht um zwei separate Zimmer.\n\nFalls Sie noch Fragen zu Ihrer Unterkunft oder zu Ihrer Buchung haben, können Sie sich jederzeit gerne an uns wenden.\n\nMit freundlichen Grüßen\nFTS Travels Customer Support Team",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-03T02:01:39.791354",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you very much for sharing your room number with us. We have received the information and updated your booking accordingly.\n\nWe appreciate your cooperation and look forward to welcoming you on your trip.\n\nKind regards,\nFTS Travels Customer Support Team",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-10T04:58:51.150626",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you for your kind words, and for such a thoughtful question ahead of your trip.\n\nRegarding shorts: Egypt is a warm destination and casual summer clothing is perfectly fine for your day trip to Cairo and Giza. For the outdoor sites — the Giza Pyramids and the open areas — shorts are generally acceptable for both your 17-year-old son and your 14-year-old daughter.\n\nFor the Egyptian Museum, which is an indoor cultural site, we do recommend slightly more modest attire as a sign of respect, though shorts are still commonly worn by visitors. As a general tip for the whole family, light, breathable clothing, comfortable walking shoes, a hat, and sunscreen will make the day much more enjoyable.\n\nIf you'd like, I can also share a few more practical tips for the day to help you all feel fully prepared.",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-10T05:44:11.635443",
+    "original": "As this booking was made via Headout, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Thank you so much for your wonderful feedback! We are absolutely thrilled to hear that you loved your Giza Complex Skip-the-Line experience and your visit inside the Great Pyramid. It truly is an unforgettable adventure, and it means the world to us that you had such a great time with us.\n\nIf you haven't already, we would be so grateful if you could share your experience on TripAdvisor or Google — your kind words help other travellers discover these magical moments in Egypt.\n\nWe hope to see you again on your next visit to Egypt!",
     "context": "UI Manual Edit"
   }
 ]

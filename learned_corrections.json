@@ -1,17 +1,5 @@
 [
   {
-    "timestamp": "2026-10-03T04:04:57.865046",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you for letting us know. If you have a valid EU student ID, please make sure to bring it with you on the day of the tour.\n\nThe student discount is available for any additional entrance tickets or attractions that are not included in your current booking. If you decide to add any additional visits during the tour, our guide will assist you with the arrangements and apply the applicable student discount upon presentation of your valid student ID.\n\nYour current booking remains unchanged, and the discount does not apply to the services already included in your reservation.\n\nWe look forward to welcoming you and hope you have a wonderful experience with us.",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-10-03T04:16:31.282172",
-    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you for reaching out with your question about the Luxor Valley of the Kings & Tutankhamun Tomb Trip.\n\nRegarding your query about the guide's presence during ticket purchases: yes, your Egyptologist guide will remain with you throughout the entire experience. They will accompany you while you purchase your entrance tickets on-site using your student IDs, and they will stay with you for the full duration of the tour — guiding you through the Valley of the Kings, Karnak Temple, and all other sites on the itinerary. You will not be left on your own at any point.\n\nA quick note on the student discount: please make sure to bring your valid student IDs with you on the day of the tour, as the discount is applied at the ticket office upon presentation of the ID.\n\nYour booking is confirmed for Monday, October 5, 2026, with pickup from Edlma Sahl Hasheesh (Room B107). Your confirmed pickup time will be sent to you via WhatsApp and email one day before your trip, typically by 6:00 PM.\n\nIf there is anything else you would like to know about the itinerary or what to expect on the day, I am happy to help.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-03T04:18:19.411933",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "vielen Dank für Ihre freundliche Nachricht und Ihre Geduld.\n\nEs freut mich sehr, dass Sie sich auf die Informationen zum Großen Ägyptischen Museum (GEM) freuen. Das GEM ist eines der beeindruckendsten Museen der Welt, und die Sammlung – insbesondere die Schätze von Tutanchamun – wird Sie sicher begeistern.\n\nBezüglich Ihrer Zimmernummer: Das ist überhaupt kein Problem. Sie können uns diese gerne am **1. Dezember 2026** nach Ihrer Ankunft im Hotel (ab ca. 15:00 Uhr) mitteilen. Sobald uns Ihre Zimmernummer vorliegt, aktualisieren wir Ihre Buchung umgehend und senden Ihnen die bestätigte Abholzeit zu. Diese erhalten Sie in der Regel einen Tag vor dem Ausflug per WhatsApp und E-Mail.\n\nWeitere Angaben benötigen wir derzeit nicht – Ihre Teilnehmerdaten (Herr Roland Ayx und Frau Karin Ayx), Ihr Hotel (Cleopatra Luxury Beach Resort Makadi Bay, Adults Only) sowie die bestätigte deutschsprachige Führung sind bereits vollständig in Ihrer Buchung hinterlegt.",
@@ -597,6 +585,18 @@
     "timestamp": "2026-10-10T07:07:37.859314",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Dear Abdellah and Yasmine,\n\nThank you for your patience.\n\nYour final pickup details will be sent to you by email today before 7:00 PM.\n\nThank you for your understanding, and we look forward to welcoming you on your tour!\n\nBest regards,\nFTS Travels Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-10T08:09:32.337835",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nإذا ترغب بالتحدث مع فريق الكواليتي، اكتب: جودة\n\nمع خالص التحية،\nفرح",
+    "corrected": "Hello, may I ask you if everything is good with you?",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-10T08:14:36.287330",
+    "original": "Thank you for your message. I'm confirming the exact pricing/fees and payment details with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Hello,\n\nThank you for reaching out and for the detailed information regarding the family's trip to Luxor for the eclipse on August 2nd, 2027.\n\nTo assist you more efficiently and provide you with all the necessary details, could you please share your WhatsApp number? This will allow us to contact you easily, better understand your request, and send you all the relevant information.\n\nWe look forward to hearing from you.",
     "context": "UI Manual Edit"
   }
 ]

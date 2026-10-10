@@ -1,17 +1,5 @@
 [
   {
-    "timestamp": "2026-10-03T02:01:39.791354",
-    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you very much for sharing your room number with us. We have received the information and updated your booking accordingly.\n\nWe appreciate your cooperation and look forward to welcoming you on your trip.\n\nKind regards,\nFTS Travels Customer Support Team",
-    "context": "UI Manual Edit"
-  },
-  {
-    "timestamp": "2026-10-03T04:00:57.049615",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "Thank you for sending over your details. I have safely noted your hotel (Empire Hotel Aqua Park, Hurghada), room number (502), and that there are no children on this booking. These details will be linked to your reservation automatically.\n\nI can also confirm your pickup details for your **Hurghada to Cairo: Pyramids & Museum for First-Time Visitors** tour:\n\n- **Booking Reference:** GYG996R2X25X\n- **Date:** Sunday, 4 October 2026\n- **Pickup Time:** 00:50\n- **Pickup Location:** Empire Hotel Aqua Park\n\nPlease be ready at your hotel entrance about 5 minutes before 00:50, and keep your phone reachable in case the driver needs to contact you.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-03T04:04:57.865046",
     "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you for letting us know. If you have a valid EU student ID, please make sure to bring it with you on the day of the tour.\n\nThe student discount is available for any additional entrance tickets or attractions that are not included in your current booking. If you decide to add any additional visits during the tour, our guide will assist you with the arrangements and apply the applicable student discount upon presentation of your valid student ID.\n\nYour current booking remains unchanged, and the discount does not apply to the services already included in your reservation.\n\nWe look forward to welcoming you and hope you have a wonderful experience with us.",
@@ -597,6 +585,18 @@
     "timestamp": "2026-10-10T05:44:11.635443",
     "original": "As this booking was made via Headout, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Thank you so much for your wonderful feedback! We are absolutely thrilled to hear that you loved your Giza Complex Skip-the-Line experience and your visit inside the Great Pyramid. It truly is an unforgettable adventure, and it means the world to us that you had such a great time with us.\n\nIf you haven't already, we would be so grateful if you could share your experience on TripAdvisor or Google — your kind words help other travellers discover these magical moments in Egypt.\n\nWe hope to see you again on your next visit to Egypt!",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-10T06:40:40.274762",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Hello Margherita,\n\nWe confirm that your pickup tomorrow will be from Xperience St. George Beach Resort, not Sunterra Resort.\n\n📍 Pickup location: Xperience St. George Beach Resort\n⏰ Pickup time: 7:25 AM\n🏨 Room number: 1010\n\nEverything is noted with our operations team. Please be ready 5 minutes before pickup time, and keep your WhatsApp available in case of any updates.\n\nThank you for your cooperation, and we look forward to welcoming you on your trip!\n\nBest regards,\nAzzam\nFTS Travels – Quality Team",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-10T07:07:37.859314",
+    "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Abdellah and Yasmine,\n\nThank you for your patience.\n\nYour final pickup details will be sent to you by email today before 7:00 PM.\n\nThank you for your understanding, and we look forward to welcoming you on your tour!\n\nBest regards,\nFTS Travels Team",
     "context": "UI Manual Edit"
   }
 ]

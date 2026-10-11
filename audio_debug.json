@@ -251650,3 +251650,199 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB0D86CB8619DC7FA208F",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0D86CB8619DC7FA208F",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "حاليا هنجرب ال AI في الرد علي رسايل الواتس اب والايميل للغردقه قاهرة وشرم الشيخ وهنختبره ونشوف لو شغال تمام ولا محتاج اي تعديل تاني",
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 176,
+          "1": 160,
+          "2": 212,
+          "3": 179,
+          "4": 44,
+          "5": 166,
+          "6": 149,
+          "7": 79,
+          "8": 113,
+          "9": 48,
+          "10": 12,
+          "11": 144,
+          "12": 70,
+          "13": 76,
+          "14": 40,
+          "15": 117,
+          "16": 72,
+          "17": 238,
+          "18": 44,
+          "19": 200,
+          "20": 49,
+          "21": 170,
+          "22": 40,
+          "23": 18,
+          "24": 188,
+          "25": 27,
+          "26": 23,
+          "27": 56,
+          "28": 189,
+          "29": 205,
+          "30": 224,
+          "31": 213
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791753785,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T14:23:06.027Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0B930A53DA3EE56C6B7"
+    },
+    "keyId": "3EB0B930A53DA3EE56C6B7",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:6067 in query_ai\nLogger: root\nReason: All AI providers failed. Last error: Provider openai failed: 401 Client Error: Unauthorized for url: https://api.openai.com/v1/chat/completions\nAt: 2026-10-11 14:39:05"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791581945,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791754745,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T14:39:06.422Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB031C237CBF4541252C7"
+    },
+    "keyId": "3EB031C237CBF4541252C7",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:10504 in generate_smart_reply\nLogger: root\nReason: AI generation failed silently. No message will be sent to the user.\nAt: 2026-10-11 14:39:08"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791581948,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791754748,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T14:39:09.645Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB04E9E92A696CBE8ABFB"
+    },
+    "keyId": "3EB04E9E92A696CBE8ABFB",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "Here is the Daily Report for today:\n Report Name: تقرير_الحجوزات_2026-10-12.html\n Dowmload:https://drive.google.com/file/d/18rfBZqW92mqXV2njUX4YKiR7LaU3ckrW/view?usp=drivesdk"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791582149,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791754949,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T14:42:30.669Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

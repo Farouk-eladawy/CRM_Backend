@@ -246582,3 +246582,338 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB00DCD0127BE4E2669E0",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB00DCD0127BE4E2669E0",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 32,
+          "1": 231,
+          "2": 253,
+          "3": 213,
+          "4": 204,
+          "5": 161,
+          "6": 82,
+          "7": 89,
+          "8": 98,
+          "9": 22,
+          "10": 53,
+          "11": 133,
+          "12": 96,
+          "13": 187,
+          "14": 249,
+          "15": 206,
+          "16": 200,
+          "17": 69,
+          "18": 133,
+          "19": 184,
+          "20": 205,
+          "21": 249,
+          "22": 117,
+          "23": 179,
+          "24": 35,
+          "25": 182,
+          "26": 211,
+          "27": 199,
+          "28": 238,
+          "29": 66,
+          "30": 165,
+          "31": 249
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "https://meet.google.com/fxz-sfoi-ujs\nمعانا 10 دقايق الكل يكون حاضر وجاهز من فضلكم @all \nالمحاضرة مدتها 15 دقيقة"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1
+      },
+      "nonJidMentions": 1
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791719975,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T04:59:36.054Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB05DB8B3F820240EA67E"
+    },
+    "keyId": "3EB05DB8B3F820240EA67E",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: ai_agent.py:16565 in send_whatsapp_message\nLogger: root\nReason: Failed to send WhatsApp message. Status: 400, Attempt: 1/3, Response: {\"error\":{\"message\":\"(#131009) Parameter value is not valid\",\"code\":131009,\"type\":\"OAuthException\",\"error_data\":{\"messaging_product\":\"whatsapp\",\"details\":\"The phone number is malformed: Please use the format: +1234567890.\"},\"fbtrace_id\":\"AmHoM4wII3ez-RnxkcNUTqb\"}}\nAt: 2026-10-11 05:01:02"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791547262,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791720062,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T05:01:03.281Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB01E29F9EB98D2E114EF",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB01E29F9EB98D2E114EF",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 231,
+          "1": 198,
+          "2": 118,
+          "3": 97,
+          "4": 104,
+          "5": 132,
+          "6": 161,
+          "7": 80,
+          "8": 244,
+          "9": 251,
+          "10": 26,
+          "11": 245,
+          "12": 79,
+          "13": 177,
+          "14": 108,
+          "15": 22,
+          "16": 102,
+          "17": 160,
+          "18": 199,
+          "19": 183,
+          "20": 1,
+          "21": 214,
+          "22": 194,
+          "23": 224,
+          "24": 227,
+          "25": 39,
+          "26": 103,
+          "27": 196,
+          "28": 202,
+          "29": 73,
+          "30": 185,
+          "31": 181
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "https://meet.google.com/fxz-sfoi-ujs\nمعانا 10 دقايق الكل يكون حاضر وجاهز من فضلكم @all \nالمحاضرة مدتها 15 دقيقة"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790776723,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1,
+        "initiatedByMe": true
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791720696,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T05:11:37.196Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0476C206B23779F6B76"
+    },
+    "keyId": "3EB0476C206B23779F6B76",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Backend Runtime\nSource: gmail_service.py:215 in _ensure_valid_credentials\nLogger: root\nReason: Error refreshing token: HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))\nAt: 2026-10-11 05:15:43"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791548146,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791720947,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T05:15:48.999Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "send.message",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "fromMe": true,
+      "id": "3EB0286D4D74B7CB981918"
+    },
+    "keyId": "3EB0286D4D74B7CB981918",
+    "fromMe": true,
+    "remoteJid": "201010323484@s.whatsapp.net",
+    "pushName": "Você",
+    "status": "PENDING",
+    "message": {
+      "conversation": "🚨 Backend Error Alert\nLevel: ERROR\nCategory: Email\nSource: gmail_service.py:219 in _ensure_valid_credentials\nLogger: root\nReason: Gmail token is missing or revoked. Connect the mailbox from the dashboard. Local browser login is disabled so the API can keep running.\nAt: 2026-10-11 05:15:52"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1791548152,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791720952,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T05:15:55.016Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

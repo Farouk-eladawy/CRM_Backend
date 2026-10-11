@@ -241,10 +241,7 @@
     "audio_guide_base_url": "http://tiqets.ftstravels.com/?GM/ticketId="
   },
   "facebook_auto_reply_enabled": false,
-  "auto_reply_locations": [
-    "Sharm",
-    "Hurghada/Cairo"
-  ],
+  "auto_reply_locations": [],
   "auto_reply_draft_locations": [
     "Religious"
   ],

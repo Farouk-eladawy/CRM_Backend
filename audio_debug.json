@@ -246917,3 +246917,369 @@
   "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
 }
 ---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB06BCBCC3B6EC30FD6AD",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB06BCBCC3B6EC30FD6AD",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 11,
+          "1": 60,
+          "2": 157,
+          "3": 12,
+          "4": 36,
+          "5": 53,
+          "6": 92,
+          "7": 98,
+          "8": 85,
+          "9": 161,
+          "10": 243,
+          "11": 188,
+          "12": 11,
+          "13": 162,
+          "14": 128,
+          "15": 93,
+          "16": 227,
+          "17": 133,
+          "18": 9,
+          "19": 25,
+          "20": 226,
+          "21": 214,
+          "22": 240,
+          "23": 102,
+          "24": 226,
+          "25": 238,
+          "26": 25,
+          "27": 85,
+          "28": 217,
+          "29": 233,
+          "30": 242,
+          "31": 238
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "https://app.tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791722697,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T05:44:57.726Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "cust_coc60258b4bd_790263863510",
+  "data": {
+    "key": {
+      "remoteJid": "201010323484@s.whatsapp.net",
+      "remoteJidAlt": "201010323484@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0F9BC77F765B138704D",
+      "participant": "",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0F9BC77F765B138704D",
+    "fromMe": false,
+    "remoteJid": "183026071916719@lid",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "deviceListMetadata": {
+          "senderKeyIndexes": [],
+          "recipientKeyIndexes": [],
+          "senderKeyHash": {
+            "0": 154,
+            "1": 235,
+            "2": 106,
+            "3": 180,
+            "4": 178,
+            "5": 235,
+            "6": 82,
+            "7": 22,
+            "8": 211,
+            "9": 247
+          },
+          "senderTimestamp": {
+            "low": 1790771332,
+            "high": 0,
+            "unsigned": true
+          },
+          "senderAccountType": 0,
+          "receiverAccountType": 0,
+          "recipientKeyHash": {
+            "0": 234,
+            "1": 80,
+            "2": 250,
+            "3": 143,
+            "4": 35,
+            "5": 153,
+            "6": 40,
+            "7": 170,
+            "8": 13,
+            "9": 255
+          },
+          "recipientTimestamp": {
+            "low": 1790263965,
+            "high": 0,
+            "unsigned": true
+          }
+        },
+        "deviceListMetadataVersion": 2,
+        "messageSecret": {
+          "0": 71,
+          "1": 120,
+          "2": 153,
+          "3": 140,
+          "4": 172,
+          "5": 58,
+          "6": 185,
+          "7": 183,
+          "8": 161,
+          "9": 242,
+          "10": 252,
+          "11": 133,
+          "12": 20,
+          "13": 23,
+          "14": 74,
+          "15": 114,
+          "16": 227,
+          "17": 170,
+          "18": 241,
+          "19": 93,
+          "20": 225,
+          "21": 140,
+          "22": 250,
+          "23": 71,
+          "24": 136,
+          "25": 10,
+          "26": 116,
+          "27": 134,
+          "28": 186,
+          "29": 246,
+          "30": 179,
+          "31": 78
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "https://app.tourcare.ai"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "ephemeralSettingTimestamp": {
+        "low": 1790776723,
+        "high": 0,
+        "unsigned": false
+      },
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1,
+        "initiatedByMe": true
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791722704,
+    "instanceId": "aaa0193b-8e4f-4d9e-8c1e-e180639e1b67",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T05:45:04.955Z",
+  "sender": "201027711222@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "71AF6016-0282-4E30-81E7-4D7A48F6E303"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB01284D28FD7ECFEB17B",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB01284D28FD7ECFEB17B",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 83,
+          "1": 223,
+          "2": 43,
+          "3": 15,
+          "4": 153,
+          "5": 71,
+          "6": 227,
+          "7": 18,
+          "8": 107,
+          "9": 58,
+          "10": 90,
+          "11": 123,
+          "12": 53,
+          "13": 127,
+          "14": 238,
+          "15": 155,
+          "16": 164,
+          "17": 162,
+          "18": 253,
+          "19": 168,
+          "20": 242,
+          "21": 119,
+          "22": 181,
+          "23": 248,
+          "24": 51,
+          "25": 157,
+          "26": 136,
+          "27": 87,
+          "28": 153,
+          "29": 238,
+          "30": 173,
+          "31": 53
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      },
+      "conversation": "https://meet.google.com/zad-wxri-jjw"
+    },
+    "contextInfo": {
+      "mentionedJid": [],
+      "groupMentions": [],
+      "statusAttributions": [],
+      "disappearingMode": {
+        "initiator": 0,
+        "trigger": 1
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791723649,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T06:00:49.559Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---
+{
+  "event": "messages.upsert",
+  "instance": "fts_internal_notifications",
+  "data": {
+    "key": {
+      "remoteJid": "201013498777-1578317593@g.us",
+      "fromMe": false,
+      "id": "3EB0C6871CB54830C5BA6F",
+      "participant": "183026071916719@lid",
+      "participantAlt": "201010323484@s.whatsapp.net",
+      "addressingMode": "lid"
+    },
+    "keyId": "3EB0C6871CB54830C5BA6F",
+    "fromMe": false,
+    "remoteJid": "201013498777-1578317593@g.us",
+    "pushName": "Ahmady Al Adawii",
+    "status": "DELIVERY_ACK",
+    "message": {
+      "conversation": "اللينك الجديد",
+      "messageContextInfo": {
+        "threadId": [],
+        "messageSecret": {
+          "0": 80,
+          "1": 66,
+          "2": 99,
+          "3": 123,
+          "4": 140,
+          "5": 165,
+          "6": 45,
+          "7": 136,
+          "8": 185,
+          "9": 11,
+          "10": 211,
+          "11": 69,
+          "12": 183,
+          "13": 238,
+          "14": 108,
+          "15": 58,
+          "16": 108,
+          "17": 123,
+          "18": 211,
+          "19": 147,
+          "20": 244,
+          "21": 100,
+          "22": 17,
+          "23": 180,
+          "24": 40,
+          "25": 226,
+          "26": 48,
+          "27": 246,
+          "28": 158,
+          "29": 117,
+          "30": 122,
+          "31": 15
+        },
+        "limitSharingV2": {
+          "trigger": 0,
+          "initiatedByMe": false
+        }
+      }
+    },
+    "messageType": "conversation",
+    "messageTimestamp": 1791723658,
+    "instanceId": "b5dcaf4b-e78b-4612-85b8-85117d841021",
+    "source": "web"
+  },
+  "destination": "http://127.0.0.1:5001/api/internal_notifications/whatsapp/webhook",
+  "date_time": "2026-10-11T06:00:58.709Z",
+  "sender": "201090005205@s.whatsapp.net",
+  "server_url": "http://localhost:8080",
+  "apikey": "908E9429-A93A-4CF5-901B-93EF4996E763"
+}
+---

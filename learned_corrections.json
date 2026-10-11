@@ -1,11 +1,5 @@
 [
   {
-    "timestamp": "2026-10-04T07:07:01.053605",
-    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
-    "corrected": "We will send you your exact pickup time the day before the trip. Please keep an eye on your messages.",
-    "context": "UI Manual Edit"
-  },
-  {
     "timestamp": "2026-10-04T07:31:32.753043",
     "original": "الحمد لله على كل حال، وربنا يتمملك على خير ويكتبلك الفوز والقبول 🤲\n\nبخصوص الوصل: تأكيد استلام المبلغ مسؤولية فريق الحسابات، وهما اللي هيبعتولك الوصل الرسمي على الواتساب بعد مراجعة التحويل.\n\nممكن تبعتلي رقم حضرتك عليه واتساب عشان أتابع معاهم ويبعتولك الوصل في أسرع وقت؟",
     "corrected": "تمام يا حاجه مني - ربنا يتتم ليكي علي خير بأذن الله - هبلغ استاذه ايه بارسال الايصال لحضرتك",
@@ -597,6 +591,12 @@
     "timestamp": "2026-10-11T09:13:34.980322",
     "original": "As this booking was made via Viator, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
     "corrected": "Dear Ms. Jackman,\n\nThank you for providing your booking reference and hotel details.\n\nWe have noted your accommodation at Parrotel Aqua Park Resort and your arrival date of Tuesday, 13 October. There is absolutely no problem regarding the room number at this stage; you can simply share it with us once you have checked in.\n\nYour booking for Friday, 16 October, for two adults is noted. We will ensure your details are linked to the reservation so our operations team can arrange your pickup accordingly.\n\nYour confirmed pickup time and final instructions will be sent to you via WhatsApp and email one day before the excursion, typically by 6:00 PM.\n\nThank you for choosing FTS Travels. We look forward to providing you with a wonderful experience!\n\nBest regards,\nFarah Elkhatib\nFTS Travels",
+    "context": "UI Manual Edit"
+  },
+  {
+    "timestamp": "2026-10-11T09:16:20.575709",
+    "original": "As this booking was made via GetYourGuide, any changes, fees, and payment terms are governed by their platform. I'm confirming the exact options and any additional charges with our team now, and we will get back to you shortly.\n\nTo speak with our Quality Team, reply: QUALITY\n\nBest regards,\nFarah Elkhatib",
+    "corrected": "Dear Lucie,\n\nThank you for your lovely message and for sharing your details with us! ☺️\n\nWe have noted the names of both travelers, Lucie Coeuret and Arnaud Lefevre, as well as your accommodation at Dreams Beach Resort.\n\nThere is no problem regarding the room number at this stage. You can share it with us once you arrive and check in on 18 October.\n\nRegarding the meeting point, thank you for your flexibility. We will confirm the appropriate meeting point and provide you with the final pickup instructions one day before your excursion, so everything is clear and convenient for you.\n\nWe’re delighted to hear that you’re excited about your trip! Our team looks forward to welcoming you and helping you enjoy a wonderful experience in Sharm El-Sheikh. ✨\n\nBest regards,\nFarah Elkhatib\nFTS Travels",
     "context": "UI Manual Edit"
   }
 ]
